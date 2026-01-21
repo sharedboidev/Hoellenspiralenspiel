@@ -7,16 +7,19 @@ namespace Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
 public partial class AbilityTooltip : BaseTooltip
 {
-    private double visibilityCooldownMs = 0.5;
     private double timeSinceLastToggle;
     private bool   tooltipIsShowing;
-    public override void _Process(double delta)
+    private double visibilityCooldownMs = 0.5;
+
+    public override void _Process(double delta) => ProcessTestDisplay(delta);
+
+    private void ProcessTestDisplay(double delta)
     {
         if (Input.IsAnythingPressed() && timeSinceLastToggle >= visibilityCooldownMs)
         {
             timeSinceLastToggle = 0;
 
-            if(tooltipIsShowing)
+            if (tooltipIsShowing)
             {
                 Hide();
                 tooltipIsShowing = false;
@@ -45,6 +48,7 @@ public class TestTooltipObject : ITooltipObject
 
     public string GetTooltipDescription() => $"I Bims eine neue Tooltipbeschreibung{Environment.NewLine}Wir haben den {DateTime.Now:dd.MM.yyyy}";
 }
+
 public class TestTooltipObjectContainer : ITooltipObjectContainer
 {
     public ITooltipObject ContainedItem { get; set; }

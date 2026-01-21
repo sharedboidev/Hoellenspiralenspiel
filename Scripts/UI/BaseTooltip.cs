@@ -1,4 +1,5 @@
-﻿using Godot;
+﻿using System;
+using Godot;
 using Hoellenspiralenspiel.Interfaces;
 using Environment = System.Environment;
 
@@ -6,14 +7,14 @@ namespace Hoellenspiralenspiel.Scripts.UI;
 
 public abstract partial class BaseTooltip : PanelContainer
 {
-    public const string         TitlePlaceholder = "Shown Object Title";
-    private      RichTextLabel? ObjectDescriptionLabel { get; set; }
-    private      RichTextLabel? ObjectTitleLabel       { get; set; }
-    public       VBoxContainer? Container              { get; set; }
-    public       Color          ColorRed               => new(0.86f, 0.09f, 0.09f);
-    public       Color          ColorGreen             => new(0.02f, 0.7f, 0.08f);
+    public const string        TitlePlaceholder = "Shown Object Title";
+    private      RichTextLabel ObjectDescriptionLabel { get; set; }
+    private      RichTextLabel ObjectTitleLabel       { get; set; }
+    public       VBoxContainer Container              { get; set; }
+    public       Color         ColorRed               => new(0.86f, 0.09f, 0.09f);
+    public       Color         ColorGreen             => new(0.02f, 0.7f, 0.08f);
 
-    public virtual void Show(ITooltipObjectContainer? objectContainer)
+    public virtual void Show(ITooltipObjectContainer objectContainer)
     {
         if (objectContainer is null)
             return;
@@ -30,7 +31,7 @@ public abstract partial class BaseTooltip : PanelContainer
         if (ObjectTitleLabel is null || ObjectDescriptionLabel is null)
             return;
 
-        ObjectTitleLabel.Text = ObjectTitleLabel.Text.Replace(TitlePlaceholder, $"[u]{tooltipObject.TooltipTitle}[/u]");
+        ObjectTitleLabel.Text =  $"[center][u]{tooltipObject.TooltipTitle} {DateTime.Now.Second}[/u][/center]";
 
         ObjectDescriptionLabel.Text = $"{Environment.NewLine}" +
                                       $"{tooltipObject.GetTooltipDescription()}{Environment.NewLine}" +

@@ -18,10 +18,10 @@ public abstract partial class FloatingCombatText : Node2D
     [Export]
     public float FadeDelaySeconds { get; set; } = 1;
 
-    public Label?                  Display { get; set; }
+    public Label                  Display { get; set; }
     public int                     Value   { get; set; }
     public double                  Elapsed { get; set; }
-    public event QueueFreedSignal? QueueFreed;
+    public event QueueFreedSignal QueueFreed;
 
     public override void _Ready()
     {
