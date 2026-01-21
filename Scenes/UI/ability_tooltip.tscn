@@ -1,0 +1,40 @@
+[gd_scene load_steps=2 format=3 uid="uid://c7cdly8lgcdqk"]
+
+[ext_resource type="Script" uid="uid://davcgdhyu68qx" path="res://Scripts/UI/Tooltips/AbilityTooltip.cs" id="1_ri6pb"]
+
+[node name="AbilityTooltip" type="PanelContainer"]
+custom_minimum_size = Vector2(300, 0)
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_ri6pb")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ObjectTitle" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "[center]Shown Object Title[/center]"
+fit_content = true
+
+[node name="ObjectDescription" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/normal_font_size = 16
+text = "Lorem ipsum dolor sit amet, 
+consectetur adipiscing elit. Donec commodo, libero a aliquam semper, sapien velit bibendum mauris, et placerat lectus orci ac nulla. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec commodo, libero a aliquam semper, sapien velit bibendum mauris, et placerat lectus orci ac nulla."
+fit_content = true

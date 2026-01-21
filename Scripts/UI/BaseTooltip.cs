@@ -6,16 +6,12 @@ namespace Hoellenspiralenspiel.Scripts.UI;
 
 public abstract partial class BaseTooltip : PanelContainer
 {
-    private RichTextLabel? ObjectDescriptionLabel { get; set; }
-    private RichTextLabel? ObjectTitleLabel        { get; set; }
-    public  RichTextLabel? Content                { get; set; }
-    public  RichTextLabel? Keywords               { get; set; }
-    public  VBoxContainer? Container              { get; set; }
-    public  HBoxContainer? Requirements           { get; set; }
-    public  RichTextLabel? Effects                { get; set; }
-    public  RichTextLabel? Boni                   { get; set; }
-    public  Color          ColorRed               => new(0.86f, 0.09f, 0.09f);
-    public  Color          ColorGreen             => new(0.02f, 0.7f, 0.08f);
+    public const string         TitlePlaceholder = "Shown Object Title";
+    private      RichTextLabel? ObjectDescriptionLabel { get; set; }
+    private      RichTextLabel? ObjectTitleLabel       { get; set; }
+    public       VBoxContainer? Container              { get; set; }
+    public       Color          ColorRed               => new(0.86f, 0.09f, 0.09f);
+    public       Color          ColorGreen             => new(0.02f, 0.7f, 0.08f);
 
     public virtual void Show(ITooltipObjectContainer? objectContainer)
     {
@@ -34,7 +30,7 @@ public abstract partial class BaseTooltip : PanelContainer
         if (ObjectTitleLabel is null || ObjectDescriptionLabel is null)
             return;
 
-        ObjectTitleLabel.Text = ObjectTitleLabel.Text.Replace("ItemName", $"[u]{tooltipObject.TooltipTitle}[/u]");
+        ObjectTitleLabel.Text = ObjectTitleLabel.Text.Replace(TitlePlaceholder, $"[u]{tooltipObject.TooltipTitle}[/u]");
 
         ObjectDescriptionLabel.Text = $"{Environment.NewLine}" +
                                       $"{tooltipObject.GetTooltipDescription()}{Environment.NewLine}" +
@@ -44,21 +40,18 @@ public abstract partial class BaseTooltip : PanelContainer
     private void SetPositionByNode(ITooltipObjectContainer container)
     {
         var xPosition = container.Position.X - Size.X + 10;
+        var yPosition = container.Position.Y - Size.Y + 10;
 
         if (xPosition <= 0) xPosition = container.Position.X + container.Size.X + 20;
+        if (yPosition <= 0) yPosition = container.Position.Y + container.Size.Y + 20;
 
-        Position = new Vector2(xPosition, 27);
+        Position = new Vector2(xPosition, yPosition);
     }
 
     private void FindUIComponents()
     {
         Container              ??= GetNode<MarginContainer>("MarginContainer").GetNode<VBoxContainer>("VBoxContainer");
-        Requirements           ??= Container?.GetNode<HBoxContainer>("Requirements");
-        Effects                ??= Container?.GetNode<RichTextLabel>("%Effects");
-        Boni                   ??= Container?.GetNode<RichTextLabel>("%Boni");
-        Content                ??= Container?.GetNode<RichTextLabel>("%Content");
-        Keywords               ??= Container?.GetNode<RichTextLabel>("Keywords");
-        ObjectDescriptionLabel ??= Container?.GetNode<RichTextLabel>("ObjectDescriptionLabel");
-        ObjectTitleLabel        ??= Container?.GetNode<RichTextLabel>("ObjectNameLabel");
+        ObjectDescriptionLabel ??= Container?.GetNode<RichTextLabel>("%ObjectDescription");
+        ObjectTitleLabel       ??= Container?.GetNode<RichTextLabel>("%ObjectTitle");
     }
 }
