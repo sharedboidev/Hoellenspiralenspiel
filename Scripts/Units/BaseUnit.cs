@@ -11,10 +11,14 @@ namespace Hoellenspiralenspiel.Scripts.Units;
 public abstract partial class BaseUnit : CharacterBody3D,
                                          INotifyPropertyChanged
 {
-    private int  lifeCurrent;
-    public  bool IsDead      => LifeCurrent <= 0;
-    public  int  LifeMaximum => (int)((LifeBase + ModifierSumOf(ModificationType.Flat, CombatStat.Life)) * ModifierSumOf(ModificationType.Percentage, CombatStat.Life));
-    public  int  LifeBase    { get; set; }
+    private int   lifeCurrent;
+    private float LifeAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Life);
+    private float LifePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Life);
+    private float LifeMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Life);
+    public  int   LifeMaximum              => (int)((LifeBase + LifeAddedFlat) * LifePercentageMultiplier);
+
+    [Export]
+    public int LifeBase { get; set; }
 
     public int LifeCurrent
     {
@@ -22,13 +26,26 @@ public abstract partial class BaseUnit : CharacterBody3D,
         set => SetField(ref lifeCurrent, value);
     }
 
+    public bool                              IsDead              => LifeCurrent <= 0;
     public List<CombatStatModifier>          CombatStatModifiers { get; } = new();
     public event PropertyChangedEventHandler PropertyChanged;
 
-    private float ModifierSumOf(ModificationType modificationType, CombatStat combatStat)
+    private float GetTotalMoreMultiplierOf(CombatStat combatStat)
+    {
+        var totalMoreMultiplier = 1f;
+
+        foreach (var modifier in GetModifierOf(ModificationType.More, combatStat))
+            totalMoreMultiplier *= 1 + modifier.Value;
+
+        return totalMoreMultiplier;
+    }
+
+    private float GetModifierSumOf(ModificationType modificationType, CombatStat combatStat)
+        => GetModifierOf(modificationType, combatStat).Sum(mod => mod.Value);
+
+    private IEnumerable<CombatStatModifier> GetModifierOf(ModificationType modificationType, CombatStat combatStat)
         => CombatStatModifiers.Where(mod => mod.AffectedStat == combatStat &&
-                                            mod.ModificationType == modificationType)
-                              .Sum(mod => mod.Value);
+                                            mod.ModificationType == modificationType);
 
     public override void _Ready() { }
 
