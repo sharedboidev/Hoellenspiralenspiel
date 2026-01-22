@@ -15,7 +15,7 @@ public abstract partial class BaseUnit : CharacterBody3D,
     private float LifeAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Life);
     private float LifePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Life);
     private float LifeMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Life);
-    public  int   LifeMaximum              => (int)((LifeBase + LifeAddedFlat) * LifePercentageMultiplier);
+    public  int   LifeMaximum              => (int)((LifeBase + LifeAddedFlat) * LifePercentageMultiplier * LifeMoreMultiplierTotal);
 
     [Export]
     public int LifeBase { get; set; }
@@ -26,6 +26,8 @@ public abstract partial class BaseUnit : CharacterBody3D,
         set => SetField(ref lifeCurrent, value);
     }
 
+    [Export]
+    public float                             Movementspeed       { get; set; }
     public bool                              IsDead              => LifeCurrent <= 0;
     public List<CombatStatModifier>          CombatStatModifiers { get; } = new();
     public event PropertyChangedEventHandler PropertyChanged;
