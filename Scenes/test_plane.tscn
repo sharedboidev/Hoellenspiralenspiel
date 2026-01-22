@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=4 uid="uid://caiy5exwyombe"]
+[gd_scene load_steps=5 format=3 uid="uid://caiy5exwyombe"]
 
 [ext_resource type="Texture2D" uid="uid://dvrumscap8t74" path="res://Tilesets/Kenneys Dungeon Tiles/TileSheets/Ground.png" id="1_7ubcl"]
 [ext_resource type="PackedScene" uid="uid://c7cdly8lgcdqk" path="res://Scenes/UI/ability_tooltip.tscn" id="1_bidin"]
@@ -155,11 +155,11 @@ tile_proxies/coords_level = [[1, Vector2i(0, 0)], [4, Vector2i(0, 0)], [2, Vecto
 
 [node name="TileMapLayer" type="TileMapLayer" parent="Node2D"]
 y_sort_enabled = true
-tile_map_data = PackedByteArray("AAACAAkASQADAAQAAAAEAAYASQACAAQAAAACAAUASQAAAAQAAAACAAYASQAFAAQAAAADAAgASQAFAAQAAAADAAQASQAFAAQAAAADAAcASQAHAAQAAAADAAUASQAHAAQAAAADAAYASQAHAAQAAAACAAcASQAHAAQAAAAEAAcASQAHAAMAAAAEAAUASQAHAAMAAAAFAAYASQAHAAMAAAAFAAcASQAIAAMAAAAFAAUASQAIAAMAAAAFAAQASQAIAAMAAAAGAAYASQAIAAMAAAAFAAgASQAIAAMAAAA=")
+position = Vector2(279, -115)
 tile_set = SubResource("TileSet_bidin")
 
-[node name="AbilityTooltip" parent="Node2D" instance=ExtResource("1_bidin")]
-offset_left = -350.0
-offset_top = -350.0
-offset_right = -50.0
-offset_bottom = -21.0
+[node name="AbilityTooltip" parent="." instance=ExtResource("1_bidin")]
+offset_left = -382.0
+offset_top = -406.0
+offset_right = -82.0
+offset_bottom = -77.0
