@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://ylvksvt4qcy8"]
+[gd_scene load_steps=8 format=3 uid="uid://ylvksvt4qcy8"]
 
 [ext_resource type="Texture2D" uid="uid://bytep2ho1fiem" path="res://Textures/13187503_1601.m10.i307.n008.F.c05.205439527 Vector grid marking for user HUD interface.jpg" id="1_lb8tj"]
+[ext_resource type="PackedScene" uid="uid://d3hf0eo12ulp1" path="res://Scenes/Units/player.tscn" id="2_gmfi0"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_lb8tj"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -35,11 +36,13 @@ shadow_enabled = true
 [node name="CSGBox3D" type="CSGBox3D" parent="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0)
 material_override = SubResource("StandardMaterial3D_gmfi0")
+use_collision = true
 size = Vector3(1020.73706, 1, 1026.4316)
 
 [node name="CSGBox3D2" type="CSGBox3D" parent="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.42871, 0, 162.7218)
 material_override = SubResource("StandardMaterial3D_lb8tj")
+use_collision = true
 size = Vector3(223.19781, 100, 140.59106)
 
 [node name="Camera3D" type="Camera3D" parent="."]
@@ -47,3 +50,6 @@ transform = Transform3D(0.7071068, 0.5, -0.5, 0, 0.7071068, 0.70710677, 0.707106
 projection = 1
 size = 184.18071
 near = 0.013
+
+[node name="Player" parent="." instance=ExtResource("2_gmfi0")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 49.838, 133.60025, 286.4297)

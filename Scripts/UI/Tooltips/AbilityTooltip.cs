@@ -15,7 +15,7 @@ public partial class AbilityTooltip : BaseTooltip
 
     private void ProcessTestDisplay(double delta)
     {
-        if (Input.IsAnythingPressed() && timeSinceLastToggle >= visibilityCooldownMs)
+        if (Input.IsKeyPressed(Key.T) && timeSinceLastToggle >= visibilityCooldownMs)
         {
             timeSinceLastToggle = 0;
 
