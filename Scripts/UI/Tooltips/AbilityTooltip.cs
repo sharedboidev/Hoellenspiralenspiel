@@ -1,15 +1,24 @@
 ﻿using System;
 using Godot;
 using Hoellenspiralenspiel.Interfaces;
+using Hoellenspiralenspiel.Scripts.Units;
 using Environment = System.Environment;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
 public partial class AbilityTooltip : BaseTooltip
 {
-    private double timeSinceLastToggle;
-    private bool   tooltipIsShowing;
-    private double visibilityCooldownMs = 0.5;
+    private double   timeSinceLastToggle;
+    private bool     tooltipIsShowing;
+    private double   visibilityCooldownMs = 0.5;
+    public  Player2D Player { get; set; }
+
+    public override void _Ready()
+    {
+        base._Ready();
+
+        Player = GetTree()?.CurrentScene?.GetNode<Player2D>("Player 2D");
+    }
 
     public override void _Process(double delta) => ProcessTestDisplay(delta);
 
@@ -28,7 +37,7 @@ public partial class AbilityTooltip : BaseTooltip
             {
                 var tooltipTestObject = new TestTooltipObjectContainer
                 {
-                    Position      = GetViewport().GetMousePosition(),
+                    Position      = Player.Position,
                     ContainedItem = new TestTooltipObject(),
                     Size          = new Vector2(10, 10)
                 };

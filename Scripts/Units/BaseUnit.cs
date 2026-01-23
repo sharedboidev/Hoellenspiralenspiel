@@ -8,7 +8,7 @@ using Hoellenspiralenspiel.Scripts.Models;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
-public abstract partial class BaseUnit : CharacterBody3D,
+public abstract partial class BaseUnit : CharacterBody2D,
                                          INotifyPropertyChanged
 {
     private int   lifeCurrent;
@@ -18,7 +18,7 @@ public abstract partial class BaseUnit : CharacterBody3D,
     public  int   LifeMaximum              => (int)((LifeBase + LifeAddedFlat) * LifePercentageMultiplier * LifeMoreMultiplierTotal);
 
     [Export]
-    public int LifeBase { get; set; }
+    public int LifeBase { get; set; } = 1;
 
     public int LifeCurrent
     {
@@ -27,7 +27,11 @@ public abstract partial class BaseUnit : CharacterBody3D,
     }
 
     [Export]
-    public float                             Movementspeed       { get; set; }
+    public Vector2 MovementDirection { get; set; } = Vector2.Zero;
+
+    [Export]
+    public float Movementspeed { get; set; }
+
     public bool                              IsDead              => LifeCurrent <= 0;
     public List<CombatStatModifier>          CombatStatModifiers { get; } = new();
     public event PropertyChangedEventHandler PropertyChanged;
@@ -49,7 +53,7 @@ public abstract partial class BaseUnit : CharacterBody3D,
         => CombatStatModifiers.Where(mod => mod.AffectedStat == combatStat &&
                                             mod.ModificationType == modificationType);
 
-    public override void _Ready() { }
+    public override void _Ready() => LifeCurrent = LifeMaximum;
 
     public override void _Process(double delta)
     {

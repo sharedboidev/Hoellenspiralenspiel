@@ -1,11 +1,23 @@
 ﻿using Godot;
+using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Extensions;
+using Hoellenspiralenspiel.Scripts.Models;
 
 namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 public abstract partial class BaseEnemy : BaseUnit
 {
-    private Player chasedPlayer;
-    private bool   isAggressive;
+    protected Player2D ChasedPlayer;
+    private   bool     isAggressive;
+    private   Node     currentScene;
+
+    public override void _Ready()
+    {
+        base._Ready();
+
+        currentScene = GetTree().CurrentScene;
+        isAggressive = true;
+    }
 
     public override void _PhysicsProcess(double delta)
     {
@@ -16,11 +28,12 @@ public abstract partial class BaseEnemy : BaseUnit
 
     public void ChasePlayer()
     {
-        if (!isAggressive || chasedPlayer.IsDead)
+        if (!isAggressive || ChasedPlayer.IsDead)
             return;
 
-        var direction = (chasedPlayer.Position - Position).Normalized();
-        Velocity = Movementspeed * direction;
+        var direction = (ChasedPlayer.Position - Position).Normalized();
+        MovementDirection = direction;
+        Velocity          = Movementspeed * direction;
 
         MoveAndSlide();
 
@@ -29,10 +42,11 @@ public abstract partial class BaseEnemy : BaseUnit
             var collision      = GetSlideCollision(i);
             var collidedObject = (Node)collision.GetCollider();
 
-            if (collidedObject.Name == nameof(Player))
+            if (collidedObject is Player2D)
             {
-                // if (!chasedPlayer.IsInvicible)
-                //     DealDamageToPlayer();
+                var fakeHit = new HitResult(9001, HitType.Normal, LifeModificationMode.Damage);
+
+                ChasedPlayer.InstatiateFloatingCombatText(fakeHit, currentScene, offset: new Vector2(0, -188));
             }
         }
     }

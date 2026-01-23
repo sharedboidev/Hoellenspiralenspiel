@@ -2,7 +2,7 @@ using Godot;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
-public partial class Player : BaseUnit
+public partial class Player : CharacterBody3D
 {
     private bool   invincibilityIsRunning;
     private double millisecondsSinceLastHit;

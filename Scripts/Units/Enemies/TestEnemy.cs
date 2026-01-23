@@ -1,8 +1,8 @@
 using Godot;
 
-namespace Hoellenspiralenspiel.Scripts.Units;
+namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
-public partial class Player2D : BaseUnit
+public partial class TestEnemy : BaseEnemy
 {
     private AnimationTree AnimationTree { get; set; }
 
@@ -11,20 +11,17 @@ public partial class Player2D : BaseUnit
         base._Ready();
 
         AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
-        Movementspeed = 300;
+        ChasedPlayer  = GetTree().CurrentScene.GetNode<Player2D>("Player 2D");
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        MovementDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
-        Velocity    = MovementDirection * Movementspeed;
+        base._PhysicsProcess(delta);
 
-        if(MovementDirection != Vector2.Zero)
+        if (MovementDirection != Vector2.Zero)
         {
             AnimationTree.Set("parameters/StateMachine/MoveState/RunState/blend_position", MovementDirection * new Vector2(1, -1));
             AnimationTree.Set("parameters/StateMachine/MoveState/IdleState/blend_position", MovementDirection * new Vector2(1, -1));
         }
-
-        MoveAndSlide();
     }
 }

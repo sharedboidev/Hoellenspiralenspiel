@@ -2,7 +2,7 @@
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
-public abstract partial class FloatingCombatText : Node2D
+public partial class FloatingCombatText : Node2D
 {
     public delegate void QueueFreedSignal();
 
@@ -19,8 +19,8 @@ public abstract partial class FloatingCombatText : Node2D
     public float FadeDelaySeconds { get; set; } = 1;
 
     public Label                  Display { get; set; }
-    public int                     Value   { get; set; }
-    public double                  Elapsed { get; set; }
+    public int                    Value   { get; set; }
+    public double                 Elapsed { get; set; }
     public event QueueFreedSignal QueueFreed;
 
     public override void _Ready()
@@ -39,7 +39,7 @@ public abstract partial class FloatingCombatText : Node2D
                .AddChild(this);
     }
 
-    protected abstract Label GetLabelComponent();
+    private Label GetLabelComponent() => GetNode<Label>(nameof(Label));
 
     public void SetFontSize(int size) => Display?.AddThemeFontSizeOverride(FontSize, size);
 
