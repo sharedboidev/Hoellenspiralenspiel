@@ -427,7 +427,7 @@ transitions = ["Start", "MoveState", SubResource("AnimationNodeStateMachineTrans
 graph_offset = Vector2(-215, -155)
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_kfbu0"]
-graph_offset = Vector2(0, -1)
+graph_offset = Vector2(-476.2367, 0)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_hm4fm")
 nodes/StateMachine/position = Vector2(-40, 80)
 node_connections = [&"output", 0, &"StateMachine"]
@@ -461,3 +461,8 @@ advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
 parameters/StateMachine/MoveState/IdleState/blend_position = Vector2(-0.5627426, -0.07048464)
 parameters/StateMachine/MoveState/RunState/blend_position = Vector2(-0.31694698, -0.7400881)
+
+[node name="FireballStartPosition" type="Marker2D" parent="."]
+position = Vector2(-1, -64)
+
+[node name="Fireballs" type="Node2D" parent="."]

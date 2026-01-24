@@ -5,6 +5,7 @@ namespace Hoellenspiralenspiel.Scripts.Units;
 public partial class Player2D : BaseUnit
 {
     private AnimationTree AnimationTree { get; set; }
+    private PackedScene   fireballScene = ResourceLoader.Load<PackedScene>("res://Scenes/Spells/fireball.tscn");
 
     public override void _Ready()
     {
@@ -26,5 +27,21 @@ public partial class Player2D : BaseUnit
         }
 
         MoveAndSlide();
+
+        if (Input.IsActionJustPressed("F"))
+        {
+            var fireball = (Fireball)fireballScene.Instantiate();
+            var container = GetNode<Node2D>("Fireballs");
+            
+            container.AddChild(fireball);
+            
+            fireball.Init(GlobalPosition, GetGlobalMousePosition());
+        }
+    }
+
+    public override void _Draw()
+    {
+        DrawLine(new Vector2(-10, 0), new Vector2(10, 0), Colors.Red, 2);
+        DrawLine(new Vector2(0, -10), new Vector2(0, 10), Colors.Red, 2);
     }
 }

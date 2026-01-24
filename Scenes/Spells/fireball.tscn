@@ -1,0 +1,52 @@
+[gd_scene load_steps=11 format=3 uid="uid://o5bkctc8ux1c"]
+
+[ext_resource type="Script" uid="uid://bxqe0uvygnlhg" path="res://Scenes/Spells/Fireball.cs" id="1_n4jxt"]
+[ext_resource type="Texture2D" uid="uid://ce3u28re7kyut" path="res://Textures/Spells/Fire Spell_Frame_01.png" id="2_hnbfx"]
+[ext_resource type="Texture2D" uid="uid://c3xyip3xjp761" path="res://Textures/Spells/Fire Spell_Frame_02.png" id="3_v0gp5"]
+[ext_resource type="Texture2D" uid="uid://bbdnpjx68chl" path="res://Textures/Spells/Fire Spell_Frame_03.png" id="4_jeop1"]
+[ext_resource type="Texture2D" uid="uid://cwkhsvnql250o" path="res://Textures/Spells/Fire Spell_Frame_04.png" id="5_t2on5"]
+[ext_resource type="Texture2D" uid="uid://dwo86oleeu07q" path="res://Textures/Spells/Fire Spell_Frame_05.png" id="6_xhx2f"]
+[ext_resource type="Texture2D" uid="uid://dlgonng7inl6t" path="res://Textures/Spells/Fire Spell_Frame_06.png" id="7_ex6o2"]
+[ext_resource type="Texture2D" uid="uid://du3g6flkag47d" path="res://Textures/Spells/Fire Spell_Frame_07.png" id="8_pbov0"]
+[ext_resource type="Texture2D" uid="uid://dqttqclq3vqvq" path="res://Textures/Spells/Fire Spell_Frame_08.png" id="9_srp83"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_hnbfx"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_hnbfx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_v0gp5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_jeop1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_t2on5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_xhx2f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_ex6o2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_pbov0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_srp83")
+}],
+"loop": true,
+"name": &"default",
+"speed": 30.0
+}]
+
+[node name="Fireball" type="Node2D"]
+scale = Vector2(0.16, 0.16)
+script = ExtResource("1_n4jxt")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_hnbfx")
+frame = 7
+frame_progress = 1.0
