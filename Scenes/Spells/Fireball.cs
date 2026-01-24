@@ -26,7 +26,7 @@ public partial class Fireball : Area2D
 	{
 		if (body.IsInGroup("monsters"))
 		{
-			var damage  = damageRng.Next(1, 251);
+			var damage  = damageRng.Next(50, 251);
 			var isCrit  = critRng.Next(1, 11) == 10;
 			var hitType = isCrit ? HitType.Critical : HitType.Normal;
 			damage = isCrit ? (int)(damage * 1.3m) : damage;
