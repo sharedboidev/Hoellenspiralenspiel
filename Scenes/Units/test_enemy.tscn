@@ -140,6 +140,8 @@ nodes/StateMachine/position = Vector2(320, 100)
 node_connections = [&"output", 0, &"StateMachine"]
 
 [node name="Test Enemy" type="CharacterBody2D"]
+platform_on_leave = 2
+platform_floor_layers = 0
 script = ExtResource("1_x3aji")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

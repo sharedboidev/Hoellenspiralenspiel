@@ -434,6 +434,8 @@ node_connections = [&"output", 0, &"StateMachine"]
 
 [node name="Player2D" type="CharacterBody2D"]
 motion_mode = 1
+platform_on_leave = 2
+platform_floor_layers = 0
 script = ExtResource("1_nnb5g")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
