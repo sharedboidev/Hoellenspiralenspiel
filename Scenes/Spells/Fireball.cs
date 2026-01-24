@@ -10,6 +10,9 @@ public partial class Fireball : Area2D
 	private       Vector2 richtung;
 	public        Vector2 Destination { get; set; }
 
+	private Random damageRng = new Random();
+	private Random critRng = new Random();
+	
 	public override void _Ready()
 	{
 		
@@ -23,10 +26,16 @@ public partial class Fireball : Area2D
 	{
 		if (body.IsInGroup("monsters"))
 		{
-			const int damage = 69;
+			var damage  = damageRng.Next(1, 251);
+			var isCrit  = critRng.Next(1, 11) == 10;
+			var hitType = isCrit ? HitType.Critical : HitType.Normal;
+			damage = isCrit ? (int)(damage * 1.3m) : damage;
+			
 			var       enemy  = body as BaseEnemy;
 			enemy.LifeCurrent -= damage;
-			var fakeHit = new HitResult(damage, HitType.Critical, LifeModificationMode.Damage);
+			
+			
+			var fakeHit = new HitResult(damage, hitType, LifeModificationMode.Damage);
 			enemy.InstatiateFloatingCombatText(fakeHit, GetTree().CurrentScene, offset: new Vector2(0, -188));
 			QueueFree(); 
 		}
