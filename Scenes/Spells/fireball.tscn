@@ -42,11 +42,17 @@ animations = [{
 "speed": 30.0
 }]
 
-[node name="Fireball" type="Node2D"]
+[node name="Fireball" type="Area2D"]
 scale = Vector2(0.16, 0.16)
+collision_layer = 4
+collision_mask = 2
 script = ExtResource("1_n4jxt")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+build_mode = 1
+polygon = PackedVector2Array(-125, 100, -187.5, 93.75, -262.5, 50, -268.75, -25, -231.25, -75, -156.25, -100, -75, -87.5, -18.75, -50, 37.5, -31.25, 112.5, -50, 187.5, -43.75, 187.5, 0, 118.75, 12.5, 93.75, 43.75, 37.5, 75, -62.5, 93.75)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CollisionPolygon2D"]
 sprite_frames = SubResource("SpriteFrames_hnbfx")
 frame = 7
 frame_progress = 1.0

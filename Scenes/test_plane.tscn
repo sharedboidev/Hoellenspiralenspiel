@@ -465,10 +465,10 @@ tile_map_data = PackedByteArray("AAANACMASQAEAAEAAAANACIASQACAAEAAAANACEASQAJAAE
 tile_set = SubResource("TileSet_bidin")
 
 [node name="AbilityTooltip" parent="." instance=ExtResource("1_bidin")]
-offset_left = -382.0
-offset_top = -406.0
-offset_right = -82.0
-offset_bottom = -77.0
+offset_left = -170.0
+offset_top = 875.0
+offset_right = 130.0
+offset_bottom = 1204.0
 
 [node name="Test Enemy" parent="." instance=ExtResource("4_vglo3")]
 position = Vector2(693, 482)

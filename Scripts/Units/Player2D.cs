@@ -38,10 +38,4 @@ public partial class Player2D : BaseUnit
             fireball.Init(GlobalPosition, GetGlobalMousePosition());
         }
     }
-
-    public override void _Draw()
-    {
-        DrawLine(new Vector2(-10, 0), new Vector2(10, 0), Colors.Red, 2);
-        DrawLine(new Vector2(0, -10), new Vector2(0, 10), Colors.Red, 2);
-    }
 }

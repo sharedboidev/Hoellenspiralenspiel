@@ -139,10 +139,13 @@ nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_x3aji")
 nodes/StateMachine/position = Vector2(320, 100)
 node_connections = [&"output", 0, &"StateMachine"]
 
-[node name="Test Enemy" type="CharacterBody2D"]
+[node name="Test Enemy" type="CharacterBody2D" groups=["monsters"]]
+collision_layer = 2
+collision_mask = 5
 platform_on_leave = 2
 platform_floor_layers = 0
 script = ExtResource("1_x3aji")
+LifeBase = 258
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -14)

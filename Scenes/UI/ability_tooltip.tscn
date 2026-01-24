@@ -26,7 +26,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/normal_font_size = 24
 bbcode_enabled = true
-text = "[center]Shown Object Title[/center]"
+text = "[center]Press F to kick  Fire Balls[/center]"
 fit_content = true
 
 [node name="ObjectDescription" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
@@ -35,6 +35,4 @@ layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/normal_font_size = 16
-text = "Lorem ipsum dolor sit amet, 
-consectetur adipiscing elit. Donec commodo, libero a aliquam semper, sapien velit bibendum mauris, et placerat lectus orci ac nulla. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec commodo, libero a aliquam semper, sapien velit bibendum mauris, et placerat lectus orci ac nulla."
 fit_content = true

@@ -1,15 +1,35 @@
 using System;
 using Godot;
+using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Extensions;
+using Hoellenspiralenspiel.Scripts.Models;
+using Hoellenspiralenspiel.Scripts.Units.Enemies;
 
-public partial class Fireball : Node2D
+public partial class Fireball : Area2D
 {
-	private Vector2 richtung;
-	public  Vector2 Destination { get; set; }
+	private       Vector2 richtung;
+	public        Vector2 Destination { get; set; }
 
 	public override void _Ready()
 	{
-		var animationNode = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+		
+		var animationNode = GetNode<CollisionPolygon2D>("CollisionPolygon2D").GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		animationNode.Play("default");
+		
+		BodyEntered += OnBodyEntered;
+	}
+
+	private void OnBodyEntered(Node2D body)
+	{
+		if (body.IsInGroup("monsters"))
+		{
+			const int damage = 69;
+			var       enemy  = body as BaseEnemy;
+			enemy.LifeCurrent -= damage;
+			var fakeHit = new HitResult(damage, HitType.Critical, LifeModificationMode.Damage);
+			enemy.InstatiateFloatingCombatText(fakeHit, GetTree().CurrentScene, offset: new Vector2(0, -188));
+			QueueFree(); 
+		}
 	}
 
 	public void Init(Vector2 startGlobal, Vector2 destinationGlobal)

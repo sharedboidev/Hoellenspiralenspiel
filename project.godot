@@ -58,5 +58,8 @@ F={
 
 [layer_names]
 
+2d_physics/layer_1="Player"
 3d_physics/layer_1="world"
+2d_physics/layer_2="Monster"
 3d_physics/layer_2="player"
+2d_physics/layer_3="Spells"
