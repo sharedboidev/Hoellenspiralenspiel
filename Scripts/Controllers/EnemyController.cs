@@ -47,7 +47,7 @@ public partial class EnemyController : Node
         spawnTimer.Timeout  += SpawnTimerOnTimeout;
     }
 
-    public override void _PhysicsProcess(double delta) => MakeEnemiesDoTheirThing();
+    public override void _PhysicsProcess(double delta) => MakeEnemiesDoTheirThing(delta);
 
     private void SpawnTimerOnTimeout() => SpawnUnit<TestEnemy>();
 
@@ -70,10 +70,10 @@ public partial class EnemyController : Node
         }
     }
 
-    private void MakeEnemiesDoTheirThing()
+    private void MakeEnemiesDoTheirThing(double delta)
     {
         foreach (var aggressiveEnemy in SpawnedEnemies.Where(e => e.IsAggressive))
-            aggressiveEnemy.ChasePlayer();
+            aggressiveEnemy.ChasePlayer(delta);
     }
 
     private Vector2 GetRandomVisiblePointNotNearPlayer()
