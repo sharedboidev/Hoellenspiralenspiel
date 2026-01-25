@@ -26,6 +26,7 @@ public abstract partial class BaseUnit : CharacterBody2D,
         set => SetField(ref lifeCurrent, value);
     }
 
+
     [Export]
     public Vector2 MovementDirection { get; set; } = Vector2.Zero;
 

@@ -9,13 +9,13 @@ public abstract partial class BaseEnemy : BaseUnit
 {
     protected Player2D ChasedPlayer;
     private   bool     isAggressive;
-    private   Node     currentScene;
+    protected Node     CurrentScene;
 
     public override void _Ready()
     {
         base._Ready();
 
-        currentScene = GetTree().CurrentScene;
+        CurrentScene = GetTree().CurrentScene;
         isAggressive = true;
     }
 
@@ -46,7 +46,7 @@ public abstract partial class BaseEnemy : BaseUnit
             {
                 var fakeHit = new HitResult(9001, HitType.Normal, LifeModificationMode.Damage);
 
-                ChasedPlayer.InstatiateFloatingCombatText(fakeHit, currentScene, offset: new Vector2(0, -188));
+                ChasedPlayer.InstatiateFloatingCombatText(fakeHit, CurrentScene, offset: new Vector2(0, -188));
             }
         }
     }

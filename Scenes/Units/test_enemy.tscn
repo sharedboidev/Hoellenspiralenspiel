@@ -146,12 +146,14 @@ platform_on_leave = 2
 platform_floor_layers = 0
 script = ExtResource("1_x3aji")
 LifeBase = 258
+Movementspeed = 50.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -14)
 shape = SubResource("RectangleShape2D_x3aji")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+y_sort_enabled = true
 position = Vector2(0, -24)
 texture = ExtResource("2_ysuca")
 hframes = 4

@@ -476,7 +476,7 @@ offset_right = 130.0
 offset_bottom = 1204.0
 
 [node name="Test Enemy" parent="." instance=ExtResource("4_vglo3")]
-position = Vector2(693, 482)
+position = Vector2(1143, 175)
 scale = Vector2(1.5, 1.5)
 Movementspeed = 150.0
 
@@ -487,6 +487,5 @@ position = Vector2(1310, 816)
 
 [node name="MonsterSpawnTimer" type="Timer" parent="."]
 wait_time = 0.2
-autostart = true
 
 [connection signal="timeout" from="MonsterSpawnTimer" to="." method="_on_monster_spawn_timer_timeout"]

@@ -10,9 +10,9 @@ public partial class TestEnemy : BaseEnemy
 	{
 		base._Ready();
 
-		AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
-		ChasedPlayer  = GetTree().CurrentScene.GetNode<Player2D>("Player 2D");
-	}
+        AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
+        ChasedPlayer  = CurrentScene.GetNode<Player2D>("Player 2D");
+    }
 
 	public override void _PhysicsProcess(double delta)
 	{

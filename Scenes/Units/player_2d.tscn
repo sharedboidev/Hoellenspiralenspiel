@@ -444,6 +444,7 @@ position = Vector2(2, -14)
 shape = SubResource("CapsuleShape2D_djq3p")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+y_sort_enabled = true
 position = Vector2(0, -204)
 texture = ExtResource("1_djq3p")
 hframes = 88

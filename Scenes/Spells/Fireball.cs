@@ -58,6 +58,7 @@ public partial class Fireball : Area2D
 	public override void _Process(double d)
 	{
 		var delta = Convert.ToSingle(d);
-		GlobalPosition += richtung * 800 * delta;
+
+		Position += richtung * 800 * delta;
 	}
 }

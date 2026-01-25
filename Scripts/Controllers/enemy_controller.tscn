@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bg8s6qmxf15f8"]
+
+[ext_resource type="Script" uid="uid://k2gb16ifn72b" path="res://Scripts/Controllers/EnemyController.cs" id="1_lfrkg"]
+
+[node name="Enemy Controller" type="Node"]
+script = ExtResource("1_lfrkg")
+
+[node name="EnemySpawnTimer" type="Timer" parent="."]
