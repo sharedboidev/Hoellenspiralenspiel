@@ -3,21 +3,22 @@ using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Models;
+using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 public partial class Fireball : Area2D
 {
-	private       Vector2 richtung;
-	public        Vector2 Destination { get; set; }
+	private readonly Random           critRng   = new();
+	private readonly Random           damageRng = new();
+	[Export] public  AnimatedSprite2D AnimationSprite;
+	private          Vector2          richtung; 
+	public           Vector2          Destination { get; set; }
 
-	private Random damageRng = new Random();
-	private Random critRng = new Random();
+	
 	
 	public override void _Ready()
 	{
-		var animationNode = GetNode<CollisionPolygon2D>("CollisionPolygon2D").GetNode<AnimatedSprite2D>("AnimatedSprite2D");
-		animationNode.Play("default");
-		
+		AnimationSprite.Play("default");
 		BodyEntered += OnBodyEntered;
 	}
 
@@ -29,14 +30,13 @@ public partial class Fireball : Area2D
 			var isCrit  = critRng.Next(1, 11) == 10;
 			var hitType = isCrit ? HitType.Critical : HitType.Normal;
 			damage = isCrit ? (int)(damage * 1.3m) : damage;
-			
-			var       enemy  = body as BaseEnemy;
+
+			var enemy = body as BaseEnemy;
 			enemy.LifeCurrent -= damage;
-			
-			
+
 			var fakeHit = new HitResult(damage, hitType, LifeModificationMode.Damage);
-			enemy.InstatiateFloatingCombatText(fakeHit, GetTree().CurrentScene, offset: new Vector2(0, -188));
-			QueueFree(); 
+			enemy.InstatiateFloatingCombatText(fakeHit, GetTree().CurrentScene, new Vector2(0, -188));
+			QueueFree();
 		}
 	}
 

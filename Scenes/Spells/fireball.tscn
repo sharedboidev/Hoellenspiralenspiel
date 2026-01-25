@@ -42,11 +42,12 @@ animations = [{
 "speed": 30.0
 }]
 
-[node name="Fireball" type="Area2D"]
+[node name="Fireball" type="Area2D" node_paths=PackedStringArray("AnimationSprite")]
 scale = Vector2(0.16, 0.16)
 collision_layer = 4
 collision_mask = 2
 script = ExtResource("1_hnbfx")
+AnimationSprite = NodePath("CollisionPolygon2D/AnimatedSprite2D")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 build_mode = 1

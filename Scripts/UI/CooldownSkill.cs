@@ -5,11 +5,14 @@ using System.Globalization;
 public partial class CooldownSkill : TextureButton
 {
 	[Export] public TextureProgressBar ProgressBarCooldown;
-	[Export] public Timer TimerCooldown;
-	[Export] public Label LabelTime;
+	[Export] public Timer              TimerCooldown;
+	[Export] public Label              LabelTime;
+	public          double             Cooldown   { get; set; } = 1.0d;
+	public          bool               OnCooldown => Disabled;
 	
 	public override void _Ready()
 	{
+		TimerCooldown.WaitTime       = Cooldown;
 		ProgressBarCooldown.MaxValue = TimerCooldown.WaitTime;
 		SetProcess(false);
 	}
@@ -20,7 +23,7 @@ public partial class CooldownSkill : TextureButton
 		ProgressBarCooldown.Value = TimerCooldown.TimeLeft;
 	}
 
-	public void _on_pressed()
+	public void Use()
 	{
 		TimerCooldown.Start();
 		Disabled = true;

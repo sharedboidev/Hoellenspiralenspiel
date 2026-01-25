@@ -1,8 +1,7 @@
-[gd_scene load_steps=48 format=3 uid="uid://c8hx5eg0q1vct"]
+[gd_scene load_steps=47 format=3 uid="uid://c8hx5eg0q1vct"]
 
 [ext_resource type="Texture2D" uid="uid://7k0aj46tmr1d" path="res://Textures/Units/Player/PlayerSpritesheet.png" id="1_djq3p"]
 [ext_resource type="Script" uid="uid://bwt2hw5i1cwjn" path="res://Scripts/Units/Player2D.cs" id="1_nnb5g"]
-[ext_resource type="PackedScene" uid="uid://bh56yt1rrhckv" path="res://Scenes/UI/cooldown_skill.tscn" id="3_o57mx"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_djq3p"]
 radius = 15.0
@@ -433,12 +432,13 @@ nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_hm4fm")
 nodes/StateMachine/position = Vector2(-40, 80)
 node_connections = [&"output", 0, &"StateMachine"]
 
-[node name="Player2D" type="CharacterBody2D"]
+[node name="Player2D" type="CharacterBody2D" node_paths=PackedStringArray("SkillBar")]
 collision_mask = 2
 motion_mode = 1
 platform_on_leave = 2
 platform_floor_layers = 0
 script = ExtResource("1_nnb5g")
+SkillBar = NodePath("CanvasLayer/SkillBar")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(2, -14)
@@ -472,7 +472,7 @@ position = Vector2(-1, -64)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer"]
+[node name="SkillBar" type="HBoxContainer" parent="CanvasLayer"]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
@@ -484,6 +484,3 @@ offset_right = 20.0
 grow_horizontal = 2
 grow_vertical = 0
 size_flags_horizontal = 4
-
-[node name="CooldownSpell" parent="CanvasLayer/HBoxContainer" instance=ExtResource("3_o57mx")]
-layout_mode = 2
