@@ -1,5 +1,7 @@
-﻿using Godot;
+﻿using System;
+using Godot;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Models;
 
@@ -8,27 +10,28 @@ namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 public abstract partial class BaseEnemy : BaseUnit
 {
     protected Player2D ChasedPlayer;
-    private   bool     isAggressive;
     protected Node     CurrentScene;
+    public    bool     IsAggressive { get; set; }
 
     public override void _Ready()
     {
         base._Ready();
 
         CurrentScene = GetTree().CurrentScene;
-        isAggressive = true;
+        IsAggressive = true;
     }
 
-    public override void _PhysicsProcess(double delta)
+    protected override void DieProperly()
     {
-        base._PhysicsProcess(delta);
+        var controller = CurrentScene.GetNode<EnemyController>(nameof(EnemyController));
+        controller.SpawnedEnemies.Remove(this);
 
-        ChasePlayer(); //In EnemyController o.Ä. auslagern
+        base.DieProperly();
     }
 
     public void ChasePlayer()
     {
-        if (!isAggressive || ChasedPlayer.IsDead)
+        if (!IsAggressive || ChasedPlayer.IsDead)
             return;
 
         var direction = (ChasedPlayer.Position - Position).Normalized();

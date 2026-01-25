@@ -15,7 +15,6 @@ public partial class Fireball : Area2D
 	
 	public override void _Ready()
 	{
-		
 		var animationNode = GetNode<CollisionPolygon2D>("CollisionPolygon2D").GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		animationNode.Play("default");
 		
