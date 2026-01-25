@@ -1,7 +1,8 @@
-[gd_scene load_steps=47 format=3 uid="uid://c8hx5eg0q1vct"]
+[gd_scene load_steps=48 format=3 uid="uid://c8hx5eg0q1vct"]
 
 [ext_resource type="Texture2D" uid="uid://7k0aj46tmr1d" path="res://Textures/Units/Player/PlayerSpritesheet.png" id="1_djq3p"]
 [ext_resource type="Script" uid="uid://bwt2hw5i1cwjn" path="res://Scripts/Units/Player2D.cs" id="1_nnb5g"]
+[ext_resource type="PackedScene" uid="uid://bh56yt1rrhckv" path="res://Scenes/UI/cooldown_spell.tscn" id="3_o57mx"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_djq3p"]
 radius = 15.0
@@ -468,3 +469,21 @@ parameters/StateMachine/MoveState/RunState/blend_position = Vector2(-0.31694698,
 position = Vector2(-1, -64)
 
 [node name="Fireballs" type="Node2D" parent="."]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -40.0
+offset_right = 20.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 4
+
+[node name="CooldownSpell" parent="CanvasLayer/HBoxContainer" instance=ExtResource("3_o57mx")]
+layout_mode = 2

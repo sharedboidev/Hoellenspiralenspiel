@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3 uid="uid://gfom5h0m8xrh"]
+
+[ext_resource type="Theme" uid="uid://bgcgayshdsaxf" path="res://Scenes/UI/base_theme.tres" id="1_jucgk"]
+[ext_resource type="Texture2D" uid="uid://c7udd6aj0mrqh" path="res://Textures/Spells/Icons_Fire Spell.png" id="2_u6f5g"]
+
+[node name="FireballSpellButton" type="TextureButton"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_jucgk")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CenterContainer" type="CenterContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="Panel/CenterContainer"]
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("2_u6f5g")

@@ -1,0 +1,37 @@
+using Godot;
+using System;
+using System.Globalization;
+
+public partial class CooldownSpell : TextureButton
+{
+	[Export] public TextureProgressBar ProgressBarCooldown;
+	[Export] public Timer TimerCooldown;
+	[Export] public Label LabelTime;
+	
+	public override void _Ready()
+	{
+		ProgressBarCooldown.MaxValue = TimerCooldown.WaitTime;
+		SetProcess(false);
+	}
+
+	public override void _Process(double delta)
+	{
+		LabelTime.Text            = TimerCooldown.TimeLeft.ToString("#.##");
+		ProgressBarCooldown.Value = TimerCooldown.TimeLeft;
+	}
+
+	public void _on_pressed()
+	{
+		TimerCooldown.Start();
+		Disabled = true;
+		SetProcess(true);
+	}
+
+	public void _on_timer_timeout()
+	{
+		Disabled                  = false;
+		LabelTime.Text            = string.Empty;
+		ProgressBarCooldown.Value = 0;
+		SetProcess(false);
+	}
+}
