@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://7k0aj46tmr1d" path="res://Textures/Units/Player/PlayerSpritesheet.png" id="1_djq3p"]
 [ext_resource type="Script" uid="uid://bwt2hw5i1cwjn" path="res://Scripts/Units/Player2D.cs" id="1_nnb5g"]
-[ext_resource type="PackedScene" uid="uid://bh56yt1rrhckv" path="res://Scenes/UI/cooldown_spell.tscn" id="3_o57mx"]
+[ext_resource type="PackedScene" uid="uid://bh56yt1rrhckv" path="res://Scenes/UI/cooldown_skill.tscn" id="3_o57mx"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_djq3p"]
 radius = 15.0

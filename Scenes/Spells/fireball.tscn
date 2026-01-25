@@ -1,6 +1,6 @@
 [gd_scene load_steps=11 format=3 uid="uid://o5bkctc8ux1c"]
 
-[ext_resource type="Script" uid="uid://bxqe0uvygnlhg" path="res://Scenes/Spells/Fireball.cs" id="1_n4jxt"]
+[ext_resource type="Script" uid="uid://bxqe0uvygnlhg" path="res://Scripts/Abilities/Spells/Fireball.cs" id="1_hnbfx"]
 [ext_resource type="Texture2D" uid="uid://ce3u28re7kyut" path="res://Textures/Spells/Fire Spell_Frame_01.png" id="2_hnbfx"]
 [ext_resource type="Texture2D" uid="uid://c3xyip3xjp761" path="res://Textures/Spells/Fire Spell_Frame_02.png" id="3_v0gp5"]
 [ext_resource type="Texture2D" uid="uid://bbdnpjx68chl" path="res://Textures/Spells/Fire Spell_Frame_03.png" id="4_jeop1"]
@@ -46,7 +46,7 @@ animations = [{
 scale = Vector2(0.16, 0.16)
 collision_layer = 4
 collision_mask = 2
-script = ExtResource("1_n4jxt")
+script = ExtResource("1_hnbfx")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 build_mode = 1

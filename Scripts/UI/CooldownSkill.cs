@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Globalization;
 
-public partial class CooldownSpell : TextureButton
+public partial class CooldownSkill : TextureButton
 {
 	[Export] public TextureProgressBar ProgressBarCooldown;
 	[Export] public Timer TimerCooldown;

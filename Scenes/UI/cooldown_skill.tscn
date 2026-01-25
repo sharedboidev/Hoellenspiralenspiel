@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://bh56yt1rrhckv"]
 
-[ext_resource type="Texture2D" uid="uid://c7udd6aj0mrqh" path="res://Textures/Spells/Icons_Fire Spell.png" id="1_6yyx2"]
-[ext_resource type="Script" uid="uid://bflmnojrytr35" path="res://Scripts/UI/CooldownSpell.cs" id="2_3hk7w"]
-[ext_resource type="Texture2D" uid="uid://ddfxuf4tdeldx" path="res://Textures/Spells/blank.png" id="3_jcxa0"]
+[ext_resource type="Texture2D" uid="uid://c7udd6aj0mrqh" path="res://Textures/Spells/Icons_Fire Spell.png" id="1_ub8xo"]
+[ext_resource type="Script" uid="uid://bflmnojrytr35" path="res://Scripts/UI/CooldownSkill.cs" id="2_1j1en"]
+[ext_resource type="Texture2D" uid="uid://ddfxuf4tdeldx" path="res://Textures/Spells/blank.png" id="3_gv0p5"]
 
 [sub_resource type="InputEventKey" id="InputEventKey_fkbda"]
 device = -1
@@ -12,20 +12,20 @@ unicode = 102
 [sub_resource type="Shortcut" id="Shortcut_yphgx"]
 events = [SubResource("InputEventKey_fkbda")]
 
-[node name="CooldownSpell" type="TextureButton" node_paths=PackedStringArray("ProgressBarCooldown", "TimerCooldown", "LabelTime")]
+[node name="CooldownSkill" type="TextureButton" node_paths=PackedStringArray("ProgressBarCooldown", "TimerCooldown", "LabelTime")]
 custom_minimum_size = Vector2(40, 40)
 offset_right = 40.0
 offset_bottom = 40.0
 shortcut = SubResource("Shortcut_yphgx")
-texture_normal = ExtResource("1_6yyx2")
+texture_normal = ExtResource("1_ub8xo")
 ignore_texture_size = true
 stretch_mode = 0
-script = ExtResource("2_3hk7w")
-ProgressBarCooldown = NodePath("Cooldown")
-TimerCooldown = NodePath("Timer")
-LabelTime = NodePath("Time")
+script = ExtResource("2_1j1en")
+ProgressBarCooldown = NodePath("CooldownOverlay")
+TimerCooldown = NodePath("CooldownTimer")
+LabelTime = NodePath("TimeText")
 
-[node name="Cooldown" type="TextureProgressBar" parent="."]
+[node name="CooldownOverlay" type="TextureProgressBar" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -35,10 +35,10 @@ grow_vertical = 2
 max_value = 1.0
 step = 0.01
 fill_mode = 5
-texture_progress = ExtResource("3_jcxa0")
+texture_progress = ExtResource("3_gv0p5")
 tint_progress = Color(0.7058824, 0.7058824, 0.7058824, 0.5882353)
 
-[node name="Key" type="Label" parent="."]
+[node name="ShortcutText" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
@@ -51,7 +51,7 @@ theme_override_font_sizes/font_size = 16
 text = "F	"
 vertical_alignment = 2
 
-[node name="Time" type="Label" parent="."]
+[node name="TimeText" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -68,7 +68,7 @@ text = "0.0"
 horizontal_alignment = 2
 vertical_alignment = 2
 
-[node name="Timer" type="Timer" parent="."]
+[node name="CooldownTimer" type="Timer" parent="."]
 
 [node name="Panel" type="Panel" parent="."]
 show_behind_parent = true
@@ -77,4 +77,4 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [connection signal="pressed" from="." to="." method="_on_pressed"]
-[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[connection signal="timeout" from="CooldownTimer" to="." method="_on_timer_timeout"]
