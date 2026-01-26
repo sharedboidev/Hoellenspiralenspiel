@@ -5,26 +5,27 @@ using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Models;
+using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 public partial class Fireball : Area2D
 {
-    private readonly Random  critRng   = new();
-    private readonly Random  damageRng = new();
-    private          Vector2 richtung;
-    public           Vector2 Destination   { get; set; }
+	private readonly Random           critRng   = new();
+	private readonly Random           damageRng = new();
+	[Export] public  AnimatedSprite2D AnimationSprite;
+	private          Vector2          richtung; 
     public           int     MaxForks      { get; set; } = 5;
     public           int     TimesForked   { get; set; }
     public           double  LebenszeitSec { get; set; } = 15;
     public           double  LebenszeitCurrentSec { get; set; }
 
-    public override void _Ready()
-    {
-        var animationNode = GetNode<CollisionPolygon2D>("CollisionPolygon2D").GetNode<AnimatedSprite2D>("AnimatedSprite2D");
-        animationNode.Play("default");
-
-        BodyEntered += OnBodyEntered;
-    }
+	
+	
+	public override void _Ready()
+	{
+		AnimationSprite.Play("default");
+		BodyEntered += OnBodyEntered;
+	}
 
     private void OnBodyEntered(Node2D body)
     {
