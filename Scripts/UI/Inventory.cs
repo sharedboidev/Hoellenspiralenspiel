@@ -23,7 +23,7 @@ public partial class Inventory : PanelContainer
     {
         var slotScene = ResourceLoader.Load<PackedScene>("res://Scenes/UI/inventory_slot.tscn");
 
-        for (int i = 0; i < AmountSlots; i++)
+        for (var i = 0; i < AmountSlots; i++)
         {
             var instance = slotScene.Instantiate<InventorySlot>();
             ItemGrid.AddChild(instance);
@@ -33,8 +33,6 @@ public partial class Inventory : PanelContainer
     public override void _Process(double delta)
     {
         if (Input.IsActionJustPressed("Tab"))
-        {
             Visible = !Visible;
-        }
     }
 }
