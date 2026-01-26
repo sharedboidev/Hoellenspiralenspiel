@@ -22,16 +22,18 @@ public abstract partial class BaseTooltip : PanelContainer
         FindUIComponents();
         SetDisplayedDataByItem(objectContainer.ContainedItem);
         SetPositionByNode(objectContainer);
+
+        Visible = true;
     }
 
-    public new virtual void Hide() => Position = new Vector2(-900, -900);
+    public new virtual void Hide() => Visible = false;
 
     private void SetDisplayedDataByItem(ITooltipObject tooltipObject)
     {
         if (ObjectTitleLabel is null || ObjectDescriptionLabel is null)
             return;
 
-        ObjectTitleLabel.Text =  $"[center][u]{tooltipObject.TooltipTitle} {DateTime.Now.Second}[/u][/center]";
+        ObjectTitleLabel.Text = $"[center][u]{tooltipObject.TooltipTitle} {DateTime.Now.Second}[/u][/center]";
 
         ObjectDescriptionLabel.Text = $"{Environment.NewLine}" +
                                       $"{tooltipObject.GetTooltipDescription()}{Environment.NewLine}" +
@@ -40,8 +42,8 @@ public abstract partial class BaseTooltip : PanelContainer
 
     private void SetPositionByNode(ITooltipObjectContainer container)
     {
-        var xPosition = container.Position.X;// - Size.X + 10;
-        var yPosition = container.Position.Y - 500;// - Size.Y + 10;
+        var xPosition = container.Position.X - Size.X + 10;
+        var yPosition = container.Position.Y - Size.Y + 10;
 
         if (xPosition <= 0) xPosition = container.Position.X + container.Size.X + 20;
         if (yPosition <= 0) yPosition = container.Position.Y + container.Size.Y + 20;

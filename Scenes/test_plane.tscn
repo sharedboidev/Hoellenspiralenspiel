@@ -474,6 +474,7 @@ SpawnIntervallSec = 0.2
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="AbilityTooltip" parent="CanvasLayer" instance=ExtResource("1_bidin")]
+visible = false
 offset_left = 1000.0
 offset_top = 1000.0
 offset_right = 1300.0
