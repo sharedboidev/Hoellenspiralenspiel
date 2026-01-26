@@ -1,4 +1,5 @@
-﻿using Godot;
+﻿using System.ComponentModel;
+using Godot;
 using Hoellenspiralenspiel.Scripts.Controllers;
 
 namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
@@ -7,6 +8,7 @@ public abstract partial class BaseEnemy : BaseUnit
 {
     protected          Player2D    ChasedPlayer;
     protected          Node        CurrentScene;
+    private            ProgressBar healthbar;
     protected abstract PackedScene AttackScene { get; }
 
     [Export]
@@ -25,8 +27,25 @@ public abstract partial class BaseEnemy : BaseUnit
     {
         base._Ready();
 
-        CurrentScene = GetTree().CurrentScene;
+        CurrentScene       = GetTree().CurrentScene;
+        healthbar          = GetNode<ProgressBar>("%Healthbar");
+        healthbar.MaxValue = LifeMaximum;
+        healthbar.Value    = LifeCurrent;
+
+        PropertyChanged += OnPropertyChanged;
+
         IsAggressive = true;
+    }
+
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(LifeCurrent))
+        {
+            healthbar.Value = LifeCurrent;
+
+            if (!healthbar.Visible && LifeCurrent < LifeMaximum)
+                healthbar.Visible = true;
+        }
     }
 
     protected override void DieProperly()

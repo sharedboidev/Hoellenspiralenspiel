@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://cycesnf53lc51"]
+[gd_scene load_steps=27 format=3 uid="uid://cycesnf53lc51"]
 
 [ext_resource type="Script" uid="uid://dvrmqxff8wdo0" path="res://Scripts/Units/Enemies/TestEnemy.cs" id="1_x3aji"]
 [ext_resource type="Texture2D" uid="uid://bdxqtrxpgx6to" path="res://Textures/Units/Enemies/TestEnemy.png" id="2_ysuca"]
@@ -139,6 +139,12 @@ nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_x3aji")
 nodes/StateMachine/position = Vector2(320, 100)
 node_connections = [&"output", 0, &"StateMachine"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x3aji"]
+bg_color = Color(0.14406255, 0.14406255, 0.14406249, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ysuca"]
+bg_color = Color(0.70586336, 0.076332815, 0.18692863, 1)
+
 [node name="Test Enemy" type="CharacterBody2D" groups=["monsters"]]
 collision_layer = 2
 collision_mask = 5
@@ -170,3 +176,15 @@ advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
 parameters/StateMachine/MoveState/IdleState/blend_position = Vector2(0, 0)
 parameters/StateMachine/MoveState/RunState/blend_position = Vector2(0.9048257, 0.00999999)
+
+[node name="Healthbar" type="ProgressBar" parent="."]
+unique_name_in_owner = true
+visible = false
+offset_left = -20.0
+offset_top = -55.0
+offset_right = 20.0
+offset_bottom = -51.0
+theme_override_styles/background = SubResource("StyleBoxFlat_x3aji")
+theme_override_styles/fill = SubResource("StyleBoxFlat_ysuca")
+value = 50.0
+show_percentage = false
