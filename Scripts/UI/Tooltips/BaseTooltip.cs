@@ -40,13 +40,13 @@ public abstract partial class BaseTooltip : PanelContainer
 
     private void SetPositionByNode(ITooltipObjectContainer container)
     {
-        var xPosition = container.Position.X - Size.X + 10;
-        var yPosition = container.Position.Y - Size.Y + 10;
+        var xPosition = container.Position.X;// - Size.X + 10;
+        var yPosition = container.Position.Y - 500;// - Size.Y + 10;
 
         if (xPosition <= 0) xPosition = container.Position.X + container.Size.X + 20;
         if (yPosition <= 0) yPosition = container.Position.Y + container.Size.Y + 20;
 
-        Position = new Vector2(xPosition, yPosition);
+        GlobalPosition = new Vector2(xPosition, yPosition);
     }
 
     private void FindUIComponents()
