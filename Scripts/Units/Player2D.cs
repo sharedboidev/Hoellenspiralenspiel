@@ -31,8 +31,7 @@ public partial class Player2D : BaseUnit
         if (Input.IsActionJustPressed("F"))
         {
             var fireball = (Fireball)fireballScene.Instantiate();
-            var container = GetNode<Node2D>("Fireballs");
-            
+
             GetTree().CurrentScene.AddChild(fireball);
             
             fireball.Init(GlobalPosition, GetGlobalMousePosition());
