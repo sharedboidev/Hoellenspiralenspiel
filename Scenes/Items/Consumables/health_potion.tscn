@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://cphtaoh2o6ddc"]
+
+[ext_resource type="Script" uid="uid://bka17tesg83fy" path="res://Scripts/Items/Consumables/HealthPotion.cs" id="1_2md7k"]
+[ext_resource type="Texture2D" uid="uid://dqo82syqyywq2" path="res://Textures/Items/Consumables/HealthPotion.png" id="2_k2bee"]
+
+[node name="HealthPotion" type="Node2D" unique_id=936939880 node_paths=PackedStringArray("Icon")]
+script = ExtResource("1_2md7k")
+StacksizeMax = 5
+Icon = NodePath("Icon")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=276818450]
+offset_right = 56.0
+offset_bottom = 56.0
+texture = ExtResource("2_k2bee")
+expand_mode = 1

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -23,7 +24,7 @@ public abstract partial class BaseUnit : CharacterBody2D,
     public int LifeCurrent
     {
         get => lifeCurrent;
-        set => SetField(ref lifeCurrent, value);
+        set => SetField(ref lifeCurrent, Math.Min(value, LifeMaximum));
     }
 
 

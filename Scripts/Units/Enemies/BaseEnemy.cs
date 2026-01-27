@@ -89,7 +89,7 @@ public abstract partial class BaseEnemy : BaseUnit
     {
         Velocity = Vector2.Zero;
 
-        var fireball = AttackScene.Instantiate<Fireball>();
+        var fireball = AttackScene.Instantiate<Abilities.Spells.Fireball>();
 
         GetTree().CurrentScene.AddChild(fireball);
 

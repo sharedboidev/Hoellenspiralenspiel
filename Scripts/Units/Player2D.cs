@@ -49,7 +49,7 @@ public partial class Player2D : BaseUnit
 			if (!spell.CanUse())
 				return;
 			
-			var node = spell.CreateVisual<Fireball>();
+			var node = spell.CreateVisual<Abilities.Spells.Fireball>();
 			GetTree().CurrentScene.AddChild(node);
 			node.Init(GlobalPosition, GetGlobalMousePosition());
 			spell.SkillBarIcon.Use();

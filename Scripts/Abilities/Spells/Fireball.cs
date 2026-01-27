@@ -5,27 +5,26 @@ using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Models;
-using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
+
+namespace Hoellenspiralenspiel.Scripts.Abilities.Spells;
 
 public partial class Fireball : Area2D
 {
-	private readonly Random           critRng   = new();
-	private readonly Random           damageRng = new();
-	[Export] public  AnimatedSprite2D AnimationSprite;
-	private          Vector2          richtung; 
-    public           int     MaxForks      { get; set; } = 5;
-    public           int     TimesForked   { get; set; }
-    public           double  LebenszeitSec { get; set; } = 15;
-    public           double  LebenszeitCurrentSec { get; set; }
+    private readonly Random           critRng   = new();
+    private readonly Random           damageRng = new();
+    [Export] public  AnimatedSprite2D AnimationSprite;
+    private          Vector2          richtung;
+    public           int              MaxForks             { get; set; } = 5;
+    public           int              TimesForked          { get; set; }
+    public           double           LebenszeitSec        { get; set; } = 15;
+    public           double           LebenszeitCurrentSec { get; set; }
 
-	
-	
-	public override void _Ready()
-	{
-		AnimationSprite.Play("default");
-		BodyEntered += OnBodyEntered;
-	}
+    public override void _Ready()
+    {
+        AnimationSprite.Play("default");
+        BodyEntered += OnBodyEntered;
+    }
 
     private void OnBodyEntered(Node2D body)
     {
@@ -92,7 +91,7 @@ public partial class Fireball : Area2D
         Position             += richtung * 800 * delta;
         LebenszeitCurrentSec += d;
 
-        if(LebenszeitCurrentSec >= LebenszeitSec)
+        if (LebenszeitCurrentSec >= LebenszeitSec)
         {
             LebenszeitCurrentSec = 0;
             QueueFree();

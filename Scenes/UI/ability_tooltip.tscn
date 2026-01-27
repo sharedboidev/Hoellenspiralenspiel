@@ -1,38 +1,47 @@
-[gd_scene load_steps=2 format=3 uid="uid://c7cdly8lgcdqk"]
+[gd_scene format=3 uid="uid://c7cdly8lgcdqk"]
 
 [ext_resource type="Script" uid="uid://davcgdhyu68qx" path="res://Scripts/UI/Tooltips/AbilityTooltip.cs" id="1_ri6pb"]
 
-[node name="AbilityTooltip" type="PanelContainer"]
-custom_minimum_size = Vector2(300, 0)
-offset_right = 40.0
-offset_bottom = 40.0
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ri6pb"]
+bg_color = Color(0.13464907, 0.1346491, 0.1346491, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[node name="AbilityTooltip" type="PanelContainer" unique_id=1060802189]
+custom_minimum_size = Vector2(250, 0)
+offset_right = 50.0
+offset_bottom = 76.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ri6pb")
 script = ExtResource("1_ri6pb")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=2079933430]
 layout_mode = 2
 theme_override_constants/margin_left = 15
 theme_override_constants/margin_top = 15
 theme_override_constants/margin_right = 15
 theme_override_constants/margin_bottom = 15
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=856167468]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="ObjectTitle" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+[node name="ObjectTitle" type="RichTextLabel" parent="MarginContainer/VBoxContainer" unique_id=1548258217]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/normal_font_size = 24
 bbcode_enabled = true
-text = "[center]Press F to kick  Fire Balls[/center]"
+text = "[center]Title[/center]"
 fit_content = true
 
-[node name="ObjectDescription" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+[node name="ObjectDescription" type="RichTextLabel" parent="MarginContainer/VBoxContainer" unique_id=1942957644]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
 fit_content = true
