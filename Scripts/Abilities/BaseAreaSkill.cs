@@ -12,10 +12,10 @@ public abstract class BaseSkill
     {
         this.triggerKey = triggerKey;
         scene           = ResourceLoader.Load<PackedScene>(skillSceneResourceName);
-        SkillBarIcon    = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn").Instantiate<CooldownSkill>();
+        SkillBarIcon    = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn").Instantiate<UI.CooldownSkill>();
     }
 
-    public CooldownSkill SkillBarIcon { get; }
+    public UI.CooldownSkill SkillBarIcon { get; }
 
     public bool CanUse()
         => !SkillBarIcon.OnCooldown;

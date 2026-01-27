@@ -1,11 +1,9 @@
-﻿using Godot;
-
+﻿
 namespace Hoellenspiralenspiel.Interfaces;
 
 public interface ITooltipObject
 {
-    [Export]
-    public string TooltipTitle { get; set; }
+    public string TooltipTitle { get; }
 
     string GetTooltipDescription();
 }
