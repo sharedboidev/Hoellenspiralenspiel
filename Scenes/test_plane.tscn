@@ -473,17 +473,19 @@ SpawnIntervallSec = 0.1
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1293480226]
 
+[node name="Inventory" parent="CanvasLayer" unique_id=567735017 instance=ExtResource("5_h4q4d")]
+visible = false
+y_sort_enabled = true
+offset_left = 1192.0
+offset_top = 62.0
+offset_right = 1232.0
+offset_bottom = 102.0
+AmountSlots = 88
+
 [node name="AbilityTooltip" parent="CanvasLayer" unique_id=832974172 instance=ExtResource("1_bidin")]
+unique_name_in_owner = true
 visible = false
 offset_left = 1000.0
 offset_top = 1000.0
-offset_right = 1300.0
-offset_bottom = 1330.0
-
-[node name="Inventory" parent="CanvasLayer" unique_id=567735017 instance=ExtResource("5_h4q4d")]
-visible = false
-offset_left = 1439.0
-offset_top = 326.0
-offset_right = 1479.0
-offset_bottom = 366.0
-AmountSlots = 88
+offset_right = 1150.0
+offset_bottom = 1080.0

@@ -12,4 +12,6 @@ public abstract partial class BaseItem : Node2D,
     public string TooltipTitle => Name;
 
     public abstract string GetTooltipDescription();
+
+    public override void _Ready() => Icon = GetNode<TextureRect>("Icon");
 }

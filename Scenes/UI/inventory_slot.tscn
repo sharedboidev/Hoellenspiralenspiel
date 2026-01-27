@@ -18,7 +18,7 @@ theme_override_constants/margin_bottom = 4
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer" unique_id=1076404156]
 layout_mode = 2
 
-[node name="Image" type="TextureRect" parent="MarginContainer/PanelContainer" unique_id=359783755]
+[node name="Icon" type="TextureRect" parent="MarginContainer/PanelContainer" unique_id=1908818975]
 unique_name_in_owner = true
 layout_mode = 2
 expand_mode = 1
@@ -39,3 +39,5 @@ text = "99x"
 horizontal_alignment = 2
 
 [connection signal="gui_input" from="MarginContainer/PanelContainer/MarginContainer" to="." method="_on_item_image_gui_input"]
+[connection signal="mouse_entered" from="MarginContainer/PanelContainer/MarginContainer" to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="MarginContainer/PanelContainer/MarginContainer" to="." method="_on_mouse_exited"]

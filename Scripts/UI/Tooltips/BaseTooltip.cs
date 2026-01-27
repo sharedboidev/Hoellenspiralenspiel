@@ -1,7 +1,5 @@
-﻿using System;
-using Godot;
+﻿using Godot;
 using Hoellenspiralenspiel.Interfaces;
-using Environment = System.Environment;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
@@ -30,25 +28,22 @@ public abstract partial class BaseTooltip : PanelContainer
 
     private void SetDisplayedDataByItem(ITooltipObject tooltipObject)
     {
-        if (ObjectTitleLabel is null || ObjectDescriptionLabel is null)
+        if (ObjectTitleLabel is null || ObjectDescriptionLabel is null || tooltipObject is null)
             return;
 
-        ObjectTitleLabel.Text = $"[center][u]{tooltipObject.TooltipTitle} {DateTime.Now.Second}[/u][/center]";
-
-        ObjectDescriptionLabel.Text = $"{Environment.NewLine}" +
-                                      $"{tooltipObject.GetTooltipDescription()}{Environment.NewLine}" +
-                                      $"{Environment.NewLine}";
+        ObjectTitleLabel.Text       = $"[center][u]{tooltipObject.TooltipTitle}[/u][/center]";
+        ObjectDescriptionLabel.Text = tooltipObject.GetTooltipDescription();
     }
 
     private void SetPositionByNode(ITooltipObjectContainer container)
     {
-        var xPosition = container.Position.X - Size.X + 10;
-        var yPosition = container.Position.Y - Size.Y + 10;
+        var xPosition = container.TooltipAnchorPoint.X + container.Size.X; // - + 10;
+        var yPosition = container.TooltipAnchorPoint.Y;                    // - Size.Y + 10;
 
-        if (xPosition <= 0) xPosition = container.Position.X + container.Size.X + 20;
-        if (yPosition <= 0) yPosition = container.Position.Y + container.Size.Y + 20;
+        if (xPosition <= 0) xPosition = container.TooltipAnchorPoint.X + container.Size.X + 20;
+        if (yPosition <= 0) yPosition = container.TooltipAnchorPoint.Y + container.Size.Y + 20;
 
-        GlobalPosition = new Vector2(xPosition, yPosition);
+        Position = new Vector2(xPosition, yPosition);
     }
 
     private void FindUIComponents()
@@ -56,5 +51,14 @@ public abstract partial class BaseTooltip : PanelContainer
         Container              ??= GetNode<MarginContainer>("MarginContainer").GetNode<VBoxContainer>("VBoxContainer");
         ObjectDescriptionLabel ??= Container?.GetNode<RichTextLabel>("%ObjectDescription");
         ObjectTitleLabel       ??= Container?.GetNode<RichTextLabel>("%ObjectTitle");
+
+        if (ObjectDescriptionLabel != null)
+        {
+            ObjectDescriptionLabel.FitContent        = true;
+            ObjectDescriptionLabel.SizeFlagsVertical = SizeFlags.ShrinkBegin;
+        }
+
+        if (Container != null)
+            Container.SizeFlagsVertical = SizeFlags.ShrinkBegin;
     }
 }

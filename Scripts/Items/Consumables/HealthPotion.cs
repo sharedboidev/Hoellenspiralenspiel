@@ -1,4 +1,7 @@
 using Godot;
+using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Extensions;
+using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.Items.Consumables;
@@ -8,11 +11,13 @@ public partial class HealthPotion : ConsumableItem
     [Export]
     public float TotalHealthRestoredPercentage { get; set; } = 20;
 
-    public override string GetTooltipDescription() => $"Restores {TotalHealthRestoredPercentage:N}% of your maximum Life.";
+    public override string GetTooltipDescription() => $"Restores {TotalHealthRestoredPercentage:N0}% of your maximum Life.";
 
     protected override void ApplyEffectOfConsumption(BaseUnit consumee)
     {
-        var healedAmount = consumee.LifeMaximum * 0.2;
+        var healedAmount = (float)(consumee.LifeMaximum * 0.2);
         consumee.LifeCurrent += (int)healedAmount;
+
+        consumee.InstatiateFloatingCombatText(new HitResult(healedAmount, HitType.Normal, LifeModificationMode.Heal), consumee.GetParent(), new Vector2(0, -128));
     }
 }

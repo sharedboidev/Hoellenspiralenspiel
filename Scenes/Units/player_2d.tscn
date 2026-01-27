@@ -1,4 +1,4 @@
-[gd_scene load_steps=47 format=3 uid="uid://c8hx5eg0q1vct"]
+[gd_scene format=3 uid="uid://c8hx5eg0q1vct"]
 
 [ext_resource type="Texture2D" uid="uid://7k0aj46tmr1d" path="res://Textures/Units/Player/PlayerSpritesheet.png" id="1_djq3p"]
 [ext_resource type="Script" uid="uid://bwt2hw5i1cwjn" path="res://Scripts/Units/Player2D.cs" id="1_nnb5g"]
@@ -432,47 +432,46 @@ nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_hm4fm")
 nodes/StateMachine/position = Vector2(-40, 80)
 node_connections = [&"output", 0, &"StateMachine"]
 
-[node name="Player2D" type="CharacterBody2D" node_paths=PackedStringArray("SkillBar")]
+[node name="Player2D" type="CharacterBody2D" unique_id=1421126971 node_paths=PackedStringArray("SkillBar")]
 collision_mask = 2
 motion_mode = 1
 platform_on_leave = 2
 platform_floor_layers = 0
 script = ExtResource("1_nnb5g")
 SkillBar = NodePath("CanvasLayer/SkillBar")
+LifeBase = 128
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1710998304]
 position = Vector2(2, -14)
 shape = SubResource("CapsuleShape2D_djq3p")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1968664450]
 y_sort_enabled = true
 position = Vector2(0, -204)
 texture = ExtResource("1_djq3p")
 hframes = 88
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1452542065]
 zoom = Vector2(0.8, 0.8)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_rl3bg")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1155738686]
+libraries/ = SubResource("AnimationLibrary_rl3bg")
 
-[node name="AnimationTree" type="AnimationTree" parent="."]
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=1226250461]
 tree_root = SubResource("AnimationNodeBlendTree_kfbu0")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
 parameters/StateMachine/MoveState/IdleState/blend_position = Vector2(-0.5627426, -0.07048464)
 parameters/StateMachine/MoveState/RunState/blend_position = Vector2(-0.31694698, -0.7400881)
 
-[node name="FireballStartPosition" type="Marker2D" parent="."]
+[node name="FireballStartPosition" type="Marker2D" parent="." unique_id=25906932]
 position = Vector2(-1, -64)
 
-[node name="Fireballs" type="Node2D" parent="."]
+[node name="Fireballs" type="Node2D" parent="." unique_id=489826101]
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=887654130]
 
-[node name="SkillBar" type="HBoxContainer" parent="CanvasLayer"]
+[node name="SkillBar" type="HBoxContainer" parent="CanvasLayer" unique_id=1930834205]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
