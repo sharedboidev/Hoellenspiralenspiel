@@ -28,7 +28,9 @@ public partial class Fireball : Area2D
 
     private void OnBodyEntered(Node2D body)
     {
-        if (body.IsInGroup("monsters"))
+        if (body is TileMapLayer tileMapLayer && tileMapLayer.Name == "Walls")
+            QueueFree();
+        else if (body.IsInGroup("monsters"))
         {
             var damage  = damageRng.Next(50, 251);
             var isCrit  = critRng.Next(1, 11) == 10;
@@ -41,7 +43,7 @@ public partial class Fireball : Area2D
             var fakeHit = new HitResult(damage, hitType, LifeModificationMode.Damage);
             enemy.InstatiateFloatingCombatText(fakeHit, GetTree().CurrentScene, new Vector2(0, -60));
 
-            var controller = GetTree().CurrentScene.GetNode<EnemyController>(nameof(EnemyController));
+            var controller = GetTree().CurrentScene.GetNode<EnemyController>("%"+nameof(EnemyController));
 
             if (controller.SpawnedEnemies.Count < 2)
             {

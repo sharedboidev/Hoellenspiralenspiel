@@ -27,7 +27,6 @@ public abstract partial class BaseUnit : CharacterBody2D,
         set => SetField(ref lifeCurrent, Math.Min(value, LifeMaximum));
     }
 
-
     [Export]
     public Vector2 MovementDirection { get; set; } = Vector2.Zero;
 

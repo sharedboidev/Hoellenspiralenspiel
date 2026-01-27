@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Godot;
+using Hoellenspiralenspiel.Scripts.Abilities.Spells;
 using Hoellenspiralenspiel.Scripts.Controllers;
 
 namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
@@ -50,7 +51,7 @@ public abstract partial class BaseEnemy : BaseUnit
 
     protected override void DieProperly()
     {
-        var controller = CurrentScene.GetNode<EnemyController>(nameof(EnemyController));
+        var controller = CurrentScene.GetNode<EnemyController>("%" + nameof(EnemyController));
         controller.SpawnedEnemies.Remove(this);
 
         base.DieProperly();
@@ -63,8 +64,8 @@ public abstract partial class BaseEnemy : BaseUnit
         if (!IsAggressive || ChasedPlayer.IsDead)
             return;
 
-        var distance     = ChasedPlayer.Position.DistanceTo(Position);
-        var isInRange    = distance < AttackRange;
+        var distance  = ChasedPlayer.Position.DistanceTo(Position);
+        var isInRange = distance < AttackRange;
 
         if (isInRange)
             ShootAtPlayer();
@@ -89,9 +90,9 @@ public abstract partial class BaseEnemy : BaseUnit
     {
         Velocity = Vector2.Zero;
 
-        var fireball = AttackScene.Instantiate<Abilities.Spells.Fireball>();
+        var fireball = AttackScene.Instantiate<Fireball>();
 
-        GetTree().CurrentScene.AddChild(fireball);
+        GetTree().CurrentScene.GetNode<Node2D>("Environment").AddChild(fireball);
 
         fireball.Init(Position, ChasedPlayer.Position);
     }

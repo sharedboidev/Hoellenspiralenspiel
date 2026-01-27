@@ -1,5 +1,4 @@
-﻿
-namespace Hoellenspiralenspiel.Interfaces;
+﻿namespace Hoellenspiralenspiel.Interfaces;
 
 public interface ITooltipObject
 {

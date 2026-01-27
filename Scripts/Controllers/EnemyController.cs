@@ -14,7 +14,7 @@ public partial class EnemyController : Node
     private readonly Random                isEliteRng          = new();
     private readonly Random                isRareRng           = new();
     private readonly RandomNumberGenerator rng                 = new();
-    private          Node                  container;
+    private          Node2D                  container;
     private          Node                  currentScene;
     private          Player2D              player;
     private          Timer                 spawnTimer;
@@ -28,9 +28,9 @@ public partial class EnemyController : Node
     [Export]
     public float MinDistanceToPlayer { get; set; } = 220f;
 
-    public  List<BaseEnemy> SpawnedEnemies { get; set; } = new();
-    private bool            NextSpawnIsRare         => isRareRng.Next(1, 11) == 1;
-    private bool            NextSpawnIsElite        => isEliteRng.Next(1, 16) == 1;
+    public  List<BaseEnemy> SpawnedEnemies   { get; set; } = new();
+    private bool            NextSpawnIsRare  => isRareRng.Next(1, 11) == 1;
+    private bool            NextSpawnIsElite => isEliteRng.Next(1, 16) == 1;
 
     public override void _Ready()
     {
@@ -39,8 +39,8 @@ public partial class EnemyController : Node
         rng.Randomize();
 
         currentScene = GetTree().CurrentScene;
-        player       = currentScene.GetNode<Player2D>("Player 2D");
-        container    = GetNode<Node>("Container");
+        player       = currentScene.GetNode<Player2D>("%Player 2D");
+        container    = currentScene.GetNode<Node2D>("%Enemies");
         spawnTimer   = GetNode<Timer>("EnemySpawnTimer");
 
         spawnTimer.WaitTime =  SpawnIntervallSec;
@@ -49,7 +49,13 @@ public partial class EnemyController : Node
 
     public override void _PhysicsProcess(double delta) => MakeEnemiesDoTheirThing(delta);
 
-    private void SpawnTimerOnTimeout() => SpawnUnit<TestEnemy>();
+    private void SpawnTimerOnTimeout()
+    {
+        if (SpawnedEnemies.Count >= 100)
+            return;
+
+        SpawnUnit<TestEnemy>();
+    }
 
     private void SpawnUnit<T>(int amountToSpawn = 1)
             where T : BaseEnemy
@@ -58,9 +64,10 @@ public partial class EnemyController : Node
         {
             var spawn = EnemyToSpawn.Instantiate<T>();
 
-            if(NextSpawnIsRare)
+            if (NextSpawnIsRare)
                 spawn.MakeRare();
-            if(NextSpawnIsElite)
+
+            if (NextSpawnIsElite)
                 spawn.MakeElite();
 
             spawn.Position = GetRandomVisiblePointNotNearPlayer();

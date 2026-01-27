@@ -1,6 +1,3 @@
 ﻿namespace Hoellenspiralenspiel;
 
-public static class StaticMemory
-{
-    
-}
+public static class StaticMemory { }

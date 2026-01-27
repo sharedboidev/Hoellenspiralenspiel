@@ -1,4 +1,5 @@
 ﻿using Godot;
+using Hoellenspiralenspiel.Scripts.UI;
 
 namespace Hoellenspiralenspiel.Scripts.Abilities;
 
@@ -12,10 +13,10 @@ public abstract class BaseSkill
     {
         this.triggerKey = triggerKey;
         scene           = ResourceLoader.Load<PackedScene>(skillSceneResourceName);
-        SkillBarIcon    = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn").Instantiate<UI.CooldownSkill>();
+        SkillBarIcon    = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn").Instantiate<CooldownSkill>();
     }
 
-    public UI.CooldownSkill SkillBarIcon { get; }
+    public CooldownSkill SkillBarIcon { get; }
 
     public bool CanUse()
         => !SkillBarIcon.OnCooldown;

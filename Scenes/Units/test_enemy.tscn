@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://cycesnf53lc51"]
+[gd_scene format=3 uid="uid://cycesnf53lc51"]
 
 [ext_resource type="Script" uid="uid://dvrmqxff8wdo0" path="res://Scripts/Units/Enemies/TestEnemy.cs" id="1_x3aji"]
 [ext_resource type="Texture2D" uid="uid://bdxqtrxpgx6to" path="res://Textures/Units/Enemies/TestEnemy.png" id="2_ysuca"]
@@ -145,39 +145,39 @@ bg_color = Color(0.14406255, 0.14406255, 0.14406249, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ysuca"]
 bg_color = Color(0.70586336, 0.076332815, 0.18692863, 1)
 
-[node name="Test Enemy" type="CharacterBody2D" groups=["monsters"]]
+[node name="Test Enemy" type="CharacterBody2D" unique_id=584748248 groups=["monsters"]]
+z_index = 1
+y_sort_enabled = true
 collision_layer = 2
-collision_mask = 5
+collision_mask = 15
 platform_on_leave = 2
 platform_floor_layers = 0
 script = ExtResource("1_x3aji")
 LifeBase = 258
 Movementspeed = 50.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=495005380]
 position = Vector2(0, -14)
 shape = SubResource("RectangleShape2D_x3aji")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=994557563]
 y_sort_enabled = true
 position = Vector2(0, -24)
 texture = ExtResource("2_ysuca")
 hframes = 4
 frame = 3
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_qyk0s")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=400631682]
+libraries/ = SubResource("AnimationLibrary_qyk0s")
 
-[node name="AnimationTree" type="AnimationTree" parent="."]
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=1408622670]
 tree_root = SubResource("AnimationNodeBlendTree_ysuca")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
 parameters/StateMachine/MoveState/IdleState/blend_position = Vector2(0, 0)
 parameters/StateMachine/MoveState/RunState/blend_position = Vector2(0.9048257, 0.00999999)
 
-[node name="Healthbar" type="ProgressBar" parent="."]
+[node name="Healthbar" type="ProgressBar" parent="." unique_id=1668243178]
 unique_name_in_owner = true
 visible = false
 offset_left = -20.0

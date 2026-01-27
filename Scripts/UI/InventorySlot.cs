@@ -11,6 +11,7 @@ public partial class InventorySlot : PanelContainer,
                                      ITooltipObjectContainer
 {
     public delegate void MouseMovementEventHandler(MousemovementDirection mousemovementDirection, InventorySlot inventorySlot);
+
     public delegate void SlotEmptiedEventHandler(InventorySlot inventorySlot);
 
     private TextureRect                    icon;
@@ -104,7 +105,7 @@ public partial class InventorySlot : PanelContainer,
         if (inputEvent is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } &&
             ContainedItem is ConsumableItem consumable)
         {
-            var player = GetTree().CurrentScene.GetNode<Player2D>("Player 2D");
+            var player = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D");
 
             consumable.GetConsumedBy(player);
         }

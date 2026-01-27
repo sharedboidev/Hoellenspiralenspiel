@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://o5bkctc8ux1c"]
+[gd_scene format=3 uid="uid://o5bkctc8ux1c"]
 
 [ext_resource type="Script" uid="uid://bxqe0uvygnlhg" path="res://Scripts/Abilities/Spells/Fireball.cs" id="1_hnbfx"]
 [ext_resource type="Texture2D" uid="uid://ce3u28re7kyut" path="res://Textures/Spells/Fire Spell_Frame_01.png" id="2_hnbfx"]
@@ -42,18 +42,20 @@ animations = [{
 "speed": 30.0
 }]
 
-[node name="Fireball" type="Area2D" node_paths=PackedStringArray("AnimationSprite")]
+[node name="Fireball" type="Area2D" unique_id=1072243128 node_paths=PackedStringArray("AnimationSprite")]
+z_index = 1
+y_sort_enabled = true
 scale = Vector2(0.16, 0.16)
 collision_layer = 4
-collision_mask = 2
+collision_mask = 10
 script = ExtResource("1_hnbfx")
 AnimationSprite = NodePath("CollisionPolygon2D/AnimatedSprite2D")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1243854169]
 build_mode = 1
 polygon = PackedVector2Array(-125, 100, -187.5, 93.75, -262.5, 50, -268.75, -25, -231.25, -75, -156.25, -100, -75, -87.5, -18.75, -50, 37.5, -31.25, 112.5, -50, 187.5, -43.75, 187.5, 0, 118.75, 12.5, 93.75, 43.75, 37.5, 75, -62.5, 93.75)
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CollisionPolygon2D"]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CollisionPolygon2D" unique_id=824782845]
 sprite_frames = SubResource("SpriteFrames_hnbfx")
 frame = 7
 frame_progress = 1.0

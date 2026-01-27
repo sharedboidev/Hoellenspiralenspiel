@@ -12,6 +12,6 @@ public partial class AbilityTooltip : BaseTooltip
     {
         base._Ready();
 
-        Player = GetTree()?.CurrentScene?.GetNode<Player2D>("Player 2D");
+        Player = GetTree()?.CurrentScene?.GetNode<Player2D>("%Player 2D");
     }
 }

@@ -2,57 +2,57 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Abilities;
+using Hoellenspiralenspiel.Scripts.Abilities.Spells;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
 public partial class Player2D : BaseUnit
 {
-	private readonly List<BaseSkill> skills = new()
-	{
-		new FireballSkill(Key.F)
-	};
+    private readonly List<BaseSkill> skills = new()
+    {
+        new FireballSkill(Key.F)
+    };
+    [Export] public HBoxContainer SkillBar;
+    private         AnimationTree AnimationTree { get; set; }
 
-	[Export] public HBoxContainer SkillBar;
-	private         AnimationTree AnimationTree { get; set; }
+    public override void _Ready()
+    {
+        base._Ready();
 
-	public override void _Ready()
-	{
-		base._Ready();
+        AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
+        Movementspeed = 300;
 
-		AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
-		Movementspeed = 300;
+        foreach (var skill in skills)
+            SkillBar.AddChild(skill.SkillBarIcon);
+    }
 
-		foreach (var skill in skills)
-			SkillBar.AddChild(skill.SkillBarIcon);
-	}
+    public override void _PhysicsProcess(double delta)
+    {
+        MovementDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+        Velocity          = MovementDirection * Movementspeed;
 
-	public override void _PhysicsProcess(double delta)
-	{
-		MovementDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
-		Velocity          = MovementDirection * Movementspeed;
+        if (MovementDirection != Vector2.Zero)
+        {
+            AnimationTree.Set("parameters/StateMachine/MoveState/RunState/blend_position", MovementDirection * new Vector2(1, -1));
+            AnimationTree.Set("parameters/StateMachine/MoveState/IdleState/blend_position", MovementDirection * new Vector2(1, -1));
+        }
 
-		if (MovementDirection != Vector2.Zero)
-		{
-			AnimationTree.Set("parameters/StateMachine/MoveState/RunState/blend_position", MovementDirection * new Vector2(1, -1));
-			AnimationTree.Set("parameters/StateMachine/MoveState/IdleState/blend_position", MovementDirection * new Vector2(1, -1));
-		}
+        MoveAndSlide();
 
-		MoveAndSlide();
+        if (Input.IsActionJustPressed("F"))
+        {
+            var spell = skills.FirstOrDefault(s => s.TriggeredBy(Key.F));
 
-		if (Input.IsActionJustPressed("F"))
-		{
-			var spell = skills.FirstOrDefault(s => s.TriggeredBy(Key.F));
+            if (spell is null)
+                return;
 
-			if (spell is null)
-				return;
+            if (!spell.CanUse())
+                return;
 
-			if (!spell.CanUse())
-				return;
-			
-			var node = spell.CreateVisual<Abilities.Spells.Fireball>();
-			GetTree().CurrentScene.AddChild(node);
-			node.Init(GlobalPosition, GetGlobalMousePosition());
-			spell.SkillBarIcon.Use();
-		}
-	}
+            var node = spell.CreateVisual<Fireball>();
+            GetTree().CurrentScene.GetNode<Node2D>("Environment").AddChild(node);
+            node.Init(GlobalPosition, GetGlobalMousePosition());
+            spell.SkillBarIcon.Use();
+        }
+    }
 }
