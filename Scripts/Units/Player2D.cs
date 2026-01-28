@@ -50,6 +50,7 @@ public partial class Player2D : BaseUnit
                 return;
 
             var node = spell.CreateVisual<Fireball>();
+            node.ShotBy = this;
             GetTree().CurrentScene.GetNode<Node2D>("Environment").AddChild(node);
             node.Init(GlobalPosition, GetGlobalMousePosition());
             spell.SkillBarIcon.Use();
