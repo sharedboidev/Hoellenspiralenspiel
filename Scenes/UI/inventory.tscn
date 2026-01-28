@@ -1,23 +1,27 @@
-[gd_scene load_steps=2 format=3 uid="uid://6yhxh7p0ijv4"]
+[gd_scene format=3 uid="uid://6yhxh7p0ijv4"]
 
 [ext_resource type="Script" uid="uid://bj1cq12utb6ep" path="res://Scripts/UI/Inventory.cs" id="1_s6m5x"]
+[ext_resource type="PackedScene" uid="uid://devwjm5t1shxy" path="res://Scenes/UI/mouse_object.tscn" id="2_dt15g"]
 
-[node name="Inventory" type="PanelContainer"]
+[node name="Inventory" type="PanelContainer" unique_id=2062578477]
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("1_s6m5x")
 AmountSlots = 32
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=365297740]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="ItemGrid" type="GridContainer" parent="MarginContainer"]
+[node name="ItemGrid" type="GridContainer" parent="MarginContainer" unique_id=1934794965]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 4
 theme_override_constants/v_separation = 4
 columns = 8
+
+[node name="MouseObject" parent="." unique_id=145715296 instance=ExtResource("2_dt15g")]
+layout_mode = 2

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://faijsg66lsgi" path="res://Scripts/UI/InventorySlot.cs" id="1_brh76"]
 
 [node name="InventorySlot" type="PanelContainer" unique_id=812413707]
-custom_minimum_size = Vector2(56, 56)
+custom_minimum_size = Vector2(64, 64)
 offset_right = 64.0
 offset_bottom = 64.0
 script = ExtResource("1_brh76")
@@ -34,7 +34,7 @@ layout_mode = 2
 size_flags_vertical = 8
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 16
 text = "99x"
 horizontal_alignment = 2
 

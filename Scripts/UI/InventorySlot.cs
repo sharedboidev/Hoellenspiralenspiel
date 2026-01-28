@@ -14,13 +14,17 @@ public partial class InventorySlot : PanelContainer,
 
     public delegate void SlotEmptiedEventHandler(InventorySlot inventorySlot);
 
-    private TextureRect                    icon;
-    private Label                          stacksizeDisplay;
-    public  bool                           HasSpace           => ContainedItem is null or ConsumableItem { IsFull: false };
-    public  ITooltipObject                 ContainedItem      { get; set; }
-    public  Vector2                        TooltipAnchorPoint => GlobalPosition;
-    public event MouseMovementEventHandler MouseMoving;
-    public event SlotEmptiedEventHandler   SlotEmptied;
+    public delegate void WithdrawingItemEventHandler(BaseItem withdrawnItem);
+
+    private TextureRect                      icon;
+    private Label                            stacksizeDisplay;
+    public  bool                             HasSpace           => ContainedItem is null or ConsumableItem { IsFull: false };
+    public  Inventory                        Inventory          { get; set; }
+    public  ITooltipObject                   ContainedItem      { get; set; }
+    public  Vector2                          TooltipAnchorPoint => GlobalPosition;
+    public event MouseMovementEventHandler   MouseMoving;
+    public event WithdrawingItemEventHandler WithdrawingItem;
+    public event SlotEmptiedEventHandler     SlotEmptied;
 
     public override void _Ready()
     {
@@ -28,31 +32,33 @@ public partial class InventorySlot : PanelContainer,
         stacksizeDisplay = GetNode<Label>("%StacksizeDisplay");
     }
 
-    public void SetItem(BaseItem incomingItem)
+    public bool SetItem(BaseItem incomingItem)
     {
         if (!HasSpace)
-            return;
+            return false;
 
         if (ContainedItem is ConsumableItem containedConsumable && incomingItem is ConsumableItem incomingConsumable)
         {
-            containedConsumable.TryAddToStack(incomingConsumable.StacksizeCurrent);
+            var couldAdd = containedConsumable.TryAddToStack(incomingConsumable.StacksizeCurrent);
 
             UpdateAndShowStacksize(containedConsumable);
+
+            return couldAdd;
         }
-        else
-        {
-            ContainedItem = incomingItem;
-            icon.Texture  = incomingItem.Icon.Texture;
 
-            incomingItem.TreeExited += ItemOnTreeExited;
+        ContainedItem = incomingItem;
+        icon.Texture  = incomingItem.Icon.Texture;
 
-            if (incomingItem is not ConsumableItem consumable)
-                return;
+        incomingItem.TreeExited += ItemOnTreeExited;
 
-            UpdateAndShowStacksize(consumable);
+        if (incomingItem is not ConsumableItem consumable)
+            return false;
 
-            consumable.OnStacksizeReduced += ConsumableOnStacksizeReduced;
-        }
+        UpdateAndShowStacksize(consumable);
+
+        consumable.OnStacksizeReduced += ConsumableOnStacksizeReduced;
+
+        return true;
     }
 
     private void UpdateAndShowStacksize(ConsumableItem consumable)
@@ -99,15 +105,34 @@ public partial class InventorySlot : PanelContainer,
 
     public void _on_item_image_gui_input(InputEvent inputEvent)
     {
-        if (ContainedItem is null)
-            return;
+        BaseItem item;
+        var      mouseObject = Inventory.GetNode<MouseObject>(nameof(MouseObject));
 
-        if (inputEvent is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } &&
-            ContainedItem is ConsumableItem consumable)
+        switch (inputEvent)
         {
-            var player = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D");
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } when ContainedItem is ConsumableItem consumable:
+            {
+                var player = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D");
 
-            consumable.GetConsumedBy(player);
+                consumable.GetConsumedBy(player);
+                break;
+            }
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is not null && !mouseObject.HasItem:
+                item = RetrieveItem();
+                WithdrawingItem?.Invoke(item);
+                break;
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is null && mouseObject.HasItem:
+                item = mouseObject.RetrieveItem();
+                SetItem(item);
+                break;
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when HasSpace && mouseObject.HasItem:
+                item = mouseObject.RetrieveItem();
+                var couldSet = SetItem(item);
+
+                if (!couldSet)
+                    mouseObject.Show(item);
+
+                break;
         }
     }
 

@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://devwjm5t1shxy"]
+
+[ext_resource type="Script" uid="uid://dmx0gsw1gcvmh" path="res://Scripts/UI/MouseObject.cs" id="1_7fxyg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7fxyg"]
+bg_color = Color(0.21621025, 0.21621025, 0.21621025, 0.46666667)
+
+[node name="MouseObject" type="PanelContainer" unique_id=145715296]
+visible = false
+custom_minimum_size = Vector2(56, 56)
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 46.0
+offset_bottom = 46.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_7fxyg")
+script = ExtResource("1_7fxyg")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=873664899]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.21960784)
+layout_mode = 2
+expand_mode = 1

@@ -3,6 +3,7 @@ using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Extensions;
+using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Items.Consumables;
 using Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
@@ -12,7 +13,8 @@ public partial class Inventory : PanelContainer
 {
     private GridContainer itemGrid;
     private bool          slotsGenerated;
-    private BaseTooltip   Tooltip => GetTree().CurrentScene.GetNode<AbilityTooltip>("%" + nameof(AbilityTooltip));
+    private BaseTooltip   Tooltip     => GetTree().CurrentScene.GetNode<AbilityTooltip>("%" + nameof(AbilityTooltip));
+    private MouseObject   MouseObject => GetNode<MouseObject>(nameof(MouseObject));
 
     [Export]
     public int AmountSlots { get; set; } = 30;
@@ -36,19 +38,24 @@ public partial class Inventory : PanelContainer
 
         for (var i = 0; i < AmountSlots; i++)
         {
-            var instance = slotScene.Instantiate<InventorySlot>();
-            ItemGrid.AddChild(instance);
+            var inventorySlot = slotScene.Instantiate<InventorySlot>();
 
-            instance.SlotEmptied += InstanceOnSlotEmptied;
-            instance.MouseMoving += InstanceOnMouseMoving;
+            inventorySlot.Inventory       =  this;
+            inventorySlot.SlotEmptied     += InventorySlotOnSlotEmptied;
+            inventorySlot.MouseMoving     += InventorySlotOnMouseMoving;
+            inventorySlot.WithdrawingItem += InventorySlotOnWithdrawingItem;
+
+            ItemGrid.AddChild(inventorySlot);
         }
 
         slotsGenerated = true;
     }
 
-    private void InstanceOnSlotEmptied(InventorySlot inventoryslot) => Tooltip.Hide();
+    private void InventorySlotOnWithdrawingItem(BaseItem withdrawnitem) => MouseObject.Show(withdrawnitem);
 
-    private void InstanceOnMouseMoving(MousemovementDirection mousemovementdirection, InventorySlot inventoryslot)
+    private void InventorySlotOnSlotEmptied(InventorySlot inventoryslot) => Tooltip.Hide();
+
+    private void InventorySlotOnMouseMoving(MousemovementDirection mousemovementdirection, InventorySlot inventoryslot)
     {
         switch (mousemovementdirection)
         {
