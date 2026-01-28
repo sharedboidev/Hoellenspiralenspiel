@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c8hx5eg0q1vct"]
 
-[ext_resource type="Texture2D" uid="uid://7k0aj46tmr1d" path="res://Textures/Units/Player/PlayerSpritesheet.png" id="1_djq3p"]
 [ext_resource type="Script" uid="uid://bwt2hw5i1cwjn" path="res://Scripts/Units/Player2D.cs" id="1_nnb5g"]
+[ext_resource type="Texture2D" uid="uid://qq3ai0jk2etf" path="res://Textures/Units/Player/PlayerSpritesheet_grid.png" id="2_nnb5g"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_djq3p"]
 radius = 15.0
@@ -450,8 +450,9 @@ shape = SubResource("CapsuleShape2D_djq3p")
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1968664450]
 y_sort_enabled = true
 position = Vector2(0, -204)
-texture = ExtResource("1_djq3p")
-hframes = 88
+texture = ExtResource("2_nnb5g")
+hframes = 11
+vframes = 8
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1452542065]
 zoom = Vector2(0.8, 0.8)
