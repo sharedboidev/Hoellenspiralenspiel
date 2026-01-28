@@ -68,7 +68,7 @@ public abstract partial class BaseEnemy : BaseUnit
         var isInRange = distance < AttackRange;
 
         if (isInRange)
-            ShootAtPlayer();
+            ExecuteAttack();
         else
             RunAtPlayer();
 
@@ -84,17 +84,6 @@ public abstract partial class BaseEnemy : BaseUnit
         //         ChasedPlayer.InstatiateFloatingCombatText(fakeHit, CurrentScene, offset: new Vector2(0, -188));
         //     }
         // }
-    }
-
-    private void ShootAtPlayer()
-    {
-        Velocity = Vector2.Zero;
-
-        var fireball = AttackScene.Instantiate<Fireball>();
-
-        GetTree().CurrentScene.GetNode<Node2D>("Environment").AddChild(fireball);
-
-        fireball.Init(Position, ChasedPlayer.Position);
     }
 
     private void RunAtPlayer()

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Godot;
+using Godot.Collections;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Extensions;
@@ -37,11 +38,13 @@ public partial class Fireball : Area2D
             var hitType = isCrit ? HitType.Critical : HitType.Normal;
             damage = isCrit ? (int)(damage * 1.3m) : damage;
 
-            var enemy = body as BaseEnemy;
-            enemy.LifeCurrent -= damage;
+            if(body is not BaseEnemy hitEnemy)
+                return;
+
+            hitEnemy.LifeCurrent -= damage;
 
             var fakeHit = new HitResult(damage, hitType, LifeModificationMode.Damage);
-            enemy.InstatiateFloatingCombatText(fakeHit, GetTree().CurrentScene, new Vector2(0, -60));
+            hitEnemy.InstatiateFloatingCombatText(fakeHit, GetTree().CurrentScene, new Vector2(0, -60));
 
             var controller = GetTree().CurrentScene.GetNode<EnemyController>("%"+nameof(EnemyController));
 
@@ -51,11 +54,36 @@ public partial class Fireball : Area2D
                 return;
             }
 
-            var twoRandomFriends = controller.SpawnedEnemies.Take(2);
+
+            var enemyDistanceDict = new Dictionary<BaseEnemy, float>();
+
+            foreach (var existingEnemy in controller.SpawnedEnemies)
+            {
+                var distance = hitEnemy.GlobalPosition.DistanceSquaredTo(existingEnemy.GlobalPosition);
+
+                if (enemyDistanceDict.Count < 2)
+                {
+                    if (!enemyDistanceDict.ContainsKey(existingEnemy))
+                    {
+                        enemyDistanceDict.Add(existingEnemy, distance);
+                    }
+                    else
+                    {
+                        enemyDistanceDict[existingEnemy] = distance;
+                    }
+                }
+                else if (enemyDistanceDict.Count == 2)
+                {
+                    var highestPair = enemyDistanceDict.MaxBy(dd => dd.Value);
+                    enemyDistanceDict.Remove(highestPair.Key);
+                    enemyDistanceDict.Add(existingEnemy, distance);
+                }
+            }
+
             var fireballScene    = ResourceLoader.Load<PackedScene>("res://Scenes/Spells/fireball.tscn");
             var timesForked      = TimesForked + 1;
 
-            foreach (var friend in twoRandomFriends)
+            foreach (var friend in enemyDistanceDict)
             {
                 if (TimesForked >= MaxForks)
                     continue;
@@ -63,9 +91,9 @@ public partial class Fireball : Area2D
                 var fireball = (Fireball)fireballScene.Instantiate();
                 fireball.TimesForked = timesForked;
 
-                GetTree().CurrentScene.CallDeferred(Node.MethodName.AddChild, fireball);
+                GetTree().CurrentScene.GetNode<Node2D>("Environment").CallDeferred(Node.MethodName.AddChild, fireball);
 
-                fireball.Init(body.Position, friend.Position);
+                fireball.Init(hitEnemy.Position, friend.Key.Position);
             }
 
             QueueFree();

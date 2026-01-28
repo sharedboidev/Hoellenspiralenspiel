@@ -1,4 +1,5 @@
 using Godot;
+using Hoellenspiralenspiel.Scripts.Abilities.Spells;
 
 namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
@@ -15,7 +16,16 @@ public partial class TestEnemy : BaseEnemy
         ChasedPlayer  = CurrentScene.GetNode<Player2D>("%Player 2D");
     }
 
-    protected override void ExecuteAttack() { }
+    protected override void ExecuteAttack()
+    {
+        Velocity = Vector2.Zero;
+
+        var fireball = AttackScene.Instantiate<Fireball>();
+
+        GetTree().CurrentScene.GetNode<Node2D>("Environment").AddChild(fireball);
+
+        fireball.Init(Position, ChasedPlayer.Position);
+    }
 
     public override void _PhysicsProcess(double delta)
     {

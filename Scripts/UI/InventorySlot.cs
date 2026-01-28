@@ -28,25 +28,25 @@ public partial class InventorySlot : PanelContainer,
         stacksizeDisplay = GetNode<Label>("%StacksizeDisplay");
     }
 
-    public void SetItem(BaseItem item)
+    public void SetItem(BaseItem incomingItem)
     {
         if (!HasSpace)
             return;
 
-        if (ContainedItem is ConsumableItem containedConsumable && item is ConsumableItem consumableItem)
+        if (ContainedItem is ConsumableItem containedConsumable && incomingItem is ConsumableItem incomingConsumable)
         {
-            containedConsumable.TryAddToStack(consumableItem.StacksizeCurrent);
+            containedConsumable.TryAddToStack(incomingConsumable.StacksizeCurrent);
 
             UpdateAndShowStacksize(containedConsumable);
         }
         else
         {
-            ContainedItem = item;
-            icon.Texture  = item.Icon.Texture;
+            ContainedItem = incomingItem;
+            icon.Texture  = incomingItem.Icon.Texture;
 
-            item.TreeExited += ItemOnTreeExited;
+            incomingItem.TreeExited += ItemOnTreeExited;
 
-            if (item is not ConsumableItem consumable)
+            if (incomingItem is not ConsumableItem consumable)
                 return;
 
             UpdateAndShowStacksize(consumable);

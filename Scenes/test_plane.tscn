@@ -27,13 +27,14 @@ y_sort_enabled = true
 tile_map_data = PackedByteArray("AAAEAAcAEAAIAAAAAAAGAAsAEAAJAAAAAAAJAP7/EAAAAAEAAAAIAP//EAAAAAAAAAAIAAAAEAAAAAEAAAAHAAEAEAAAAAEAAAAHAAIAEAAAAAEAAAAGAAMAEAAAAAEAAAAGAAQAEAAAAAEAAAAFAAUAEAAAAAAAAAAFAAYAEAAAAAEAAAAHAAoAEAADAAEAAAAHAAkAEAADAAEAAAAIAAgAEAADAAEAAAAIAAcAEAADAAEAAAAJAAYAEAADAAEAAAAJAAUAEAADAAEAAAAKAAQAEAADAAEAAAAKAAMAEAADAAAAAAALAAIAEAADAAEAAAALAAEAEAALAAAAAAAJAP3/EAAKAAAAAAAKAP7/EAACAAEAAAAKAP//EAACAAEAAAALAAAAEAACAAEAAAAFAAgAEAAFAAAAAAAGAAoAEAAEAAAAAAA=")
 tile_set = ExtResource("1_vglo3")
 
+[node name="Player 2D" parent="Environment" unique_id=809220738 instance=ExtResource("3_35xgq")]
+unique_name_in_owner = true
+y_sort_enabled = false
+position = Vector2(2594, 50)
+
 [node name="Enemies" type="Node2D" parent="Environment" unique_id=845394208]
 unique_name_in_owner = true
 y_sort_enabled = true
-
-[node name="Player 2D" parent="Environment" unique_id=809220738 instance=ExtResource("3_35xgq")]
-unique_name_in_owner = true
-position = Vector2(1000, 1000)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1293480226]
 
