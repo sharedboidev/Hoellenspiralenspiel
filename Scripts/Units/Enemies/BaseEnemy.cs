@@ -56,8 +56,6 @@ public abstract partial class BaseEnemy : BaseUnit
         var controller = CurrentScene.GetNode<EnemyController>("%" + nameof(EnemyController));
         controller.SpawnedEnemies.Remove(this);
 
-
-
         base.DieProperly();
     }
 

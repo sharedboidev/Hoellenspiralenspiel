@@ -1,0 +1,191 @@
+[gd_scene format=3 uid="uid://cnxyy07a3er8q"]
+
+[ext_resource type="Script" uid="uid://bw5x32awb8efw" path="res://Scripts/Units/Enemies/BlueBlob.cs" id="1_e1ef1"]
+[ext_resource type="Texture2D" uid="uid://32vlmynx8of0" path="res://Textures/Units/Enemies/BlueBlob/Slime1_Run_with_shadow.png" id="1_e786n"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_dn1kk"]
+
+[sub_resource type="Animation" id="Animation_e1ef1"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_e786n"]
+resource_name = "run_down"
+length = 0.8
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.09959524, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7]
+}
+
+[sub_resource type="Animation" id="Animation_wrm3r"]
+resource_name = "run_left"
+length = 0.8
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [16, 17, 18, 19, 20, 21, 22, 23]
+}
+
+[sub_resource type="Animation" id="Animation_tyw56"]
+resource_name = "run_right"
+length = 0.8
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [24, 25, 26, 27, 28, 29, 30, 31]
+}
+
+[sub_resource type="Animation" id="Animation_in1bd"]
+resource_name = "run_top"
+length = 0.8
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [8, 9, 10, 11, 12, 13, 14, 15]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_e1ef1"]
+_data = {
+&"RESET": SubResource("Animation_e1ef1"),
+&"run_down": SubResource("Animation_e786n"),
+&"run_left": SubResource("Animation_wrm3r"),
+&"run_right": SubResource("Animation_tyw56"),
+&"run_top": SubResource("Animation_in1bd")
+}
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_e786n"]
+animation = &"run_top"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_e1ef1"]
+animation = &"run_right"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_in1bd"]
+animation = &"run_down"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_wrm3r"]
+animation = &"run_left"
+
+[sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_tyw56"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_e786n")
+blend_point_0/pos = Vector2(0, 1)
+blend_point_1/node = SubResource("AnimationNodeAnimation_e1ef1")
+blend_point_1/pos = Vector2(1, 0)
+blend_point_2/node = SubResource("AnimationNodeAnimation_in1bd")
+blend_point_2/pos = Vector2(0, -1)
+blend_point_3/node = SubResource("AnimationNodeAnimation_wrm3r")
+blend_point_3/pos = Vector2(-1, 0)
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_qiutx"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_x87bo"]
+states/RunState/node = SubResource("AnimationNodeBlendSpace2D_tyw56")
+states/RunState/position = Vector2(469.19998, 99.616005)
+transitions = ["Start", "RunState", SubResource("AnimationNodeStateMachineTransition_qiutx")]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_jm8ae"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_5enjw"]
+states/MoveState/node = SubResource("AnimationNodeStateMachine_x87bo")
+states/MoveState/position = Vector2(396.4, 100.159996)
+transitions = ["Start", "MoveState", SubResource("AnimationNodeStateMachineTransition_jm8ae")]
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_dn1kk"]
+nodes/output/position = Vector2(576, 128)
+nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_5enjw")
+nodes/StateMachine/position = Vector2(240, 80)
+node_connections = [&"output", 0, &"StateMachine"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dn1kk"]
+bg_color = Color(0.14406255, 0.14406255, 0.14406249, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e786n"]
+bg_color = Color(0.70586336, 0.076332815, 0.18692863, 1)
+
+[node name="BlueBlob" type="CharacterBody2D" unique_id=552501055 groups=["monsters"]]
+scale = Vector2(2, 2)
+collision_layer = 2
+collision_mask = 13
+script = ExtResource("1_e1ef1")
+IsAggressive = true
+LifeBase = 120
+Movementspeed = 25.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=174800444]
+position = Vector2(0, -0.5)
+shape = SubResource("CircleShape2D_dn1kk")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=604546868]
+texture = ExtResource("1_e786n")
+hframes = 8
+vframes = 4
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1060821654]
+libraries/ = SubResource("AnimationLibrary_e1ef1")
+
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=30115427]
+tree_root = SubResource("AnimationNodeBlendTree_dn1kk")
+advance_expression_base_node = NodePath("..")
+anim_player = NodePath("../AnimationPlayer")
+parameters/StateMachine/MoveState/RunState/blend_position = Vector2(0.22258914, 0)
+
+[node name="Healthbar" type="ProgressBar" parent="." unique_id=813237691]
+unique_name_in_owner = true
+visible = false
+offset_left = -20.0
+offset_top = -55.0
+offset_right = 20.0
+offset_bottom = -51.0
+theme_override_styles/background = SubResource("StyleBoxFlat_dn1kk")
+theme_override_styles/fill = SubResource("StyleBoxFlat_e786n")
+value = 50.0
+show_percentage = false

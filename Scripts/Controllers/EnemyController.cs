@@ -23,8 +23,11 @@ public partial class EnemyController : Node
     private          Player2D              player;
     private          Timer                 spawnTimer;
 
+    // [Export]
+    // public PackedScene EnemyToSpawn { get; set; }
+
     [Export]
-    public PackedScene EnemyToSpawn { get; set; }
+    public PackedScene[] EnemiesToSpawn { get; set; }
 
     [Export]
     public Lootsystem Lootsystem { get; set; }
@@ -66,15 +69,18 @@ public partial class EnemyController : Node
         if (SpawnedEnemies.Count >= 100)
             return;
 
-        SpawnUnit<TestEnemy>();
+        if (SpawnedEnemies.Count % 2 == 0)
+            SpawnUnit<TestEnemy>(EnemiesToSpawn[0]);
+        else
+            SpawnUnit<BlueBlob>(EnemiesToSpawn[1]);
     }
 
-    private void SpawnUnit<T>(int amountToSpawn = 1)
+    private void SpawnUnit<T>(PackedScene enemyToSpawn, int amountToSpawn = 1)
             where T : BaseEnemy
     {
         for (var i = 0; i < amountToSpawn; i++)
         {
-            var spawn = EnemyToSpawn.Instantiate<T>();
+            var spawn = enemyToSpawn.Instantiate<T>();
 
             if (NextSpawnIsRare)
                 spawn.MakeRare();
