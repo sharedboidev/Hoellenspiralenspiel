@@ -54,12 +54,14 @@ public abstract partial class BaseEnemy : BaseUnit
         var controller = CurrentScene.GetNode<EnemyController>("%" + nameof(EnemyController));
         controller.SpawnedEnemies.Remove(this);
 
+
+
         base.DieProperly();
     }
 
     protected abstract void ExecuteAttack();
 
-    public void ChasePlayer(double delta)
+    public void ChasePlayer()
     {
         if (!IsAggressive || ChasedPlayer.IsDead)
             return;
@@ -71,19 +73,6 @@ public abstract partial class BaseEnemy : BaseUnit
             ExecuteAttack();
         else
             RunAtPlayer();
-
-        // for (var i = 0; i < GetSlideCollisionCount(); i++)
-        // {
-        //     var collision      = GetSlideCollision(i);
-        //     var collidedObject = (Node)collision.GetCollider();
-        //
-        //     if (collidedObject is Player2D)
-        //     {
-        //         var fakeHit = new HitResult(9001, HitType.Normal, LifeModificationMode.Damage);
-        //
-        //         ChasedPlayer.InstatiateFloatingCombatText(fakeHit, CurrentScene, offset: new Vector2(0, -188));
-        //     }
-        // }
     }
 
     private void RunAtPlayer()

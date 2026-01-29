@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Extensions;
+using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
 
@@ -14,13 +17,15 @@ public partial class EnemyController : Node
     private readonly Random                isEliteRng          = new();
     private readonly Random                isRareRng           = new();
     private readonly RandomNumberGenerator rng                 = new();
-    private          Node2D                  container;
+    private          Node2D                container;
     private          Node                  currentScene;
     private          Player2D              player;
     private          Timer                 spawnTimer;
 
     [Export]
     public PackedScene EnemyToSpawn { get; set; }
+
+    private PackedScene LootbagScene { get; set; } = ResourceLoader.Load<PackedScene>("res://Scenes/Objects/lootbag.tscn");
 
     [Export]
     public float SpawnIntervallSec { get; set; } = 1.5f;
@@ -70,17 +75,46 @@ public partial class EnemyController : Node
             if (NextSpawnIsElite)
                 spawn.MakeElite();
 
-            spawn.Position = GetRandomVisiblePointNotNearPlayer();
+            spawn.Position        =  GetRandomVisiblePointNotNearPlayer();
+            spawn.PropertyChanged += SpawnOnPropertyChanged;
 
-            container.AddChild(spawn);
             SpawnedEnemies.Add(spawn);
+            container.AddChild(spawn);
         }
+    }
+
+    private void SpawnOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(BaseEnemy.LifeCurrent) || sender is not BaseEnemy { LifeCurrent: <= 0 } enemy)
+            return;
+
+        SpawnLootbag(enemy);
+    }
+
+    private void SpawnLootbag(BaseEnemy enemy)
+    {
+        //Lootsystem.GenerateLoot()
+
+        var lootbagInstance = LootbagScene.Instantiate<Lootbag>();
+        lootbagInstance.GlobalPosition = enemy.GlobalPosition;
+        //lootbagInstance.ContainedItem = ...
+        lootbagInstance.LootClicked += LootbagInstanceOnLootClicked;
+
+        GetParent().GetNode<Node2D>("Environment").AddChild(lootbagInstance);
+    }
+
+    private void LootbagInstanceOnLootClicked(Lootbag sender, BaseItem lootedItem)
+    {
+        GD.Print($"{lootedItem?.Name} looted by {player?.Name}");
+
+        lootedItem?.QueueFree();
+        sender?.QueueFree();
     }
 
     private void MakeEnemiesDoTheirThing(double delta)
     {
         foreach (var aggressiveEnemy in SpawnedEnemies.Where(e => e.IsAggressive))
-            aggressiveEnemy.ChasePlayer(delta);
+            aggressiveEnemy.ChasePlayer();
     }
 
     private Vector2 GetRandomVisiblePointNotNearPlayer()
