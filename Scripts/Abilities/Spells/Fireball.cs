@@ -1,10 +1,8 @@
 using System;
 using System.Linq;
 using Godot;
-using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Extensions;
-using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
 
@@ -12,15 +10,14 @@ namespace Hoellenspiralenspiel.Scripts.Abilities.Spells;
 
 public partial class Fireball : Area2D
 {
-    private readonly Random           critRng   = new();
-    private readonly Random           damageRng = new();
-    [Export] public  AnimatedSprite2D AnimationSprite;
-    private          Vector2          richtung;
-    public           BaseUnit         ShotBy               { get; set; }
-    public           int              MaxForks             { get; set; } = 5;
-    public           int              TimesForked          { get; set; }
-    public           double           LebenszeitSec        { get; set; } = 15;
-    public           double           LebenszeitCurrentSec { get; set; }
+    [Export] public AnimatedSprite2D AnimationSprite;
+    private         Vector2          richtung;
+    private         FireballSkill    skill;
+    public          BaseUnit         ShotBy               { get; set; }
+    public          int              MaxForks             { get; set; } = 5;
+    public          int              TimesForked          { get; set; }
+    public          double           LebenszeitSec        { get; set; } = 15;
+    public          double           LebenszeitCurrentSec { get; set; }
 
     public override void _Ready()
     {
@@ -32,52 +29,51 @@ public partial class Fireball : Area2D
     {
         if (body is TileMapLayer tileMapLayer && tileMapLayer.Name == "Walls")
             QueueFree();
-        else if (body.IsInGroup("monsters") && ShotBy != body && body is BaseEnemy hitEnemy)
+
+        else
         {
-            var damage  = damageRng.Next(50, 251);
-            var isCrit  = critRng.Next(1, 11) == 10;
-            var hitType = isCrit ? HitType.Critical : HitType.Normal;
-            damage = isCrit ? (int)(damage * 1.3m) : damage;
-
-            hitEnemy.LifeCurrent -= damage;
-
-            var fakeHit = new HitResult(damage, hitType, LifeModificationMode.Damage);
-            hitEnemy.InstatiateFloatingCombatText(fakeHit, GetTree().CurrentScene, new Vector2(0, -60));
-
-            var controller = GetTree().CurrentScene.GetNode<EnemyController>("%" + nameof(EnemyController));
-
-            if (controller.SpawnedEnemies.Count < 2)
+            if (body.IsInGroup("monsters") && ShotBy != body && body is BaseEnemy hitEnemy)
             {
+                var damageResult = skill.MakeRealDamage(hitEnemy);
+                hitEnemy.LifeCurrent -= (int)damageResult.Value;
+                hitEnemy.InstatiateFloatingCombatText(damageResult, GetTree().CurrentScene, new Vector2(0, -60));
+
+                var controller = GetTree().CurrentScene.GetNode<EnemyController>("%" + nameof(EnemyController));
+
+                if (controller.SpawnedEnemies.Count < 2)
+                {
+                    QueueFree();
+
+                    return;
+                }
+
+                var possibleTargets = controller.SpawnedEnemies.Except([hitEnemy]).ToList();
+                var nearestBois     = hitEnemy.FindClosestEnemyFrom(possibleTargets, 2);
+                var fireballScene   = ResourceLoader.Load<PackedScene>("res://Scenes/Spells/fireball.tscn");
+
+                var timesForked = TimesForked + 1;
+
+                foreach (var friend in nearestBois)
+                {
+                    if (TimesForked >= MaxForks)
+                        continue;
+
+                    var fireball = (Fireball)fireballScene.Instantiate();
+                    fireball.TimesForked = timesForked;
+                    fireball.ShotBy      = hitEnemy;
+
+                    fireball.Init(new FireballSkill(skill.Owner), hitEnemy.Position, friend.Position);
+                    GetTree().CurrentScene.GetNode<Node2D>("Environment").CallDeferred(Node.MethodName.AddChild, fireball);
+                }
+
                 QueueFree();
-                return;
             }
-
-            var possibleTargets = controller.SpawnedEnemies.Except([hitEnemy]).ToList();
-            var nearestBois     = hitEnemy.FindClosestEnemyFrom(possibleTargets, 2);
-            var fireballScene   = ResourceLoader.Load<PackedScene>("res://Scenes/Spells/fireball.tscn");
-
-            var timesForked = TimesForked + 1;
-
-            foreach (var friend in nearestBois)
-            {
-                if (TimesForked >= MaxForks)
-                    continue;
-
-                var fireball = (Fireball)fireballScene.Instantiate();
-                fireball.TimesForked = timesForked;
-                fireball.ShotBy      = hitEnemy;
-
-                GetTree().CurrentScene.GetNode<Node2D>("Environment").CallDeferred(Node.MethodName.AddChild, fireball);
-
-                fireball.Init(hitEnemy.Position, friend.Position);
-            }
-
-            QueueFree();
         }
     }
 
-    public void Init(Vector2 startGlobal, Vector2 destinationGlobal)
+    public void Init(FireballSkill skill, Vector2 startGlobal, Vector2 destinationGlobal)
     {
+        this.skill     = skill;
         GlobalPosition = startGlobal;
 
         richtung = destinationGlobal - startGlobal;

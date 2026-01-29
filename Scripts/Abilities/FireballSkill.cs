@@ -1,11 +1,11 @@
-﻿using Godot;
+﻿using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.Abilities;
 
-public class FireballSkill : BaseSkill
+public class FireballSkill : BaseSpell
 {
-    private readonly double cooldown = 0.25d;
 
-    public FireballSkill(Key triggerKey)
-            : base(triggerKey, "res://Scenes/Spells/fireball.tscn") => SkillBarIcon.Cooldown = cooldown;
+
+    public FireballSkill(BaseUnit owner)
+            : base(50, 250, 10, 0.25d, owner){}
 }
