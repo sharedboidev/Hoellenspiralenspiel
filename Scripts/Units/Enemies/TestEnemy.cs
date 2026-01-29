@@ -21,8 +21,12 @@ public partial class TestEnemy : BaseEnemy
         Velocity = Vector2.Zero;
 
         var fireball = AttackScene.Instantiate<Fireball>();
+        fireball.ShotBy = this;
 
-        GetTree().CurrentScene.GetNode<Node2D>("Environment").AddChild(fireball);
+        GetTree()
+               .CurrentScene
+               .GetNode<Node2D>("Environment")
+               .AddChild(fireball);
 
         fireball.Init(Position, ChasedPlayer.Position);
     }

@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Models;
+using Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
@@ -60,6 +61,24 @@ public abstract partial class BaseUnit : CharacterBody2D,
     {
         if (IsDead)
             DieProperly();
+    }
+
+    public BaseEnemy[] FindClosestEnemyFrom(List<BaseEnemy> existingEnemies, int amountReturned = 1)
+    {
+        var enemyDistanceDict = new Godot.Collections.Dictionary<BaseEnemy, float>();
+
+        foreach (var existingEnemy in existingEnemies)
+        {
+            var distance = GlobalPosition.DistanceSquaredTo(existingEnemy.GlobalPosition);
+
+            enemyDistanceDict.Add(existingEnemy, distance);
+        }
+
+        var nearestBois = enemyDistanceDict.OrderBy(dd => dd.Value)
+                                           .Take(amountReturned)
+                                           .Select(dd => dd.Key)
+                                           .ToArray();
+        return nearestBois;
     }
 
     protected virtual void DieProperly() => QueueFree();

@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Godot;
-using Godot.Collections;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Extensions;
@@ -33,15 +32,12 @@ public partial class Fireball : Area2D
     {
         if (body is TileMapLayer tileMapLayer && tileMapLayer.Name == "Walls")
             QueueFree();
-        else if (body.IsInGroup("monsters") && ShotBy != body)
+        else if (body.IsInGroup("monsters") && ShotBy != body && body is BaseEnemy hitEnemy)
         {
             var damage  = damageRng.Next(50, 251);
             var isCrit  = critRng.Next(1, 11) == 10;
             var hitType = isCrit ? HitType.Critical : HitType.Normal;
             damage = isCrit ? (int)(damage * 1.3m) : damage;
-
-            if (body is not BaseEnemy hitEnemy)
-                return;
 
             hitEnemy.LifeCurrent -= damage;
 
@@ -56,22 +52,11 @@ public partial class Fireball : Area2D
                 return;
             }
 
-            var enemyDistanceDict = new Dictionary<BaseEnemy, float>();
+            var possibleTargets = controller.SpawnedEnemies.Except([hitEnemy]).ToList();
+            var nearestBois     = hitEnemy.FindClosestEnemyFrom(possibleTargets, 2);
+            var fireballScene   = ResourceLoader.Load<PackedScene>("res://Scenes/Spells/fireball.tscn");
 
-            foreach (var existingEnemy in controller.SpawnedEnemies.Except([hitEnemy]))
-            {
-                var distance = hitEnemy.GlobalPosition.DistanceSquaredTo(existingEnemy.GlobalPosition);
-
-                enemyDistanceDict.Add(existingEnemy, distance);
-            }
-
-            var nearestBois = enemyDistanceDict.OrderBy(dd => dd.Value)
-                                               .Take(2)
-                                               .Select(dd => dd.Key)
-                                               .ToArray();
-
-            var fireballScene = ResourceLoader.Load<PackedScene>("res://Scenes/Spells/fireball.tscn");
-            var timesForked   = TimesForked + 1;
+            var timesForked = TimesForked + 1;
 
             foreach (var friend in nearestBois)
             {

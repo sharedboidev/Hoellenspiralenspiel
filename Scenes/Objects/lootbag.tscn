@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://cc0hfsra13pml"]
+
+[ext_resource type="Script" uid="uid://c6ieb4psqn6s1" path="res://Scripts/Objects/Lootbag.cs" id="1_2o4qr"]
+[ext_resource type="Texture2D" uid="uid://cg7fgdit1xho8" path="res://Textures/Objects/Loot/LittleBag.png" id="1_ts0tl"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2o4qr"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[node name="Lootbag" type="PanelContainer" unique_id=358972205]
+z_index = 1
+y_sort_enabled = true
+custom_minimum_size = Vector2(16, 16)
+theme_override_styles/panel = SubResource("StyleBoxFlat_2o4qr")
+script = ExtResource("1_2o4qr")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=66317787]
+z_index = 1
+y_sort_enabled = true
+layout_mode = 2
+texture = ExtResource("1_ts0tl")
+expand_mode = 1
