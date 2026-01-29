@@ -5,4 +5,7 @@
         <EnableDynamicLoading>true</EnableDynamicLoading>
         <LangVersion>default</LangVersion>
     </PropertyGroup>
+    <ItemGroup>
+      <Folder Include="Scripts\Items\Weapons\Staffs\" />
+    </ItemGroup>
 </Project>

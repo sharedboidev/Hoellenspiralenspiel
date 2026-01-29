@@ -5,6 +5,7 @@ using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Items.Consumables;
+using Hoellenspiralenspiel.Scripts.Items.Weapons.Staffs;
 using Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
@@ -84,28 +85,47 @@ public partial class Inventory : PanelContainer
         }
         else if (Input.IsActionJustPressed("+"))
         {
-            var healthPotionScene = ResourceLoader.Load<PackedScene>("res://Scenes/Items/Consumables/health_potion.tscn");
+            var rng      = new Random();
+            var myNumber = rng.Next(1, 6);
 
-            var rng = new Random();
-
-            var potionInstance = healthPotionScene.Instantiate<HealthPotion>();
-            potionInstance.StacksizeCurrent = rng.Next(1, 6);
-
-            var freeSlots = ItemGrid.GetAllChildren<InventorySlot>()
-                                    .Where(slot => slot.HasSpace)
-                                    .ToList();
-
-            if (!freeSlots.Any())
-                return;
-
-            foreach (var freeSlot in freeSlots)
+            if (myNumber % 2 == 0)
             {
-                if (freeSlot.ContainedItem is not null && potionInstance.StacksizeCurrent > potionInstance.StacksizeMax - ((ConsumableItem)freeSlot.ContainedItem).StacksizeCurrent)
-                    continue;
+                var healthPotionScene = ResourceLoader.Load<PackedScene>("res://Scenes/Items/Consumables/health_potion.tscn");
 
-                freeSlot.SetItem(potionInstance);
-                return;
+                var potionInstance = healthPotionScene.Instantiate<HealthPotion>();
+                potionInstance.StacksizeCurrent = myNumber;
+
+                var freeSlot = GetNextFreeSlotOrDefaultFor(potionInstance);
+                freeSlot?.SetItem(potionInstance);
+            }
+            else
+            {
+                var staffScene    = ResourceLoader.Load<PackedScene>("res://Scenes/Items/Weapons/Staffs/staff.tscn");
+                var staffInstance = staffScene.Instantiate<Staff>();
+
+                var freeSlot = GetNextFreeSlotOrDefaultFor(staffInstance);
+                freeSlot?.SetItem(staffInstance);
             }
         }
+    }
+
+    public InventorySlot GetNextFreeSlotOrDefaultFor(BaseItem incomingItem)
+    {
+        var slotsWithSpace = ItemGrid.GetAllChildren<InventorySlot>()
+                                     .Where(slot => slot.HasSpace)
+                                     .ToList();
+
+        foreach (var nextSlot in slotsWithSpace)
+        {
+            if (nextSlot.ContainedItem is null)
+                return nextSlot;
+
+            if (incomingItem is ConsumableItem incomingConsumable
+                && nextSlot.ContainedItem is ConsumableItem { IsStackable: true } containedConsumable
+                && containedConsumable.CanFit(incomingConsumable))
+                return nextSlot;
+        }
+
+        return null;
     }
 }

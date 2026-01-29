@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://bafd40n3y6xtn"]
+
+[ext_resource type="Script" uid="uid://cy5ul7hakwg0x" path="res://Scripts/Items/Weapons/Staffs/Staff.cs" id="1_34oae"]
+[ext_resource type="Texture2D" uid="uid://30hpggqgjfab" path="res://Textures/Items/Weapons/Staffs/Staff.png" id="2_5vpgh"]
+
+[node name="Staff" type="Node2D" unique_id=34298413 node_paths=PackedStringArray("Icon")]
+script = ExtResource("1_34oae")
+Icon = NodePath("Icon")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=177823713]
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("2_5vpgh")

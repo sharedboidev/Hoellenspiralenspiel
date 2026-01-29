@@ -10,6 +10,8 @@ public abstract partial class ConsumableItem : BaseItem
     [Export]
     public int StacksizeMax { get; set; } = 1;
 
+    public override bool IsStackable => StacksizeMax > 1;
+
     [Export]
     public int StacksizeCurrent { get; set; } = 1;
 
@@ -38,5 +40,13 @@ public abstract partial class ConsumableItem : BaseItem
         StacksizeCurrent += amount;
 
         return true;
+    }
+
+    public bool CanFit(ConsumableItem consumable)
+    {
+        if (IsFull)
+            return false;
+
+        return StacksizeMax >= StacksizeCurrent + consumable.StacksizeCurrent;
     }
 }
