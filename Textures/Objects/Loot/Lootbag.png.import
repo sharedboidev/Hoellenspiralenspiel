@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cg7fgdit1xho8"
-path="res://.godot/imported/LittleBag.png-fd8d6938078f738c27369de05b16fcd5.ctex"
+uid="uid://c71vm3fa1p17d"
+path="res://.godot/imported/Lootbag.png-6f1bd898e8d17285359d213062ed7afd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Textures/Objects/Loot/LittleBag.png"
-dest_files=["res://.godot/imported/LittleBag.png-fd8d6938078f738c27369de05b16fcd5.ctex"]
+source_file="res://Textures/Objects/Loot/Lootbag.png"
+dest_files=["res://.godot/imported/Lootbag.png-6f1bd898e8d17285359d213062ed7afd.ctex"]
 
 [params]
 
