@@ -1,22 +1,31 @@
-[gd_scene load_steps=4 format=3 uid="uid://bh56yt1rrhckv"]
+[gd_scene format=3 uid="uid://bh56yt1rrhckv"]
 
 [ext_resource type="Texture2D" uid="uid://c7udd6aj0mrqh" path="res://Textures/Spells/Icons_Fire Spell.png" id="1_ub8xo"]
 [ext_resource type="Script" uid="uid://bflmnojrytr35" path="res://Scripts/UI/CooldownSkill.cs" id="2_1j1en"]
 [ext_resource type="Texture2D" uid="uid://ddfxuf4tdeldx" path="res://Textures/Spells/blank.png" id="3_gv0p5"]
 
-[node name="CooldownSkill" type="TextureButton" node_paths=PackedStringArray("ProgressBarCooldown", "TimerCooldown", "LabelTime")]
+[sub_resource type="InputEventKey" id="InputEventKey_ub8xo"]
+device = -1
+keycode = 70
+unicode = 102
+
+[sub_resource type="Shortcut" id="Shortcut_1j1en"]
+events = [SubResource("InputEventKey_ub8xo")]
+
+[node name="CooldownSkill" type="TextureButton" unique_id=817879907 node_paths=PackedStringArray("LabelTime", "ProgressBarCooldown", "TimerCooldown")]
 custom_minimum_size = Vector2(40, 40)
 offset_right = 40.0
 offset_bottom = 40.0
+shortcut = SubResource("Shortcut_1j1en")
 texture_normal = ExtResource("1_ub8xo")
 ignore_texture_size = true
 stretch_mode = 0
 script = ExtResource("2_1j1en")
+LabelTime = NodePath("TimeText")
 ProgressBarCooldown = NodePath("CooldownOverlay")
 TimerCooldown = NodePath("CooldownTimer")
-LabelTime = NodePath("TimeText")
 
-[node name="CooldownOverlay" type="TextureProgressBar" parent="."]
+[node name="CooldownOverlay" type="TextureProgressBar" parent="." unique_id=119252174]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -29,7 +38,7 @@ fill_mode = 5
 texture_progress = ExtResource("3_gv0p5")
 tint_progress = Color(0.7058824, 0.7058824, 0.7058824, 0.5882353)
 
-[node name="ShortcutText" type="Label" parent="."]
+[node name="ShortcutText" type="Label" parent="." unique_id=1316878958]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
@@ -42,7 +51,7 @@ theme_override_font_sizes/font_size = 16
 text = "F	"
 vertical_alignment = 2
 
-[node name="TimeText" type="Label" parent="."]
+[node name="TimeText" type="Label" parent="." unique_id=580401500]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -59,9 +68,9 @@ text = "0.0"
 horizontal_alignment = 2
 vertical_alignment = 2
 
-[node name="CooldownTimer" type="Timer" parent="."]
+[node name="CooldownTimer" type="Timer" parent="." unique_id=2145693772]
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Panel" type="Panel" parent="." unique_id=1802005243]
 show_behind_parent = true
 layout_mode = 0
 offset_right = 40.0
