@@ -11,6 +11,8 @@ public partial class Lootsystem : Node
     [Export]
     public string LootTablesPath { get; set; } = "res://Resources/LootTables/";
 
+    public override void _Ready() => LoadAllTables();
+
     private void LoadAllTables()
     {
         LoadTablesFromDirectory(LootTablesPath);

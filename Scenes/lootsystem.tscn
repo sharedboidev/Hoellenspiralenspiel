@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://blqiwj17e0cdf"]
+
+[ext_resource type="Script" uid="uid://cb8qwrge6ceiy" path="res://Scripts/Controllers/Lootsystem.cs" id="1_x65kw"]
+
+[node name="Lootsystem" type="Node" unique_id=1477031551]
+script = ExtResource("1_x65kw")
