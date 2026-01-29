@@ -6,6 +6,7 @@
 [sub_resource type="Resource" id="Resource_oa5wn"]
 script = ExtResource("1_oa5wn")
 ItemId = "health_potion"
+ItemScenePath = "res://Scenes/Items/Consumables/health_potion.tscn"
 Weight = 6.0
 QuantityMax = 5
 metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
@@ -18,6 +19,7 @@ metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
 [sub_resource type="Resource" id="Resource_qbgce"]
 script = ExtResource("1_oa5wn")
 ItemId = "staff"
+ItemScenePath = "res://Scenes/Items/Weapons/Staffs/staff.tscn"
 metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
 
 [resource]

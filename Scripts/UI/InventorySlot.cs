@@ -34,7 +34,7 @@ public partial class InventorySlot : PanelContainer,
 
     public bool SetItem(BaseItem incomingItem)
     {
-        if (!HasSpace)
+        if (!HasSpace || incomingItem is null)
             return false;
 
         if (ContainedItem is ConsumableItem containedConsumable && incomingItem is ConsumableItem incomingConsumable)

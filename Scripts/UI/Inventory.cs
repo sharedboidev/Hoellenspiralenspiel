@@ -1,11 +1,9 @@
-using System;
 using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Items.Consumables;
-using Hoellenspiralenspiel.Scripts.Items.Weapons.Staffs;
 using Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
@@ -28,6 +26,13 @@ public partial class Inventory : PanelContainer
 
             return itemGrid;
         }
+    }
+
+    public void SetItem(BaseItem item)
+    {
+        var freeSlot = GetNextFreeSlotOrDefaultFor(item);
+
+        freeSlot?.SetItem(item);
     }
 
     private void BuildInventory()
@@ -82,30 +87,6 @@ public partial class Inventory : PanelContainer
             BuildInventory();
 
             Visible = !Visible;
-        }
-        else if (Input.IsActionJustPressed("+"))
-        {
-            var rng      = new Random();
-            var myNumber = rng.Next(1, 6);
-
-            if (myNumber % 2 == 0)
-            {
-                var healthPotionScene = ResourceLoader.Load<PackedScene>("res://Scenes/Items/Consumables/health_potion.tscn");
-
-                var potionInstance = healthPotionScene.Instantiate<HealthPotion>();
-                potionInstance.StacksizeCurrent = myNumber;
-
-                var freeSlot = GetNextFreeSlotOrDefaultFor(potionInstance);
-                freeSlot?.SetItem(potionInstance);
-            }
-            else
-            {
-                var staffScene    = ResourceLoader.Load<PackedScene>("res://Scenes/Items/Weapons/Staffs/staff.tscn");
-                var staffInstance = staffScene.Instantiate<Staff>();
-
-                var freeSlot = GetNextFreeSlotOrDefaultFor(staffInstance);
-                freeSlot?.SetItem(staffInstance);
-            }
         }
     }
 

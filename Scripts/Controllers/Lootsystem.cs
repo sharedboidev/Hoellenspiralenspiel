@@ -1,6 +1,8 @@
 ﻿using Godot;
 using Godot.Collections;
 using Hoellenspiralenspiel.Resources;
+using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 namespace Hoellenspiralenspiel.Scripts.Controllers;
 
@@ -12,6 +14,16 @@ public partial class Lootsystem : Node
     public string LootTablesPath { get; set; } = "res://Resources/LootTables/";
 
     public override void _Ready() => LoadAllTables();
+
+    public BaseItem[] GenerateLoot(BaseEnemy enemy)
+    {
+        if(!Tables.TryGetValue(enemy.LootTableId, out var fittingTable))
+            return [];
+
+        var loot = fittingTable.RollLoot();
+
+        return loot;
+    }
 
     private void LoadAllTables()
     {
@@ -30,8 +42,7 @@ public partial class Lootsystem : Node
             return;
         }
 
-        directory.ListDirBegin();
-        var fileName = directory.GetNext();
+        var fileName = GetFileName(directory);
 
         while (!string.IsNullOrWhiteSpace(fileName))
         {
@@ -43,20 +54,30 @@ public partial class Lootsystem : Node
                     LoadTablesFromDirectory(fullPath + "/");
             }
             else if (fileName.EndsWith(".tres") || fileName.EndsWith(".res"))
-            {
-                var table = GD.Load<LootTable>(fullPath);
-
-                if (table != null && !string.IsNullOrEmpty(table.TableId))
-                {
-                    Tables[table.TableId] = table;
-
-                    GD.Print($"Loaded loot table: {table.TableId}");
-                }
-            }
+                LoadTableIntoDictionary(fullPath);
 
             fileName = directory.GetNext();
         }
 
         directory.ListDirEnd();
+    }
+
+    private void LoadTableIntoDictionary(string fullPath)
+    {
+        var table = GD.Load<LootTable>(fullPath);
+
+        if (table != null && !string.IsNullOrEmpty(table.TableId))
+        {
+            Tables[table.TableId] = table;
+
+            GD.Print($"Loaded loot table: {table.TableId}");
+        }
+    }
+
+    private static string GetFileName(DirAccess directory)
+    {
+        directory.ListDirBegin();
+        var fileName = directory.GetNext();
+        return fileName;
     }
 }

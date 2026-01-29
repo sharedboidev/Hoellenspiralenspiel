@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using Godot;
-using Hoellenspiralenspiel.Scripts.Abilities.Spells;
 using Hoellenspiralenspiel.Scripts.Controllers;
 
 namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
@@ -23,6 +22,9 @@ public abstract partial class BaseEnemy : BaseUnit
 
     [Export]
     public float AttackRecoveryTimeSec { get; set; } = 0.2f;
+
+    [Export]
+    public string LootTableId { get; set; }
 
     public override void _Ready()
     {

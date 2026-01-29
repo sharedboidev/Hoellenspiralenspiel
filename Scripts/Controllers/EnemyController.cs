@@ -6,6 +6,7 @@ using Godot;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Objects;
+using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
 
@@ -24,6 +25,12 @@ public partial class EnemyController : Node
 
     [Export]
     public PackedScene EnemyToSpawn { get; set; }
+
+    [Export]
+    public Lootsystem Lootsystem { get; set; }
+
+    [Export]
+    public Inventory Inventory { get; set; }
 
     private PackedScene LootbagScene { get; set; } = ResourceLoader.Load<PackedScene>("res://Scenes/Objects/lootbag.tscn");
 
@@ -93,21 +100,22 @@ public partial class EnemyController : Node
 
     private void SpawnLootbag(BaseEnemy enemy)
     {
-        //Lootsystem.GenerateLoot()
+        var loot = Lootsystem.GenerateLoot(enemy);
 
         var lootbagInstance = LootbagScene.Instantiate<Lootbag>();
-        lootbagInstance.GlobalPosition = enemy.GlobalPosition;
-        //lootbagInstance.ContainedItem = ...
-        lootbagInstance.LootClicked += LootbagInstanceOnLootClicked;
+        lootbagInstance.GlobalPosition =  enemy.GlobalPosition;
+        lootbagInstance.ContainedItem  =  loot.FirstOrDefault();
+        lootbagInstance.LootClicked    += LootbagInstanceOnLootClicked;
 
         GetParent().GetNode<Node2D>("Environment").AddChild(lootbagInstance);
     }
 
     private void LootbagInstanceOnLootClicked(Lootbag sender, BaseItem lootedItem)
     {
-        GD.Print($"{lootedItem?.Name} looted by {player?.Name}");
+        GD.Print($"{lootedItem?.Name ?? "Nothing"} looted by {player?.Name}");
 
-        lootedItem?.QueueFree();
+        Inventory.SetItem(lootedItem);
+
         sender?.QueueFree();
     }
 

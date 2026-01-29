@@ -12,8 +12,10 @@
 [node name="Lootsystem" parent="." unique_id=1477031551 instance=ExtResource("1_h4q4d")]
 unique_name_in_owner = true
 
-[node name="EnemyController" parent="." unique_id=722604080 instance=ExtResource("5_vglo3")]
+[node name="EnemyController" parent="." unique_id=722604080 node_paths=PackedStringArray("Lootsystem", "Inventory") instance=ExtResource("5_vglo3")]
 unique_name_in_owner = true
+Lootsystem = NodePath("../Lootsystem")
+Inventory = NodePath("../CanvasLayer/Inventory")
 SpawnIntervallSec = 0.1
 
 [node name="Environment" type="Node2D" parent="." unique_id=1968535861]
