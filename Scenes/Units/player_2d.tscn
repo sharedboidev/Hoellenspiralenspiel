@@ -413,9 +413,9 @@ advance_expression = "MovementDirection.length() == 0.0"
 states/IdleState/node = SubResource("AnimationNodeBlendSpace2D_e2uij")
 states/IdleState/position = Vector2(482, 100)
 states/RunState/node = SubResource("AnimationNodeBlendSpace2D_10250")
-states/RunState/position = Vector2(482, 219)
+states/RunState/position = Vector2(481.84, 219)
 transitions = ["Start", "IdleState", SubResource("AnimationNodeStateMachineTransition_pc0mr"), "IdleState", "RunState", SubResource("AnimationNodeStateMachineTransition_djq3p"), "RunState", "IdleState", SubResource("AnimationNodeStateMachineTransition_nnb5g")]
-graph_offset = Vector2(-315, -119)
+graph_offset = Vector2(-148, -7)
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_r02y1"]
 advance_mode = 2
@@ -424,10 +424,10 @@ advance_mode = 2
 states/MoveState/node = SubResource("AnimationNodeStateMachine_4eaiw")
 states/MoveState/position = Vector2(465, 100)
 transitions = ["Start", "MoveState", SubResource("AnimationNodeStateMachineTransition_r02y1")]
-graph_offset = Vector2(-215, -155)
+graph_offset = Vector2(-124, 12)
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_kfbu0"]
-graph_offset = Vector2(-476.2367, 0)
+graph_offset = Vector2(-476.23672, 0)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_hm4fm")
 nodes/StateMachine/position = Vector2(-40, 80)
 node_connections = [&"output", 0, &"StateMachine"]
@@ -465,7 +465,7 @@ tree_root = SubResource("AnimationNodeBlendTree_kfbu0")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
 parameters/StateMachine/MoveState/IdleState/blend_position = Vector2(-0.5627426, -0.07048464)
-parameters/StateMachine/MoveState/RunState/blend_position = Vector2(-0.31694698, -0.7400881)
+parameters/StateMachine/MoveState/RunState/blend_position = Vector2(-0.5214522, -0.63942313)
 
 [node name="FireballStartPosition" type="Marker2D" parent="." unique_id=25906932]
 position = Vector2(-1, -64)

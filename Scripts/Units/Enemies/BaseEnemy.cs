@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Controllers;
 
@@ -14,6 +15,9 @@ public abstract partial class BaseEnemy : BaseUnit
     [Export]
     public bool IsAggressive { get; set; }
 
+    [Export(PropertyHint.Range, "0,1,")]
+    public float LootDropChance { get; set; } = 0.1f;
+
     [Export]
     public float AttackRange { get; set; } = 150f;
 
@@ -26,11 +30,14 @@ public abstract partial class BaseEnemy : BaseUnit
     [Export]
     public string LootTableId { get; set; }
 
+    protected AnimationTree AnimationTree { get; set; }
+
     public override void _Ready()
     {
         base._Ready();
 
         CurrentScene       = GetTree().CurrentScene;
+        AnimationTree      = GetNode<AnimationTree>(nameof(AnimationTree));
         healthbar          = GetNode<ProgressBar>("%Healthbar");
         healthbar.MaxValue = LifeMaximum;
         healthbar.Value    = LifeCurrent;
@@ -38,6 +45,17 @@ public abstract partial class BaseEnemy : BaseUnit
         PropertyChanged += OnPropertyChanged;
 
         IsAggressive = true;
+    }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        base._PhysicsProcess(delta);
+
+        if (MovementDirection != Vector2.Zero)
+        {
+            AnimationTree.Set("parameters/StateMachine/MoveState/RunState/blend_position", MovementDirection * new Vector2(1, -1));
+            //AnimationTree.Set("parameters/StateMachine/MoveState/IdleState/blend_position", MovementDirection * new Vector2(1, -1));
+        }
     }
 
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -49,6 +67,14 @@ public abstract partial class BaseEnemy : BaseUnit
             if (!healthbar.Visible && LifeCurrent < LifeMaximum)
                 healthbar.Visible = true;
         }
+    }
+
+    public bool WillDropLoot()
+    {
+        var rng = new Random();
+        var roll = rng.Next(0, 100);
+
+        return roll <= LootDropChance * 100;
     }
 
     protected override void DieProperly()

@@ -28,6 +28,8 @@ public partial class Inventory : PanelContainer
         }
     }
 
+    public override void _Ready() => BuildInventory();
+
     public void SetItem(BaseItem item)
     {
         var freeSlot = GetNextFreeSlotOrDefaultFor(item);
@@ -83,11 +85,7 @@ public partial class Inventory : PanelContainer
     public override void _Process(double delta)
     {
         if (Input.IsActionJustPressed("Tab"))
-        {
-            BuildInventory();
-
             Visible = !Visible;
-        }
     }
 
     public InventorySlot GetNextFreeSlotOrDefaultFor(BaseItem incomingItem)

@@ -17,7 +17,7 @@ public partial class Lootsystem : Node
 
     public BaseItem[] GenerateLoot(BaseEnemy enemy)
     {
-        if(!Tables.TryGetValue(enemy.LootTableId, out var fittingTable))
+        if(!enemy.WillDropLoot() || !Tables.TryGetValue(enemy.LootTableId, out var fittingTable))
             return [];
 
         var loot = fittingTable.RollLoot();

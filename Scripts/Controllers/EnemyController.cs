@@ -108,6 +108,9 @@ public partial class EnemyController : Node
     {
         var loot = Lootsystem.GenerateLoot(enemy);
 
+        if(loot is null || loot.Length == 0)
+            return;
+
         var lootbagInstance = LootbagScene.Instantiate<Lootbag>();
         lootbagInstance.GlobalPosition =  enemy.GlobalPosition;
         lootbagInstance.ContainedItem  =  loot.FirstOrDefault();

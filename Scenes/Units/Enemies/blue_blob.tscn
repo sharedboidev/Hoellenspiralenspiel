@@ -122,6 +122,7 @@ blend_point_2/node = SubResource("AnimationNodeAnimation_in1bd")
 blend_point_2/pos = Vector2(0, -1)
 blend_point_3/node = SubResource("AnimationNodeAnimation_wrm3r")
 blend_point_3/pos = Vector2(-1, 0)
+blend_mode = 1
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_qiutx"]
 advance_mode = 2
@@ -176,7 +177,7 @@ libraries/ = SubResource("AnimationLibrary_e1ef1")
 tree_root = SubResource("AnimationNodeBlendTree_dn1kk")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
-parameters/StateMachine/MoveState/RunState/blend_position = Vector2(0.22258914, 0)
+parameters/StateMachine/MoveState/RunState/blend_position = Vector2(0.01452148, -0.51442313)
 
 [node name="Healthbar" type="ProgressBar" parent="." unique_id=813237691]
 unique_name_in_owner = true
