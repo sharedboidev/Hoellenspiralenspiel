@@ -35,7 +35,7 @@ public partial class EnemyController : Node
     [Export]
     public Inventory Inventory { get; set; }
 
-    private PackedScene LootbagScene { get; set; } = ResourceLoader.Load<PackedScene>("res://Scenes/Objects/lootbag.tscn");
+    private PackedScene LootbagScene { get; set; }
 
     [Export]
     public float SpawnIntervallSec { get; set; } = 1.5f;
@@ -53,6 +53,7 @@ public partial class EnemyController : Node
 
         rng.Randomize();
 
+        LootbagScene = ResourceLoader.Load<PackedScene>("res://Scenes/Objects/lootbag.tscn");
         currentScene = GetTree().CurrentScene;
         player       = currentScene.GetNode<Player2D>("%Player 2D");
         container    = currentScene.GetNode<Node2D>("%Enemies");

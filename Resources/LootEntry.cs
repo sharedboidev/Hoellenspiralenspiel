@@ -16,12 +16,7 @@ public partial class LootEntry : Resource
     public EntryType Type { get; set; } = EntryType.Item;
 
     [Export]
-    public string ItemId { get; set; } = string.Empty;
-
-    [Export]
-    public string ItemScenePath { get; set; } = string.Empty;
-
-    public PackedScene ItemScene => ResourceLoader.Load<PackedScene>(ItemScenePath);
+    public PackedScene ItemScene { get; set; }
 
     [Export]
     public LootTable NestedTable { get; set; }

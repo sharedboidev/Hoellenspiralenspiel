@@ -8,7 +8,7 @@ namespace Hoellenspiralenspiel.Scripts.Extensions;
 
 public static class FCTExtensions
 {
-    private static PackedScene FCTScene => ResourceLoader.Load<PackedScene>("res://Scenes/UI/floating_combat_text.tscn");
+    private static readonly PackedScene FCTScene = ResourceLoader.Load<PackedScene>("res://Scenes/UI/floating_combat_text.tscn");
 
     public static void InstatiateFloatingCombatText(this BaseUnit target, HitResult hitResult, Node currentScene, Vector2 offset = default)
     {

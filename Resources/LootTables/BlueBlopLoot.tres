@@ -2,16 +2,17 @@
 
 [ext_resource type="Script" uid="uid://dovuo5xiwuhtc" path="res://Resources/LootEntry.cs" id="1_lvq8t"]
 [ext_resource type="Script" uid="uid://butusdti7dpn" path="res://Resources/LootTable.cs" id="2_5w23i"]
+[ext_resource type="PackedScene" uid="uid://bafd40n3y6xtn" path="res://Scenes/Items/Weapons/Staffs/staff.tscn" id="2_e2jip"]
 
 [sub_resource type="Resource" id="Resource_lvq8t"]
 script = ExtResource("1_lvq8t")
 Type = 2
-Weight = 19.0
+Weight = 99.0
 metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
 
 [sub_resource type="Resource" id="Resource_5w23i"]
 script = ExtResource("1_lvq8t")
-ItemScenePath = "res://Scenes/Items/Weapons/Staffs/staff.tscn"
+ItemScene = ExtResource("2_e2jip")
 metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
 
 [resource]
