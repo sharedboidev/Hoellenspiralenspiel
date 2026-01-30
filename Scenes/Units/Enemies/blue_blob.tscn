@@ -183,6 +183,8 @@ parameters/StateMachine/MoveState/RunState/blend_position = Vector2(0.01452148, 
 [node name="Healthbar" type="ProgressBar" parent="." unique_id=813237691]
 unique_name_in_owner = true
 visible = false
+z_index = 1
+y_sort_enabled = true
 offset_left = -20.0
 offset_top = -55.0
 offset_right = 20.0

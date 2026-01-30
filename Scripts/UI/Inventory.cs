@@ -12,7 +12,7 @@ public partial class Inventory : PanelContainer
 {
     private GridContainer itemGrid;
     private bool          slotsGenerated;
-    private BaseTooltip   Tooltip     => GetTree().CurrentScene.GetNode<AbilityTooltip>("%" + nameof(AbilityTooltip));
+    private BaseTooltip   Tooltip     => GetTree().CurrentScene.GetNode<ItemTooltip>("%" + nameof(ItemTooltip));
     private MouseObject   MouseObject => GetNode<MouseObject>(nameof(MouseObject));
 
     [Export]

@@ -3,20 +3,29 @@
 [ext_resource type="Script" uid="uid://dovuo5xiwuhtc" path="res://Resources/LootEntry.cs" id="1_lvq8t"]
 [ext_resource type="Script" uid="uid://butusdti7dpn" path="res://Resources/LootTable.cs" id="2_5w23i"]
 [ext_resource type="PackedScene" uid="uid://bafd40n3y6xtn" path="res://Scenes/Items/Weapons/Staffs/staff.tscn" id="2_e2jip"]
+[ext_resource type="PackedScene" uid="uid://cphtaoh2o6ddc" path="res://Scenes/Items/Consumables/health_potion.tscn" id="3_e2jip"]
 
 [sub_resource type="Resource" id="Resource_lvq8t"]
 script = ExtResource("1_lvq8t")
 Type = 2
-Weight = 99.0
+Weight = 85.0
 metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
 
 [sub_resource type="Resource" id="Resource_5w23i"]
 script = ExtResource("1_lvq8t")
 ItemScene = ExtResource("2_e2jip")
+Weight = 2.0
+metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
+
+[sub_resource type="Resource" id="Resource_g3b5r"]
+script = ExtResource("1_lvq8t")
+ItemScene = ExtResource("3_e2jip")
+Weight = 13.0
+QuantityMax = 5
 metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
 
 [resource]
 script = ExtResource("2_5w23i")
 TableId = "blue_blob_loot"
-Entries = Array[ExtResource("1_lvq8t")]([SubResource("Resource_lvq8t"), SubResource("Resource_5w23i")])
+Entries = Array[ExtResource("1_lvq8t")]([SubResource("Resource_lvq8t"), SubResource("Resource_5w23i"), SubResource("Resource_g3b5r")])
 metadata/_custom_type_script = "uid://butusdti7dpn"

@@ -1,9 +1,8 @@
 [gd_scene format=4 uid="uid://caiy5exwyombe"]
 
-[ext_resource type="PackedScene" uid="uid://c7cdly8lgcdqk" path="res://Scenes/UI/ability_tooltip.tscn" id="1_bidin"]
+[ext_resource type="PackedScene" uid="uid://c7cdly8lgcdqk" path="res://Scenes/UI/item_tooltip.tscn" id="1_bidin"]
 [ext_resource type="PackedScene" uid="uid://blqiwj17e0cdf" path="res://Scenes/lootsystem.tscn" id="1_h4q4d"]
 [ext_resource type="TileSet" uid="uid://bjrvhfwxc86rt" path="res://Resources/Desert.tres" id="1_vglo3"]
-[ext_resource type="PackedScene" uid="uid://cycesnf53lc51" path="res://Scenes/Units/test_enemy.tscn" id="3_7imrf"]
 [ext_resource type="PackedScene" uid="uid://c8hx5eg0q1vct" path="res://Scenes/Units/player_2d.tscn" id="3_35xgq"]
 [ext_resource type="PackedScene" uid="uid://cnxyy07a3er8q" path="res://Scenes/Units/Enemies/blue_blob.tscn" id="4_db61r"]
 [ext_resource type="PackedScene" uid="uid://6yhxh7p0ijv4" path="res://Scenes/UI/inventory.tscn" id="5_h4q4d"]
@@ -16,10 +15,11 @@ unique_name_in_owner = true
 
 [node name="EnemyController" parent="." unique_id=722604080 node_paths=PackedStringArray("Lootsystem", "Inventory") instance=ExtResource("5_vglo3")]
 unique_name_in_owner = true
-EnemiesToSpawn = Array[PackedScene]([ExtResource("3_7imrf"), ExtResource("4_db61r")])
+EnemiesToSpawn = Array[PackedScene]([ExtResource("4_db61r")])
 Lootsystem = NodePath("../Lootsystem")
 Inventory = NodePath("../CanvasLayer/Inventory")
-SpawnIntervallSec = 0.1
+SpawnIntervallSec = 0.5
+MinDistanceToPlayer = 300.0
 
 [node name="Environment" type="Node2D" parent="." unique_id=1968535861]
 y_sort_enabled = true
@@ -45,6 +45,8 @@ position = Vector2(2594, 50)
 unique_name_in_owner = true
 y_sort_enabled = true
 
+[node name="SpawnMarker" type="Node2D" parent="." unique_id=1148664553]
+
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1293480226]
 
 [node name="Inventory" parent="CanvasLayer" unique_id=567735017 instance=ExtResource("5_h4q4d")]
@@ -56,7 +58,7 @@ offset_right = 1232.0
 offset_bottom = 102.0
 AmountSlots = 88
 
-[node name="AbilityTooltip" parent="CanvasLayer" unique_id=832974172 instance=ExtResource("1_bidin")]
+[node name="ItemTooltip" parent="CanvasLayer" unique_id=832974172 instance=ExtResource("1_bidin")]
 unique_name_in_owner = true
 visible = false
 offset_left = 1000.0

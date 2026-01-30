@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c7cdly8lgcdqk"]
 
-[ext_resource type="Script" uid="uid://davcgdhyu68qx" path="res://Scripts/UI/Tooltips/AbilityTooltip.cs" id="1_ri6pb"]
+[ext_resource type="Script" uid="uid://dnr61tex5k42p" path="res://Scripts/UI/Tooltips/ItemTooltip.cs" id="1_ri6pb"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ri6pb"]
 bg_color = Color(0.13464907, 0.1346491, 0.1346491, 1)
@@ -9,7 +9,7 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 
-[node name="AbilityTooltip" type="PanelContainer" unique_id=1060802189]
+[node name="ItemTooltip" type="PanelContainer" unique_id=1060802189]
 custom_minimum_size = Vector2(250, 0)
 offset_right = 50.0
 offset_bottom = 76.0

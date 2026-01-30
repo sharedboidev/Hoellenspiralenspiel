@@ -70,10 +70,7 @@ public partial class EnemyController : Node
         if (SpawnedEnemies.Count >= 100)
             return;
 
-        // if (SpawnedEnemies.Count % 2 == 0)
-        //     SpawnUnit<TestEnemy>(EnemiesToSpawn[0]);
-        // else
-            SpawnUnit<BlueBlob>(EnemiesToSpawn[1]);
+        SpawnUnit<BlueBlob>(EnemiesToSpawn.First());
     }
 
     private void SpawnUnit<T>(PackedScene enemyToSpawn, int amountToSpawn = 1)
@@ -109,7 +106,7 @@ public partial class EnemyController : Node
     {
         var loot = Lootsystem.GenerateLoot(enemy);
 
-        if(loot is null || loot.Length == 0)
+        if (loot is null || loot.Length == 0)
             return;
 
         var lootbagInstance = LootbagScene.Instantiate<Lootbag>();

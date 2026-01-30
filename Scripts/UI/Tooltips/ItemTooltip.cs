@@ -2,7 +2,7 @@
 
 namespace Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
-public partial class AbilityTooltip : BaseTooltip
+public partial class ItemTooltip : BaseTooltip
 {
     private double   timeSinceLastToggle;
     private bool     tooltipIsShowing;
