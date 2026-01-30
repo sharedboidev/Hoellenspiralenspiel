@@ -69,9 +69,9 @@ public partial class EnemyController : Node
         if (SpawnedEnemies.Count >= 100)
             return;
 
-        if (SpawnedEnemies.Count % 2 == 0)
-            SpawnUnit<TestEnemy>(EnemiesToSpawn[0]);
-        else
+        // if (SpawnedEnemies.Count % 2 == 0)
+        //     SpawnUnit<TestEnemy>(EnemiesToSpawn[0]);
+        // else
             SpawnUnit<BlueBlob>(EnemiesToSpawn[1]);
     }
 

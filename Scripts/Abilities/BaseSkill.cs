@@ -1,4 +1,5 @@
 ﻿using System;
+using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Units;
@@ -34,6 +35,10 @@ public abstract class BaseSkill
     public HitResult MakeRealDamage(BaseUnit target)
     {
         //HitResult vong schnell her
+
+        var kek              = GD.Randf();
+
+
         var val              = critRng.Next(1, 101);
         var isCrit           = val <= baseCritRate;
         var rolledBaseDamage = baseDamageRng.Next(baseDamageMin, baseDamageMax + 1);

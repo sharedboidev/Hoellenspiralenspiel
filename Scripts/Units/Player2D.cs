@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Abilities;
-using Hoellenspiralenspiel.Scripts.Abilities.Spells;
 using Hoellenspiralenspiel.Scripts.UI;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
@@ -43,7 +42,5 @@ public partial class Player2D : BaseUnit
 		}
 
 		MoveAndSlide();
-
-		
 	}
 }
