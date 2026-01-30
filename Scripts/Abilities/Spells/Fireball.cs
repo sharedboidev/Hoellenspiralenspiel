@@ -15,6 +15,7 @@ public partial class Fireball : Area2D
 	private         Vector2          richtung;
 	private         FireballSkill    skill;
 	public          BaseUnit         ShotBy               { get; set; }
+	[Export]
 	public          int              MaxForks             { get; set; } = 5;
 	public          int              TimesForked          { get; set; }
 	public          double           LebenszeitSec        { get; set; } = 15;

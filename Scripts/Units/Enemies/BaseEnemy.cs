@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Controllers;
 
@@ -15,8 +14,8 @@ public abstract partial class BaseEnemy : BaseUnit
     [Export]
     public bool IsAggressive { get; set; }
 
-    [Export(PropertyHint.Range, "0,1,")]
-    public float LootDropChance { get; set; } = 0.1f;
+    [Export]
+    public float AggroRange { get; set; } = 500f;
 
     [Export]
     public float AttackRange { get; set; } = 150f;
@@ -43,8 +42,6 @@ public abstract partial class BaseEnemy : BaseUnit
         healthbar.Value    = LifeCurrent;
 
         PropertyChanged += OnPropertyChanged;
-
-        IsAggressive = true;
     }
 
     public override void _PhysicsProcess(double delta)
@@ -65,16 +62,11 @@ public abstract partial class BaseEnemy : BaseUnit
             healthbar.Value = LifeCurrent;
 
             if (!healthbar.Visible && LifeCurrent < LifeMaximum)
+            {
                 healthbar.Visible = true;
+                IsAggressive      = true;
+            }
         }
-    }
-
-    public bool WillDropLoot()
-    {
-        var rng = new Random();
-        var roll = rng.Next(0, 100);
-
-        return roll <= LootDropChance * 100;
     }
 
     protected override void DieProperly()

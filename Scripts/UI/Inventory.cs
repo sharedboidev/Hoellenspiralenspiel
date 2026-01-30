@@ -84,7 +84,7 @@ public partial class Inventory : PanelContainer
 
     public override void _Process(double delta)
     {
-        if (Input.IsActionJustPressed("Tab"))
+        if (Input.IsActionJustPressed("B"))
             Visible = !Visible;
     }
 

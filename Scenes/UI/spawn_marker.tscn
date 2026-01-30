@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://dpai8eumf00w0"]
+
+[ext_resource type="Script" uid="uid://bkogtdyjb8euo" path="res://Scripts/UI/SpawnMarker.cs" id="1_8fl01"]
+[ext_resource type="Texture2D" uid="uid://c5h02jip4koyn" path="res://Textures/UI/SpawnMarker.png" id="2_fwaun"]
+[ext_resource type="PackedScene" uid="uid://cnxyy07a3er8q" path="res://Scenes/Units/Enemies/blue_blob.tscn" id="2_xo2jn"]
+
+[node name="SpawnMarker" type="PanelContainer" unique_id=1519096458]
+self_modulate = Color(1, 1, 1, 0)
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_8fl01")
+EnemyToSpawn = ExtResource("2_xo2jn")
+AmountToSpawn = 8
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1281384149]
+self_modulate = Color(3.0540712, 0, 0.61999357, 1)
+layout_mode = 2
+texture = ExtResource("2_fwaun")
+expand_mode = 3

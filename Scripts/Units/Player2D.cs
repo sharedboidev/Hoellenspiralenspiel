@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Abilities;
 using Hoellenspiralenspiel.Scripts.UI;
+using Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
@@ -30,6 +32,12 @@ public partial class Player2D : BaseUnit
 		Movementspeed = 300;
 	}
 
+	public bool IsInAggroRangeOf(BaseEnemy enemy)
+	{
+		var distanceToEnemy = Math.Sqrt(GlobalPosition.DistanceSquaredTo(enemy.GlobalPosition));
+
+		return distanceToEnemy <= enemy.AggroRange;
+	}
 	public override void _PhysicsProcess(double delta)
 	{
 		MovementDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");

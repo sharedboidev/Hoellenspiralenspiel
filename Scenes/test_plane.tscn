@@ -7,19 +7,10 @@
 [ext_resource type="PackedScene" uid="uid://cnxyy07a3er8q" path="res://Scenes/Units/Enemies/blue_blob.tscn" id="4_db61r"]
 [ext_resource type="PackedScene" uid="uid://6yhxh7p0ijv4" path="res://Scenes/UI/inventory.tscn" id="5_h4q4d"]
 [ext_resource type="PackedScene" uid="uid://bg8s6qmxf15f8" path="res://Scripts/Controllers/enemy_controller.tscn" id="5_vglo3"]
+[ext_resource type="PackedScene" uid="uid://dpai8eumf00w0" path="res://Scenes/UI/spawn_marker.tscn" id="6_7imrf"]
+[ext_resource type="Script" uid="uid://v5paruy0b76n" path="res://Scripts/UI/OverlayMapViewport.cs" id="9_db61r"]
 
 [node name="Test Plane" type="Node" unique_id=807554671]
-
-[node name="Lootsystem" parent="." unique_id=1477031551 instance=ExtResource("1_h4q4d")]
-unique_name_in_owner = true
-
-[node name="EnemyController" parent="." unique_id=722604080 node_paths=PackedStringArray("Lootsystem", "Inventory") instance=ExtResource("5_vglo3")]
-unique_name_in_owner = true
-EnemiesToSpawn = Array[PackedScene]([ExtResource("4_db61r")])
-Lootsystem = NodePath("../Lootsystem")
-Inventory = NodePath("../CanvasLayer/Inventory")
-SpawnIntervallSec = 0.5
-MinDistanceToPlayer = 300.0
 
 [node name="Environment" type="Node2D" parent="." unique_id=1968535861]
 y_sort_enabled = true
@@ -47,6 +38,35 @@ y_sort_enabled = true
 
 [node name="SpawnMarker" type="Node2D" parent="." unique_id=1148664553]
 
+[node name="SpawnMarker" parent="SpawnMarker" unique_id=1519096458 instance=ExtResource("6_7imrf")]
+offset_left = 952.0
+offset_top = 919.0
+offset_right = 1018.9725
+offset_bottom = 959.0
+
+[node name="SpawnMarker2" parent="SpawnMarker" unique_id=334759122 instance=ExtResource("6_7imrf")]
+offset_left = 532.0
+offset_top = 12.0
+offset_right = 598.9725
+offset_bottom = 52.0
+
+[node name="SpawnMarker3" parent="SpawnMarker" unique_id=578690069 instance=ExtResource("6_7imrf")]
+offset_left = -3.0
+offset_top = 486.0
+offset_right = 63.972473
+offset_bottom = 526.0
+
+[node name="Lootsystem" parent="." unique_id=1477031551 instance=ExtResource("1_h4q4d")]
+unique_name_in_owner = true
+
+[node name="EnemyController" parent="." unique_id=722604080 node_paths=PackedStringArray("Lootsystem", "Inventory") instance=ExtResource("5_vglo3")]
+unique_name_in_owner = true
+EnemiesToSpawn = Array[PackedScene]([ExtResource("4_db61r")])
+Lootsystem = NodePath("../Lootsystem")
+Inventory = NodePath("../CanvasLayer/Inventory")
+SpawnIntervallSec = 0.5
+MinDistanceToPlayer = 300.0
+
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1293480226]
 
 [node name="Inventory" parent="CanvasLayer" unique_id=567735017 instance=ExtResource("5_h4q4d")]
@@ -65,3 +85,16 @@ offset_left = 1000.0
 offset_top = 1000.0
 offset_right = 1150.0
 offset_bottom = 1080.0
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="CanvasLayer" unique_id=909995035]
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="OverlayMapViewport" type="SubViewport" parent="CanvasLayer/SubViewportContainer" unique_id=962996928 node_paths=PackedStringArray("Camera", "Player")]
+size = Vector2i(1920, 1080)
+script = ExtResource("9_db61r")
+Camera = NodePath("Camera2D")
+Player = NodePath("../../../Environment/Player 2D")
+
+[node name="Camera2D" type="Camera2D" parent="CanvasLayer/SubViewportContainer/OverlayMapViewport" unique_id=1918112167]
+zoom = Vector2(0.2, 0.2)

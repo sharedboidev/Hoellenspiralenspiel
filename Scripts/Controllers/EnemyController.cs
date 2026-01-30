@@ -23,9 +23,6 @@ public partial class EnemyController : Node
     private          Player2D              player;
     private          Timer                 spawnTimer;
 
-    // [Export]
-    // public PackedScene EnemyToSpawn { get; set; }
-
     [Export]
     public PackedScene[] EnemiesToSpawn { get; set; }
 
@@ -57,7 +54,18 @@ public partial class EnemyController : Node
         currentScene = GetTree().CurrentScene;
         player       = currentScene.GetNode<Player2D>("%Player 2D");
         container    = currentScene.GetNode<Node2D>("%Enemies");
-        spawnTimer   = GetNode<Timer>("EnemySpawnTimer");
+
+        //ConfigureSpawntimer();
+
+        var spawnMarkers = GetParent().GetNode<Node2D>(nameof(SpawnMarker)).GetAllChildren<SpawnMarker>();
+
+        foreach (var spawnMarker in spawnMarkers)
+            SpawnEnemies(spawnMarker);
+    }
+
+    private void ConfigureSpawntimer()
+    {
+        spawnTimer = GetNode<Timer>("EnemySpawnTimer");
 
         spawnTimer.WaitTime =  SpawnIntervallSec;
         spawnTimer.Timeout  += SpawnTimerOnTimeout;
@@ -69,16 +77,13 @@ public partial class EnemyController : Node
     {
         if (SpawnedEnemies.Count >= 100)
             return;
-
-        SpawnUnit<BlueBlob>(EnemiesToSpawn.First());
     }
 
-    private void SpawnUnit<T>(PackedScene enemyToSpawn, int amountToSpawn = 1)
-            where T : BaseEnemy
+    private void SpawnEnemies(SpawnMarker spawnMarker)
     {
-        for (var i = 0; i < amountToSpawn; i++)
+        for (var i = 0; i < spawnMarker.AmountToSpawn; i++)
         {
-            var spawn = enemyToSpawn.Instantiate<T>();
+            var spawn = spawnMarker.EnemyToSpawn.Instantiate<BaseEnemy>();
 
             if (NextSpawnIsRare)
                 spawn.MakeRare();
@@ -86,7 +91,7 @@ public partial class EnemyController : Node
             if (NextSpawnIsElite)
                 spawn.MakeElite();
 
-            spawn.Position        =  GetRandomVisiblePointNotNearPlayer();
+            spawn.Position        =  spawnMarker.GetSpawnlocationFor(i);
             spawn.PropertyChanged += SpawnOnPropertyChanged;
 
             SpawnedEnemies.Add(spawn);
@@ -128,8 +133,13 @@ public partial class EnemyController : Node
 
     private void MakeEnemiesDoTheirThing(double delta)
     {
-        foreach (var aggressiveEnemy in SpawnedEnemies.Where(e => e.IsAggressive))
-            aggressiveEnemy.ChasePlayer();
+        foreach (var enemy in SpawnedEnemies)
+        {
+            if (player.IsInAggroRangeOf(enemy))
+                enemy.IsAggressive = true;
+
+            enemy.ChasePlayer();
+        }
     }
 
     private Vector2 GetRandomVisiblePointNotNearPlayer()
