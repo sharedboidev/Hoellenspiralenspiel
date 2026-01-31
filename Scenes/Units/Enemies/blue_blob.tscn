@@ -177,7 +177,7 @@ libraries/ = SubResource("AnimationLibrary_e1ef1")
 tree_root = SubResource("AnimationNodeBlendTree_dn1kk")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
-parameters/StateMachine/MoveState/RunState/blend_position = Vector2(0.01452148, -0.51442313)
+parameters/StateMachine/MoveState/RunState/blend_position = Vector2(0.36414397, -0.0023640394)
 
 [node name="Healthbar" type="ProgressBar" parent="." unique_id=813237691]
 unique_name_in_owner = true
