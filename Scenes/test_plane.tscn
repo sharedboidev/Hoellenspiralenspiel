@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://bg8s6qmxf15f8" path="res://Scripts/Controllers/enemy_controller.tscn" id="5_vglo3"]
 [ext_resource type="PackedScene" uid="uid://dpai8eumf00w0" path="res://Scenes/UI/spawn_marker.tscn" id="6_7imrf"]
 [ext_resource type="Script" uid="uid://v5paruy0b76n" path="res://Scripts/UI/OverlayMapViewport.cs" id="9_db61r"]
+[ext_resource type="PackedScene" uid="uid://carsjy7sm2ntw" path="res://Scenes/UI/hotkey_info.tscn" id="10_v18oo"]
 
 [node name="Test Plane" type="Node" unique_id=807554671]
 
@@ -56,6 +57,13 @@ offset_top = 486.0
 offset_right = 63.972473
 offset_bottom = 526.0
 
+[node name="SpawnMarker4" parent="SpawnMarker" unique_id=1766736446 instance=ExtResource("6_7imrf")]
+offset_left = 1651.0
+offset_top = 388.0
+offset_right = 1717.9724
+offset_bottom = 428.0
+AmountToSpawn = 15
+
 [node name="Lootsystem" parent="." unique_id=1477031551 instance=ExtResource("1_h4q4d")]
 unique_name_in_owner = true
 
@@ -86,15 +94,24 @@ offset_top = 1000.0
 offset_right = 1150.0
 offset_bottom = 1080.0
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="CanvasLayer" unique_id=909995035]
+[node name="OverlayMapContainer" type="SubViewportContainer" parent="CanvasLayer" unique_id=909995035]
+visible = false
 offset_right = 1920.0
 offset_bottom = 1080.0
 
-[node name="OverlayMapViewport" type="SubViewport" parent="CanvasLayer/SubViewportContainer" unique_id=962996928 node_paths=PackedStringArray("Camera", "Player")]
+[node name="OverlayMapViewport" type="SubViewport" parent="CanvasLayer/OverlayMapContainer" unique_id=962996928 node_paths=PackedStringArray("Camera", "Player")]
+handle_input_locally = false
 size = Vector2i(1920, 1080)
+render_target_update_mode = 0
 script = ExtResource("9_db61r")
 Camera = NodePath("Camera2D")
 Player = NodePath("../../../Environment/Player 2D")
 
-[node name="Camera2D" type="Camera2D" parent="CanvasLayer/SubViewportContainer/OverlayMapViewport" unique_id=1918112167]
+[node name="Camera2D" type="Camera2D" parent="CanvasLayer/OverlayMapContainer/OverlayMapViewport" unique_id=1918112167]
 zoom = Vector2(0.2, 0.2)
+
+[node name="HotkeyInfo" parent="CanvasLayer" unique_id=1910666900 instance=ExtResource("10_v18oo")]
+offset_left = 23.0
+offset_top = 23.0
+offset_right = 233.0
+offset_bottom = 177.0
