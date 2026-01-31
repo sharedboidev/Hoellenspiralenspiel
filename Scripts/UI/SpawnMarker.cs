@@ -27,8 +27,8 @@ public partial class SpawnMarker : PanelContainer
     {
         var dimension     = (int)Math.Sqrt(AmountToSpawn) + 1;
         var assumedSizePx = 64;
-        var offset        = new Vector2(assumedSizePx * (float)dimension / 2, assumedSizePx * (float)dimension / 2);
-        var totalCount = 0;
+        var offset        = new Vector2(-assumedSizePx * (float)dimension / 4, -assumedSizePx * (float)dimension / 4);
+        var totalCount    = 0;
 
         for (var i = 0; i < dimension; i++)
         {

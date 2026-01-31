@@ -64,10 +64,10 @@ offset_right = 63.972473
 offset_bottom = 526.0
 
 [node name="SpawnMarker4" parent="SpawnMarker" unique_id=1766736446 instance=ExtResource("6_7imrf")]
-offset_left = 1651.0
-offset_top = 388.0
-offset_right = 1717.9724
-offset_bottom = 428.0
+offset_left = 1846.0
+offset_top = 384.0
+offset_right = 1912.9724
+offset_bottom = 424.0
 AmountToSpawn = 15
 
 [node name="Lootsystem" parent="." unique_id=1477031551 instance=ExtResource("1_h4q4d")]
