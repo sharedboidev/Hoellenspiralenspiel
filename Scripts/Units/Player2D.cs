@@ -30,6 +30,8 @@ public partial class Player2D : BaseUnit
 
 	[Export]
 	public float ManaMax { get; set; } = 100;
+	
+	private float manaProSekunde = 3f;
 
 	public override void _Ready()
 	{
@@ -58,6 +60,13 @@ public partial class Player2D : BaseUnit
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (ManaCurrent < ManaMax)
+		{
+			ManaCurrent += manaProSekunde * (float)delta;
+			ManaCurrent = Mathf.Clamp(ManaCurrent, 0, ManaMax);
+			ManaOrb.SetRessource(ManaCurrent);
+		}
+		
 		MovementDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
 		Velocity          = MovementDirection * Movementspeed;
 
@@ -102,9 +111,9 @@ public partial class Player2D : BaseUnit
 		ManaOrb.SetRessource(ManaCurrent);
 	}
 
-	public void _on_mana_reg_timer_timeout()
-	{
-		ManaCurrent += 2f;
-		ManaOrb.SetRessource(ManaCurrent);
-	}
+	// public void _on_mana_reg_timer_timeout()
+	// {
+	// 	ManaCurrent += 2f;
+	// 	ManaOrb.SetRessource(ManaCurrent);
+	// }
 }

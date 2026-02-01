@@ -500,9 +500,3 @@ offset_bottom = 648.0
 [node name="NoManaSound" type="AudioStreamPlayer2D" parent="." unique_id=236623057]
 stream = ExtResource("4_rl3bg")
 volume_db = -10.0
-
-[node name="ManaRegTimer" type="Timer" parent="." unique_id=1349618707]
-wait_time = 0.5
-autostart = true
-
-[connection signal="timeout" from="ManaRegTimer" to="." method="_on_mana_reg_timer_timeout"]
