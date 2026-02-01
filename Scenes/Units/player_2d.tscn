@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bwt2hw5i1cwjn" path="res://Scripts/Units/Player2D.cs" id="1_nnb5g"]
 [ext_resource type="Texture2D" uid="uid://qq3ai0jk2etf" path="res://Textures/Units/Player/PlayerSpritesheet_grid.png" id="2_nnb5g"]
 [ext_resource type="PackedScene" uid="uid://bapl2sjbv6xe6" path="res://Scenes/UI/ressource_orb.tscn" id="3_o57mx"]
+[ext_resource type="AudioStream" uid="uid://sri6stb07ual" path="res://Audio/no mana.mp3" id="4_rl3bg"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_djq3p"]
 radius = 15.0
@@ -433,7 +434,7 @@ nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_hm4fm")
 nodes/StateMachine/position = Vector2(-40, 80)
 node_connections = [&"output", 0, &"StateMachine"]
 
-[node name="Player2D" type="CharacterBody2D" unique_id=1421126971 node_paths=PackedStringArray("LifeOrb", "ManaOrb", "SkillBar")]
+[node name="Player2D" type="CharacterBody2D" unique_id=1421126971 node_paths=PackedStringArray("LifeOrb", "ManaOrb", "SkillBar", "NoManaSound")]
 z_index = 1
 y_sort_enabled = true
 collision_mask = 10
@@ -444,6 +445,7 @@ script = ExtResource("1_nnb5g")
 LifeOrb = NodePath("LifeOrb")
 ManaOrb = NodePath("ManaOrb")
 SkillBar = NodePath("CanvasLayer/SkillBar")
+NoManaSound = NodePath("NoManaSound")
 LifeBase = 128
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1710998304]
@@ -486,11 +488,21 @@ size_flags_horizontal = 4
 [node name="LifeOrb" parent="." unique_id=1740844714 instance=ExtResource("3_o57mx")]
 offset_left = -1108.0
 offset_top = 459.0
-offset_right = -1068.0
-offset_bottom = 499.0
+offset_right = -921.0
+offset_bottom = 646.0
 
 [node name="ManaOrb" parent="." unique_id=235976386 instance=ExtResource("3_o57mx")]
 offset_left = 982.0
 offset_top = 457.0
-offset_right = 1022.0
-offset_bottom = 497.0
+offset_right = 1173.0
+offset_bottom = 648.0
+
+[node name="NoManaSound" type="AudioStreamPlayer2D" parent="." unique_id=236623057]
+stream = ExtResource("4_rl3bg")
+volume_db = -10.0
+
+[node name="ManaRegTimer" type="Timer" parent="." unique_id=1349618707]
+wait_time = 0.5
+autostart = true
+
+[connection signal="timeout" from="ManaRegTimer" to="." method="_on_mana_reg_timer_timeout"]

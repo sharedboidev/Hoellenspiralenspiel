@@ -23,11 +23,20 @@ public partial class Player2D : BaseUnit
 	private         PackedScene   SkillBarIcon = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
 	private         AnimationTree AnimationTree { get; set; }
 
+	[Export]
+	public AudioStreamPlayer2D NoManaSound { get; set; }
+
+	public float ManaCurrent { get; set; }
+
+	[Export]
+	public float ManaMax { get; set; } = 100;
+
 	public override void _Ready()
 	{
-		 ManaOrb.Init(100, RessourceType.Mana);
-		 LifeOrb.Init(LifeMaximum,RessourceType.Life);
-		
+		ManaCurrent = ManaMax;
+		ManaOrb.Init(ManaMax, RessourceType.Mana);
+		LifeOrb.Init(LifeMaximum, RessourceType.Life);
+
 		base._Ready();
 
 		skills.Add(new FireballSkill(this));
@@ -76,5 +85,26 @@ public partial class Player2D : BaseUnit
 				LifeOrb.SetRessource(LifeCurrent);
 			}
 		}
+	}
+
+	public bool CanUseAbility(float manaCost)
+		=> ManaCurrent >= manaCost;
+
+	public void PlayOutOfMana()
+	{
+		if (!NoManaSound.IsPlaying())
+			NoManaSound.Play();
+	}
+
+	public void ReduceMana(float mana)
+	{
+		ManaCurrent -= mana;
+		ManaOrb.SetRessource(ManaCurrent);
+	}
+
+	public void _on_mana_reg_timer_timeout()
+	{
+		ManaCurrent += 2f;
+		ManaOrb.SetRessource(ManaCurrent);
 	}
 }

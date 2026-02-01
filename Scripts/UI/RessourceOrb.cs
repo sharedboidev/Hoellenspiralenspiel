@@ -17,9 +17,7 @@ public partial class RessourceOrb : Control
 	private         RessourceType  type;
 
 	public override void _Ready()
-	{
-		current = maxRessource;
-	}
+		=> current = maxRessource;
 
 	public void Init(float max, RessourceType type)
 	{
