@@ -1,12 +1,12 @@
 using Godot;
 
-public enum RessourceType
+public enum ResourceType
 {
 	Life = 0,
 	Mana = 1
 }
 
-public partial class RessourceOrb : Control
+public partial class ResourceOrb : Control
 {
 	private         float          current;
 	private         Color          lifeColor    = new(0.65f, 0.08f, 0.10f);
@@ -14,12 +14,14 @@ public partial class RessourceOrb : Control
 	[Export] public float          maxRessource = 100f;
 	private         ShaderMaterial orbShader;
 	[Export] public TextureRect    OrbTexture;
-	private         RessourceType  type;
+	[Export] public Label          ResourceText;
+	private         string         resourceTextFormat = "{current} / {max}";
+	private         ResourceType   type;
 
 	public override void _Ready()
 		=> current = maxRessource;
 
-	public void Init(float max, RessourceType type)
+	public void Init(float max, ResourceType type)
 	{
 		var original = OrbTexture.Material as ShaderMaterial;
 
@@ -39,7 +41,7 @@ public partial class RessourceOrb : Control
 	{
 		if (orbShader is null)
 			GD.Print("orbShader is null");
-		var c = type == RessourceType.Life ? lifeColor : manaColor;
+		var c = type == ResourceType.Life ? lifeColor : manaColor;
 		orbShader.SetShaderParameter("liquid_color", c);
 	}
 
@@ -48,6 +50,9 @@ public partial class RessourceOrb : Control
 		current = Mathf.Clamp(c, 0f, maxRessource);
 		var fillAmount = current / maxRessource;
 
+
+		ResourceText.Text = resourceTextFormat.Replace("{current}", ((int)current).ToString())
+		                                      .Replace("{max}", maxRessource.ToString()); 
 		orbShader.SetShaderParameter("fill_amount", fillAmount);
 	}
 }

@@ -16,8 +16,8 @@ public class FireballContainer { }
 public partial class Player2D : BaseUnit
 {
 	private readonly List<BaseSkill> skills = new();
-	[Export] private RessourceOrb    LifeOrb;
-	[Export] private RessourceOrb    ManaOrb;
+	[Export] private ResourceOrb    LifeOrb;
+	[Export] private ResourceOrb    ManaOrb;
 
 	[Export] public HBoxContainer SkillBar;
 	private         PackedScene   SkillBarIcon = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
@@ -36,8 +36,8 @@ public partial class Player2D : BaseUnit
 	public override void _Ready()
 	{
 		ManaCurrent = ManaMax;
-		ManaOrb.Init(ManaMax, RessourceType.Mana);
-		LifeOrb.Init(LifeMaximum, RessourceType.Life);
+		ManaOrb.Init(ManaMax, ResourceType.Mana);
+		LifeOrb.Init(LifeMaximum, ResourceType.Life);
 
 		base._Ready();
 
