@@ -16,12 +16,12 @@ public partial class InventorySlot : PanelContainer,
 
     public delegate void WithdrawingItemEventHandler(BaseItem withdrawnItem);
 
-    private TextureRect                      icon;
-    private Label                            stacksizeDisplay;
-    public  bool                             HasSpace           => ContainedItem is null or ConsumableItem { IsFull: false };
-    public  Inventory                        Inventory          { get; set; }
-    public  ITooltipObject                   ContainedItem      { get; set; }
-    public  Vector2                          TooltipAnchorPoint => GlobalPosition;
+    private TextureRect    icon;
+    private Label          stacksizeDisplay;
+    public  Inventory      Inventory          { get; set; }
+    public  ITooltipObject ContainedItem      { get; set; }
+    public  Vector2        TooltipAnchorPoint => GlobalPosition;
+
     public event MouseMovementEventHandler   MouseMoving;
     public event WithdrawingItemEventHandler WithdrawingItem;
     public event SlotEmptiedEventHandler     SlotEmptied;
@@ -34,7 +34,7 @@ public partial class InventorySlot : PanelContainer,
 
     public bool SetItem(BaseItem incomingItem)
     {
-        if (!HasSpace || incomingItem is null)
+        if (incomingItem is null || !HasSpaceFor(incomingItem))
             return false;
 
         if (ContainedItem is ConsumableItem containedConsumable && incomingItem is ConsumableItem incomingConsumable)
@@ -101,39 +101,78 @@ public partial class InventorySlot : PanelContainer,
         return (BaseItem)itemAboutToBeReturned;
     }
 
+    public bool HasSpaceFor(BaseItem item)
+    {
+        if (item is ConsumableItem newConsumable && ContainedItem is ConsumableItem containedConsumable)
+            return containedConsumable.CanFit(newConsumable);
+
+        return ContainedItem is null;
+    }
+
     private void ItemOnTreeExited() => stacksizeDisplay.Visible = false;
 
     public void _on_item_image_gui_input(InputEvent inputEvent)
     {
-        BaseItem item;
-        var      mouseObject = Inventory.GetNode<MouseObject>(nameof(MouseObject));
+        var mouseObject = Inventory.GetNode<MouseObject>(nameof(MouseObject));
 
         switch (inputEvent)
         {
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } when ContainedItem is ConsumableItem consumable:
-            {
-                var player = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D");
-
-                consumable.GetConsumedBy(player);
+                ConsumeItem(consumable);
                 break;
-            }
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is not null && !mouseObject.HasItem:
-                item = RetrieveItem();
-                WithdrawingItem?.Invoke(item);
+                WithdrawItem();
                 break;
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is null && mouseObject.HasItem:
-                item = mouseObject.RetrieveItem();
-                SetItem(item);
+                PutItemIntoSlot(mouseObject);
                 break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when HasSpace && mouseObject.HasItem:
-                item = mouseObject.RetrieveItem();
-                var couldSet = SetItem(item);
-
-                if (!couldSet)
-                    mouseObject.Show(item);
-
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && !HasSpaceFor((BaseItem)mouseObject.ContainedItem):
+                SwapItems(mouseObject);
+                break;
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && HasSpaceFor((BaseItem)mouseObject.ContainedItem):
+                MergeItems(mouseObject);
                 break;
         }
+    }
+
+    private void ConsumeItem(ConsumableItem consumable)
+    {
+        var player = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D");
+
+        consumable.GetConsumedBy(player);
+    }
+
+    private void PutItemIntoSlot(MouseObject mouseObject)
+    {
+        var item = mouseObject.RetrieveItem();
+
+        SetItem(item);
+    }
+
+    private void WithdrawItem()
+    {
+        BaseItem item;
+        item = RetrieveItem();
+        WithdrawingItem?.Invoke(item);
+    }
+
+    private void SwapItems(MouseObject mouseObject)
+    {
+        var mousItem = mouseObject.RetrieveItem();
+        var slotItem = RetrieveItem();
+
+        SetItem(mousItem);
+        mouseObject.Show(slotItem);
+    }
+
+    private void MergeItems(MouseObject mouseObject)
+    {
+        BaseItem item;
+        item = mouseObject.RetrieveItem();
+        var couldSet = SetItem(item);
+
+        if (!couldSet)
+            mouseObject.Show(item);
     }
 
     public void _on_mouse_entered() => MouseMoving?.Invoke(MousemovementDirection.Entered, this);

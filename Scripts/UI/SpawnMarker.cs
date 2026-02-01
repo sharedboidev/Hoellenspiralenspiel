@@ -20,10 +20,10 @@ public partial class SpawnMarker : PanelContainer
     {
         SetVisible(false);
 
-        FillSpawnMap();
+        FillSpawnLocationMap();
     }
 
-    private void FillSpawnMap()
+    private void FillSpawnLocationMap()
     {
         var dimension     = (int)Math.Sqrt(AmountToSpawn) + 1;
         var assumedSizePx = 64;

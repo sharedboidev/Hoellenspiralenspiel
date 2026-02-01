@@ -92,6 +92,7 @@ public partial class EnemyController : Node
                 spawn.MakeElite();
 
             spawn.Position        =  spawnMarker.GetSpawnlocationFor(i);
+            spawn.SpawnGroup      =  spawnMarker.Name;
             spawn.PropertyChanged += SpawnOnPropertyChanged;
 
             SpawnedEnemies.Add(spawn);
@@ -101,10 +102,21 @@ public partial class EnemyController : Node
 
     private void SpawnOnPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName != nameof(BaseEnemy.LifeCurrent) || sender is not BaseEnemy { LifeCurrent: <= 0 } enemy)
+        if (e.PropertyName != nameof(BaseEnemy.LifeCurrent) || sender is not BaseEnemy enemy)
             return;
 
-        SpawnLootbag(enemy);
+        if(enemy.LifeCurrent < enemy.LifeMaximum)
+            AggroMyGroup(enemy);
+
+        if (enemy.LifeCurrent <= 0)
+            SpawnLootbag(enemy);
+    }
+
+    private void AggroMyGroup(BaseEnemy enemy)
+    {
+        foreach (var groupMember in SpawnedEnemies.Except([enemy]).Where(friends => !friends.IsAggressive &&
+                                                                                    friends.SpawnGroup == enemy.SpawnGroup))
+            groupMember.IsAggressive = true;
     }
 
     private void SpawnLootbag(BaseEnemy enemy)

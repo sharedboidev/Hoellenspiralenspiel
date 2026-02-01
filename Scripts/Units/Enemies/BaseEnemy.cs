@@ -10,6 +10,7 @@ public abstract partial class BaseEnemy : BaseUnit
     protected          Node        CurrentScene;
     private            ProgressBar healthbar;
     protected abstract PackedScene AttackScene { get; }
+    public             string      SpawnGroup  { get; set; }
 
     [Export]
     public bool IsAggressive { get; set; }

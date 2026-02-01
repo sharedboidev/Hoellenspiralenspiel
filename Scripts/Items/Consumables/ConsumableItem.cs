@@ -44,7 +44,7 @@ public abstract partial class ConsumableItem : BaseItem
 
     public bool CanFit(ConsumableItem consumable)
     {
-        if (IsFull)
+        if (IsFull || consumable.GetType().FullName != GetType().FullName)
             return false;
 
         return StacksizeMax >= StacksizeCurrent + consumable.StacksizeCurrent;

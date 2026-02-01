@@ -37,6 +37,14 @@ public partial class Inventory : PanelContainer
         freeSlot?.SetItem(item);
     }
 
+    public override void _Input(InputEvent @event)
+    {
+        if (@event is InputEventMouseButton { ButtonIndex: MouseButton.Left })
+        {
+
+        }
+    }
+
     private void BuildInventory()
     {
         if (slotsGenerated)
@@ -91,7 +99,7 @@ public partial class Inventory : PanelContainer
     public InventorySlot GetNextFreeSlotOrDefaultFor(BaseItem incomingItem)
     {
         var slotsWithSpace = ItemGrid.GetAllChildren<InventorySlot>()
-                                     .Where(slot => slot.HasSpace)
+                                     .Where(slot => slot.HasSpaceFor(incomingItem))
                                      .ToList();
 
         foreach (var nextSlot in slotsWithSpace)

@@ -158,7 +158,6 @@ collision_layer = 2
 collision_mask = 13
 script = ExtResource("1_e1ef1")
 LootTableId = "blue_blob_loot"
-LifeBase = 120
 Movementspeed = 25.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=174800444]
@@ -177,7 +176,7 @@ libraries/ = SubResource("AnimationLibrary_e1ef1")
 tree_root = SubResource("AnimationNodeBlendTree_dn1kk")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
-parameters/StateMachine/MoveState/RunState/blend_position = Vector2(0.36414397, -0.0023640394)
+parameters/StateMachine/MoveState/RunState/blend_position = Vector2(-0.0055831075, -0.4704492)
 
 [node name="Healthbar" type="ProgressBar" parent="." unique_id=813237691]
 unique_name_in_owner = true
