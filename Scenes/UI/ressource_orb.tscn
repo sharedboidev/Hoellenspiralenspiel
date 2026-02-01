@@ -7,7 +7,7 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_by0lb"]
 shader = ExtResource("2_4ikmt")
 shader_parameter/fill_amount = 1.0
-shader_parameter/liquid_color = Color(0.9744794, 0, 0.08421912, 1)
+shader_parameter/liquid_color = Vector4(0, 1, 0, 1)
 shader_parameter/wave_strength = 0.02
 shader_parameter/time_speed = 8.0
 
