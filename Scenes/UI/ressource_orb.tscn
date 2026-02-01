@@ -7,21 +7,21 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_by0lb"]
 shader = ExtResource("2_4ikmt")
 shader_parameter/fill_amount = 1.0
-shader_parameter/liquid_color = Vector4(0, 1, 0, 1)
+shader_parameter/liquid_color = Color(0.8, 0, 0, 1)
 shader_parameter/wave_strength = 0.02
 shader_parameter/time_speed = 8.0
 
 [node name="RessourceOrb" type="Control" unique_id=1740844714 node_paths=PackedStringArray("OrbTexture")]
 layout_mode = 3
 anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 190.0
+offset_bottom = 190.0
 script = ExtResource("1_6a6dy")
 OrbTexture = NodePath("Orb")
 
 [node name="Orb" type="TextureRect" parent="." unique_id=1177697242]
 material = SubResource("ShaderMaterial_by0lb")
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 184.0
+offset_bottom = 184.0
 texture = ExtResource("3_6lu0o")

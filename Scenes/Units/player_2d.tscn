@@ -488,11 +488,9 @@ offset_left = -1108.0
 offset_top = 459.0
 offset_right = -1068.0
 offset_bottom = 499.0
-scale = Vector2(3, 3)
 
 [node name="ManaOrb" parent="." unique_id=235976386 instance=ExtResource("3_o57mx")]
 offset_left = 982.0
 offset_top = 457.0
 offset_right = 1022.0
 offset_bottom = 497.0
-scale = Vector2(3, 3)
