@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dxpktdn4a3wtf"
+path="res://.godot/imported/guess what.mp3-296e560ca33ffea96dfd1c1e0a647564.mp3str"
+
+[deps]
+
+source_file="res://Audio/Background/guess what.mp3"
+dest_files=["res://.godot/imported/guess what.mp3-296e560ca33ffea96dfd1c1e0a647564.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
