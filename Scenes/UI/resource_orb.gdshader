@@ -2,6 +2,7 @@ shader_type canvas_item;
 
 uniform float fill_amount : hint_range(0.0, 1.0) = 1.0;
 uniform vec4 liquid_color : source_color = vec4(0.8, 0.0, 0.0, 1.0);
+uniform vec4 glass_color : source_color = vec4(1, 1, 1.0, 0.6);
 uniform float wave_strength = 0.02;
 uniform float time_speed = 5;
 
@@ -20,9 +21,8 @@ void fragment() {
 
     // Füllhöhe
     float height = 1.0 - fill_amount * 2.0 + wave;
-
-    if (uv.y < height)
-        discard;
+	float liquid_mask = step(height, uv.y);
+	
 		
 	// ---- Farbe hübscher machen ----
 	float y01 = (uv.y + 1.0) * 0.5;                 // 0..1 (oben->unten)
@@ -37,6 +37,14 @@ void fragment() {
 	vec2 hlPos = vec2(-0.25, -0.35);
 	float hl = 1.0 - smoothstep(0.0, 0.35, length(uv - hlPos));
 	col += vec3(1.0) * hl * 0.25;
-
-	COLOR = vec4(col, liquid_color.a);
+	
+	//Glas
+	vec3 glass_col = glass_color.rgb;
+	float glass_edge = smoothstep(0.6, 1.0, dist);
+	glass_col *= mix(1.0, 0.7, glass_edge);
+	
+	vec3 final_rgb = mix(glass_col, col, liquid_mask);
+	float final_a  = mix(glass_color.a, liquid_color.a, liquid_mask);
+	
+	COLOR = vec4(final_rgb, final_a);
 }

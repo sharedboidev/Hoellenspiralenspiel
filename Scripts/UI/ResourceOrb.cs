@@ -29,7 +29,8 @@ public partial class ResourceOrb : Control
 		orbShader.Shader = original.Shader;
 
 		OrbTexture.Material = orbShader;
-
+		OrbTexture.Modulate = Colors.White;
+		
 		current   = maxRessource = max;
 		this.type = type;
 
@@ -52,7 +53,7 @@ public partial class ResourceOrb : Control
 
 
 		ResourceText.Text = resourceTextFormat.Replace("{current}", ((int)current).ToString())
-		                                      .Replace("{max}", maxRessource.ToString()); 
+											  .Replace("{max}", maxRessource.ToString()); 
 		orbShader.SetShaderParameter("fill_amount", fillAmount);
 	}
 }

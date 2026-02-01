@@ -8,6 +8,7 @@
 shader = ExtResource("2_4ikmt")
 shader_parameter/fill_amount = 1.0
 shader_parameter/liquid_color = Color(0.8, 0, 0, 1)
+shader_parameter/glass_color = Color(0.9, 0.95, 1, 0.12)
 shader_parameter/wave_strength = 0.02
 shader_parameter/time_speed = 8.0
 
@@ -17,7 +18,6 @@ anchors_preset = 0
 offset_right = 190.0
 offset_bottom = 190.0
 script = ExtResource("1_6a6dy")
-maxRessource = null
 OrbTexture = NodePath("Orb")
 ResourceText = NodePath("ResourceText")
 

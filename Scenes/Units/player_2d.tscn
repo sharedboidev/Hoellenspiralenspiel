@@ -486,16 +486,16 @@ grow_vertical = 0
 size_flags_horizontal = 4
 
 [node name="LifeOrb" parent="." unique_id=1740844714 instance=ExtResource("3_o57mx")]
-offset_left = -1108.0
-offset_top = 459.0
-offset_right = -921.0
-offset_bottom = 646.0
+offset_left = -1146.0
+offset_top = 596.0
+offset_right = -959.0
+offset_bottom = 783.0
 
 [node name="ManaOrb" parent="." unique_id=235976386 instance=ExtResource("3_o57mx")]
-offset_left = 982.0
-offset_top = 457.0
-offset_right = 1173.0
-offset_bottom = 648.0
+offset_left = 964.0
+offset_top = 594.0
+offset_right = 1155.0
+offset_bottom = 785.0
 
 [node name="NoManaSound" type="AudioStreamPlayer2D" parent="." unique_id=236623057]
 stream = ExtResource("4_rl3bg")
