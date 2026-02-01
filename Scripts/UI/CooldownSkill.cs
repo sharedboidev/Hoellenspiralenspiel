@@ -1,6 +1,7 @@
 using Godot;
 using Hoellenspiralenspiel.Scripts.Abilities;
 using Hoellenspiralenspiel.Scripts.Abilities.Spells;
+using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
@@ -36,6 +37,18 @@ public partial class CooldownSkill : TextureButton
 
 	public void Use()
 	{
+		if (skill.Owner is not Player2D player)
+			return;
+
+		var manaCost = 10;
+
+		if (!player.CanUseAbility(manaCost))
+		{
+			player.PlayOutOfMana();
+			return;
+		}
+
+		player.ReduceMana(10);
 		var someSkill = visualScene.Instantiate<Area2D>() as Fireball;
 
 		someSkill.Init(skill as FireballSkill,
@@ -43,6 +56,7 @@ public partial class CooldownSkill : TextureButton
 					   GetViewport().GetCamera2D().GetGlobalMousePosition());
 		GetTree().CurrentScene.GetNode<Node2D>("Environment").AddChild(someSkill);
 
+		
 		TimerCooldown.Start();
 		Disabled = true;
 		SetProcess(true);

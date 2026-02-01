@@ -2,16 +2,21 @@
 
 [ext_resource type="PackedScene" uid="uid://c7cdly8lgcdqk" path="res://Scenes/UI/item_tooltip.tscn" id="1_bidin"]
 [ext_resource type="PackedScene" uid="uid://blqiwj17e0cdf" path="res://Scenes/lootsystem.tscn" id="1_h4q4d"]
+[ext_resource type="Script" uid="uid://dvho5k4efpf5h" path="res://Scripts/UI/TestPlane.cs" id="1_qf8p0"]
 [ext_resource type="TileSet" uid="uid://bjrvhfwxc86rt" path="res://Resources/Desert.tres" id="1_vglo3"]
 [ext_resource type="PackedScene" uid="uid://c8hx5eg0q1vct" path="res://Scenes/Units/player_2d.tscn" id="3_35xgq"]
 [ext_resource type="PackedScene" uid="uid://cnxyy07a3er8q" path="res://Scenes/Units/Enemies/blue_blob.tscn" id="4_db61r"]
+[ext_resource type="PackedScene" uid="uid://cycesnf53lc51" path="res://Scenes/Units/test_enemy.tscn" id="5_bjuw8"]
 [ext_resource type="PackedScene" uid="uid://6yhxh7p0ijv4" path="res://Scenes/UI/inventory.tscn" id="5_h4q4d"]
 [ext_resource type="PackedScene" uid="uid://bg8s6qmxf15f8" path="res://Scripts/Controllers/enemy_controller.tscn" id="5_vglo3"]
 [ext_resource type="PackedScene" uid="uid://dpai8eumf00w0" path="res://Scenes/UI/spawn_marker.tscn" id="6_7imrf"]
 [ext_resource type="Script" uid="uid://v5paruy0b76n" path="res://Scripts/UI/OverlayMapViewport.cs" id="9_db61r"]
 [ext_resource type="PackedScene" uid="uid://carsjy7sm2ntw" path="res://Scenes/UI/hotkey_info.tscn" id="10_v18oo"]
+[ext_resource type="AudioStream" uid="uid://dxpktdn4a3wtf" path="res://Audio/Background/guess what.mp3" id="11_olf6n"]
 
-[node name="Test Plane" type="Node" unique_id=807554671]
+[node name="Test Plane" type="Node" unique_id=807554671 node_paths=PackedStringArray("BackgroundPlayer")]
+script = ExtResource("1_qf8p0")
+BackgroundPlayer = NodePath("AudioStreamPlayer2D")
 
 [node name="Environment" type="Node2D" parent="." unique_id=1968535861]
 y_sort_enabled = true
@@ -37,7 +42,7 @@ tile_set = ExtResource("1_vglo3")
 [node name="Player 2D" parent="Environment" unique_id=809220738 instance=ExtResource("3_35xgq")]
 unique_name_in_owner = true
 y_sort_enabled = false
-position = Vector2(2594, 50)
+position = Vector2(1242, 722)
 
 [node name="Enemies" type="Node2D" parent="Environment" unique_id=845394208]
 unique_name_in_owner = true
@@ -46,10 +51,11 @@ y_sort_enabled = true
 [node name="SpawnMarker" type="Node2D" parent="." unique_id=1148664553]
 
 [node name="SpawnMarker" parent="SpawnMarker" unique_id=1519096458 instance=ExtResource("6_7imrf")]
-offset_left = 952.0
-offset_top = 919.0
-offset_right = 1018.9725
-offset_bottom = 959.0
+offset_left = 2387.0
+offset_top = 1619.0
+offset_right = 2453.9724
+offset_bottom = 1659.0
+EnemyToSpawn = ExtResource("5_bjuw8")
 
 [node name="SpawnMarker2" parent="SpawnMarker" unique_id=334759122 instance=ExtResource("6_7imrf")]
 offset_left = 532.0
@@ -121,3 +127,8 @@ offset_left = 23.0
 offset_top = 23.0
 offset_right = 233.0
 offset_bottom = 177.0
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=1896865411]
+stream = ExtResource("11_olf6n")
+volume_db = -20.0
+autoplay = true

@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://bapl2sjbv6xe6"]
+
+[ext_resource type="Script" uid="uid://dwcyh745542nv" path="res://Scripts/UI/ResourceOrb.cs" id="1_6a6dy"]
+[ext_resource type="Shader" uid="uid://c104sas7p10vg" path="res://Scenes/UI/resource_orb.gdshader" id="2_4ikmt"]
+[ext_resource type="Texture2D" uid="uid://ddfxuf4tdeldx" path="res://Textures/Spells/blank.png" id="3_6lu0o"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_by0lb"]
+shader = ExtResource("2_4ikmt")
+shader_parameter/fill_amount = 1.0
+shader_parameter/liquid_color = Color(0.8, 0, 0, 1)
+shader_parameter/glass_color = Color(0.9, 0.95, 1, 0.12)
+shader_parameter/wave_strength = 0.02
+shader_parameter/time_speed = 8.0
+
+[node name="ResourceOrb" type="Control" unique_id=1740844714 node_paths=PackedStringArray("OrbTexture", "ResourceText")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 190.0
+offset_bottom = 190.0
+script = ExtResource("1_6a6dy")
+OrbTexture = NodePath("Orb")
+ResourceText = NodePath("ResourceText")
+
+[node name="Orb" type="TextureRect" parent="." unique_id=1177697242]
+material = SubResource("ShaderMaterial_by0lb")
+layout_mode = 0
+offset_right = 184.0
+offset_bottom = 184.0
+texture = ExtResource("3_6lu0o")
+
+[node name="ResourceText" type="Label" parent="." unique_id=837161245]
+layout_mode = 0
+offset_left = 54.0
+offset_top = 148.0
+offset_right = 136.0
+offset_bottom = 171.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "2000/1000"

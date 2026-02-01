@@ -52,8 +52,6 @@ public partial class Fireball : Area2D
 					return;
 				}
 				
-				
-				
 				var possibleTargets = controller.SpawnedEnemies.Except([hitEnemy]).ToList();
 				var nearestBois     = hitEnemy.FindClosestEnemyFrom(possibleTargets, 2);
 				var fireballScene   = ResourceLoader.Load<PackedScene>("res://Scenes/Spells/fireball.tscn");

@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Abilities;
+using Hoellenspiralenspiel.Scripts.Extensions;
+using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
 
@@ -13,21 +16,37 @@ public class FireballContainer { }
 public partial class Player2D : BaseUnit
 {
 	private readonly List<BaseSkill> skills = new();
+	[Export] private ResourceOrb    LifeOrb;
+	[Export] private ResourceOrb    ManaOrb;
 
 	[Export] public HBoxContainer SkillBar;
 	private         PackedScene   SkillBarIcon = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
 	private         AnimationTree AnimationTree { get; set; }
 
+	[Export]
+	public AudioStreamPlayer2D NoManaSound { get; set; }
+
+	public float ManaCurrent { get; set; }
+
+	[Export]
+	public float ManaMax { get; set; } = 100;
+	
+	private float manaProSekunde = 3f;
+
 	public override void _Ready()
 	{
+		ManaCurrent = ManaMax;
+		ManaOrb.Init(ManaMax, ResourceType.Mana);
+		LifeOrb.Init(LifeMaximum, ResourceType.Life);
+
 		base._Ready();
 
 		skills.Add(new FireballSkill(this));
 
 		var fireballActionBarItem = SkillBarIcon.Instantiate<CooldownSkill>();
-		fireballActionBarItem.Init(skills.First(), visualResourceName: "res://Scenes/Spells/fireball.tscn");
+		fireballActionBarItem.Init(skills.First(), "res://Scenes/Spells/fireball.tscn");
 		SkillBar.AddChild(fireballActionBarItem);
-		
+
 		AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
 		Movementspeed = 300;
 	}
@@ -38,8 +57,16 @@ public partial class Player2D : BaseUnit
 
 		return distanceToEnemy <= enemy.AggroRange;
 	}
+
 	public override void _PhysicsProcess(double delta)
 	{
+		if (ManaCurrent < ManaMax)
+		{
+			ManaCurrent += manaProSekunde * (float)delta;
+			ManaCurrent = Mathf.Clamp(ManaCurrent, 0, ManaMax);
+			ManaOrb.SetRessource(ManaCurrent);
+		}
+		
 		MovementDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
 		Velocity          = MovementDirection * Movementspeed;
 
@@ -50,5 +77,43 @@ public partial class Player2D : BaseUnit
 		}
 
 		MoveAndSlide();
+
+		for (var i = 0; i < GetSlideCollisionCount(); i++)
+		{
+			var collision = GetSlideCollision(i);
+			var collider  = collision.GetCollider() as Node;
+
+			if (collider != null && collider.IsInGroup("monsters"))
+			{
+				var monsters = collider as BaseUnit;
+
+				var damageTaken = new HitResult(1, HitType.Normal, LifeModificationMode.Damage);
+				this.InstatiateFloatingCombatText(damageTaken, GetTree().CurrentScene, new Vector2(0, -60));
+
+				LifeCurrent -= (int)damageTaken.Value;
+				LifeOrb.SetRessource(LifeCurrent);
+			}
+		}
 	}
+
+	public bool CanUseAbility(float manaCost)
+		=> ManaCurrent >= manaCost;
+
+	public void PlayOutOfMana()
+	{
+		if (!NoManaSound.IsPlaying())
+			NoManaSound.Play();
+	}
+
+	public void ReduceMana(float mana)
+	{
+		ManaCurrent -= mana;
+		ManaOrb.SetRessource(ManaCurrent);
+	}
+
+	// public void _on_mana_reg_timer_timeout()
+	// {
+	// 	ManaCurrent += 2f;
+	// 	ManaOrb.SetRessource(ManaCurrent);
+	// }
 }

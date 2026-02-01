@@ -1,11 +1,10 @@
 [gd_scene format=3 uid="uid://bg8s6qmxf15f8"]
 
 [ext_resource type="Script" uid="uid://k2gb16ifn72b" path="res://Scripts/Controllers/EnemyController.cs" id="1_lfrkg"]
-[ext_resource type="PackedScene" uid="uid://cycesnf53lc51" path="res://Scenes/Units/test_enemy.tscn" id="2_qrm8y"]
 
 [node name="EnemyController" type="Node" unique_id=1289861331]
 script = ExtResource("1_lfrkg")
-EnemyToSpawn = ExtResource("2_qrm8y")
+EnemiesToSpawn = Array[PackedScene]([])
 SpawnIntervallSec = 0.75
 
 [node name="EnemySpawnTimer" type="Timer" parent="." unique_id=624589109]
