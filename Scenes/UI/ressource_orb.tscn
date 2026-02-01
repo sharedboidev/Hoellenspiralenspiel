@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://bapl2sjbv6xe6"]
+
+[ext_resource type="Script" uid="uid://d0okc0q0cwpkp" path="res://Scripts/UI/RessourceOrb.cs" id="1_6a6dy"]
+[ext_resource type="Shader" uid="uid://c104sas7p10vg" path="res://Scenes/UI/ressource_orb.gdshader" id="2_4ikmt"]
+[ext_resource type="Texture2D" uid="uid://ddfxuf4tdeldx" path="res://Textures/Spells/blank.png" id="3_6lu0o"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_by0lb"]
+shader = ExtResource("2_4ikmt")
+shader_parameter/fill_amount = 1.0
+shader_parameter/liquid_color = Color(0.9744794, 0, 0.08421912, 1)
+shader_parameter/wave_strength = 0.02
+shader_parameter/time_speed = 8.0
+
+[node name="RessourceOrb" type="Control" unique_id=1740844714 node_paths=PackedStringArray("OrbTexture")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_6a6dy")
+OrbTexture = NodePath("Orb")
+
+[node name="Orb" type="TextureRect" parent="." unique_id=1177697242]
+material = SubResource("ShaderMaterial_by0lb")
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("3_6lu0o")

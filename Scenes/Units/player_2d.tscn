@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bwt2hw5i1cwjn" path="res://Scripts/Units/Player2D.cs" id="1_nnb5g"]
 [ext_resource type="Texture2D" uid="uid://qq3ai0jk2etf" path="res://Textures/Units/Player/PlayerSpritesheet_grid.png" id="2_nnb5g"]
+[ext_resource type="PackedScene" uid="uid://bapl2sjbv6xe6" path="res://Scenes/UI/ressource_orb.tscn" id="3_o57mx"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_djq3p"]
 radius = 15.0
@@ -475,14 +476,27 @@ position = Vector2(-1, -64)
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=887654130]
 
 [node name="SkillBar" type="HBoxContainer" parent="CanvasLayer" unique_id=1930834205]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -20.0
-offset_top = -40.0
-offset_right = 20.0
+offset_left = 959.0
+offset_top = 1025.0
+offset_right = 959.0
+offset_bottom = 1080.0
 grow_horizontal = 2
 grow_vertical = 0
 size_flags_horizontal = 4
+
+[node name="ManaOrb" parent="CanvasLayer" unique_id=2130439323 instance=ExtResource("3_o57mx")]
+offset_left = 1734.0
+offset_top = 956.0
+offset_right = 1780.0
+offset_bottom = 1002.0
+scale = Vector2(2, 2)
+size_flags_horizontal = 8
+Type = 1
+
+[node name="LifeOrb" parent="CanvasLayer" unique_id=1740844714 instance=ExtResource("3_o57mx")]
+offset_left = 117.0
+offset_top = 964.0
+offset_right = 158.0
+offset_bottom = 1005.0
+scale = Vector2(2, 2)
+size_flags_horizontal = 0
