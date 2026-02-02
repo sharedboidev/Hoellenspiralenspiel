@@ -11,97 +11,97 @@ namespace Hoellenspiralenspiel.Scripts.Abilities.Spells;
 
 public partial class Fireball : Area2D
 {
-	[Export] public AnimatedSprite2D AnimationSprite;
-	private         Vector2          richtung;
-	private         FireballSkill    skill;
-	public          BaseUnit         ShotBy               { get; set; }
-	[Export]
-	public          int              MaxForks             { get; set; } = 5;
-	public          int              TimesForked          { get; set; }
-	public          double           LebenszeitSec        { get; set; } = 15;
-	public          double           LebenszeitCurrentSec { get; set; }
+    [Export] public AnimatedSprite2D AnimationSprite;
+    private         List<BaseUnit>   forkTargets = new();
+    private         Vector2          richtung;
+    private         FireballSkill    skill;
+    public          BaseUnit         ShotBy { get; set; }
 
-	private List<BaseUnit> forkTargets = new List<BaseUnit>(); 
-	
-	
-	public override void _Ready()
-	{
-		AnimationSprite.Play("default");
-		BodyEntered += OnBodyEntered;
-	}
+    [Export]
+    public int MaxForks { get; set; } = 5;
 
-	private void OnBodyEntered(Node2D body)
-	{
-		if (body is TileMapLayer tileMapLayer && tileMapLayer.Name == "Walls")
-			QueueFree();
+    public int    TimesForked          { get; set; }
+    public double LebenszeitSec        { get; set; } = 15;
+    public double LebenszeitCurrentSec { get; set; }
 
-		else
-		{
-			if (body.IsInGroup("monsters") && ShotBy != body && body is BaseEnemy hitEnemy)
-			{
-				var damageResult = skill.MakeRealDamage(hitEnemy);
-				hitEnemy.LifeCurrent -= (int)damageResult.Value;
-				hitEnemy.InstatiateFloatingCombatText(damageResult, GetTree().CurrentScene, new Vector2(0, -60));
+    public override void _Ready()
+    {
+        AnimationSprite.Play("default");
+        BodyEntered += OnBodyEntered;
+    }
 
-				var controller = GetTree().CurrentScene.GetNode<EnemyController>("%" + nameof(EnemyController));
+    private void OnBodyEntered(Node2D body)
+    {
+        if (body is TileMapLayer tileMapLayer && tileMapLayer.Name == "Walls")
+            QueueFree();
 
-				if (controller.SpawnedEnemies.Count < 2)
-				{
-					QueueFree();
+        else
+        {
+            if (body.IsInGroup("monsters") && ShotBy != body && body is BaseEnemy hitEnemy)
+            {
+                var damageResult = skill.MakeRealDamage(hitEnemy);
+                hitEnemy.LifeCurrent -= (int)damageResult.Value;
+                hitEnemy.InstatiateFloatingCombatText(damageResult, GetTree().CurrentScene, new Vector2(0, -60));
 
-					return;
-				}
-				
-				var possibleTargets = controller.SpawnedEnemies.Except([hitEnemy]).ToList();
-				var nearestBois     = hitEnemy.FindClosestEnemyFrom(possibleTargets, 2);
-				var fireballScene   = ResourceLoader.Load<PackedScene>("res://Scenes/Spells/fireball.tscn");
+                var controller = GetTree().CurrentScene.GetNode<EnemyController>("%" + nameof(EnemyController));
 
-				var timesForked = TimesForked + 1;
+                if (controller.SpawnedEnemies.Count < 2)
+                {
+                    QueueFree();
 
-				foreach (var friend in nearestBois)
-				{
-					if (TimesForked >= MaxForks)
-						continue;
+                    return;
+                }
 
-					var fireball = (Fireball)fireballScene.Instantiate();
-					fireball.TimesForked = timesForked;
-					fireball.ShotBy      = hitEnemy;
+                var possibleTargets = controller.SpawnedEnemies.Except([hitEnemy]).ToList();
+                var nearestBois     = hitEnemy.FindClosestEnemyFrom(possibleTargets, 2);
+                var fireballScene   = ResourceLoader.Load<PackedScene>("res://Scenes/Spells/fireball.tscn");
 
-					fireball.Init(new FireballSkill(skill.Owner), hitEnemy.Position, friend.Position);
-					GetTree().CurrentScene.GetNode<Node2D>("Environment").CallDeferred(Node.MethodName.AddChild, fireball);
-				}
+                var timesForked = TimesForked + 1;
 
-				QueueFree();
-			}
-		}
-	}
+                foreach (var friend in nearestBois)
+                {
+                    if (TimesForked >= MaxForks)
+                        continue;
 
-	public void Init(FireballSkill skill, Vector2 startGlobal, Vector2 destinationGlobal)
-	{
-		this.skill     = skill;
-		GlobalPosition = startGlobal;
+                    var fireball = (Fireball)fireballScene.Instantiate();
+                    fireball.TimesForked = timesForked;
+                    fireball.ShotBy      = hitEnemy;
 
-		richtung = destinationGlobal - startGlobal;
+                    fireball.Init(new FireballSkill(skill.Owner), hitEnemy.Position, friend.Position);
+                    GetTree().CurrentScene.GetNode<Node2D>("Environment").CallDeferred(Node.MethodName.AddChild, fireball);
+                }
 
-		if (richtung.LengthSquared() < 0.0001f)
-			richtung = Vector2.Right;
-		else
-			richtung = richtung.Normalized();
+                QueueFree();
+            }
+        }
+    }
 
-		Rotation = (-richtung).Angle();
-	}
+    public void Init(FireballSkill skill, Vector2 startGlobal, Vector2 destinationGlobal)
+    {
+        this.skill     = skill;
+        GlobalPosition = startGlobal;
 
-	public override void _Process(double d)
-	{
-		var delta = Convert.ToSingle(d);
+        richtung = destinationGlobal - startGlobal;
 
-		Position             += richtung * 800 * delta;
-		LebenszeitCurrentSec += d;
+        if (richtung.LengthSquared() < 0.0001f)
+            richtung = Vector2.Right;
+        else
+            richtung = richtung.Normalized();
 
-		if (LebenszeitCurrentSec >= LebenszeitSec)
-		{
-			LebenszeitCurrentSec = 0;
-			QueueFree();
-		}
-	}
+        Rotation = (-richtung).Angle();
+    }
+
+    public override void _Process(double d)
+    {
+        var delta = Convert.ToSingle(d);
+
+        Position             += richtung * 800 * delta;
+        LebenszeitCurrentSec += d;
+
+        if (LebenszeitCurrentSec >= LebenszeitSec)
+        {
+            LebenszeitCurrentSec = 0;
+            QueueFree();
+        }
+    }
 }

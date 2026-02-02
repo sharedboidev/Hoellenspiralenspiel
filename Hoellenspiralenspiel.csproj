@@ -6,10 +6,10 @@
         <LangVersion>default</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-      <Folder Include="Resources\LootTables\" />
-      <Folder Include="Scripts\Items\Weapons\Staffs\" />
+        <Folder Include="Resources\LootTables\"/>
+        <Folder Include="Scripts\Items\Weapons\Staffs\"/>
     </ItemGroup>
     <ItemGroup>
-      <Content Include="Resources\Desert.tres" />
+        <Content Include="Resources\Desert.tres"/>
     </ItemGroup>
 </Project>

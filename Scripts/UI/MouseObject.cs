@@ -8,9 +8,9 @@ public partial class MouseObject : PanelContainer,
                                    ITooltipObjectContainer
 {
     private TextureRect    Icon               => GetNode<TextureRect>("%Icon");
-    public  ITooltipObject ContainedItem      { get; set; }
-    public  Vector2        TooltipAnchorPoint => GetGlobalMousePosition() + new Vector2(5,5);
     public  bool           HasItem            => ContainedItem is not null;
+    public  ITooltipObject ContainedItem      { get; set; }
+    public  Vector2        TooltipAnchorPoint => GetGlobalMousePosition() + new Vector2(5, 5);
 
     public override void _Process(double delta)
     {

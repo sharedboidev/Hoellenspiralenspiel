@@ -39,9 +39,14 @@ public partial class Inventory : PanelContainer
 
     public override void _Input(InputEvent @event)
     {
-        if (@event is InputEventMouseButton { ButtonIndex: MouseButton.Left })
+        if (@event is InputEventMouseButton { ButtonIndex: MouseButton.Left } mouseEvent)
         {
+            var clickedOutside = mouseEvent.GlobalPosition.X < GlobalPosition.X
+                                 || mouseEvent.GlobalPosition.Y < GlobalPosition.Y
+                                 || mouseEvent.GlobalPosition.Y > GlobalPosition.Y + Size.Y
+                                 || mouseEvent.GlobalPosition.X > GlobalPosition.X + Size.X;
 
+            GD.Print($"Clicked outside Invetory?: {clickedOutside}");
         }
     }
 

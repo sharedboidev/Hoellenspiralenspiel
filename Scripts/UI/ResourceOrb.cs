@@ -42,6 +42,7 @@ public partial class ResourceOrb : Control
 	{
 		if (orbShader is null)
 			GD.Print("orbShader is null");
+
 		var c = type == ResourceType.Life ? lifeColor : manaColor;
 		orbShader.SetShaderParameter("liquid_color", c);
 	}

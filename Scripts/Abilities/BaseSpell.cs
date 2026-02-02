@@ -11,7 +11,6 @@ public class BaseSpell : BaseSkill
                      BaseUnit owner)
             : base(baseDamageMin, baseDamageMax, baseCritRate, baseCooldown, owner) { }
 
-    public bool CanFork { get; }
-
-    public int MaxForks { get; }
+    public bool CanFork  { get; }
+    public int  MaxForks { get; }
 }

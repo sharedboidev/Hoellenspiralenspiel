@@ -34,7 +34,7 @@ public partial class SpawnMarker : PanelContainer
         {
             for (var j = 0; j < dimension; j++)
             {
-                if(totalCount >= AmountToSpawn)
+                if (totalCount >= AmountToSpawn)
                     break;
 
                 var newPosition = GlobalPosition + offset;

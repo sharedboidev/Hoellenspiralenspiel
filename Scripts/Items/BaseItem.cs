@@ -8,9 +8,9 @@ public abstract partial class BaseItem : Node2D,
 {
     [Export]
     public TextureRect Icon { get; set; }
-    public abstract bool IsStackable { get; }
 
-    public string TooltipTitle => Name;
+    public abstract bool   IsStackable  { get; }
+    public          string TooltipTitle => Name;
 
     public abstract string GetTooltipDescription();
 

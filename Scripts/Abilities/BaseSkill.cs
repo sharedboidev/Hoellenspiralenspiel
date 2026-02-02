@@ -9,11 +9,11 @@ namespace Hoellenspiralenspiel.Scripts.Abilities;
 public abstract class BaseSkill
 {
     private readonly decimal baseCritModifier = 1.3m;
-    private readonly Random  baseDamageRng    = new();
-    private readonly Random  critRng          = new();
     private readonly int     baseCritRate;
     private readonly int     baseDamageMax;
     private readonly int     baseDamageMin;
+    private readonly Random  baseDamageRng = new();
+    private readonly Random  critRng       = new();
 
     public BaseSkill(int      baseDamageMin,
                      int      baseDamageMax,
@@ -36,8 +36,7 @@ public abstract class BaseSkill
     {
         //HitResult vong schnell her
 
-        var kek              = GD.Randf();
-
+        var kek = GD.Randf();
 
         var val              = critRng.Next(1, 101);
         var isCrit           = val <= baseCritRate;
@@ -46,7 +45,7 @@ public abstract class BaseSkill
         var hitType          = isCrit ? HitType.Critical : HitType.Normal;
 
         //Entweder hier maybe defence vong enemu berücksichtigen
-        
+
         return new HitResult(realDamage, hitType, LifeModificationMode.Damage);
     }
 }
