@@ -1,0 +1,42 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://irh6idx3cp6i"]
+
+[ext_resource type="Texture2D" uid="uid://ce3u28re7kyut" path="res://Textures/Spells/Fire Spell_Frame_01.png" id="1_ulo0g"]
+[ext_resource type="Texture2D" uid="uid://c3xyip3xjp761" path="res://Textures/Spells/Fire Spell_Frame_02.png" id="2_d8qr4"]
+[ext_resource type="Texture2D" uid="uid://bbdnpjx68chl" path="res://Textures/Spells/Fire Spell_Frame_03.png" id="3_w4i0r"]
+[ext_resource type="Texture2D" uid="uid://cwkhsvnql250o" path="res://Textures/Spells/Fire Spell_Frame_04.png" id="4_aeyhy"]
+[ext_resource type="Texture2D" uid="uid://dwo86oleeu07q" path="res://Textures/Spells/Fire Spell_Frame_05.png" id="5_vk6qa"]
+[ext_resource type="Texture2D" uid="uid://dlgonng7inl6t" path="res://Textures/Spells/Fire Spell_Frame_06.png" id="6_7aps3"]
+[ext_resource type="Texture2D" uid="uid://du3g6flkag47d" path="res://Textures/Spells/Fire Spell_Frame_07.png" id="7_5eawg"]
+[ext_resource type="Texture2D" uid="uid://dqttqclq3vqvq" path="res://Textures/Spells/Fire Spell_Frame_08.png" id="8_kgmwr"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_ulo0g")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_d8qr4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_w4i0r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_aeyhy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_vk6qa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_7aps3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_5eawg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_kgmwr")
+}],
+"loop": true,
+"name": &"default",
+"speed": 30.0
+}]

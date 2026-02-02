@@ -102,21 +102,20 @@ public partial class EnemyController : Node
 
     private void SpawnOnPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName != nameof(BaseEnemy.LifeCurrent) || sender is not BaseEnemy { LifeCurrent: <= 0 } enemy)
+        if (e.PropertyName != nameof(BaseEnemy.LifeCurrent) || sender is not BaseEnemy enemy)
             return;
-
-        if (enemy.LifeCurrent < enemy.LifeMaximum)
-            AggroMyGroup(enemy);
 
         if (enemy.LifeCurrent <= 0)
             SpawnLootbag(enemy);
+        else if (enemy.LifeCurrent < enemy.LifeMaximum)
+            AggroMyGroup(enemy);
     }
 
-    private void AggroMyGroup(BaseEnemy enemy)
+    private void AggroMyGroup(BaseEnemy hitEnemy)
     {
-        foreach (var groupMember in SpawnedEnemies.Except([enemy])
+        foreach (var groupMember in SpawnedEnemies.Except([hitEnemy])
                                                   .Where(friends => !friends.IsAggressive &&
-                                                                    friends.SpawnGroup == enemy.SpawnGroup))
+                                                                    friends.SpawnGroup == hitEnemy.SpawnGroup))
             groupMember.IsAggressive = true;
     }
 

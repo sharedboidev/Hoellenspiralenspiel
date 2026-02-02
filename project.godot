@@ -32,6 +32,10 @@ window/stretch/aspect="expand"
 
 project/assembly_name="Hoellenspiralenspiel"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/DropShadowCaster2D/plugin.cfg")
+
 [input]
 
 move_left={

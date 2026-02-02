@@ -56,12 +56,14 @@ offset_top = 1619.0
 offset_right = 2453.9724
 offset_bottom = 1659.0
 EnemyToSpawn = ExtResource("5_bjuw8")
+AmountToSpawn = 100
 
 [node name="SpawnMarker2" parent="SpawnMarker" unique_id=334759122 instance=ExtResource("6_7imrf")]
 offset_left = 532.0
 offset_top = 12.0
 offset_right = 598.9725
 offset_bottom = 52.0
+AmountToSpawn = 50
 
 [node name="SpawnMarker3" parent="SpawnMarker" unique_id=578690069 instance=ExtResource("6_7imrf")]
 offset_left = -3.0

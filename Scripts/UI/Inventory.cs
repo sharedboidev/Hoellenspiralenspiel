@@ -46,6 +46,8 @@ public partial class Inventory : PanelContainer
                                  || mouseEvent.GlobalPosition.Y > GlobalPosition.Y + Size.Y
                                  || mouseEvent.GlobalPosition.X > GlobalPosition.X + Size.X;
 
+
+
             GD.Print($"Clicked outside Invetory?: {clickedOutside}");
         }
     }
