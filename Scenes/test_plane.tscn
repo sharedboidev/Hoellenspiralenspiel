@@ -14,9 +14,9 @@
 [ext_resource type="PackedScene" uid="uid://carsjy7sm2ntw" path="res://Scenes/UI/hotkey_info.tscn" id="10_v18oo"]
 [ext_resource type="AudioStream" uid="uid://dxpktdn4a3wtf" path="res://Audio/Background/guess what.mp3" id="11_olf6n"]
 
-[node name="Test Plane" type="Node" unique_id=807554671 node_paths=PackedStringArray("BackgroundPlayer")]
+[node name="Test Plane" type="Node" unique_id=807554671 node_paths=PackedStringArray("backgroundPlayer")]
 script = ExtResource("1_qf8p0")
-BackgroundPlayer = NodePath("AudioStreamPlayer2D")
+backgroundPlayer = NodePath("AudioStreamPlayer2D")
 
 [node name="Environment" type="Node2D" parent="." unique_id=1968535861]
 y_sort_enabled = true
@@ -132,5 +132,5 @@ offset_bottom = 177.0
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=1896865411]
 stream = ExtResource("11_olf6n")
-volume_db = -20.0
+volume_db = -6.0
 autoplay = true

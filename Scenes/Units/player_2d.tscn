@@ -502,4 +502,4 @@ offset_bottom = 785.0
 
 [node name="NoManaSound" type="AudioStreamPlayer2D" parent="." unique_id=236623057]
 stream = ExtResource("4_rl3bg")
-volume_db = -10.0
+volume_db = -20.0
