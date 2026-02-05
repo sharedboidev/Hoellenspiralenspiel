@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://l81wih2ja1kw"]
+
+[ext_resource type="Script" uid="uid://dlstmxc1l0i4t" path="res://Scripts/Test/TweenTestScene.cs" id="1_1nwa6"]
+[ext_resource type="Texture2D" uid="uid://dqo82syqyywq2" path="res://Textures/Items/Consumables/HealthPotion.png" id="1_wka2f"]
+
+[node name="TweenTestScene" type="PanelContainer" unique_id=671966881]
+custom_minimum_size = Vector2(128, 128)
+offset_left = 448.0
+offset_top = 640.0
+offset_right = 576.0
+offset_bottom = 768.0
+pivot_offset = Vector2(64, 64)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("1_1nwa6")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1963742997]
+layout_mode = 2
+texture = ExtResource("1_wka2f")
+expand_mode = 1
