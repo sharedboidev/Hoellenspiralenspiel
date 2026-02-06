@@ -7,12 +7,13 @@ public partial class Fog : Sprite2D
     private          Image        fogImage;
     private          ImageTexture fogTexture;
     [Export] private int          gridSize = 16;
-    [Export]private          TileMapLayer groundTiles;
+    [Export] private TileMapLayer groundTiles;
     private          Image        lightImage;
     private          Vector2      lightOffset;
     private          Texture2D    lightTexture = GD.Load<Texture2D>("res://Textures/Items/Environment/Light.png");
     private          int          viewportHeight;
     private          int          viewportWidth;
+    private          Vector2I     worldpositionOffset;
 
     public override void _Ready()
     {
@@ -25,11 +26,11 @@ public partial class Fog : Sprite2D
         lightImage  = lightTexture.GetImage();
         lightOffset = new Vector2(lightTexture.GetWidth() / 2f, lightTexture.GetHeight() / 2f);
 
+        var worldDimension = groundTiles is null ? new Vector2I(viewportWidth, viewportHeight) : groundTiles.GetUsedRect().Size * groundTiles.TileSet.TileSize / 5;
+       // var worldPosition       = groundTiles is null ? new Vector2I(viewportWidth, viewportHeight) : groundTiles.GetUsedRect().Position * groundTiles.TileSet.TileSize / 5;
 
-        var worldDimension = groundTiles is null ? new Vector2I(viewportWidth, viewportHeight) : groundTiles.GetUsedRect().Size * groundTiles.TileSet.TileSize /5;
-        //var worldPosition  = groundTiles.GetUsedRect().Position * groundTiles.TileSet.TileSize;
-
-        fogImage = Image.CreateEmpty(worldDimension.X, worldDimension.Y, false, Image.Format.Rgbah);
+        //worldpositionOffset = worldPosition / gridSize;
+        fogImage            = Image.CreateEmpty(worldDimension.X, worldDimension.Y, false, Image.Format.Rgbah);
         fogImage.Fill(Colors.Black);
         fogTexture = ImageTexture.CreateFromImage(fogImage);
 
@@ -50,9 +51,9 @@ public partial class Fog : Sprite2D
 
     public void UpdateFog(Vector2 newGridPosition)
     {
-        var lightRect = new Rect2I(Vector2I.Zero, new Vector2I(lightImage.GetWidth(), lightImage.GetHeight()));
+        var lightRect           = new Rect2I(Vector2I.Zero, new Vector2I(lightImage.GetWidth(), lightImage.GetHeight()));
 
-        fogImage.BlendRect(lightImage, lightRect, (Vector2I)(newGridPosition - lightOffset));
+        fogImage.BlendRect(lightImage, lightRect, (Vector2I)(newGridPosition - worldpositionOffset - lightOffset));
 
         UpdateFogImageTexture();
     }
@@ -61,8 +62,5 @@ public partial class Fog : Sprite2D
     {
         var newFogTexture = ImageTexture.CreateFromImage(fogImage);
         Texture = newFogTexture;
-        //fogTexture.Tex.Update(fogImage);
-
-        //Texture = fogTexture;
     }
 }
