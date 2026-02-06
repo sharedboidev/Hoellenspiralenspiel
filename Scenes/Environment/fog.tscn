@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://ladhrpeeqfrq"]
+
+[ext_resource type="Script" uid="uid://0ds11dx6r6u1" path="res://Scripts/Environment/Fog.cs" id="1_duyi4"]
+[ext_resource type="Texture2D" uid="uid://7x0w8v1mxohb" path="res://Textures/Items/Environment/Light.png" id="1_ryd3t"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ryd3t"]
+blend_mode = 3
+
+[node name="Fog" type="Sprite2D" unique_id=1064313683]
+z_index = 5
+y_sort_enabled = true
+material = SubResource("CanvasItemMaterial_ryd3t")
+texture = ExtResource("1_ryd3t")
+centered = false
+script = ExtResource("1_duyi4")

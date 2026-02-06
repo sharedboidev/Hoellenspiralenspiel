@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://dvho5k4efpf5h" path="res://Scripts/UI/TestPlane.cs" id="1_qf8p0"]
 [ext_resource type="TileSet" uid="uid://bjrvhfwxc86rt" path="res://Resources/Desert.tres" id="1_vglo3"]
 [ext_resource type="PackedScene" uid="uid://c8hx5eg0q1vct" path="res://Scenes/Units/player_2d.tscn" id="3_35xgq"]
+[ext_resource type="PackedScene" uid="uid://ladhrpeeqfrq" path="res://Scenes/Environment/fog.tscn" id="4_2sot3"]
 [ext_resource type="PackedScene" uid="uid://cnxyy07a3er8q" path="res://Scenes/Units/Enemies/blue_blob.tscn" id="4_db61r"]
 [ext_resource type="PackedScene" uid="uid://cycesnf53lc51" path="res://Scenes/Units/test_enemy.tscn" id="5_bjuw8"]
 [ext_resource type="PackedScene" uid="uid://6yhxh7p0ijv4" path="res://Scenes/UI/inventory.tscn" id="5_h4q4d"]
@@ -47,6 +48,9 @@ position = Vector2(1242, 722)
 [node name="Enemies" type="Node2D" parent="Environment" unique_id=845394208]
 unique_name_in_owner = true
 y_sort_enabled = true
+
+[node name="Fog" parent="Environment" unique_id=1064313683 node_paths=PackedStringArray("groundTiles") instance=ExtResource("4_2sot3")]
+groundTiles = NodePath("../Ground")
 
 [node name="SpawnMarker" type="Node2D" parent="." unique_id=1148664553]
 
