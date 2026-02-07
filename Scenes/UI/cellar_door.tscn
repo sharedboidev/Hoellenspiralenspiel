@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://cfcncnx4arpno"]
+
+[ext_resource type="Shader" uid="uid://ceaga47ndfwfc" path="res://Shaders/god_rays.gdshader" id="1_bbls4"]
+[ext_resource type="Script" uid="uid://dnoobbqawkc0w" path="res://Scripts/Environment/CellarDoor.cs" id="1_od4l0"]
+[ext_resource type="Texture2D" uid="uid://ddfxuf4tdeldx" path="res://Textures/Spells/blank.png" id="2_od4l0"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_od4l0"]
+shader = ExtResource("1_bbls4")
+shader_parameter/angle = -0.3
+shader_parameter/position = -0.2
+shader_parameter/spread = 0.5
+shader_parameter/cutoff = 0.1
+shader_parameter/falloff = 0.2
+shader_parameter/edge_fade = 0.15
+shader_parameter/speed = 1.0
+shader_parameter/ray1_density = 8.0
+shader_parameter/ray2_density = 30.0
+shader_parameter/ray2_intensity = 0.3
+shader_parameter/color = Color(1, 0.9, 0.65, 0.8)
+shader_parameter/hdr = false
+shader_parameter/seed = 5.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_od4l0"]
+size = Vector2(31, 7)
+
+[node name="CellarDoor" type="PanelContainer" unique_id=399300928]
+self_modulate = Color(1, 1, 1, 0)
+scale = Vector2(3, 3)
+script = ExtResource("1_od4l0")
+
+[node name="GodRays" type="TextureRect" parent="." unique_id=1882737827]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_od4l0")
+layout_mode = 2
+texture = ExtResource("2_od4l0")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=118504102]
+position = Vector2(24, 30)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1403850054]
+unique_name_in_owner = true
+position = Vector2(0.5, 6.5)
+shape = SubResource("RectangleShape2D_od4l0")
+
+[connection signal="mouse_entered" from="Area2D" to="." method="_mouse_entered"]
+[connection signal="mouse_exited" from="Area2D" to="." method="_mouse_exited"]
