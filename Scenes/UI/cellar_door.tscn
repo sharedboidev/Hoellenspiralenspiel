@@ -30,13 +30,12 @@ script = ExtResource("1_od4l0")
 
 [node name="GodRays" type="TextureRect" parent="." unique_id=1882737827]
 unique_name_in_owner = true
-visible = false
 material = SubResource("ShaderMaterial_od4l0")
 layout_mode = 2
 texture = ExtResource("2_od4l0")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=118504102]
-position = Vector2(24, 30)
+position = Vector2(23.666666, 36.666668)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1403850054]
 unique_name_in_owner = true

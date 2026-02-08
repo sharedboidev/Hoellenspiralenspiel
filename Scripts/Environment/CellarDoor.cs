@@ -21,7 +21,15 @@ public partial class CellarDoor : PanelContainer
         GD.Print("Init Scene Transition!!");
     }
 
-    public void _mouse_entered() => godRaysTexture.SetVisible(true);
+    public void _mouse_entered()
+    {
+        GD.Print("Activated");
+        godRaysTexture.SetVisible(true);
+    }
 
-    public void _mouse_exited() => godRaysTexture.SetVisible(false);
+    public void _mouse_exited()
+    {
+        GD.Print("Deactivated");
+        godRaysTexture.SetVisible(false);
+    }
 }
