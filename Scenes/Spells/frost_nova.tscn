@@ -3,17 +3,14 @@
 [ext_resource type="Script" uid="uid://7aunhdjotq7h" path="res://Scripts/Abilities/Spells/FrostNova.cs" id="1_bm70b"]
 [ext_resource type="Texture2D" uid="uid://bimy6yugt0oad" path="res://Textures/Spells/frost nova.png" id="1_bueqi"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_bm70b"]
-radius = 148.40822
-
 [node name="FrostNova" type="Area2D" unique_id=197103431]
 scale = Vector2(0.355, 0.355)
 collision_layer = 4
 collision_mask = 2
 script = ExtResource("1_bm70b")
 
-[node name="Collision" type="CollisionShape2D" parent="." unique_id=459701622]
-shape = SubResource("CircleShape2D_bm70b")
+[node name="Collision" type="CollisionPolygon2D" parent="." unique_id=986306347]
+polygon = PackedVector2Array(-56.338028, -87.323944, -104.22536, -73.23944, -138.02817, -50.704227, -154.92958, -28.169014, -160.56339, -19.71831, -163.38028, -8.450705, -163.38028, 16.90141, -149.29578, 45.070423, -129.57747, 56.338028, -109.85915, 70.42254, -90.14085, 81.69014, -36.61972, 92.95775, -14.084507, 95.77465, 28.169014, 95.77465, 61.971832, 90.14085, 98.59155, 78.87324, 126.76057, 64.788734, 149.29578, 42.25352, 157.74648, 33.80282, 163.38028, 16.90141, 166.19719, 0, 163.38028, -16.90141, 149.29578, -36.61972, 132.39436, -56.338028, 109.85915, -67.60564, 78.87324, -81.69014, 53.521126, -87.323944, 16.90141, -92.95775, -2.8169014, -92.95775, -33.80282, -90.14085)
 
 [node name="Sprite" type="Sprite2D" parent="." unique_id=1902014549]
 texture = ExtResource("1_bueqi")

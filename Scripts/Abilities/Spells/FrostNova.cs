@@ -25,7 +25,7 @@ public partial class FrostNova : Area2D,
 		if (durationOver)
 			QueueFree();
 		else
-			Scale += new Vector2(6f  * (float)delta, 6f * (float)delta);
+			Scale += new Vector2(8f  * (float)delta, 8f * (float)delta);
 	}
 
 	private void OnBodyEntered(Node2D body)
