@@ -1,7 +1,14 @@
 [gd_scene format=3 uid="uid://o5bkctc8ux1c"]
 
 [ext_resource type="Script" uid="uid://bxqe0uvygnlhg" path="res://Scripts/Abilities/Spells/Fireball.cs" id="1_hnbfx"]
+[ext_resource type="Shader" uid="uid://dkvsgxal07oxi" path="res://Scenes/Spells/fireball.gdshader" id="2_ix1hh"]
 [ext_resource type="SpriteFrames" uid="uid://irh6idx3cp6i" path="res://Resources/SpriteFrames/fireball.tres" id="3_ix1hh"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4n7jj"]
+shader = ExtResource("2_ix1hh")
+shader_parameter/outline_color = Color(1, 0.4, 0.1, 1)
+shader_parameter/outline_size = 3.0
+shader_parameter/intensity = 1.2
 
 [node name="Fireball" type="Area2D" unique_id=1072243128 node_paths=PackedStringArray("AnimationSprite")]
 z_index = 1
@@ -18,5 +25,6 @@ build_mode = 1
 polygon = PackedVector2Array(-125, 100, -187.5, 93.75, -262.5, 50, -268.75, -25, -231.25, -75, -156.25, -100, -75, -87.5, -18.75, -50, 37.5, -31.25, 112.5, -50, 187.5, -43.75, 187.5, 0, 118.75, 12.5, 93.75, 43.75, 37.5, 75, -62.5, 93.75)
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CollisionPolygon2D" unique_id=824782845]
+material = SubResource("ShaderMaterial_4n7jj")
 sprite_frames = ExtResource("3_ix1hh")
 frame_progress = 0.18586469

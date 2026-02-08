@@ -31,7 +31,7 @@ public partial class Player2D : BaseUnit
 	[Export]
 	public float ManaMax { get; set; } = 100;
 	
-	private float manaProSekunde = 3f;
+	private float manaProSekunde = 5f;
 
 	public override void _Ready()
 	{
@@ -42,10 +42,15 @@ public partial class Player2D : BaseUnit
 		base._Ready();
 
 		skills.Add(new FireballSkill(this));
+		skills.Add(new FrostNovaSkill(this));
 
 		var fireballActionBarItem = SkillBarIcon.Instantiate<CooldownSkill>();
-		fireballActionBarItem.Init(skills.First(), "res://Scenes/Spells/fireball.tscn");
+		fireballActionBarItem.Init(skills.First(), "res://Scenes/Spells/fireball.tscn", Key.F);
+		var frostNovaActionBarItem = SkillBarIcon.Instantiate<CooldownSkill>();
+		frostNovaActionBarItem.Init(skills.Last(), "res://Scenes/Spells/frost_nova.tscn", Key.E);
+		
 		SkillBar.AddChild(fireballActionBarItem);
+		SkillBar.AddChild(frostNovaActionBarItem);
 
 		AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
 		Movementspeed = 300;
@@ -110,10 +115,4 @@ public partial class Player2D : BaseUnit
 		ManaCurrent -= mana;
 		ManaOrb.SetRessource(ManaCurrent);
 	}
-
-	// public void _on_mana_reg_timer_timeout()
-	// {
-	// 	ManaCurrent += 2f;
-	// 	ManaOrb.SetRessource(ManaCurrent);
-	// }
 }
