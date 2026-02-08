@@ -1,3 +1,4 @@
+using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Abilities;
 using Hoellenspiralenspiel.Scripts.Abilities.Spells;
@@ -7,68 +8,81 @@ namespace Hoellenspiralenspiel.Scripts.UI;
 
 public partial class CooldownSkill : TextureButton
 {
-    private         double             cooldown = 1.0d;
-    [Export] public Label              LabelTime;
-    [Export] public TextureProgressBar ProgressBarCooldown;
-    private         BaseSkill          skill;
-    [Export] public Timer              TimerCooldown;
-    private         PackedScene        visualScene;
+	private         double             cooldown = 1.0d;
+	[Export] public Label              LabelTime;
+	[Export] public Label              LabelShortcut;
+	[Export] public TextureProgressBar ProgressBarCooldown;
+	private         BaseSkill          skill;
+	[Export] public Timer              TimerCooldown;
+	private         PackedScene        visualScene;
 
-    public void Init(BaseSkill skill,
-                     string    visualResourceName)
-    {
-        this.skill  = skill;
-        cooldown    = skill.RealCooldown;
-        visualScene = ResourceLoader.Load<PackedScene>(visualResourceName);
-    }
+	public void Init(BaseSkill s,
+					 string    visualResourceName,
+					 Key shortcut)
+	{
+		Shortcut = new Shortcut();
+		skill    = s;
+		cooldown      = s.RealCooldown;
+		visualScene   = ResourceLoader.Load<PackedScene>(visualResourceName);
 
-    public override void _Ready()
-    {
-        TimerCooldown.WaitTime       = cooldown;
-        ProgressBarCooldown.MaxValue = TimerCooldown.WaitTime;
-        SetProcess(false);
-    }
+		var inputKey = new InputEventKey();
+		inputKey.Keycode = shortcut;
+		Shortcut.Events.Add(inputKey);
+		LabelShortcut.Text = shortcut.ToString();
+	}
 
-    public override void _Process(double delta)
-    {
-        LabelTime.Text            = TimerCooldown.TimeLeft.ToString("#.##");
-        ProgressBarCooldown.Value = TimerCooldown.TimeLeft;
-    }
+	public override void _Ready()
+	{
+		TimerCooldown.WaitTime       = cooldown;
+		ProgressBarCooldown.MaxValue = TimerCooldown.WaitTime;
+		SetProcess(false);
+	}
 
-    public void Use()
-    {
-        if (skill.Owner is not Player2D player)
-            return;
+	public override void _Process(double delta)
+	{
+		LabelTime.Text            = TimerCooldown.TimeLeft.ToString("#.##");
+		ProgressBarCooldown.Value = TimerCooldown.TimeLeft;
+	}
 
-        var manaCost = 10;
+	public void Use()
+	{
+		if (skill.Owner is not Player2D player)
+			return;
 
-        if (!player.CanUseAbility(manaCost))
-        {
-            player.PlayOutOfMana();
-            return;
-        }
+		
+		var manaCost = 10;
 
-        player.ReduceMana(10);
-        var someSkill = visualScene.Instantiate<Area2D>() as Fireball;
+		if (!player.CanUseAbility(manaCost))
+		{
+			player.PlayOutOfMana();
+			return;
+		}
 
-        someSkill.Init(skill as FireballSkill,
-                       skill.Owner.GlobalPosition,
-                       GetViewport().GetCamera2D().GetGlobalMousePosition());
-        GetTree().CurrentScene.GetNode<Node2D>("Environment").AddChild(someSkill);
+		player.ReduceMana(10);
+		var someSkill = visualScene.Instantiate<Area2D>();
+		
+		if (someSkill is ISpell spellSkill)
+		{
+			spellSkill.Init(skill, 
+							skill.Owner.GlobalPosition,
+							GetViewport().GetCamera2D().GetGlobalMousePosition());
+			
+		}
+		GetTree().CurrentScene.GetNode<Node2D>("Environment").AddChild(someSkill);
 
-        TimerCooldown.Start();
-        Disabled = true;
-        SetProcess(true);
-    }
+		TimerCooldown.Start();
+		Disabled = true;
+		SetProcess(true);
+	}
 
-    public void _on_timer_timeout()
-    {
-        Disabled                  = false;
-        LabelTime.Text            = string.Empty;
-        ProgressBarCooldown.Value = 0;
-        SetProcess(false);
-    }
+	public void _on_timer_timeout()
+	{
+		Disabled                  = false;
+		LabelTime.Text            = string.Empty;
+		ProgressBarCooldown.Value = 0;
+		SetProcess(false);
+	}
 
-    public void _on_pressed()
-        => Use();
+	public void _on_pressed()
+		=> Use();
 }

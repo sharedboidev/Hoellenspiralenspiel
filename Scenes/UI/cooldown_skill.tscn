@@ -4,24 +4,16 @@
 [ext_resource type="Script" uid="uid://bflmnojrytr35" path="res://Scripts/UI/CooldownSkill.cs" id="2_1j1en"]
 [ext_resource type="Texture2D" uid="uid://ddfxuf4tdeldx" path="res://Textures/Spells/blank.png" id="3_gv0p5"]
 
-[sub_resource type="InputEventKey" id="InputEventKey_ub8xo"]
-device = -1
-keycode = 70
-unicode = 102
-
-[sub_resource type="Shortcut" id="Shortcut_1j1en"]
-events = [SubResource("InputEventKey_ub8xo")]
-
-[node name="CooldownSkill" type="TextureButton" unique_id=817879907 node_paths=PackedStringArray("LabelTime", "ProgressBarCooldown", "TimerCooldown")]
+[node name="CooldownSkill" type="TextureButton" unique_id=817879907 node_paths=PackedStringArray("LabelTime", "LabelShortcut", "ProgressBarCooldown", "TimerCooldown")]
 custom_minimum_size = Vector2(40, 40)
 offset_right = 40.0
 offset_bottom = 40.0
-shortcut = SubResource("Shortcut_1j1en")
 texture_normal = ExtResource("1_ub8xo")
 ignore_texture_size = true
 stretch_mode = 0
 script = ExtResource("2_1j1en")
 LabelTime = NodePath("TimeText")
+LabelShortcut = NodePath("ShortcutText")
 ProgressBarCooldown = NodePath("CooldownOverlay")
 TimerCooldown = NodePath("CooldownTimer")
 
