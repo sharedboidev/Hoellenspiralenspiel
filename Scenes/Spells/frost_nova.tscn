@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://bn6nowhmbd6sn"]
+
+[ext_resource type="Script" uid="uid://7aunhdjotq7h" path="res://Scripts/Abilities/Spells/FrostNova.cs" id="1_bm70b"]
+[ext_resource type="Texture2D" uid="uid://bimy6yugt0oad" path="res://Textures/Spells/frost nova.png" id="1_bueqi"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bm70b"]
+radius = 148.40822
+
+[node name="FrostNova" type="Area2D" unique_id=197103431]
+scale = Vector2(0.355, 0.355)
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_bm70b")
+
+[node name="Collision" type="CollisionShape2D" parent="." unique_id=459701622]
+shape = SubResource("CircleShape2D_bm70b")
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=1902014549]
+texture = ExtResource("1_bueqi")
+
+[node name="ExpandDurationTimer" type="Timer" parent="." unique_id=2099436262]
+wait_time = 0.5
+one_shot = true
+autostart = true
+
+[connection signal="timeout" from="ExpandDurationTimer" to="." method="_on_expand_duration_timer_timeout"]
