@@ -43,7 +43,8 @@ public partial class Fog : Sprite2D
         Position -= new Vector2I(1000, 1000);
     }
 
-    public override void _Process(double delta) => UpdateFog(player.Position / gridSize);
+    public override void _Process(double delta) => UpdateFog(player?.Position ?? new Vector2(0,0) / gridSize);
+    //public override void _Process(double delta) => UpdateFog(GetViewport().GetMousePosition() / gridSize);
 
     public void UpdateFog(Vector2 newGridPosition)
     {
