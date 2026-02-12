@@ -1,8 +1,8 @@
-[gd_scene format=3 uid="uid://bn6nowhmbd6sn"]
+[gd_scene format=3 uid="uid://r8isqojsqvd0"]
 
 [ext_resource type="Script" uid="uid://7aunhdjotq7h" path="res://Scripts/Abilities/Spells/FrostNova.cs" id="1_bm70b"]
 [ext_resource type="Texture2D" uid="uid://bimy6yugt0oad" path="res://Textures/Spells/frost nova.png" id="1_bueqi"]
-[ext_resource type="Shape2D" uid="uid://dxgcqmb5r10lo" path="res://Resources/CircleShape.tres" id="2_3q41y"]
+[ext_resource type="Shape2D" path="res://Resources/CircleShape.tres" id="2_3q41y"]
 
 [node name="FrostNova" type="Area2D" unique_id=197103431 node_paths=PackedStringArray("CollisionShape", "Sprite")]
 scale = Vector2(0.355, 0.355)

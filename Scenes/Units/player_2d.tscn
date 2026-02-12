@@ -9,6 +9,17 @@
 radius = 15.0
 height = 36.0
 
+[sub_resource type="Gradient" id="Gradient_rl3bg"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_e2uij"]
+gradient = SubResource("Gradient_rl3bg")
+width = 1500
+height = 1500
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.82222223, 0.16581197)
+
 [sub_resource type="Animation" id="Animation_o57mx"]
 length = 0.001
 tracks/0/type = "value"
@@ -446,6 +457,7 @@ ManaOrb = NodePath("ManaOrb")
 SkillBar = NodePath("CanvasLayer/SkillBar")
 NoManaSound = NodePath("NoManaSound")
 LifeBase = 128
+Movementspeed = 1000.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1710998304]
 position = Vector2(0, -23)
@@ -457,6 +469,14 @@ position = Vector2(2, -213)
 texture = ExtResource("2_rl3bg")
 hframes = 11
 vframes = 8
+
+[node name="VisionSprite" type="Sprite2D" parent="." unique_id=823598942]
+unique_name_in_owner = true
+visible = false
+z_index = 5
+y_sort_enabled = true
+position = Vector2(0, -131)
+texture = SubResource("GradientTexture2D_e2uij")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1452542065]
 zoom = Vector2(0.8, 0.8)

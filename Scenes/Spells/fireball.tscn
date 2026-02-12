@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://o5bkctc8ux1c"]
 
 [ext_resource type="Script" uid="uid://bxqe0uvygnlhg" path="res://Scripts/Abilities/Spells/Fireball.cs" id="1_hnbfx"]
-[ext_resource type="Shader" uid="uid://dkvsgxal07oxi" path="res://Scenes/Spells/fireball.gdshader" id="2_ix1hh"]
+[ext_resource type="Shader" path="res://Scenes/Spells/fireball.gdshader" id="2_ix1hh"]
 [ext_resource type="SpriteFrames" uid="uid://irh6idx3cp6i" path="res://Resources/SpriteFrames/fireball.tres" id="3_ix1hh"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4n7jj"]

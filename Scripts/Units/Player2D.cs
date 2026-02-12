@@ -15,9 +15,10 @@ public class FireballContainer { }
 
 public partial class Player2D : BaseUnit
 {
+	public           Sprite2D        VisionSprite { get; set; }
 	private readonly List<BaseSkill> skills = new();
-	[Export] private ResourceOrb    LifeOrb;
-	[Export] private ResourceOrb    ManaOrb;
+	[Export] private ResourceOrb     LifeOrb;
+	[Export] private ResourceOrb     ManaOrb;
 
 	[Export] public HBoxContainer SkillBar;
 	private         PackedScene   SkillBarIcon = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
@@ -35,7 +36,9 @@ public partial class Player2D : BaseUnit
 
 	public override void _Ready()
 	{
-		ManaCurrent = ManaMax;
+		VisionSprite = GetNode<Sprite2D>("%VisionSprite");
+
+		ManaCurrent  = ManaMax;
 		ManaOrb.Init(ManaMax, ResourceType.Mana);
 		LifeOrb.Init(LifeMaximum, ResourceType.Life);
 
@@ -53,7 +56,6 @@ public partial class Player2D : BaseUnit
 		SkillBar.AddChild(frostNovaActionBarItem);
 
 		AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
-		Movementspeed = 300;
 	}
 
 	public bool IsInAggroRangeOf(BaseEnemy enemy)
