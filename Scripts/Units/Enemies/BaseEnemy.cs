@@ -1,16 +1,19 @@
 ﻿using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Controllers;
+using Hoellenspiralenspiel.Scripts.UI;
 
 namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 public abstract partial class BaseEnemy : BaseUnit
 {
-    protected          Player2D    ChasedPlayer;
-    protected          Node        CurrentScene;
-    private            ProgressBar healthbar;
-    protected abstract PackedScene AttackScene { get; }
-    public             string      SpawnGroup  { get; set; }
+    protected          Player2D       ChasedPlayer;
+    protected          Node           CurrentScene;
+    private            FogOfWar       fogOfWar;
+    private            ProgressBar    healthbar;
+    private            ShaderMaterial hiddenInFogShaderMaterial;
+    protected abstract PackedScene    AttackScene { get; }
+    public             string         SpawnGroup  { get; set; }
 
     [Export]
     public bool IsAggressive { get; set; }
@@ -42,8 +45,52 @@ public abstract partial class BaseEnemy : BaseUnit
         healthbar.MaxValue = LifeMaximum;
         healthbar.Value    = LifeCurrent;
 
+        //ConfigureFogOfWarVisibilityShader();
+
         PropertyChanged += OnPropertyChanged;
     }
+
+    private void ConfigureFogOfWarVisibilityShader()
+    {
+        fogOfWar = CurrentScene.GetNode<FogOfWar>("%" + nameof(FogOfWar));
+
+        hiddenInFogShaderMaterial        = new ShaderMaterial();
+        hiddenInFogShaderMaterial.Shader = GD.Load<Shader>("res://Shaders/hidden_in_fog.gdshader");
+
+        var mySprite = GetNode<Sprite2D>(nameof(Sprite2D));
+        mySprite.Material = hiddenInFogShaderMaterial;
+
+        UpdateShaderParams();
+    }
+
+    private void UpdateShaderParams()
+    {
+        if (hiddenInFogShaderMaterial != null && fogOfWar != null)
+        {
+            hiddenInFogShaderMaterial.SetShaderParameter("fog_texture", fogOfWar.GetFogTexture());
+            hiddenInFogShaderMaterial.SetShaderParameter("fog_offset", fogOfWar.GetFogOffset());
+            hiddenInFogShaderMaterial.SetShaderParameter("fog_scale", fogOfWar.GetFogScale());
+        }
+    }
+    // private void UpdateShaderParams()
+    // {
+    //     if (hiddenInFogShaderMaterial != null && fogOfWar != null)
+    //     {
+    //         var fogTexture = fogOfWar.GetFogTexture();
+    //         var fogOffset  = fogOfWar.GetFogOffset();
+    //         var fogScale   = fogOfWar.GetFogScale();
+    //
+    //         // Debug output
+    //         GD.Print($"Enemy Position: {GlobalPosition}");
+    //         GD.Print($"Fog Offset: {fogOffset}");
+    //         GD.Print($"Fog Scale: {fogScale}");
+    //         GD.Print($"Fog Texture Size: {fogTexture?.GetSize()}");
+    //
+    //         hiddenInFogShaderMaterial.SetShaderParameter("fog_texture", fogTexture);
+    //         hiddenInFogShaderMaterial.SetShaderParameter("fog_offset", fogOffset);
+    //         hiddenInFogShaderMaterial.SetShaderParameter("fog_scale", fogScale);
+    //     }
+    // }
 
     public override void _PhysicsProcess(double delta)
     {
@@ -54,6 +101,13 @@ public abstract partial class BaseEnemy : BaseUnit
             AnimationTree.Set("parameters/StateMachine/MoveState/RunState/blend_position", MovementDirection * new Vector2(1, -1));
             //AnimationTree.Set("parameters/StateMachine/MoveState/IdleState/blend_position", MovementDirection * new Vector2(1, -1));
         }
+    }
+
+    public override void _Process(double delta)
+    {
+        base._Process(delta);
+
+        UpdateShaderParams();
     }
 
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)

@@ -28,6 +28,12 @@ public partial class FogOfWar : Node2D
             UpdateFog();
     }
 
+    public Texture2D GetFogTexture() => fogSprite.Texture;
+
+    public Vector2 GetFogOffset() => worldPosition;
+
+    public int GetFogScale() => fogScale;
+
     private void UpdateFog()
     {
         var playerPos = (Vector2I)player.GlobalPosition;
@@ -51,12 +57,36 @@ public partial class FogOfWar : Node2D
         SetFogTexture();
 
         visionImage = player.VisionSprite.Texture.GetImage();
-        visionImage.Convert(Image.Format.Rgbah);
+        visionImage.Convert(Image.Format.Rgba8);
 
-        var scaledVisionSize = visionImage.GetSize() / (fogScale);
+        //InvertAlpha();
+        SetVisionRect();
+    }
+
+    private void SetVisionRect()
+    {
+        var scaledVisionSize = visionImage.GetSize() / fogScale;
         visionImage.Resize(scaledVisionSize.X, scaledVisionSize.Y);
 
         visionRect = new Rect2I(Vector2I.Zero, visionImage.GetSize());
+    }
+
+    private void InvertAlpha()
+    {
+        for (var y = 0; y < visionImage.GetHeight(); y++)
+        {
+            for (var x = 0; x < visionImage.GetWidth(); x++)
+            {
+                var pixel = visionImage.GetPixel(x, y);
+
+                pixel.A = 1.0f - pixel.A;
+                pixel.R = 0;
+                pixel.G = 0;
+                pixel.B = 0;
+
+                visionImage.SetPixel(x, y, pixel);
+            }
+        }
     }
 
     private void SetFogTexture()
@@ -75,7 +105,7 @@ public partial class FogOfWar : Node2D
 
     private void CreateFogImage(Vector2I fogDimension)
     {
-        fogImage = Image.CreateEmpty(fogDimension.X, fogDimension.Y, false, Image.Format.Rgbah);
+        fogImage = Image.CreateEmpty(fogDimension.X, fogDimension.Y, false, Image.Format.Rgba8);
         fogImage.Fill(Colors.Black);
     }
 }

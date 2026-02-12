@@ -50,6 +50,7 @@ unique_name_in_owner = true
 y_sort_enabled = true
 
 [node name="FogOfWar" parent="Environment" unique_id=386282002 node_paths=PackedStringArray("ground", "player") instance=ExtResource("4_2sot3")]
+unique_name_in_owner = true
 fogScale = 32
 ground = NodePath("../Ground")
 player = NodePath("../Player 2D")

@@ -153,7 +153,6 @@ collision_mask = 15
 platform_on_leave = 2
 platform_floor_layers = 0
 script = ExtResource("1_x3aji")
-LootDropChance = 0.05
 LootTableId = "test_loot"
 LifeBase = 258
 Movementspeed = 50.0
@@ -164,7 +163,7 @@ shape = SubResource("RectangleShape2D_x3aji")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=994557563]
 y_sort_enabled = true
-position = Vector2(0, -24)
+position = Vector2(0, -23)
 texture = ExtResource("2_ysuca")
 hframes = 4
 frame = 3

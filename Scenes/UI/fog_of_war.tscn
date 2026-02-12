@@ -18,14 +18,13 @@ color_ramp = SubResource("Gradient_it38x")
 shader = ExtResource("2_it38x")
 shader_parameter/noise = SubResource("NoiseTexture2D_gwhdd")
 shader_parameter/drift_speed = Vector2(0.02, 0.01)
-shader_parameter/min_alpha = 0.8
+shader_parameter/fog_alpha = 0.95
 
 [node name="FogOfWar" type="Node2D" unique_id=386282002]
 script = ExtResource("1_a6ddi")
 
 [node name="FogSprite" type="Sprite2D" parent="." unique_id=1263062449]
 unique_name_in_owner = true
-modulate = Color(1, 1, 1, 0.42745098)
 z_index = 5
 y_sort_enabled = true
 material = SubResource("ShaderMaterial_dv8oc")
