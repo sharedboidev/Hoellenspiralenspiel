@@ -126,9 +126,14 @@ public partial class EnemyController : Node
 		if (loot is null || loot.Length == 0)
 			return;
 
+		InstantiateLootbag(enemy, loot[0]);
+	}
+
+	private void InstantiateLootbag(BaseEnemy enemy, BaseItem loot)
+	{
 		var lootbagInstance = LootbagScene.Instantiate<Lootbag>();
 		lootbagInstance.GlobalPosition =  enemy.GlobalPosition;
-		lootbagInstance.ContainedItem  =  loot.FirstOrDefault();
+		lootbagInstance.ContainedItem  =  loot;
 		lootbagInstance.LootClicked    += LootbagInstanceOnLootClicked;
 
 		GetParent().GetNode<Node2D>("Environment").AddChild(lootbagInstance);
@@ -136,7 +141,7 @@ public partial class EnemyController : Node
 
 	private void LootbagInstanceOnLootClicked(Lootbag sender, BaseItem lootedItem)
 	{
-		GD.Print($"{lootedItem?.Name ?? "Nothing"} looted by {player?.Name}");
+		GD.Print($"{lootedItem?.Name ?? "Nothing"} looted.");
 
 		Inventory.SetItem(lootedItem);
 
