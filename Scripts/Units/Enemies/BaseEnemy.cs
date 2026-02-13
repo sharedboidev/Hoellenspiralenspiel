@@ -72,25 +72,6 @@ public abstract partial class BaseEnemy : BaseUnit
             hiddenInFogShaderMaterial.SetShaderParameter("fog_scale", fogOfWar.GetFogScale());
         }
     }
-    // private void UpdateShaderParams()
-    // {
-    //     if (hiddenInFogShaderMaterial != null && fogOfWar != null)
-    //     {
-    //         var fogTexture = fogOfWar.GetFogTexture();
-    //         var fogOffset  = fogOfWar.GetFogOffset();
-    //         var fogScale   = fogOfWar.GetFogScale();
-    //
-    //         // Debug output
-    //         GD.Print($"Enemy Position: {GlobalPosition}");
-    //         GD.Print($"Fog Offset: {fogOffset}");
-    //         GD.Print($"Fog Scale: {fogScale}");
-    //         GD.Print($"Fog Texture Size: {fogTexture?.GetSize()}");
-    //
-    //         hiddenInFogShaderMaterial.SetShaderParameter("fog_texture", fogTexture);
-    //         hiddenInFogShaderMaterial.SetShaderParameter("fog_offset", fogOffset);
-    //         hiddenInFogShaderMaterial.SetShaderParameter("fog_scale", fogScale);
-    //     }
-    // }
 
     public override void _PhysicsProcess(double delta)
     {
@@ -107,7 +88,7 @@ public abstract partial class BaseEnemy : BaseUnit
     {
         base._Process(delta);
 
-        UpdateShaderParams();
+        //UpdateShaderParams();
     }
 
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)

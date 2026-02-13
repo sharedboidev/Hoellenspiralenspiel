@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bw5x32awb8efw" path="res://Scripts/Units/Enemies/BlueBlob.cs" id="1_e1ef1"]
 [ext_resource type="Texture2D" uid="uid://32vlmynx8of0" path="res://Textures/Units/Enemies/BlueBlob/Slime1_Run_with_shadow.png" id="1_e786n"]
+[ext_resource type="Script" uid="uid://egvfl2cc48oy" path="res://Scripts/Controllers/FogVisibilityController.cs" id="3_in1bd"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_dn1kk"]
 
@@ -152,7 +153,7 @@ bg_color = Color(0.14406255, 0.14406255, 0.14406249, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e786n"]
 bg_color = Color(0.70586336, 0.076332815, 0.18692863, 1)
 
-[node name="BlueBlob" type="CharacterBody2D" unique_id=552501055 groups=["monsters"]]
+[node name="BlueBlob" type="CharacterBody2D" unique_id=552501055 groups=["enemies", "monsters"]]
 scale = Vector2(2, 2)
 collision_layer = 2
 collision_mask = 13
@@ -168,6 +169,10 @@ shape = SubResource("CircleShape2D_dn1kk")
 texture = ExtResource("1_e786n")
 hframes = 8
 vframes = 4
+
+[node name="FogVisibilityController" type="Node" parent="Sprite2D" unique_id=1836009093]
+unique_name_in_owner = true
+script = ExtResource("3_in1bd")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1060821654]
 libraries/ = SubResource("AnimationLibrary_e1ef1")

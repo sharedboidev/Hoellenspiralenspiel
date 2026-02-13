@@ -1,5 +1,7 @@
 using Godot;
+using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Units;
+using FogVisibilityController = Hoellenspiralenspiel.Scripts.Controllers.FogVisibilityController;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
@@ -14,12 +16,22 @@ public partial class FogOfWar : Node2D
     private          Rect2I       visionRect;
     private          Vector2I     worldPosition;
 
+    private bool _initialized = false;
+    private Texture2D _lastFogTexture;
+
     public override void _Ready()
     {
         fogSprite = GetNode<Sprite2D>("%FogSprite");
 
         GenerateFog();
         UpdateFog();
+
+        _initialized = true;
+
+        // Add to group so enemies can find us
+        AddToGroup("fog_of_war");
+
+        // Initial update - enemies will auto-update in their _Ready()
     }
 
     public override void _Process(double delta)
@@ -45,6 +57,34 @@ public partial class FogOfWar : Node2D
         fogImage.BlendRect(visionImage, visionRect, centeredPos);
 
         AssignTextureFromImage();
+
+        // Only update enemies when texture actually changes
+        // The individual controllers update positions themselves in _Process
+        if (_initialized && fogSprite.Texture != _lastFogTexture)
+        {
+            UpdateEnemyVisibility();
+            _lastFogTexture = fogSprite.Texture;
+        }
+    }
+
+    private void UpdateEnemyVisibility()
+    {
+        var enemies = GetTree().GetNodesInGroup("enemies");
+
+        foreach (var enemy in enemies)
+        {
+            if (enemy is Node node)
+            {
+                var controller = node.FindChild("FogVisibilityController", true, false) as FogVisibilityController;
+
+                if (controller == null && node.HasNode("FogVisibilityController"))
+                {
+                    controller = node.GetNode<FogVisibilityController>("FogVisibilityController");
+                }
+
+                controller?.UpdateFogData(fogSprite.Texture, worldPosition, fogScale);
+            }
+        }
     }
 
     private void GenerateFog()

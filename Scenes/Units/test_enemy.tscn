@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dvrmqxff8wdo0" path="res://Scripts/Units/Enemies/TestEnemy.cs" id="1_x3aji"]
 [ext_resource type="Texture2D" uid="uid://bdxqtrxpgx6to" path="res://Textures/Units/Enemies/TestEnemy.png" id="2_ysuca"]
+[ext_resource type="Script" uid="uid://egvfl2cc48oy" path="res://Scripts/Controllers/FogVisibilityController.cs" id="3_ysuca"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x3aji"]
 size = Vector2(38, 28)
@@ -145,7 +146,7 @@ bg_color = Color(0.14406255, 0.14406255, 0.14406249, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ysuca"]
 bg_color = Color(0.70586336, 0.076332815, 0.18692863, 1)
 
-[node name="Test Enemy" type="CharacterBody2D" unique_id=584748248 groups=["monsters"]]
+[node name="Test Enemy" type="CharacterBody2D" unique_id=584748248 groups=["enemies", "monsters"]]
 z_index = 1
 y_sort_enabled = true
 collision_layer = 2
@@ -167,6 +168,10 @@ position = Vector2(0, -23)
 texture = ExtResource("2_ysuca")
 hframes = 4
 frame = 3
+
+[node name="FogVisibilityController" type="Node" parent="Sprite2D" unique_id=1774375291]
+unique_name_in_owner = true
+script = ExtResource("3_ysuca")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=400631682]
 libraries/ = SubResource("AnimationLibrary_qyk0s")
