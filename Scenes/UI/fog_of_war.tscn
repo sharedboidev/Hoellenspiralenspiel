@@ -20,10 +20,10 @@ shader_parameter/noise = SubResource("NoiseTexture2D_gwhdd")
 shader_parameter/drift_speed = Vector2(0.02, 0.01)
 shader_parameter/fog_alpha = 0.95
 
-[node name="FogOfWar" type="Node2D" unique_id=386282002]
+[node name="FogOfWar" type="Node2D" unique_id=386282002 groups=["fog_of_war"]]
 script = ExtResource("1_a6ddi")
 
-[node name="FogSprite" type="Sprite2D" parent="." unique_id=1263062449 groups=["fog_of_war"]]
+[node name="FogSprite" type="Sprite2D" parent="." unique_id=1263062449]
 unique_name_in_owner = true
 z_index = 5
 y_sort_enabled = true

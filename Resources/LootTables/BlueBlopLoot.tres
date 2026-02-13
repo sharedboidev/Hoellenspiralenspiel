@@ -4,17 +4,18 @@
 [ext_resource type="Script" uid="uid://butusdti7dpn" path="res://Resources/LootTable.cs" id="2_5w23i"]
 [ext_resource type="PackedScene" uid="uid://bafd40n3y6xtn" path="res://Scenes/Items/Weapons/Staffs/staff.tscn" id="2_e2jip"]
 [ext_resource type="PackedScene" uid="uid://cphtaoh2o6ddc" path="res://Scenes/Items/Consumables/health_potion.tscn" id="3_e2jip"]
+[ext_resource type="PackedScene" uid="uid://chsic7gu1dtji" path="res://Scenes/Items/Consumables/mana_potion.tscn" id="4_g3b5r"]
 
 [sub_resource type="Resource" id="Resource_lvq8t"]
 script = ExtResource("1_lvq8t")
 Type = 2
-Weight = 94.0
+Weight = 90.0
 metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
 
 [sub_resource type="Resource" id="Resource_5w23i"]
 script = ExtResource("1_lvq8t")
 ItemScene = ExtResource("2_e2jip")
-Weight = 10.0
+Weight = 5.0
 metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
 
 [sub_resource type="Resource" id="Resource_g3b5r"]
@@ -24,8 +25,15 @@ Weight = 10.0
 QuantityMax = 5
 metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
 
+[sub_resource type="Resource" id="Resource_x3xyj"]
+script = ExtResource("1_lvq8t")
+ItemScene = ExtResource("4_g3b5r")
+Weight = 10.0
+QuantityMax = 5
+metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
+
 [resource]
 script = ExtResource("2_5w23i")
 TableId = "blue_blob_loot"
-Entries = Array[ExtResource("1_lvq8t")]([SubResource("Resource_lvq8t"), SubResource("Resource_5w23i"), SubResource("Resource_g3b5r")])
+Entries = Array[ExtResource("1_lvq8t")]([SubResource("Resource_lvq8t"), SubResource("Resource_5w23i"), SubResource("Resource_g3b5r"), SubResource("Resource_x3xyj")])
 metadata/_custom_type_script = "uid://butusdti7dpn"

@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://chsic7gu1dtji"]
+
+[ext_resource type="Script" uid="uid://cljmgmw1vnwgm" path="res://Scripts/Items/Consumables/ManaPotion.cs" id="1_stxi5"]
+[ext_resource type="Texture2D" uid="uid://cq2vnovnsqqbf" path="res://Textures/Items/Consumables/ManaPotion.png" id="2_0ykis"]
+
+[node name="ManaPotion" type="Node2D" unique_id=257248302 node_paths=PackedStringArray("Icon")]
+script = ExtResource("1_stxi5")
+StacksizeMax = 5
+Icon = NodePath("Icon")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=903719889]
+offset_right = 56.0
+offset_bottom = 56.0
+texture = ExtResource("2_0ykis")
+expand_mode = 1

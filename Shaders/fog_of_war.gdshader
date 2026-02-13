@@ -2,7 +2,7 @@ shader_type canvas_item;
 
 uniform sampler2D noise: repeat_enable;
 uniform vec2 drift_speed = vec2(0.002, 0.001);
-uniform float fog_alpha = 0.95; 
+uniform float fog_alpha = 0.2; 
 
 void fragment() {
     vec4 t = texture(TEXTURE, UV);

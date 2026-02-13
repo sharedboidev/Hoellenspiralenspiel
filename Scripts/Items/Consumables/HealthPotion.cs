@@ -15,7 +15,7 @@ public partial class HealthPotion : ConsumableItem
 
     protected override void ApplyEffectOfConsumption(BaseUnit consumee)
     {
-        var healedAmount = (float)(consumee.LifeMaximum * 0.2);
+        var healedAmount = consumee.LifeMaximum * TotalHealthRestoredPercentage / 100f;
         consumee.LifeCurrent += (int)healedAmount;
 
         consumee.InstatiateFloatingCombatText(new HitResult(healedAmount, HitType.Normal, LifeModificationMode.Heal), consumee.GetParent(), new Vector2(0, -128));

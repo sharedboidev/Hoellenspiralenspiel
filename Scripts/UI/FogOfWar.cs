@@ -1,5 +1,4 @@
 using Godot;
-using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Units;
 using FogVisibilityController = Hoellenspiralenspiel.Scripts.Controllers.FogVisibilityController;
 
@@ -11,13 +10,12 @@ public partial class FogOfWar : Node2D
     [Export] private int          fogScale = 16;
     private          Sprite2D     fogSprite;
     [Export] private TileMapLayer ground;
+    private          bool         initialized;
+    private          Texture2D    lastFogTexture;
     [Export] private Player2D     player;
     private          Image        visionImage;
     private          Rect2I       visionRect;
     private          Vector2I     worldPosition;
-
-    private bool _initialized = false;
-    private Texture2D _lastFogTexture;
 
     public override void _Ready()
     {
@@ -26,12 +24,7 @@ public partial class FogOfWar : Node2D
         GenerateFog();
         UpdateFog();
 
-        _initialized = true;
-
-        // Add to group so enemies can find us
-        AddToGroup("fog_of_war");
-
-        // Initial update - enemies will auto-update in their _Ready()
+        initialized = true;
     }
 
     public override void _Process(double delta)
@@ -58,13 +51,11 @@ public partial class FogOfWar : Node2D
 
         AssignTextureFromImage();
 
-        // Only update enemies when texture actually changes
-        // The individual controllers update positions themselves in _Process
-        if (_initialized && fogSprite.Texture != _lastFogTexture)
-        {
-            UpdateEnemyVisibility();
-            _lastFogTexture = fogSprite.Texture;
-        }
+        if (!initialized || fogSprite.Texture == lastFogTexture)
+            return;
+
+        UpdateEnemyVisibility();
+        lastFogTexture = fogSprite.Texture;
     }
 
     private void UpdateEnemyVisibility()
@@ -73,14 +64,12 @@ public partial class FogOfWar : Node2D
 
         foreach (var enemy in enemies)
         {
-            if (enemy is Node node)
+            if (enemy is { } node)
             {
-                var controller = node.FindChild("FogVisibilityController", true, false) as FogVisibilityController;
+                var controller = node.FindChild(nameof(FogVisibilityController), true, false) as FogVisibilityController;
 
-                if (controller == null && node.HasNode("FogVisibilityController"))
-                {
-                    controller = node.GetNode<FogVisibilityController>("FogVisibilityController");
-                }
+                if (controller == null && node.HasNode(nameof(FogVisibilityController)))
+                    controller = node.GetNode<FogVisibilityController>(nameof(FogVisibilityController));
 
                 controller?.UpdateFogData(fogSprite.Texture, worldPosition, fogScale);
             }
@@ -99,7 +88,6 @@ public partial class FogOfWar : Node2D
         visionImage = player.VisionSprite.Texture.GetImage();
         visionImage.Convert(Image.Format.Rgba8);
 
-        //InvertAlpha();
         SetVisionRect();
     }
 
@@ -109,24 +97,6 @@ public partial class FogOfWar : Node2D
         visionImage.Resize(scaledVisionSize.X, scaledVisionSize.Y);
 
         visionRect = new Rect2I(Vector2I.Zero, visionImage.GetSize());
-    }
-
-    private void InvertAlpha()
-    {
-        for (var y = 0; y < visionImage.GetHeight(); y++)
-        {
-            for (var x = 0; x < visionImage.GetWidth(); x++)
-            {
-                var pixel = visionImage.GetPixel(x, y);
-
-                pixel.A = 1.0f - pixel.A;
-                pixel.R = 0;
-                pixel.G = 0;
-                pixel.B = 0;
-
-                visionImage.SetPixel(x, y, pixel);
-            }
-        }
     }
 
     private void SetFogTexture()
