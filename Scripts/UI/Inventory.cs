@@ -28,7 +28,11 @@ public partial class Inventory : PanelContainer
         }
     }
 
-    public override void _Ready() => BuildInventory();
+    public override void _Ready()
+    {
+        BuildInventory();
+        ToggleVisibility();
+    }
 
     public void SetItem(BaseItem item)
     {
@@ -102,7 +106,23 @@ public partial class Inventory : PanelContainer
     public override void _Process(double delta)
     {
         if (Input.IsActionJustPressed("B"))
-            Visible = !Visible;
+            ToggleVisibility();
+    }
+
+    private void ToggleVisibility()
+    {
+        ModifyVisibilityThroughSelfModulate(this);
+
+        foreach (var inventorySlot in ItemGrid.GetAllChildren<InventorySlot>())
+            inventorySlot.SetVisible(!inventorySlot.IsVisible());
+    }
+
+    private void ModifyVisibilityThroughSelfModulate(PanelContainer panelContainer)
+    {
+        var newSelfModulate = panelContainer.SelfModulate;
+        newSelfModulate.A = newSelfModulate.A == 0 ? 1 : 0;
+
+        panelContainer.SetSelfModulate(newSelfModulate);
     }
 
     public InventorySlot GetNextFreeSlotOrDefaultFor(BaseItem incomingItem)

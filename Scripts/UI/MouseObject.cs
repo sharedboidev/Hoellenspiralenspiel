@@ -2,6 +2,7 @@ using Godot;
 using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Objects;
+using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
@@ -48,9 +49,12 @@ public partial class MouseObject : PanelContainer,
         if (itemToDrop is null)
             return;
 
-        var globalMousePosition = GetViewport().GetMousePosition();
+        var globalMousePosition = GetGlobalMousePosition();
+        var playerPosition      = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D").GlobalPosition;
+        var clickDirection      = (globalMousePosition - playerPosition).Normalized();
+        var dropAtPosition      = playerPosition + clickDirection * 30;
 
-        InstantiateLootbag(new Vector2(globalMousePosition.X / 2, globalMousePosition.Y * 2), itemToDrop);
+        InstantiateLootbag(dropAtPosition, itemToDrop);
 
         GD.Print($"{itemToDrop?.Name ?? "Nothing"} dropped by Player.");
     }

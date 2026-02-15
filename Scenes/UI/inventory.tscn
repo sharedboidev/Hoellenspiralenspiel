@@ -24,4 +24,5 @@ theme_override_constants/v_separation = 4
 columns = 12
 
 [node name="MouseObject" parent="." unique_id=145715296 instance=ExtResource("2_dt15g")]
+top_level = true
 layout_mode = 2
