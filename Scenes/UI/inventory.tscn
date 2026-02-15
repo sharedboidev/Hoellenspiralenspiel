@@ -3,9 +3,30 @@
 [ext_resource type="Script" uid="uid://bj1cq12utb6ep" path="res://Scripts/UI/Inventory.cs" id="1_s6m5x"]
 [ext_resource type="PackedScene" uid="uid://devwjm5t1shxy" path="res://Scenes/UI/mouse_object.tscn" id="2_dt15g"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dt15g"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.14622876, 0.14622876, 0.14622873, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.8569272, 0.8569273, 0.85692716, 1)
+border_blend = true
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
 [node name="Inventory" type="PanelContainer" unique_id=2062578477]
+z_index = 10
+y_sort_enabled = true
 offset_right = 40.0
 offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dt15g")
 script = ExtResource("1_s6m5x")
 AmountSlots = 32
 
@@ -25,4 +46,6 @@ columns = 12
 
 [node name="MouseObject" parent="." unique_id=145715296 instance=ExtResource("2_dt15g")]
 top_level = true
+z_index = 15
+y_sort_enabled = true
 layout_mode = 2
