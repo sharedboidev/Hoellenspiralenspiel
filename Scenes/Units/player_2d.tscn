@@ -461,7 +461,7 @@ hframes = 11
 vframes = 8
 
 [node name="ShadowCasterLight" type="PointLight2D" parent="Sprite2D" unique_id=1054227515]
-position = Vector2(0, 81)
+position = Vector2(-2, 190)
 shadow_enabled = true
 shadow_filter = 2
 texture = ExtResource("3_e2uij")
