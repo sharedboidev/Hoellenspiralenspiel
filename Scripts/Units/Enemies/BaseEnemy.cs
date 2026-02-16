@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Controllers;
-using Hoellenspiralenspiel.Scripts.UI;
 
 namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
@@ -9,7 +8,6 @@ public abstract partial class BaseEnemy : BaseUnit
 {
     protected          Player2D       ChasedPlayer;
     protected          Node           CurrentScene;
-    private            FogOfWar       fogOfWar;
     private            ProgressBar    healthbar;
     private            ShaderMaterial hiddenInFogShaderMaterial;
     protected abstract PackedScene    AttackScene { get; }
@@ -45,32 +43,7 @@ public abstract partial class BaseEnemy : BaseUnit
         healthbar.MaxValue = LifeMaximum;
         healthbar.Value    = LifeCurrent;
 
-        //ConfigureFogOfWarVisibilityShader();
-
         PropertyChanged += OnPropertyChanged;
-    }
-
-    private void ConfigureFogOfWarVisibilityShader()
-    {
-        fogOfWar = CurrentScene.GetNode<FogOfWar>("%" + nameof(FogOfWar));
-
-        hiddenInFogShaderMaterial        = new ShaderMaterial();
-        hiddenInFogShaderMaterial.Shader = GD.Load<Shader>("res://Shaders/hidden_in_fog.gdshader");
-
-        var mySprite = GetNode<Sprite2D>(nameof(Sprite2D));
-        mySprite.Material = hiddenInFogShaderMaterial;
-
-        UpdateShaderParams();
-    }
-
-    private void UpdateShaderParams()
-    {
-        if (hiddenInFogShaderMaterial != null && fogOfWar != null)
-        {
-            hiddenInFogShaderMaterial.SetShaderParameter("fog_texture", fogOfWar.GetFogTexture());
-            hiddenInFogShaderMaterial.SetShaderParameter("fog_offset", fogOfWar.GetFogOffset());
-            hiddenInFogShaderMaterial.SetShaderParameter("fog_scale", fogOfWar.GetFogScale());
-        }
     }
 
     public override void _PhysicsProcess(double delta)
@@ -82,13 +55,6 @@ public abstract partial class BaseEnemy : BaseUnit
             AnimationTree.Set("parameters/StateMachine/MoveState/RunState/blend_position", MovementDirection * new Vector2(1, -1));
             //AnimationTree.Set("parameters/StateMachine/MoveState/IdleState/blend_position", MovementDirection * new Vector2(1, -1));
         }
-    }
-
-    public override void _Process(double delta)
-    {
-        base._Process(delta);
-
-        //UpdateShaderParams();
     }
 
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)

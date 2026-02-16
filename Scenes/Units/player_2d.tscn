@@ -2,23 +2,13 @@
 
 [ext_resource type="Script" uid="uid://bwt2hw5i1cwjn" path="res://Scripts/Units/Player2D.cs" id="1_nnb5g"]
 [ext_resource type="Texture2D" uid="uid://din6ixbiigxo" path="res://Resources/SpriteFrames/playerSheet.tres" id="2_rl3bg"]
+[ext_resource type="Texture2D" uid="uid://cy75cqqe2xi1w" path="res://Textures/UI/light_radius.tres" id="3_e2uij"]
 [ext_resource type="PackedScene" uid="uid://bapl2sjbv6xe6" path="res://Scenes/UI/resource_orb.tscn" id="3_o57mx"]
 [ext_resource type="AudioStream" uid="uid://sri6stb07ual" path="res://Audio/no mana.mp3" id="4_rl3bg"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_djq3p"]
 radius = 15.0
 height = 36.0
-
-[sub_resource type="Gradient" id="Gradient_rl3bg"]
-colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_e2uij"]
-gradient = SubResource("Gradient_rl3bg")
-width = 1500
-height = 1500
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(0.82222223, 0.16581197)
 
 [sub_resource type="Animation" id="Animation_o57mx"]
 length = 0.001
@@ -470,13 +460,19 @@ texture = ExtResource("2_rl3bg")
 hframes = 11
 vframes = 8
 
-[node name="VisionSprite" type="Sprite2D" parent="." unique_id=823598942]
-unique_name_in_owner = true
-visible = false
-z_index = 5
-y_sort_enabled = true
-position = Vector2(0, -131)
-texture = SubResource("GradientTexture2D_e2uij")
+[node name="ShadowCasterLight" type="PointLight2D" parent="Sprite2D" unique_id=1054227515]
+position = Vector2(0, 81)
+shadow_enabled = true
+shadow_filter = 2
+texture = ExtResource("3_e2uij")
+offset = Vector2(0, -40)
+height = 120.0
+
+[node name="ShadowlessLight" type="PointLight2D" parent="Sprite2D/ShadowCasterLight" unique_id=538577359]
+light_mask = 2
+visibility_layer = 2
+range_item_cull_mask = 2
+texture = ExtResource("3_e2uij")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1452542065]
 zoom = Vector2(0.8, 0.8)
@@ -505,7 +501,7 @@ grow_vertical = 0
 size_flags_horizontal = 4
 
 [node name="LifeOrb" parent="." unique_id=1740844714 instance=ExtResource("3_o57mx")]
-z_index = 3
+z_index = 10
 y_sort_enabled = true
 offset_left = -1146.0
 offset_top = 596.0
@@ -513,7 +509,7 @@ offset_right = -959.0
 offset_bottom = 783.0
 
 [node name="ManaOrb" parent="." unique_id=235976386 instance=ExtResource("3_o57mx")]
-z_index = 3
+z_index = 10
 y_sort_enabled = true
 offset_left = 964.0
 offset_top = 594.0

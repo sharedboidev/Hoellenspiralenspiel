@@ -5,6 +5,9 @@
 [ext_resource type="Texture2D" uid="uid://dvrumscap8t74" path="res://Tilesets/Kenneys Dungeon Tiles/TileSheets/Ground.png" id="2_bn5ab"]
 [ext_resource type="Texture2D" uid="uid://b6f8avdg6v5mi" path="res://Tilesets/Kenneys Dungeon Tiles/TileSheets/Barrels.png" id="2_lnmlr"]
 
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_lnmlr"]
+polygon = PackedVector2Array(0.63726807, 74.04978, -32.245438, 57.480988, 0.38235474, 37.59843, 32.500336, 57.735893)
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lnmlr"]
 texture = ExtResource("1_p8qxl")
 texture_region_size = Vector2i(256, 512)
@@ -30,6 +33,7 @@ texture_region_size = Vector2i(256, 512)
 5:0/0 = 0
 5:0/0/texture_origin = Vector2i(0, 182)
 5:0/0/y_sort_origin = 48
+5:0/0/occlusion_layer_0/polygon_0/polygon = SubResource("OccluderPolygon2D_lnmlr")
 5:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(0, 21.333336, -42.666664, 42.66667, 0, 64, 42.66667, 42.66667)
 6:0/0 = 0
 6:0/0/texture_origin = Vector2i(0, 182)
@@ -686,6 +690,7 @@ texture_region_size = Vector2i(256, 512)
 [resource]
 tile_shape = 1
 tile_size = Vector2i(256, 128)
+occlusion_layer_0/light_mask = 1
 physics_layer_0/collision_layer = 8
 physics_layer_0/collision_mask = 0
 terrain_set_0/mode = 0

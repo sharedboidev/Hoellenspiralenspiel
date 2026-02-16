@@ -22,7 +22,6 @@ public partial class Player2D : BaseUnit
     private          float           manaProSekunde = 5f;
     [Export] public  HBoxContainer   SkillBar;
     private          PackedScene     SkillBarIcon = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
-    public           Sprite2D        VisionSprite  { get; set; }
     private          AnimationTree   AnimationTree { get; set; }
 
     [Export]
@@ -39,8 +38,6 @@ public partial class Player2D : BaseUnit
 
     public override void _Ready()
     {
-        VisionSprite = GetNode<Sprite2D>("%VisionSprite");
-
         ManaCurrent = ManaMaximum;
 
         ManaOrb.Init(this, ResourceType.Mana);

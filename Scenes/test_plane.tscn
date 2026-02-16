@@ -5,7 +5,6 @@
 [ext_resource type="Script" uid="uid://dvho5k4efpf5h" path="res://Scripts/UI/TestPlane.cs" id="1_qf8p0"]
 [ext_resource type="TileSet" uid="uid://bjrvhfwxc86rt" path="res://Resources/Desert.tres" id="1_vglo3"]
 [ext_resource type="PackedScene" uid="uid://c8hx5eg0q1vct" path="res://Scenes/Units/player_2d.tscn" id="3_35xgq"]
-[ext_resource type="PackedScene" uid="uid://be7r6o51owiog" path="res://Scenes/UI/fog_of_war.tscn" id="4_2sot3"]
 [ext_resource type="PackedScene" uid="uid://cnxyy07a3er8q" path="res://Scenes/Units/Enemies/blue_blob.tscn" id="4_db61r"]
 [ext_resource type="PackedScene" uid="uid://cycesnf53lc51" path="res://Scenes/Units/test_enemy.tscn" id="5_bjuw8"]
 [ext_resource type="PackedScene" uid="uid://6yhxh7p0ijv4" path="res://Scenes/UI/inventory.tscn" id="5_h4q4d"]
@@ -29,6 +28,7 @@ tile_map_data = PackedByteArray("AAANACMASQAIAAMAAAANACIASQAIAAMAAAANACEASQALAAM
 tile_set = ExtResource("1_vglo3")
 
 [node name="Walls" type="TileMapLayer" parent="Environment" unique_id=816992441]
+light_mask = 2
 z_index = 1
 y_sort_enabled = true
 tile_map_data = PackedByteArray("AAAEAAcAEAAIAAAAAAAGAAsAEAAJAAAAAAAJAP7/EAAAAAEAAAAIAP//EAAAAAAAAAAIAAAAEAAAAAEAAAAHAAEAEAAAAAEAAAAHAAIAEAAAAAEAAAAGAAMAEAAAAAEAAAAGAAQAEAAAAAEAAAAFAAUAEAAAAAAAAAAFAAYAEAAAAAEAAAAHAAoAEAADAAEAAAAHAAkAEAADAAEAAAAIAAgAEAADAAEAAAAIAAcAEAADAAEAAAAJAAYAEAADAAEAAAAJAAUAEAADAAEAAAAKAAQAEAADAAEAAAAKAAMAEAADAAAAAAALAAIAEAADAAEAAAALAAEAEAALAAAAAAAJAP3/EAAKAAAAAAAKAP7/EAACAAEAAAAKAP//EAACAAEAAAALAAAAEAACAAEAAAAFAAgAEAAFAAAAAAAGAAoAEAAEAAAAAAA=")
@@ -43,17 +43,14 @@ tile_set = ExtResource("1_vglo3")
 [node name="Player 2D" parent="Environment" unique_id=809220738 instance=ExtResource("3_35xgq")]
 unique_name_in_owner = true
 y_sort_enabled = false
-position = Vector2(1242, 722)
+position = Vector2(1481, 769)
 
 [node name="Enemies" type="Node2D" parent="Environment" unique_id=845394208]
 unique_name_in_owner = true
 y_sort_enabled = true
 
-[node name="FogOfWar" parent="Environment" unique_id=386282002 node_paths=PackedStringArray("ground", "player") instance=ExtResource("4_2sot3")]
-unique_name_in_owner = true
-fogScale = 32
-ground = NodePath("../Ground")
-player = NodePath("../Player 2D")
+[node name="CanvasModulate" type="CanvasModulate" parent="Environment" unique_id=2038441828]
+color = Color(0.05109611, 0.05109611, 0.051096104, 1)
 
 [node name="SpawnMarker" type="Node2D" parent="." unique_id=1148664553]
 
@@ -99,7 +96,6 @@ MinDistanceToPlayer = 300.0
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1293480226]
 
 [node name="Inventory" parent="CanvasLayer" unique_id=567735017 instance=ExtResource("5_h4q4d")]
-y_sort_enabled = true
 offset_left = 1103.0
 offset_top = 886.0
 offset_right = 1143.0
