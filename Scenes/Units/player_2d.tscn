@@ -454,6 +454,7 @@ position = Vector2(0, -23)
 shape = SubResource("CapsuleShape2D_djq3p")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1968664450]
+light_mask = 2
 y_sort_enabled = true
 position = Vector2(2, -213)
 texture = ExtResource("2_rl3bg")
@@ -462,17 +463,18 @@ vframes = 8
 
 [node name="ShadowCasterLight" type="PointLight2D" parent="Sprite2D" unique_id=1054227515]
 position = Vector2(-2, 190)
+energy = 0.48
 shadow_enabled = true
-shadow_filter = 2
+shadow_filter = 1
 texture = ExtResource("3_e2uij")
-offset = Vector2(0, -40)
-height = 120.0
+height = 512.0
 
 [node name="ShadowlessLight" type="PointLight2D" parent="Sprite2D/ShadowCasterLight" unique_id=538577359]
 light_mask = 2
 visibility_layer = 2
 range_item_cull_mask = 2
 texture = ExtResource("3_e2uij")
+height = 512.0
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1452542065]
 zoom = Vector2(0.8, 0.8)

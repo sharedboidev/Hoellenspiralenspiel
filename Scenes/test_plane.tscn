@@ -29,12 +29,14 @@ tile_set = ExtResource("1_vglo3")
 
 [node name="Walls" type="TileMapLayer" parent="Environment" unique_id=816992441]
 light_mask = 2
+visibility_layer = 2
 z_index = 1
 y_sort_enabled = true
 tile_map_data = PackedByteArray("AAAEAAcAEAAIAAAAAAAGAAsAEAAJAAAAAAAJAP7/EAAAAAEAAAAIAP//EAAAAAAAAAAIAAAAEAAAAAEAAAAHAAEAEAAAAAEAAAAHAAIAEAAAAAEAAAAGAAMAEAAAAAEAAAAGAAQAEAAAAAEAAAAFAAUAEAAAAAAAAAAFAAYAEAAAAAEAAAAHAAoAEAADAAEAAAAHAAkAEAADAAEAAAAIAAgAEAADAAEAAAAIAAcAEAADAAEAAAAJAAYAEAADAAEAAAAJAAUAEAADAAEAAAAKAAQAEAADAAEAAAAKAAMAEAADAAAAAAALAAIAEAADAAEAAAALAAEAEAALAAAAAAAJAP3/EAAKAAAAAAAKAP7/EAACAAEAAAAKAP//EAACAAEAAAALAAAAEAACAAEAAAAFAAgAEAAFAAAAAAAGAAoAEAAEAAAAAAA=")
 tile_set = ExtResource("1_vglo3")
 
 [node name="Objects" type="TileMapLayer" parent="Environment" unique_id=7967155]
+light_mask = 2
 z_index = 1
 y_sort_enabled = true
 tile_map_data = PackedByteArray("AAAHAAEAJgADAAAAAAAHAAIAJgACAAEAAAAJAP3/JgADAAIAAAAGAAwAJgADAAEAAAAEAAgAJgABAAIAAAA=")
@@ -43,14 +45,14 @@ tile_set = ExtResource("1_vglo3")
 [node name="Player 2D" parent="Environment" unique_id=809220738 instance=ExtResource("3_35xgq")]
 unique_name_in_owner = true
 y_sort_enabled = false
-position = Vector2(1260, 756)
+position = Vector2(1067, 676)
 
 [node name="Enemies" type="Node2D" parent="Environment" unique_id=845394208]
 unique_name_in_owner = true
 y_sort_enabled = true
 
 [node name="CanvasModulate" type="CanvasModulate" parent="Environment" unique_id=2038441828]
-color = Color(0.05109611, 0.05109611, 0.051096104, 1)
+color = Color(0.41062272, 0.41062272, 0.41062272, 1)
 
 [node name="SpawnMarker" type="Node2D" parent="." unique_id=1148664553]
 
