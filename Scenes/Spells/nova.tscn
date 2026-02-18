@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://dbpj52c8iuhb7"]
+
+[ext_resource type="Shader" uid="uid://c516a8vwsjr60" path="res://Scenes/Spells/xx.tres" id="1_br4ue"]
+[ext_resource type="Texture2D" uid="uid://cvol2y7cu6lwu" path="res://Textures/T_VFX_Noise_465.png" id="2_cdovu"]
+[ext_resource type="Texture2D" uid="uid://dfk26lnoowarm" path="res://Textures/T_Flame1.jpg" id="3_cbm8y"]
+[ext_resource type="Texture2D" uid="uid://2owcggbm2w0u" path="res://Textures/T_1_pixel.jpg" id="4_4v1jl"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7y034"]
+shader = ExtResource("1_br4ue")
+shader_parameter/Dissolver_Texture2 = ExtResource("2_cdovu")
+shader_parameter/Flame_Texture = ExtResource("3_cbm8y")
+
+[sub_resource type="Curve" id="Curve_br4ue"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0.8452878), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_5vo26"]
+texture_mode = 1
+curve = SubResource("Curve_br4ue")
+
+[sub_resource type="Gradient" id="Gradient_t2cis"]
+offsets = PackedFloat32Array(0.01754386, 0.18567252, 0.32017544, 0.55263156)
+colors = PackedColorArray(0.99090844, 0.6846719, 0.0685658, 1, 0.84154606, 0.37280744, 0.02616118, 1, 0.84624726, 0.1455256, 0.22533819, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_x6iuh"]
+gradient = SubResource("Gradient_t2cis")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_uebgu"]
+particle_flag_rotate_y = true
+particle_flag_disable_z = true
+angle_min = -89.99999
+angle_max = 90.000015
+inherit_velocity_ratio = 0.2
+direction = Vector3(0, 0, 0)
+spread = 7.619
+initial_velocity_min = 1000.0
+initial_velocity_max = 1000.0
+gravity = Vector3(0, 0, 0)
+linear_accel_min = -2.2351742e-06
+linear_accel_max = -2.2351742e-06
+scale_min = 50.0
+scale_max = 100.0
+color_ramp = SubResource("GradientTexture1D_x6iuh")
+alpha_curve = SubResource("CurveTexture_5vo26")
+hue_variation_min = -2.2351742e-08
+hue_variation_max = -2.2351742e-08
+collision_mode = 2
+collision_use_scale = true
+
+[node name="Flamethrowa" type="Node2D" unique_id=1468790027]
+
+[node name="VFX_Dynamic_Fire" type="GPUParticles2D" parent="." unique_id=1655280584]
+material = SubResource("ShaderMaterial_7y034")
+position = Vector2(0, -2)
+amount = 500
+texture = ExtResource("4_4v1jl")
+lifetime = 1.46
+speed_scale = 1.5
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_uebgu")

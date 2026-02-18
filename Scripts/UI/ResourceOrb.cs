@@ -6,89 +6,89 @@ namespace Hoellenspiralenspiel.Scripts.UI;
 
 public enum ResourceType
 {
-    Life = 0,
-    Mana = 1
+	Life = 0,
+	Mana = 1
 }
 
 public partial class ResourceOrb : Control
 {
-    private         float          current;
-    private         Color          lifeColor    = new(0.65f, 0.08f, 0.10f);
-    private         Color          manaColor    = new(0.10f, 0.30f, 0.85f);
-    [Export] public float          MaxRessource = 100f;
-    private         ShaderMaterial orbShader;
-    [Export] public TextureRect    OrbTexture;
-    private         Player2D       player;
-    [Export] public Label          ResourceText;
-    private         string         resourceTextFormat = "{current} / {max}";
-    private         ResourceType   type;
+	private         float          current;
+	private         Color          lifeColor    = new(0.65f, 0.08f, 0.10f);
+	private         Color          manaColor    = new(0.10f, 0.30f, 0.85f);
+	[Export] public float          MaxRessource = 100f;
+	private         ShaderMaterial orbShader;
+	[Export] public TextureRect    OrbTexture;
+	private         Player2D       player;
+	[Export] public Label          ResourceText;
+	private         string         resourceTextFormat = "{current} / {max}";
+	private         ResourceType   type;
 
-    public override void _Ready()
-        => current = MaxRessource;
+	public override void _Ready()
+		=> current = MaxRessource;
 
-    public void Init(Player2D adherentPlayer, ResourceType resourceTypetype)
-    {
-        player = adherentPlayer;
+	public void Init(Player2D adherentPlayer, ResourceType resourceTypetype)
+	{
+		player = adherentPlayer;
 
-        ConfigureOrbColors();
-        SetRessourceValues(resourceTypetype);
+		ConfigureOrbColors();
+		SetRessourceValues(resourceTypetype);
 
-        player.PropertyChanged += PlayerOnPropertyChanged;
+		player.PropertyChanged += PlayerOnPropertyChanged;
 
-        ApplyColor();
-        SetRessource(current);
-    }
+		ApplyColor();
+		SetRessource(current);
+	}
 
-    private void SetRessourceValues(ResourceType resourceTypetype)
-    {
-        type         = resourceTypetype;
-        MaxRessource = type == ResourceType.Life ? player.LifeMaximum : player.ManaMaximum;
-        current      = type == ResourceType.Life ? player.LifeCurrent : player.ManaCurrent;
-    }
+	private void SetRessourceValues(ResourceType resourceTypetype)
+	{
+		type         = resourceTypetype;
+		MaxRessource = type == ResourceType.Life ? player.LifeMaximum : player.ManaMaximum;
+		current      = type == ResourceType.Life ? player.LifeCurrent : player.ManaCurrent;
+	}
 
-    private void ConfigureOrbColors()
-    {
-        var original = OrbTexture.Material as ShaderMaterial;
+	private void ConfigureOrbColors()
+	{
+		var original = OrbTexture.Material as ShaderMaterial;
 
-        orbShader        = new ShaderMaterial();
-        orbShader.Shader = original?.Shader;
+		orbShader        = new ShaderMaterial();
+		orbShader.Shader = original?.Shader;
 
-        OrbTexture.Material = orbShader;
-        OrbTexture.Modulate = Colors.White;
-    }
+		OrbTexture.Material = orbShader;
+		OrbTexture.Modulate = Colors.White;
+	}
 
-    private void PlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        switch (type)
-        {
-            case ResourceType.Life when e.PropertyName == nameof(BaseUnit.LifeCurrent):
-                SetRessource(player.LifeCurrent);
-                break;
-            case ResourceType.Mana when e.PropertyName == nameof(Player2D.ManaCurrent):
-                SetRessource(player.ManaCurrent);
-                break;
-        }
-    }
+	private void PlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+	{
+		switch (type)
+		{
+			case ResourceType.Life when e.PropertyName == nameof(BaseUnit.LifeCurrent):
+				SetRessource(player.LifeCurrent);
+				break;
+			case ResourceType.Mana when e.PropertyName == nameof(Player2D.ManaCurrent):
+				SetRessource(player.ManaCurrent);
+				break;
+		}
+	}
 
-    public override void _ExitTree() => player.PropertyChanged -= PlayerOnPropertyChanged;
+	public override void _ExitTree() => player.PropertyChanged -= PlayerOnPropertyChanged;
 
-    private void ApplyColor()
-    {
-        if (orbShader is null)
-            GD.Print("orbShader is null");
+	private void ApplyColor()
+	{
+		if (orbShader is null)
+			GD.Print("orbShader is null");
 
-        var c = type == ResourceType.Life ? lifeColor : manaColor;
-        orbShader?.SetShaderParameter("liquid_color", c);
-    }
+		var c = type == ResourceType.Life ? lifeColor : manaColor;
+		orbShader?.SetShaderParameter("liquid_color", c);
+	}
 
-    public void SetRessource(float newValue)
-    {
-        current = Mathf.Clamp(newValue, 0f, MaxRessource);
-        var fillAmount = current / MaxRessource;
+	public void SetRessource(float newValue)
+	{
+		current = Mathf.Clamp(newValue, 0f, MaxRessource);
+		var fillAmount = current / MaxRessource;
 
-        ResourceText.Text = resourceTextFormat.Replace("{current}", ((int)current).ToString())
-                                              .Replace("{max}", MaxRessource.ToString());
+		ResourceText.Text = resourceTextFormat.Replace("{current}", ((int)current).ToString())
+											  .Replace("{max}", MaxRessource.ToString());
 
-        orbShader.SetShaderParameter("fill_amount", fillAmount);
-    }
+		orbShader.SetShaderParameter("fill_amount", fillAmount);
+	}
 }
