@@ -32,6 +32,10 @@ window/stretch/aspect="expand"
 
 project/assembly_name="Hoellenspiralenspiel"
 
+[global_group]
+
+monsters=""
+
 [input]
 
 move_left={

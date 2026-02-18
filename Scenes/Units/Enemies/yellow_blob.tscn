@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://cl3lxlu01o60m" path="res://Textures/Units/Enemies/YellowBlob/Slime2_Attack_with_shadow.png" id="4_oe3gs"]
 [ext_resource type="Texture2D" uid="uid://bmcg7v5ag07x7" path="res://Textures/Units/Enemies/YellowBlob/Slime2_Death_with_shadow.png" id="5_fe6qb"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_oe3gs"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_jhcx6"]
 resource_local_to_scene = true
 
 [sub_resource type="Animation" id="Animation_qj7bg"]
@@ -338,7 +338,7 @@ tracks/0/keys = {
 "values": [8, 9, 10, 11, 12, 13, 14, 15]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_oe3gs"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1nepw"]
 _data = {
 &"RESET": SubResource("Animation_qj7bg"),
 &"attack_down": SubResource("Animation_m4c2b"),
@@ -359,41 +359,43 @@ _data = {
 &"run_top": SubResource("Animation_uynnh")
 }
 
-[node name="YellowBlob" unique_id=1290199613 instance=ExtResource("1_qkjco")]
+[node name="YellowBlob" unique_id=1290199613 groups=["monsters"] instance=ExtResource("1_qkjco")]
+scale = Vector2(2, 2)
 script = ExtResource("2_jhcx6")
 LootTableId = "blue_blob_loot"
 LifeBase = 50
 Movementspeed = 50.0
 
-[node name="CollisionShape2D" parent="." index="0" unique_id=375828209]
-shape = SubResource("CircleShape2D_oe3gs")
-
-[node name="IdleSprite" parent="." index="1" unique_id=1122812897]
+[node name="IdleSprite" parent="." index="0" unique_id=1122812897]
 texture = ExtResource("2_qj7bg")
 hframes = 6
 vframes = 4
 frame = 1
 
-[node name="RunSprite" parent="." index="2" unique_id=3504056]
+[node name="RunSprite" parent="." index="1" unique_id=3504056]
 visible = false
 texture = ExtResource("3_kybs8")
 hframes = 8
 vframes = 4
 
-[node name="AttackSprite" parent="." index="3" unique_id=1828661331]
+[node name="AttackSprite" parent="." index="2" unique_id=1828661331]
 visible = false
 texture = ExtResource("4_oe3gs")
 hframes = 10
 vframes = 4
 
-[node name="DeathSprite" parent="." index="4" unique_id=744198561]
+[node name="DeathSprite" parent="." index="3" unique_id=744198561]
 visible = false
 texture = ExtResource("5_fe6qb")
 hframes = 10
 vframes = 4
 
+[node name="CollisionShape2D" parent="." index="4" unique_id=375828209]
+shape = SubResource("CircleShape2D_jhcx6")
+
 [node name="AnimationPlayer" parent="." index="5" unique_id=942966989]
-libraries/ = SubResource("AnimationLibrary_oe3gs")
+libraries/ = SubResource("AnimationLibrary_1nepw")
 
 [node name="AnimationTree" parent="." index="6" unique_id=192769642]
 active = true
+parameters/StateMachine/MoveState/IdleState/blend_position = Vector2(-0.009732366, -0.68330467)
