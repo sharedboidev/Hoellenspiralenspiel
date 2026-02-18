@@ -3,9 +3,40 @@
 [ext_resource type="Shape2D" uid="uid://dxgcqmb5r10lo" path="res://Resources/CircleShape.tres" id="1_2uqth"]
 [ext_resource type="Texture2D" uid="uid://dxdttrmghay8k" path="res://icon.svg" id="2_ch28j"]
 
+[sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_ch28j"]
+
+[sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_dv8a7"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ch28j"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_dv8a7"]
+advance_mode = 2
+advance_expression = "MovementDirection.length() > 0.0"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_fadhx"]
+advance_mode = 2
+advance_expression = "MovementDirection.length() == 0.0"
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_dv8a7"]
+states/IdleState/node = SubResource("AnimationNodeBlendSpace2D_ch28j")
+states/IdleState/position = Vector2(422, 100.64)
+states/RunState/node = SubResource("AnimationNodeBlendSpace2D_dv8a7")
+states/RunState/position = Vector2(421.904, 232)
+transitions = ["Start", "IdleState", SubResource("AnimationNodeStateMachineTransition_ch28j"), "IdleState", "RunState", SubResource("AnimationNodeStateMachineTransition_dv8a7"), "RunState", "IdleState", SubResource("AnimationNodeStateMachineTransition_fadhx")]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_xpqtf"]
+advance_mode = 2
+
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_ch28j"]
+states/MoveState/node = SubResource("AnimationNodeStateMachine_dv8a7")
+states/MoveState/position = Vector2(438.4, 37.84)
+states/Start/position = Vector2(204, 38.4)
+transitions = ["Start", "MoveState", SubResource("AnimationNodeStateMachineTransition_xpqtf")]
+graph_offset = Vector2(-10, -102)
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_dv8a7"]
+graph_offset = Vector2(-146.70195, -83.10295)
 nodes/output/position = Vector2(528, 80)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_ch28j")
 nodes/StateMachine/position = Vector2(172, 122.8)
@@ -18,19 +49,30 @@ bg_color = Color(0.14406255, 0.14406255, 0.14406249, 1)
 bg_color = Color(0.70586336, 0.076332815, 0.18692863, 1)
 
 [node name="BaseEnemy" type="CharacterBody2D" unique_id=1290199613]
+collision_layer = 2
+collision_mask = 13
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=375828209]
 shape = ExtResource("1_2uqth")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1122812897]
+[node name="IdleSprite" type="Sprite2D" parent="." unique_id=1122812897]
 texture = ExtResource("2_ch28j")
+
+[node name="RunSprite" type="Sprite2D" parent="." unique_id=3504056]
+
+[node name="AttackSprite" type="Sprite2D" parent="." unique_id=1828661331]
+
+[node name="DeathSprite" type="Sprite2D" parent="." unique_id=744198561]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=942966989]
 
 [node name="AnimationTree" type="AnimationTree" parent="." unique_id=192769642]
+active = false
 tree_root = SubResource("AnimationNodeBlendTree_dv8a7")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
+parameters/StateMachine/MoveState/IdleState/blend_position = Vector2(0, 0)
+parameters/StateMachine/MoveState/RunState/blend_position = Vector2(0, 0)
 
 [node name="Healthbar" type="ProgressBar" parent="." unique_id=1393637794]
 unique_name_in_owner = true

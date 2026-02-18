@@ -418,7 +418,7 @@ states/IdleState/position = Vector2(482, 100)
 states/RunState/node = SubResource("AnimationNodeBlendSpace2D_10250")
 states/RunState/position = Vector2(481.84, 219)
 transitions = ["Start", "IdleState", SubResource("AnimationNodeStateMachineTransition_pc0mr"), "IdleState", "RunState", SubResource("AnimationNodeStateMachineTransition_djq3p"), "RunState", "IdleState", SubResource("AnimationNodeStateMachineTransition_nnb5g")]
-graph_offset = Vector2(-148, -7)
+graph_offset = Vector2(-29, -53)
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_r02y1"]
 advance_mode = 2
@@ -430,6 +430,7 @@ transitions = ["Start", "MoveState", SubResource("AnimationNodeStateMachineTrans
 graph_offset = Vector2(-124, 12)
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_kfbu0"]
+graph_offset = Vector2(-319.2, -10.4)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_hm4fm")
 nodes/StateMachine/position = Vector2(-40, 80)
 node_connections = [&"output", 0, &"StateMachine"]
