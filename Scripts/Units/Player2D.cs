@@ -99,7 +99,7 @@ public partial class Player2D : BaseUnit
 		
 		//meaningful movement
 		var shitParticles =  Input.IsMouseButtonPressed(MouseButton.Left);
-		var tmpMovementspeed = shitParticles ? Movementspeed * .5f : Movementspeed;
+		var tmpMovementspeed = shitParticles ? Movementspeed * .3f : Movementspeed;
 		
 		MovementDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
 		Velocity          = MovementDirection * tmpMovementspeed;
