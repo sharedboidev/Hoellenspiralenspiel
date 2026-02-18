@@ -443,8 +443,8 @@ motion_mode = 1
 platform_on_leave = 2
 platform_floor_layers = 0
 script = ExtResource("1_nnb5g")
-lifeOrb = NodePath("CanvasLayer/LifeOrb")
-manaOrb = NodePath("CanvasLayer/ManaOrb")
+lifeOrb = NodePath("LifeOrb")
+manaOrb = NodePath("ManaOrb")
 SkillBar = NodePath("CanvasLayer/SkillBar")
 NoManaSound = NodePath("NoManaSound")
 LifeBase = 128
@@ -494,22 +494,6 @@ parameters/StateMachine/MoveState/RunState/blend_position = Vector2(-0.18877888,
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=887654130]
 
-[node name="LifeOrb" parent="CanvasLayer" unique_id=1740844714 instance=ExtResource("3_o57mx")]
-z_index = 10
-y_sort_enabled = true
-offset_left = -260.0
-offset_top = -214.0
-offset_right = -73.0
-offset_bottom = -27.0
-
-[node name="ManaOrb" parent="CanvasLayer" unique_id=235976386 instance=ExtResource("3_o57mx")]
-z_index = 10
-y_sort_enabled = true
-offset_left = 60.0
-offset_top = -223.0
-offset_right = 251.0
-offset_bottom = -32.0
-
 [node name="SkillBar" type="HBoxContainer" parent="CanvasLayer" unique_id=1930834205]
 offset_left = 959.0
 offset_top = 1025.0
@@ -524,3 +508,19 @@ stream = ExtResource("4_rl3bg")
 volume_db = -20.0
 
 [node name="SpellsContainer" type="Node2D" parent="." unique_id=27157321]
+
+[node name="LifeOrb" parent="." unique_id=1740844714 instance=ExtResource("3_o57mx")]
+z_index = 10
+y_sort_enabled = true
+offset_left = -1056.0
+offset_top = 573.0
+offset_right = -869.0
+offset_bottom = 760.0
+
+[node name="ManaOrb" parent="." unique_id=235976386 instance=ExtResource("3_o57mx")]
+z_index = 10
+y_sort_enabled = true
+offset_left = 854.0
+offset_top = 569.0
+offset_right = 1045.0
+offset_bottom = 760.0
