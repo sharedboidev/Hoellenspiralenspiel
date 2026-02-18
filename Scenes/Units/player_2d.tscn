@@ -496,18 +496,18 @@ parameters/StateMachine/MoveState/RunState/blend_position = Vector2(-0.18877888,
 [node name="LifeOrb" parent="CanvasLayer" unique_id=1740844714 instance=ExtResource("3_o57mx")]
 z_index = 10
 y_sort_enabled = true
-offset_left = 647.0
-offset_top = 1231.0
-offset_right = 834.0
-offset_bottom = 1418.0
+offset_left = -260.0
+offset_top = -214.0
+offset_right = -73.0
+offset_bottom = -27.0
 
 [node name="ManaOrb" parent="CanvasLayer" unique_id=235976386 instance=ExtResource("3_o57mx")]
 z_index = 10
 y_sort_enabled = true
-offset_left = 920.0
-offset_top = 645.0
-offset_right = 1111.0
-offset_bottom = 836.0
+offset_left = 60.0
+offset_top = -223.0
+offset_right = 251.0
+offset_bottom = -32.0
 
 [node name="SkillBar" type="HBoxContainer" parent="CanvasLayer" unique_id=1930834205]
 offset_left = 959.0
