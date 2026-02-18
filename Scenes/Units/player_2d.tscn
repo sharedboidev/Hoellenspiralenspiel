@@ -434,7 +434,7 @@ nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_hm4fm")
 nodes/StateMachine/position = Vector2(-40, 80)
 node_connections = [&"output", 0, &"StateMachine"]
 
-[node name="Player2D" type="CharacterBody2D" unique_id=1421126971 node_paths=PackedStringArray("LifeOrb", "ManaOrb", "SkillBar", "NoManaSound")]
+[node name="Player2D" type="CharacterBody2D" unique_id=1421126971 node_paths=PackedStringArray("lifeOrb", "manaOrb", "SkillBar", "NoManaSound")]
 z_index = 1
 y_sort_enabled = true
 collision_mask = 10
@@ -442,8 +442,8 @@ motion_mode = 1
 platform_on_leave = 2
 platform_floor_layers = 0
 script = ExtResource("1_nnb5g")
-LifeOrb = NodePath("LifeOrb")
-ManaOrb = NodePath("ManaOrb")
+lifeOrb = NodePath("CanvasLayer/LifeOrb")
+manaOrb = NodePath("CanvasLayer/ManaOrb")
 SkillBar = NodePath("CanvasLayer/SkillBar")
 NoManaSound = NodePath("NoManaSound")
 LifeBase = 128
@@ -493,6 +493,22 @@ parameters/StateMachine/MoveState/RunState/blend_position = Vector2(-0.18877888,
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=887654130]
 
+[node name="LifeOrb" parent="CanvasLayer" unique_id=1740844714 instance=ExtResource("3_o57mx")]
+z_index = 10
+y_sort_enabled = true
+offset_left = 647.0
+offset_top = 1231.0
+offset_right = 834.0
+offset_bottom = 1418.0
+
+[node name="ManaOrb" parent="CanvasLayer" unique_id=235976386 instance=ExtResource("3_o57mx")]
+z_index = 10
+y_sort_enabled = true
+offset_left = 920.0
+offset_top = 645.0
+offset_right = 1111.0
+offset_bottom = 836.0
+
 [node name="SkillBar" type="HBoxContainer" parent="CanvasLayer" unique_id=1930834205]
 offset_left = 959.0
 offset_top = 1025.0
@@ -501,22 +517,6 @@ offset_bottom = 1080.0
 grow_horizontal = 2
 grow_vertical = 0
 size_flags_horizontal = 4
-
-[node name="LifeOrb" parent="." unique_id=1740844714 instance=ExtResource("3_o57mx")]
-z_index = 10
-y_sort_enabled = true
-offset_left = -1146.0
-offset_top = 596.0
-offset_right = -959.0
-offset_bottom = 783.0
-
-[node name="ManaOrb" parent="." unique_id=235976386 instance=ExtResource("3_o57mx")]
-z_index = 10
-y_sort_enabled = true
-offset_left = 964.0
-offset_top = 594.0
-offset_right = 1155.0
-offset_bottom = 785.0
 
 [node name="NoManaSound" type="AudioStreamPlayer2D" parent="." unique_id=236623057]
 stream = ExtResource("4_rl3bg")

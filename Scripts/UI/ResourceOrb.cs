@@ -23,8 +23,7 @@ public partial class ResourceOrb : Control
     private         string         resourceTextFormat = "{current} / {max}";
     private         ResourceType   type;
 
-    public override void _Ready()
-        => current = MaxRessource;
+    public override void _Ready() => current = MaxRessource;
 
     public void Init(Player2D adherentPlayer, ResourceType resourceTypetype)
     {
@@ -32,11 +31,28 @@ public partial class ResourceOrb : Control
 
         ConfigureOrbColors();
         SetRessourceValues(resourceTypetype);
+        SetPositionInViewport(resourceTypetype);
 
         player.PropertyChanged += PlayerOnPropertyChanged;
 
         ApplyColor();
         SetRessource(current);
+    }
+
+    private void SetPositionInViewport(ResourceType resourceTypetype)
+    {
+        var viewportSize   = GetViewportRect().Size;
+        var viewportWidth  = viewportSize.X;
+        var viewportHeight = viewportSize.Y;
+
+        var orbPosition = resourceTypetype switch
+        {
+            ResourceType.Life => new Vector2(viewportWidth / 4 - Size.X / 2, viewportHeight - Size.Y),
+            ResourceType.Mana => new Vector2(viewportWidth * 3 / 4 - Size.X / 2, viewportHeight - Size.Y),
+            _ => Vector2.Zero
+        };
+
+        Position = orbPosition;
     }
 
     private void SetRessourceValues(ResourceType resourceTypetype)

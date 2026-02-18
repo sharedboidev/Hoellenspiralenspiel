@@ -15,13 +15,13 @@ public class FireballContainer { }
 
 public partial class Player2D : BaseUnit
 {
-    private readonly List<BaseSkill> skills = new();
-    [Export] private ResourceOrb     LifeOrb;
+    private readonly PackedScene     skillBarIcon = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
+    private readonly List<BaseSkill> skills       = new();
+    [Export] private ResourceOrb     lifeOrb;
     private          float           manaCurrent;
-    [Export] private ResourceOrb     ManaOrb;
+    [Export] private ResourceOrb     manaOrb;
     private          float           manaProSekunde = 5f;
     [Export] public  HBoxContainer   SkillBar;
-    private          PackedScene     SkillBarIcon = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
     private          AnimationTree   AnimationTree { get; set; }
 
     [Export]
@@ -40,23 +40,44 @@ public partial class Player2D : BaseUnit
     {
         ManaCurrent = ManaMaximum;
 
-        ManaOrb.Init(this, ResourceType.Mana);
-        LifeOrb.Init(this, ResourceType.Life);
+        lifeOrb.Init(this, ResourceType.Life);
+        manaOrb.Init(this, ResourceType.Mana);
 
         base._Ready();
 
+        ConfigureSkillbar();
+
+        AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
+    }
+
+    private void ConfigureSkillbar()
+    {
+        AddSkillsToBar();
+        SetSkillbarposition();
+    }
+
+    private void SetSkillbarposition()
+    {
+        var viewportSize     = GetViewportRect().Size;
+        var skillbarSize     = SkillBar.Size;
+        var skillbarPosition = new Vector2((viewportSize.X - skillbarSize.X) / 2, viewportSize.Y - 2 * skillbarSize.Y);
+
+        SkillBar.Position = skillbarPosition;
+    }
+
+    private void AddSkillsToBar()
+    {
         skills.Add(new FireballSkill(this));
         skills.Add(new FrostNovaSkill(this));
 
-        var fireballActionBarItem = SkillBarIcon.Instantiate<CooldownSkill>();
+        var fireballActionBarItem = skillBarIcon.Instantiate<CooldownSkill>();
         fireballActionBarItem.Init(skills.First(), "res://Scenes/Spells/fireball.tscn", Key.F);
-        var frostNovaActionBarItem = SkillBarIcon.Instantiate<CooldownSkill>();
+
+        var frostNovaActionBarItem = skillBarIcon.Instantiate<CooldownSkill>();
         frostNovaActionBarItem.Init(skills.Last(), "res://Scenes/Spells/frost_nova.tscn", Key.E);
 
         SkillBar.AddChild(fireballActionBarItem);
         SkillBar.AddChild(frostNovaActionBarItem);
-
-        AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
     }
 
     public bool IsInAggroRangeOf(BaseEnemy enemy)
@@ -72,7 +93,7 @@ public partial class Player2D : BaseUnit
         {
             ManaCurrent += manaProSekunde * (float)delta;
             ManaCurrent =  Mathf.Clamp(ManaCurrent, 0, ManaMaximum);
-            ManaOrb.SetRessource(ManaCurrent);
+            manaOrb.SetRessource(ManaCurrent);
         }
 
         MovementDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
@@ -99,7 +120,7 @@ public partial class Player2D : BaseUnit
                 this.InstatiateFloatingCombatText(damageTaken, GetTree().CurrentScene, new Vector2(0, -60));
 
                 LifeCurrent -= (int)damageTaken.Value;
-                LifeOrb.SetRessource(LifeCurrent);
+                lifeOrb.SetRessource(LifeCurrent);
             }
         }
     }
@@ -116,6 +137,6 @@ public partial class Player2D : BaseUnit
     public void ReduceMana(float mana)
     {
         ManaCurrent -= mana;
-        ManaOrb.SetRessource(ManaCurrent);
+        manaOrb.SetRessource(ManaCurrent);
     }
 }
