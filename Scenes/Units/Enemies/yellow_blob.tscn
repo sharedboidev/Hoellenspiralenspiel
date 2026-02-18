@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://v011gi31s48p"]
 
 [ext_resource type="PackedScene" uid="uid://c7yp7pw7ntcdu" path="res://Scenes/Units/Enemies/base_enemy.tscn" id="1_qkjco"]
+[ext_resource type="Script" uid="uid://ycbbkcyjrooq" path="res://Scripts/Units/Enemies/YellowBlob.cs" id="2_jhcx6"]
 [ext_resource type="Texture2D" uid="uid://b268cer7pnl7j" path="res://Textures/Units/Enemies/YellowBlob/Slime2_Idle_with_shadow.png" id="2_qj7bg"]
 [ext_resource type="Texture2D" uid="uid://poensx0kr85k" path="res://Textures/Units/Enemies/YellowBlob/Slime2_Run_with_shadow.png" id="3_kybs8"]
 [ext_resource type="Texture2D" uid="uid://cl3lxlu01o60m" path="res://Textures/Units/Enemies/YellowBlob/Slime2_Attack_with_shadow.png" id="4_oe3gs"]
@@ -359,6 +360,10 @@ _data = {
 }
 
 [node name="YellowBlob" unique_id=1290199613 instance=ExtResource("1_qkjco")]
+script = ExtResource("2_jhcx6")
+LootTableId = "blue_blob_loot"
+LifeBase = 50
+Movementspeed = 50.0
 
 [node name="CollisionShape2D" parent="." index="0" unique_id=375828209]
 shape = SubResource("CircleShape2D_oe3gs")
