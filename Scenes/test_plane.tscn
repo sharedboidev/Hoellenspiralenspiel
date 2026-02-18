@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://cycesnf53lc51" path="res://Scenes/Units/test_enemy.tscn" id="5_bjuw8"]
 [ext_resource type="PackedScene" uid="uid://6yhxh7p0ijv4" path="res://Scenes/UI/inventory.tscn" id="5_h4q4d"]
 [ext_resource type="PackedScene" uid="uid://bg8s6qmxf15f8" path="res://Scripts/Controllers/enemy_controller.tscn" id="5_vglo3"]
+[ext_resource type="PackedScene" uid="uid://v011gi31s48p" path="res://Scenes/Units/Enemies/yellow_blob.tscn" id="6_2sot3"]
 [ext_resource type="PackedScene" uid="uid://dpai8eumf00w0" path="res://Scenes/UI/spawn_marker.tscn" id="6_7imrf"]
 [ext_resource type="Script" uid="uid://v5paruy0b76n" path="res://Scripts/UI/OverlayMapViewport.cs" id="9_db61r"]
 [ext_resource type="PackedScene" uid="uid://carsjy7sm2ntw" path="res://Scenes/UI/hotkey_info.tscn" id="10_v18oo"]
@@ -76,6 +77,7 @@ offset_left = -3.0
 offset_top = 486.0
 offset_right = 63.972473
 offset_bottom = 526.0
+EnemyToSpawn = ExtResource("6_2sot3")
 
 [node name="SpawnMarker4" parent="SpawnMarker" unique_id=1766736446 instance=ExtResource("6_7imrf")]
 offset_left = 1846.0
