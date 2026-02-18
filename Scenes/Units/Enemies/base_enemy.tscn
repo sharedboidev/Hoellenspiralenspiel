@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://c7yp7pw7ntcdu"]
+
+[ext_resource type="Shape2D" uid="uid://dxgcqmb5r10lo" path="res://Resources/CircleShape.tres" id="1_2uqth"]
+[ext_resource type="Texture2D" uid="uid://dxdttrmghay8k" path="res://icon.svg" id="2_ch28j"]
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_ch28j"]
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_dv8a7"]
+nodes/output/position = Vector2(528, 80)
+nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_ch28j")
+nodes/StateMachine/position = Vector2(172, 122.8)
+node_connections = [&"output", 0, &"StateMachine"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ch28j"]
+bg_color = Color(0.14406255, 0.14406255, 0.14406249, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dv8a7"]
+bg_color = Color(0.70586336, 0.076332815, 0.18692863, 1)
+
+[node name="BaseEnemy" type="CharacterBody2D" unique_id=1290199613]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=375828209]
+shape = ExtResource("1_2uqth")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1122812897]
+texture = ExtResource("2_ch28j")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=942966989]
+
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=192769642]
+tree_root = SubResource("AnimationNodeBlendTree_dv8a7")
+advance_expression_base_node = NodePath("..")
+anim_player = NodePath("../AnimationPlayer")
+
+[node name="Healthbar" type="ProgressBar" parent="." unique_id=1393637794]
+unique_name_in_owner = true
+visible = false
+z_index = 1
+y_sort_enabled = true
+offset_left = -20.0
+offset_top = -55.0
+offset_right = 20.0
+offset_bottom = -51.0
+theme_override_styles/background = SubResource("StyleBoxFlat_ch28j")
+theme_override_styles/fill = SubResource("StyleBoxFlat_dv8a7")
+value = 50.0
+show_percentage = false

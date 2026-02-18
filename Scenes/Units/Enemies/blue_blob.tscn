@@ -141,6 +141,7 @@ states/MoveState/position = Vector2(396.4, 100.159996)
 transitions = ["Start", "MoveState", SubResource("AnimationNodeStateMachineTransition_jm8ae")]
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_dn1kk"]
+graph_offset = Vector2(-240.42378, -93.25771)
 nodes/output/position = Vector2(576, 128)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_5enjw")
 nodes/StateMachine/position = Vector2(240, 80)
@@ -176,7 +177,7 @@ libraries/ = SubResource("AnimationLibrary_e1ef1")
 tree_root = SubResource("AnimationNodeBlendTree_dn1kk")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
-parameters/StateMachine/MoveState/RunState/blend_position = Vector2(-0.0055831075, -0.4704492)
+parameters/StateMachine/MoveState/RunState/blend_position = Vector2(0.030032516, -0.56501186)
 
 [node name="Healthbar" type="ProgressBar" parent="." unique_id=813237691]
 unique_name_in_owner = true
