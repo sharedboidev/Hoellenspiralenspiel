@@ -142,8 +142,9 @@ public partial class Player2D : BaseUnit
 				richtung = richtung.Normalized();
 
 			Flamethrower.Rotation = (-richtung).Angle();
-			 
-			GetNode("SpellsContainer").AddChild(Flamethrower);
+
+			if(GetNode("SpellsContainer").GetChildren().All(c => c.Name != Flamethrower.Name))
+				GetNode("SpellsContainer").AddChild(Flamethrower);
 			
 		}
 		else
