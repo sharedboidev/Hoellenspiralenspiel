@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://cjf203yhhwo42"]
+
+[ext_resource type="Texture2D" uid="uid://dxdttrmghay8k" path="res://icon.svg" id="1_ovxcs"]
+
+[node name="BaseWeapon" type="Node2D" unique_id=839299820]
+
+[node name="Icon" type="TextureRect" parent="." unique_id=732627025]
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("1_ovxcs")
