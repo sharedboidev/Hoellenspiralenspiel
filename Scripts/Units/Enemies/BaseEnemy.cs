@@ -130,7 +130,7 @@ public abstract partial class BaseEnemy : BaseUnit
             }
         }
         else if (e.PropertyName == nameof(MovementDirection) && MovementDirection.Length() > 0.0f)
-            SetAsOnlyVisibleSprite(runSprite);
+            SetAsOnlyVisibleSprite(runSprite);//Hack, die Statemachine im Animationtree Startet die Animation nicht mehr
     }
 
     protected override void DieProperly()

@@ -13,11 +13,12 @@ namespace Hoellenspiralenspiel.Scripts.Units;
 public abstract partial class BaseUnit : CharacterBody2D,
                                          INotifyPropertyChanged
 {
-    private int   lifeCurrent;
-    private float LifeAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Life);
-    private float LifePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Life);
-    private float LifeMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Life);
-    public  int   LifeMaximum              => (int)((LifeBase + LifeAddedFlat) * LifePercentageMultiplier * LifeMoreMultiplierTotal);
+    private int     lifeCurrent;
+    private Vector2 movementDirection = Vector2.Zero;
+    private float   LifeAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Life);
+    private float   LifePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Life);
+    private float   LifeMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Life);
+    public  int     LifeMaximum              => (int)((LifeBase + LifeAddedFlat) * LifePercentageMultiplier * LifeMoreMultiplierTotal);
 
     [Export]
     public int LifeBase { get; set; } = 1;
@@ -30,7 +31,11 @@ public abstract partial class BaseUnit : CharacterBody2D,
     }
 
     [Export]
-    public Vector2 MovementDirection { get; set; } = Vector2.Zero;
+    public Vector2 MovementDirection
+    {
+        get => movementDirection;
+        set => SetField(ref movementDirection, value);
+    }
 
     [Export]
     public float Movementspeed { get; set; }
