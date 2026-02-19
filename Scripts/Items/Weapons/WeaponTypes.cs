@@ -1,6 +1,6 @@
 ﻿namespace Hoellenspiralenspiel.Scripts.Items.Weapons;
 
-public enum WeaponTypes
+public enum WeaponType
 {
     Undefined,
     Sword,

@@ -54,14 +54,14 @@ public partial class Player2D : BaseUnit
         AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
     }
 
-    public int GetRequiredAttributevalue(Requirements requirement) => requirement switch
+    public int GetRequiredAttributevalue(Requirement requirement) => requirement switch
     {
-        Requirements.Strength => 1,
-        Requirements.Dexterity => 1,
-        Requirements.Intelligence => 1,
-        Requirements.Constitution => 1,
-        Requirements.Awareness => 1,
-        Requirements.CharacterLevel => Level,
+        Requirement.Strength => 1,
+        Requirement.Dexterity => 1,
+        Requirement.Intelligence => 1,
+        Requirement.Constitution => 1,
+        Requirement.Awareness => 1,
+        Requirement.CharacterLevel => Level,
         _ => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null)
     };
 

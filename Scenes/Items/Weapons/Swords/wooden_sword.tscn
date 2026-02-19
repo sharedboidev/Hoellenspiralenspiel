@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bmnr4uijb76uv"]
 
 [ext_resource type="PackedScene" uid="uid://cjf203yhhwo42" path="res://Scenes/Items/Weapons/base_weapon.tscn" id="1_cgrcf"]
-[ext_resource type="Texture2D" uid="uid://bas0n1xr80ss7" path="res://Textures/Items/Weapons/Swords/WoodenSword.png" id="2_012t7"]
+[ext_resource type="Texture2D" uid="uid://iro2pd1blvre" path="res://Textures/Items/Weapons/Swords/WoodenSword.png" id="2_012t7"]
 [ext_resource type="Script" uid="uid://csgfgsv6k63dh" path="res://Scripts/Items/Weapons/Swords/WoodenSword.cs" id="2_an771"]
 
 [node name="WoodenSword" unique_id=839299820 node_paths=PackedStringArray("Icon") instance=ExtResource("1_cgrcf")]

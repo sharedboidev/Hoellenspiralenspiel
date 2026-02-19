@@ -1,6 +1,6 @@
 ﻿namespace Hoellenspiralenspiel.Scripts.Items.Weapons;
 
-public enum Requirements
+public enum Requirement
 {
     Strength,
     Dexterity,

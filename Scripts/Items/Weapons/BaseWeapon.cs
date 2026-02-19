@@ -19,16 +19,16 @@ public abstract partial class BaseWeapon : BaseItem
     public float AttacksPerSecond => 1 / SwingCooldownSec;
 
     [Export]
-    public WeaponTypes WeaponType { get; set; }
+    public WeaponType WeaponType { get; set; }
 
     [Export]
-    public WieldStrategies WieldStrategie { get; set; }
+    public WieldStrategy WieldStrategie { get; set; }
 
     [Export(PropertyHint.Range, "0.0, 100.0,")]
     public float CriticalHitChance { get; set; }
 
     [Export]
-    public Dictionary<Requirements, int> Requirements { get; set; } = new();
+    public Dictionary<Requirement, int> Requirements { get; set; } = new();
 
     public          DamageType DamageType  { get; private set; }
     public override bool       IsStackable => false;
@@ -56,11 +56,11 @@ public abstract partial class BaseWeapon : BaseItem
 
     private void SetDamagetypeByWeapon() => DamageType = WeaponType switch
     {
-        WeaponTypes.Sword => new SlashDamage(),
-        WeaponTypes.Axe => new SlashDamage(),
-        WeaponTypes.Flail => new CrushDamage(),
-        WeaponTypes.Staff => new CrushDamage(),
-        WeaponTypes.Bow => new PierceDamage(),
+        WeaponType.Sword => new SlashDamage(),
+        WeaponType.Axe => new SlashDamage(),
+        WeaponType.Flail => new CrushDamage(),
+        WeaponType.Staff => new CrushDamage(),
+        WeaponType.Bow => new PierceDamage(),
         _ => null
     };
 }
