@@ -235,7 +235,7 @@ texture = ExtResource("2_ch28j")
 shape = ExtResource("1_2uqth")
 debug_color = Color(0.95373243, 0.19770393, 0.23620155, 0.41960785)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=942966989 groups=["monsters"]]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=942966989]
 libraries/ = SubResource("AnimationLibrary_mi5a6")
 
 [node name="AnimationTree" type="AnimationTree" parent="." unique_id=192769642]

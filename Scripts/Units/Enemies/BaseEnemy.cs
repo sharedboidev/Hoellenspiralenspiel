@@ -59,6 +59,7 @@ public abstract partial class BaseEnemy : BaseUnit
         switch (animname)
         {
             case Animation.DieLeft or Animation.DieRight or Animation.DieTop or Animation.DieDown:
+                healthbar.Visible = false;
                 SetAsOnlyVisibleSprite(deathSprite);
                 break;
             case Animation.RunLeft or Animation.RunRight or Animation.RunTop or Animation.RunDown:
@@ -89,13 +90,17 @@ public abstract partial class BaseEnemy : BaseUnit
 
     private void SetAsOnlyVisibleSprite(Sprite2D sprite)
     {
-        if (sprite is null)
-            return;
+        if (idleSprite is not null)
+            idleSprite.Visible = idleSprite == sprite;
 
-        idleSprite.Visible   = idleSprite == sprite;
-        runSprite.Visible    = runSprite == sprite;
-        attackSprite.Visible = attackSprite == sprite;
-        deathSprite.Visible  = deathSprite == sprite;
+        if (runSprite is not null)
+            runSprite.Visible = runSprite == sprite;
+
+        if (attackSprite is not null)
+            attackSprite.Visible = attackSprite == sprite;
+
+        if (deathSprite is not null)
+            deathSprite.Visible = deathSprite == sprite;
     }
 
     public override void _PhysicsProcess(double delta)
@@ -104,7 +109,7 @@ public abstract partial class BaseEnemy : BaseUnit
 
         if (MovementDirection != Vector2.Zero)
         {
-            var direction = MovementDirection;// * new Vector2(1, -1);
+            var direction = MovementDirection; // * new Vector2(1, -1);
 
             AnimationTree.Set("parameters/StateMachine/MoveState/RunState/blend_position", direction);
             AnimationTree.Set("parameters/StateMachine/MoveState/IdleState/blend_position", direction);
@@ -118,7 +123,7 @@ public abstract partial class BaseEnemy : BaseUnit
         {
             healthbar.Value = LifeCurrent;
 
-            if (!healthbar.Visible && LifeCurrent < LifeMaximum)
+            if (!IsDead && !healthbar.Visible && LifeCurrent < LifeMaximum)
             {
                 healthbar.Visible = true;
                 IsAggressive      = true;
