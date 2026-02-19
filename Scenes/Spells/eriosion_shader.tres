@@ -1,0 +1,6 @@
+[gd_resource type="VisualShader" format=3 uid="uid://dg6w44ytw03t2"]
+
+[resource]
+mode = 1
+flags/unshaded = true
+flags/light_only = false
