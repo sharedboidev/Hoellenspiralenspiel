@@ -124,6 +124,8 @@ public abstract partial class BaseEnemy : BaseUnit
                 IsAggressive      = true;
             }
         }
+        else if (e.PropertyName == nameof(MovementDirection) && MovementDirection.Length() > 0.0f)
+            SetAsOnlyVisibleSprite(runSprite);
     }
 
     protected override void DieProperly()

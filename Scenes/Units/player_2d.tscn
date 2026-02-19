@@ -443,8 +443,8 @@ motion_mode = 1
 platform_on_leave = 2
 platform_floor_layers = 0
 script = ExtResource("1_nnb5g")
-lifeOrb = NodePath("LifeOrb")
-manaOrb = NodePath("ManaOrb")
+lifeOrb = NodePath("CanvasLayer/LifeOrb")
+manaOrb = NodePath("CanvasLayer/ManaOrb")
 SkillBar = NodePath("CanvasLayer/SkillBar")
 NoManaSound = NodePath("NoManaSound")
 LifeBase = 128
@@ -503,13 +503,7 @@ grow_horizontal = 2
 grow_vertical = 0
 size_flags_horizontal = 4
 
-[node name="NoManaSound" type="AudioStreamPlayer2D" parent="." unique_id=236623057]
-stream = ExtResource("4_rl3bg")
-volume_db = -20.0
-
-[node name="SpellsContainer" type="Node2D" parent="." unique_id=27157321]
-
-[node name="LifeOrb" parent="." unique_id=1740844714 instance=ExtResource("3_o57mx")]
+[node name="LifeOrb" parent="CanvasLayer" unique_id=1740844714 instance=ExtResource("3_o57mx")]
 z_index = 10
 y_sort_enabled = true
 offset_left = -1056.0
@@ -517,10 +511,16 @@ offset_top = 573.0
 offset_right = -869.0
 offset_bottom = 760.0
 
-[node name="ManaOrb" parent="." unique_id=235976386 instance=ExtResource("3_o57mx")]
+[node name="ManaOrb" parent="CanvasLayer" unique_id=235976386 instance=ExtResource("3_o57mx")]
 z_index = 10
 y_sort_enabled = true
 offset_left = 854.0
 offset_top = 569.0
 offset_right = 1045.0
 offset_bottom = 760.0
+
+[node name="NoManaSound" type="AudioStreamPlayer2D" parent="." unique_id=236623057]
+stream = ExtResource("4_rl3bg")
+volume_db = -20.0
+
+[node name="SpellsContainer" type="Node2D" parent="." unique_id=27157321]
