@@ -6,10 +6,14 @@ namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 public abstract partial class BaseEnemy : BaseUnit
 {
+    private            Sprite2D       attackSprite;
     protected          Player2D       ChasedPlayer;
     protected          Node           CurrentScene;
+    private            Sprite2D       deathSprite;
     private            ProgressBar    healthbar;
     private            ShaderMaterial hiddenInFogShaderMaterial;
+    private            Sprite2D       idleSprite;
+    private            Sprite2D       runSprite;
     protected abstract PackedScene    AttackScene { get; }
     public             string         SpawnGroup  { get; set; }
 
@@ -43,7 +47,55 @@ public abstract partial class BaseEnemy : BaseUnit
         healthbar.MaxValue = LifeMaximum;
         healthbar.Value    = LifeCurrent;
 
-        PropertyChanged += OnPropertyChanged;
+        LoadSpriteNodes();
+
+        PropertyChanged                 += OnPropertyChanged;
+        AnimationTree.AnimationFinished += AnimationTreeOnAnimationFinished;
+        AnimationTree.AnimationStarted  += AnimationTreeOnAnimationStarted;
+    }
+
+    private void AnimationTreeOnAnimationStarted(StringName animname)
+    {
+        switch (animname)
+        {
+            case Animation.DieLeft or Animation.DieRight or Animation.DieTop or Animation.DieDown:
+                SetAsOnlyVisibleSprite(deathSprite);
+                break;
+            case Animation.RunLeft or Animation.RunRight or Animation.RunTop or Animation.RunDown:
+                SetAsOnlyVisibleSprite(runSprite);
+                break;
+            case Animation.AttackLeft or Animation.AttackRight or Animation.AttackTop or Animation.AttackDown:
+                SetAsOnlyVisibleSprite(attackSprite);
+                break;
+            case Animation.IdleLeft or Animation.IdleRight or Animation.IdleTop or Animation.IdleDown:
+                SetAsOnlyVisibleSprite(idleSprite);
+                break;
+        }
+    }
+
+    private void AnimationTreeOnAnimationFinished(StringName animname)
+    {
+        if (animname == Animation.DieLeft || animname == Animation.DieRight || animname == Animation.DieTop || animname == Animation.DieDown)
+            DieProperly();
+    }
+
+    private void LoadSpriteNodes()
+    {
+        idleSprite   = GetNodeOrNull<Sprite2D>("IdleSprite");
+        runSprite    = GetNodeOrNull<Sprite2D>("RunSprite");
+        attackSprite = GetNodeOrNull<Sprite2D>("AttackSprite");
+        deathSprite  = GetNodeOrNull<Sprite2D>("DeathSprite");
+    }
+
+    private void SetAsOnlyVisibleSprite(Sprite2D sprite)
+    {
+        if (sprite is null)
+            return;
+
+        idleSprite.Visible   = idleSprite == sprite;
+        runSprite.Visible    = runSprite == sprite;
+        attackSprite.Visible = attackSprite == sprite;
+        deathSprite.Visible  = deathSprite == sprite;
     }
 
     public override void _PhysicsProcess(double delta)
@@ -52,8 +104,11 @@ public abstract partial class BaseEnemy : BaseUnit
 
         if (MovementDirection != Vector2.Zero)
         {
-            AnimationTree.Set("parameters/StateMachine/MoveState/RunState/blend_position", MovementDirection * new Vector2(1, -1));
-            //AnimationTree.Set("parameters/StateMachine/MoveState/IdleState/blend_position", MovementDirection * new Vector2(1, -1));
+            var direction = MovementDirection;// * new Vector2(1, -1);
+
+            AnimationTree.Set("parameters/StateMachine/MoveState/RunState/blend_position", direction);
+            AnimationTree.Set("parameters/StateMachine/MoveState/IdleState/blend_position", direction);
+            AnimationTree.Set("parameters/StateMachine/MoveState/DeathState/blend_position", direction);
         }
     }
 
@@ -76,6 +131,10 @@ public abstract partial class BaseEnemy : BaseUnit
         var controller = CurrentScene.GetNode<EnemyController>("%" + nameof(EnemyController));
         controller.SpawnedEnemies.Remove(this);
 
+        PropertyChanged                 -= OnPropertyChanged;
+        AnimationTree.AnimationFinished -= AnimationTreeOnAnimationFinished;
+        AnimationTree.AnimationStarted  -= AnimationTreeOnAnimationStarted;
+
         base.DieProperly();
     }
 
@@ -83,8 +142,11 @@ public abstract partial class BaseEnemy : BaseUnit
 
     public void ChasePlayer()
     {
-        if (!IsAggressive || ChasedPlayer.IsDead)
+        if (!IsAggressive || IsDead || ChasedPlayer.IsDead)
+        {
+            MovementDirection = Vector2.Zero;
             return;
+        }
 
         var distance  = ChasedPlayer.Position.DistanceTo(Position);
         var isInRange = distance < AttackRange;

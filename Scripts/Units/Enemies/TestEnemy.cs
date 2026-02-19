@@ -29,15 +29,4 @@ public partial class TestEnemy : BaseEnemy
 
 		fireball.Init(new FireballSkill(this), Position, ChasedPlayer.Position);
 	}
-
-	public override void _PhysicsProcess(double delta)
-	{
-		base._PhysicsProcess(delta);
-
-		if (MovementDirection != Vector2.Zero)
-		{
-			AnimationTree.Set("parameters/StateMachine/MoveState/RunState/blend_position", MovementDirection * new Vector2(1, -1));
-			AnimationTree.Set("parameters/StateMachine/MoveState/IdleState/blend_position", MovementDirection * new Vector2(1, -1));
-		}
-	}
 }

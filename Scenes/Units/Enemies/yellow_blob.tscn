@@ -359,12 +359,13 @@ _data = {
 &"run_top": SubResource("Animation_uynnh")
 }
 
-[node name="YellowBlob" unique_id=1290199613 groups=["monsters"] instance=ExtResource("1_qkjco")]
+[node name="YellowBlob" unique_id=1290199613 instance=ExtResource("1_qkjco")]
 scale = Vector2(2, 2)
 script = ExtResource("2_jhcx6")
 LootTableId = "blue_blob_loot"
 LifeBase = 50
-Movementspeed = 50.0
+LifeCurrent = 50
+Movementspeed = 100.0
 
 [node name="IdleSprite" parent="." index="0" unique_id=1122812897]
 texture = ExtResource("2_qj7bg")
@@ -398,4 +399,4 @@ libraries/ = SubResource("AnimationLibrary_1nepw")
 
 [node name="AnimationTree" parent="." index="6" unique_id=192769642]
 active = true
-parameters/StateMachine/MoveState/IdleState/blend_position = Vector2(-0.009732366, -0.68330467)
+parameters/StateMachine/MoveState/IdleState/blend_position = Vector2(-1, -1)

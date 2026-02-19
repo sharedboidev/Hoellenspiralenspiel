@@ -168,7 +168,7 @@ advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_dv8a7"]
 advance_mode = 2
-advance_expression = "MovementDirection.length() > 0.0"
+advance_expression = "MovementDirection.length() != 0.0"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_fadhx"]
 advance_mode = 2
@@ -176,11 +176,12 @@ advance_expression = "MovementDirection.length() == 0.0"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_mi5a6"]
 advance_mode = 2
-advance_expression = "IsDead	"
+advance_expression = "LifeCurrent <= 0"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_sqcfs"]
 advance_mode = 2
-advance_expression = "IsDead"
+advance_expression = "LifeCurrent <= 0
+"
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_dv8a7"]
 states/AttackState/node = SubResource("AnimationNodeBlendSpace2D_w2jn5")
@@ -188,11 +189,11 @@ states/AttackState/position = Vector2(422.47998, -25.399998)
 states/DeathState/node = SubResource("AnimationNodeBlendSpace2D_fsesa")
 states/DeathState/position = Vector2(707.6, 99.496)
 states/IdleState/node = SubResource("AnimationNodeBlendSpace2D_ch28j")
-states/IdleState/position = Vector2(422, 100.64)
+states/IdleState/position = Vector2(422.3072, 99.2128)
 states/RunState/node = SubResource("AnimationNodeBlendSpace2D_dv8a7")
 states/RunState/position = Vector2(421.904, 232)
 transitions = ["Start", "IdleState", SubResource("AnimationNodeStateMachineTransition_ch28j"), "IdleState", "RunState", SubResource("AnimationNodeStateMachineTransition_dv8a7"), "RunState", "IdleState", SubResource("AnimationNodeStateMachineTransition_fadhx"), "IdleState", "DeathState", SubResource("AnimationNodeStateMachineTransition_mi5a6"), "RunState", "DeathState", SubResource("AnimationNodeStateMachineTransition_sqcfs")]
-graph_offset = Vector2(-64, -87)
+graph_offset = Vector2(39, -77)
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_xpqtf"]
 advance_mode = 2
@@ -202,10 +203,10 @@ states/MoveState/node = SubResource("AnimationNodeStateMachine_dv8a7")
 states/MoveState/position = Vector2(438.4, 37.84)
 states/Start/position = Vector2(204, 38.4)
 transitions = ["Start", "MoveState", SubResource("AnimationNodeStateMachineTransition_xpqtf")]
-graph_offset = Vector2(-10, -102)
+graph_offset = Vector2(12, -121)
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_dv8a7"]
-graph_offset = Vector2(-186.99492, 11.778516)
+graph_offset = Vector2(-130.19492, 38.978516)
 nodes/output/position = Vector2(528, 80)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_ch28j")
 nodes/StateMachine/position = Vector2(172, 122.8)
@@ -234,7 +235,7 @@ texture = ExtResource("2_ch28j")
 shape = ExtResource("1_2uqth")
 debug_color = Color(0.95373243, 0.19770393, 0.23620155, 0.41960785)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=942966989]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=942966989 groups=["monsters"]]
 libraries/ = SubResource("AnimationLibrary_mi5a6")
 
 [node name="AnimationTree" type="AnimationTree" parent="." unique_id=192769642]
@@ -245,7 +246,7 @@ anim_player = NodePath("../AnimationPlayer")
 parameters/StateMachine/MoveState/AttackState/blend_position = Vector2(0, 0)
 parameters/StateMachine/MoveState/DeathState/blend_position = Vector2(0, 0)
 parameters/StateMachine/MoveState/IdleState/blend_position = Vector2(-0.0016220808, -0.7119342)
-parameters/StateMachine/MoveState/RunState/blend_position = Vector2(0, 0)
+parameters/StateMachine/MoveState/RunState/blend_position = Vector2(0.0024311543, -0.9424083)
 
 [node name="Healthbar" type="ProgressBar" parent="." unique_id=1393637794]
 unique_name_in_owner = true

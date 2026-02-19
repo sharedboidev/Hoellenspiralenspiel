@@ -46,7 +46,7 @@ tile_set = ExtResource("1_vglo3")
 [node name="Player 2D" parent="Environment" unique_id=809220738 instance=ExtResource("3_35xgq")]
 unique_name_in_owner = true
 y_sort_enabled = false
-position = Vector2(1067, 676)
+position = Vector2(741, 887)
 
 [node name="Enemies" type="Node2D" parent="Environment" unique_id=845394208]
 unique_name_in_owner = true
@@ -66,10 +66,10 @@ EnemyToSpawn = ExtResource("5_bjuw8")
 AmountToSpawn = 25
 
 [node name="SpawnMarker2" parent="SpawnMarker" unique_id=334759122 instance=ExtResource("6_7imrf")]
-offset_left = 532.0
-offset_top = 12.0
-offset_right = 598.9725
-offset_bottom = 52.0
+offset_left = 630.0
+offset_top = -737.0
+offset_right = 696.9725
+offset_bottom = -697.0
 AmountToSpawn = 50
 
 [node name="SpawnMarker3" parent="SpawnMarker" unique_id=578690069 instance=ExtResource("6_7imrf")]

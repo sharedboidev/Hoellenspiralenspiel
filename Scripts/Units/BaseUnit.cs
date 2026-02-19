@@ -22,6 +22,7 @@ public abstract partial class BaseUnit : CharacterBody2D,
     [Export]
     public int LifeBase { get; set; } = 1;
 
+    [Export]
     public int LifeCurrent
     {
         get => lifeCurrent;
@@ -56,12 +57,6 @@ public abstract partial class BaseUnit : CharacterBody2D,
                                             mod.ModificationType == modificationType);
 
     public override void _Ready() => LifeCurrent = LifeMaximum;
-
-    public override void _Process(double delta)
-    {
-        if (IsDead)
-            DieProperly();
-    }
 
     public BaseEnemy[] FindClosestEnemyFrom(List<BaseEnemy> existingEnemies, int amountReturned = 1)
     {
