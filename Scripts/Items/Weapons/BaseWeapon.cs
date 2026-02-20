@@ -77,8 +77,6 @@ public abstract partial class BaseWeapon : BaseItem
     {
         base.Init();
 
-        ItemLevel = 100;
-
         SetDamagetypeByWeapon();
         RollModifiers();
         SetExceptionalName();
