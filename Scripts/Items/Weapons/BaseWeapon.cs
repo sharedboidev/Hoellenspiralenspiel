@@ -1,7 +1,9 @@
-﻿using Godot;
+﻿using System.Text;
+using Godot;
 using Godot.Collections;
 using Hoellenspiralenspiel.Scripts.Configuration;
 using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.Items.Weapons;
 
@@ -33,13 +35,6 @@ public abstract partial class BaseWeapon : BaseItem
     public          DamageType DamageType  { get; private set; }
     public override bool       IsStackable => false;
 
-    public override void _Ready()
-    {
-        base._Ready();
-
-        SetDamagetypeByWeapon();
-    }
-
     public bool CanBeEquipedBy(Player2D player)
     {
         var canWear = true;
@@ -52,6 +47,30 @@ public abstract partial class BaseWeapon : BaseItem
         }
 
         return canWear;
+    }
+
+    public override void Init()
+    {
+        base.Init();
+
+        SetDamagetypeByWeapon();
+    }
+
+    public override string GetTooltipDescription()
+    {
+        var emil = new StringBuilder();
+        emil.Append("[center]");
+        emil.AppendLine($"{WieldStrategie.GetDescription()} {WeaponType.GetDescription()}");
+        emil.AppendLine($"{DamageType.Name} Damage: {MinDamage:N0} To {MaxDamage:N0}");
+        emil.AppendLine($"Attacks per Second: {AttacksPerSecond:N}");
+        emil.AppendLine($"Critical Hit Chance: {CriticalHitChance:N2}%");
+
+        foreach (var requirement in Requirements)
+            emil.AppendLine($"Required {requirement.Key}: {requirement.Value}");
+
+        emil.Append("[/center]");
+
+        return emil.ToString();
     }
 
     private void SetDamagetypeByWeapon() => DamageType = WeaponType switch

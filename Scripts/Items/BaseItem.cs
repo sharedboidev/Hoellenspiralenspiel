@@ -12,7 +12,9 @@ public abstract partial class BaseItem : Node2D,
     public abstract bool   IsStackable  { get; }
     public          string TooltipTitle => Name;
 
-    public abstract string GetTooltipDescription();
+    public virtual string GetTooltipDescription() => string.Empty;
+
+    public virtual void Init() { }
 
     public override void _Ready() => Icon = GetNode<TextureRect>("Icon");
 }

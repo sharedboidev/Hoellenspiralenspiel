@@ -43,6 +43,7 @@ public partial class LootTable : Resource
                     break;
 
                 var itemInstance = lootEntry.ItemScene.Instantiate<BaseItem>();
+                itemInstance.Init();
 
                 if (itemInstance is ConsumableItem consumableItem)
                     consumableItem.StacksizeCurrent = rng.Next(lootEntry.QuantityMin, lootEntry.QuantityMax + 1);
