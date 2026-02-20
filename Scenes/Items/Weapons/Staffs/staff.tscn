@@ -5,12 +5,12 @@
 
 [node name="Staff" type="Node2D" unique_id=34298413 node_paths=PackedStringArray("Icon")]
 script = ExtResource("1_34oae")
-MinDamage = 10
-MaxDamage = 14
-SwingCooldownSec = 3.5
+MinDamageBase = 10
+MaxDamageBase = 14
+AttacksPerSecondBase = 0.33
+CriticalHitChanceBase = 3.0
 WeaponType = 4
 WieldStrategie = 4
-CriticalHitChance = 3.0
 Requirements = Dictionary[int, int]({
 2: 2,
 5: 3

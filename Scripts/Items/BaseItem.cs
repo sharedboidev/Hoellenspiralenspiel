@@ -10,6 +10,7 @@ public abstract partial class BaseItem : Node2D,
     [Export]
     public TextureRect Icon { get; set; }
 
+    public          int    ItemLevel       { get; set; }
     public abstract bool   IsStackable     { get; }
     public abstract string ItembaseName    { get; }
     protected       string ExceptionalName { get; set; }

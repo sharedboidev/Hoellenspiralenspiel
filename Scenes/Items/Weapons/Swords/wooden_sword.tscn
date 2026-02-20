@@ -6,12 +6,12 @@
 
 [node name="TrainingSword" unique_id=839299820 node_paths=PackedStringArray("Icon") instance=ExtResource("1_cgrcf")]
 script = ExtResource("2_an771")
-MinDamage = 3
-MaxDamage = 7
-SwingCooldownSec = 0.7
+MinDamageBase = 4
+MaxDamageBase = 9
+AttacksPerSecondBase = 1.4
+CriticalHitChanceBase = 5.0
 WeaponType = 1
 WieldStrategie = 2
-CriticalHitChance = 5.0
 Requirements = Dictionary[int, int]({
 0: 1,
 5: 1

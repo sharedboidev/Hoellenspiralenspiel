@@ -99,10 +99,10 @@ MinDistanceToPlayer = 300.0
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1293480226]
 
 [node name="Inventory" parent="CanvasLayer" unique_id=567735017 instance=ExtResource("5_h4q4d")]
-offset_left = 1103.0
-offset_top = 886.0
-offset_right = 1143.0
-offset_bottom = 926.0
+offset_left = 1034.0
+offset_top = 565.0
+offset_right = 1074.0
+offset_bottom = 605.0
 AmountSlots = 60
 
 [node name="ItemTooltip" parent="CanvasLayer" unique_id=832974172 instance=ExtResource("1_bidin")]

@@ -1,7 +1,11 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Godot;
-using Godot.Collections;
+using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Configuration;
+using Hoellenspiralenspiel.Scripts.Models.Weapons;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Utils;
 
@@ -10,15 +14,37 @@ namespace Hoellenspiralenspiel.Scripts.Items.Weapons;
 public abstract partial class BaseWeapon : BaseItem
 {
     [Export]
-    public int MinDamage { get; private set; }
+    public int MinDamageBase { get; private set; }
+
+    private float MinDamageAddedFlat            => GetModifierSumOf(ModificationType.Flat, WeaponStat.PhysicalDamage);
+    private float MinDamagePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, WeaponStat.PhysicalDamage);
+    private float MinDamageMoreMultiplierTotal  => GetTotalMoreMultiplierOf(WeaponStat.PhysicalDamage);
+    public  int   MinDamageFinal                => (int)((MinDamageBase + MinDamageAddedFlat) * MinDamagePercentageMultiplier * MinDamageMoreMultiplierTotal);
 
     [Export]
-    public int MaxDamage { get; set; }
+    public int MaxDamageBase { get; set; }
+
+    private float MaxDamageAddedFlat            => GetModifierSumOf(ModificationType.Flat, WeaponStat.PhysicalDamage);
+    private float MaxDamagePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, WeaponStat.PhysicalDamage);
+    private float MaxDamageMoreMultiplierTotal  => GetTotalMoreMultiplierOf(WeaponStat.PhysicalDamage);
+    public  int   MaxDamageFinal                => (int)((MaxDamageBase + MaxDamageAddedFlat) * MaxDamagePercentageMultiplier * MaxDamageMoreMultiplierTotal);
 
     [Export]
-    public float SwingCooldownSec { get; set; } = 1f;
+    public float AttacksPerSecondBase { get; set; } = 1f;
 
-    public float AttacksPerSecond => 1 / SwingCooldownSec;
+    private float  AttacksPerSecondAddedFlat            => GetModifierSumOf(ModificationType.Flat, WeaponStat.AttackSpeed);
+    private float  AttacksPerSecondPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, WeaponStat.AttackSpeed);
+    private float  AttacksPerSecondMoreMultiplierTotal  => GetTotalMoreMultiplierOf(WeaponStat.AttackSpeed);
+    public  double AttacksPerSecondFinal                => Math.Round((AttacksPerSecondBase + AttacksPerSecondAddedFlat) * AttacksPerSecondPercentageMultiplier * AttacksPerSecondMoreMultiplierTotal, 2);
+    public  double SwingCooldownSec                     => 1 / AttacksPerSecondFinal;
+
+    [Export(PropertyHint.Range, "0.0, 100.0,")]
+    public float CriticalHitChanceBase { get; set; }
+
+    private float  CriticalHitChanceAddedFlat            => GetModifierSumOf(ModificationType.Flat, WeaponStat.CriticalHitChance);
+    private float  CriticalHitChancePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, WeaponStat.CriticalHitChance);
+    private float  CriticalHitChanceMoreMultiplierTotal  => GetTotalMoreMultiplierOf(WeaponStat.CriticalHitChance);
+    public  double CriticalHitChanceFinal                => Math.Round((CriticalHitChanceBase + CriticalHitChanceAddedFlat) * CriticalHitChancePercentageMultiplier * CriticalHitChanceMoreMultiplierTotal, 2);
 
     [Export]
     public WeaponType WeaponType { get; set; }
@@ -26,14 +52,12 @@ public abstract partial class BaseWeapon : BaseItem
     [Export]
     public WieldStrategy WieldStrategie { get; set; }
 
-    [Export(PropertyHint.Range, "0.0, 100.0,")]
-    public float CriticalHitChance { get; set; }
-
     [Export]
-    public Dictionary<Requirement, int> Requirements { get; set; } = new();
+    public Godot.Collections.Dictionary<Requirement, int> Requirements { get; set; } = new();
 
-    public          DamageType DamageType  { get; private set; }
-    public override bool       IsStackable => false;
+    public          List<WeaponStatModifier> WeaponStatModifiers { get; } = new();
+    public          DamageType               DamageType          { get; private set; }
+    public override bool                     IsStackable         => false;
 
     public bool CanBeEquipedBy(Player2D player)
     {
@@ -53,26 +77,135 @@ public abstract partial class BaseWeapon : BaseItem
     {
         base.Init();
 
+        ItemLevel = 100;
+
         SetDamagetypeByWeapon();
+        RollModifiers();
         SetExceptionalName();
     }
+
+    private void RollModifiers()
+    {
+        var normalizedAffixCount = GetNormalizedAffixAmount();
+        var rng                  = new Random();
+
+        for (var i = 0; i < normalizedAffixCount; i++)
+        {
+            var nextAffixToRoll = rng.Next(0, 2) == 0 ? AffixType.Prefix : AffixType.Suffix;
+            var newAffix        = AffixDispenser.GetWeaponAffix(nextAffixToRoll);
+
+            WeaponStatModifiers.Add(newAffix);
+        }
+    }
+
+    private int GetNormalizedAffixAmount()
+    {
+        var possibleAffixProbabilityCeiling = FindAffixProbability();
+
+        var maximumAffixes = 8;
+        var totalAffixes   = new Random().Next(0, possibleAffixProbabilityCeiling + 1);
+
+        return Math.Min(totalAffixes, maximumAffixes);
+    }
+
+    private int FindAffixProbability() => ItemLevel switch
+    {
+        >= 0 and <= 10 => 3,
+        <= 25 => 5,
+        <= 40 => 6,
+        <= 50 => 7,
+        <= 60 => 8,
+        <= 70 => 9,
+        <= 80 => 10,
+        <= 90 => 11,
+        <= 100 => 12,
+        _ => throw new ArgumentOutOfRangeException()
+    };
 
     public override string GetTooltipDescription()
     {
         var emil = new StringBuilder();
         emil.Append("[center]");
-        emil.AppendLine($"{WieldStrategie.GetDescription()} {WeaponType.GetDescription()}");
-        emil.AppendLine($"{DamageType.Name} Damage: {MinDamage:N0} To {MaxDamage:N0}");
-        emil.AppendLine($"Attacks per Second: {AttacksPerSecond:N}");
-        emil.AppendLine($"Critical Hit Chance: {CriticalHitChance:N2}%");
 
-        foreach (var requirement in Requirements)
-            emil.AppendLine($"Required {requirement.Key.GetDescription()}: {requirement.Value:N0}");
+        AppendStats(emil);
+        AppendRequirements(emil);
+        AppendAffixes(emil);
 
         emil.Append("[/center]");
 
         return emil.ToString();
     }
+
+    private void AppendAffixes(StringBuilder emil)
+    {
+        foreach (var affix in WeaponStatModifiers.OrderBy(a => a.AffixType))
+        {
+            switch (affix.ModificationType)
+            {
+                case ModificationType.Flat when affix.WeaponStat == WeaponStat.AttackSpeed:
+                    emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##} to Attacks per Second[/color]");
+                    break;
+                case ModificationType.Flat when affix.WeaponStat == WeaponStat.CriticalHitChance:
+                    emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##}% to Critical Hit Chance[/color]");
+                    break;
+                case ModificationType.Flat:
+                    emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##} to {affix.WeaponStat.GetDescription()}[/color]");
+                    break;
+                case ModificationType.Percentage:
+                    emil.AppendLine($"[color=dodger_blue]{affix.Value * 100:N0}% increased {affix.WeaponStat.GetDescription()}[/color]");
+                    break;
+                case ModificationType.More:
+                    emil.AppendLine($"[color=dodger_blue]{affix.Value * 100:N0}% More {affix.WeaponStat.GetDescription()}[/color]");
+                    break;
+                default: throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
+
+    private void AppendStats(StringBuilder emil)
+    {
+        emil.AppendLine($"{WieldStrategie.GetDescription()} {WeaponType.GetDescription()}");
+        emil.AppendLine($"{DamageType.Name} Damage: {GetStyledValue(MinDamageFinal, MinDamageBase):N0} to {GetStyledValue(MaxDamageFinal, MaxDamageBase):N0}");
+        emil.AppendLine($"Attacks per Second: {GetStyledValue(AttacksPerSecondFinal, AttacksPerSecondBase):0.##}");
+        emil.AppendLine($"Critical Hit Chance: {GetStyledValue(CriticalHitChanceFinal, CriticalHitChanceBase):0.##}%");
+    }
+
+    private void AppendRequirements(StringBuilder emil)
+    {
+        foreach (var requirement in Requirements)
+            emil.AppendLine($"Required {requirement.Key.GetDescription()}: {requirement.Value:N0}");
+    }
+
+    private string GetStyledValue(double finalValue, double propertyToCompareValueWith)
+    {
+        finalValue                 = Math.Round(finalValue, 2);
+        propertyToCompareValueWith = Math.Round(propertyToCompareValueWith, 2);
+
+        if (finalValue < propertyToCompareValueWith)
+            return $"[color=firebrick]{finalValue}[/color]";
+
+        if (finalValue > propertyToCompareValueWith)
+            return $"[color=dodger_blue]{finalValue}[/color]";
+
+        return $"{finalValue}";
+    }
+
+    private float GetTotalMoreMultiplierOf(WeaponStat weaponStat)
+    {
+        var totalMoreMultiplier = 1f;
+
+        foreach (var modifier in GetModifierOf(ModificationType.More, weaponStat))
+            totalMoreMultiplier *= 1 + modifier.Value;
+
+        return totalMoreMultiplier;
+    }
+
+    private float GetModifierSumOf(ModificationType modificationType, WeaponStat weaponStat)
+        => GetModifierOf(modificationType, weaponStat).Sum(mod => mod.Value);
+
+    private IEnumerable<WeaponStatModifier> GetModifierOf(ModificationType modificationType, WeaponStat weaponStat)
+        => WeaponStatModifiers.Where(mod => mod.WeaponStat == weaponStat &&
+                                            mod.ModificationType == modificationType);
 
     private void SetDamagetypeByWeapon() => DamageType = WeaponType switch
     {
