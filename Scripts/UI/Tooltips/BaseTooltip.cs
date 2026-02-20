@@ -31,7 +31,7 @@ public abstract partial class BaseTooltip : PanelContainer
         if (ObjectTitleLabel is null || ObjectDescriptionLabel is null || tooltipObject is null)
             return;
 
-        ObjectTitleLabel.Text       = $"[center][u]{tooltipObject.TooltipTitle}[/u][/center]";
+        ObjectTitleLabel.Text = tooltipObject.GetTooltipTitle();
         ObjectDescriptionLabel.Text = tooltipObject.GetTooltipDescription();
     }
 

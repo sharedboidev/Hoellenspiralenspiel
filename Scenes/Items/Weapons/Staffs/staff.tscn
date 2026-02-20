@@ -5,11 +5,16 @@
 
 [node name="Staff" type="Node2D" unique_id=34298413 node_paths=PackedStringArray("Icon")]
 script = ExtResource("1_34oae")
-MinDamage = 1
-MaxDamage = 2
+MinDamage = 10
+MaxDamage = 14
 SwingCooldownSec = 3.5
 WeaponType = 4
-WieldStrategie = 3
+WieldStrategie = 4
+CriticalHitChance = 3.0
+Requirements = Dictionary[int, int]({
+2: 2,
+5: 3
+})
 Icon = NodePath("Icon")
 
 [node name="Icon" type="TextureRect" parent="." unique_id=177823713]

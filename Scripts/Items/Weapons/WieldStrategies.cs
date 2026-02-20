@@ -5,10 +5,8 @@ namespace Hoellenspiralenspiel.Scripts.Items.Weapons;
 public enum WieldStrategy
 {
     Undefined,
-    [Description("One-Hand")]
-    OneHand,
-    [Description("Off-Hand")]
-    OffHand,
-    [Description("Two-Hand")]
-    TwoHand
+    [Description("Off-Hand")]  OffHand,
+    [Description("Main-Hand")] MainHand,
+    [Description("One-Hand")]  OneHand,
+    [Description("Two-Hand")]  TwoHand
 }

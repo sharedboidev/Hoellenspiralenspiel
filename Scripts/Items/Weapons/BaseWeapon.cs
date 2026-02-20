@@ -54,6 +54,7 @@ public abstract partial class BaseWeapon : BaseItem
         base.Init();
 
         SetDamagetypeByWeapon();
+        SetExceptionalName();
     }
 
     public override string GetTooltipDescription()
@@ -66,7 +67,7 @@ public abstract partial class BaseWeapon : BaseItem
         emil.AppendLine($"Critical Hit Chance: {CriticalHitChance:N2}%");
 
         foreach (var requirement in Requirements)
-            emil.AppendLine($"Required {requirement.Key}: {requirement.Value}");
+            emil.AppendLine($"Required {requirement.Key.GetDescription()}: {requirement.Value:N0}");
 
         emil.Append("[/center]");
 

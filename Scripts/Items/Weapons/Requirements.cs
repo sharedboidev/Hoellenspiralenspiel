@@ -1,4 +1,6 @@
-﻿namespace Hoellenspiralenspiel.Scripts.Items.Weapons;
+﻿using System.ComponentModel;
+
+namespace Hoellenspiralenspiel.Scripts.Items.Weapons;
 
 public enum Requirement
 {
@@ -7,5 +9,6 @@ public enum Requirement
     Intelligence,
     Constitution,
     Awareness,
+    [Description("Level")]
     CharacterLevel
 }

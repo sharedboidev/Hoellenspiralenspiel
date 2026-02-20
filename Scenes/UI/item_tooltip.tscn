@@ -12,29 +12,30 @@ border_width_bottom = 2
 [node name="ItemTooltip" type="PanelContainer" unique_id=1060802189]
 z_index = 15
 y_sort_enabled = true
-custom_minimum_size = Vector2(250, 0)
+custom_minimum_size = Vector2(400, 0)
 offset_right = 50.0
 offset_bottom = 76.0
+size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_ri6pb")
 script = ExtResource("1_ri6pb")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=2079933430]
 layout_mode = 2
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 15
-theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = 15
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=856167468]
 layout_mode = 2
-theme_override_constants/separation = 12
 
 [node name="ObjectTitle" type="RichTextLabel" parent="MarginContainer/VBoxContainer" unique_id=1548258217]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
-theme_override_font_sizes/normal_font_size = 24
+theme_override_font_sizes/normal_font_size = 36
 bbcode_enabled = true
 text = "[center]Title[/center]"
 fit_content = true
@@ -44,6 +45,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
-theme_override_font_sizes/normal_font_size = 16
+theme_override_font_sizes/normal_font_size = 24
 bbcode_enabled = true
 fit_content = true

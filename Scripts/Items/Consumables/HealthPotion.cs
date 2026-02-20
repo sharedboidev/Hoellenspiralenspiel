@@ -11,6 +11,8 @@ public partial class HealthPotion : ConsumableItem
     [Export]
     public float TotalHealthRestoredPercentage { get; set; } = 20;
 
+    public override string ItembaseName => "Health Potion";
+
     public override string GetTooltipDescription() => $"Restores {TotalHealthRestoredPercentage:N0}% of your maximum Life.";
 
     protected override void ApplyEffectOfConsumption(BaseUnit consumee)

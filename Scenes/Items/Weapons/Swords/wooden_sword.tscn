@@ -2,15 +2,15 @@
 
 [ext_resource type="PackedScene" uid="uid://cjf203yhhwo42" path="res://Scenes/Items/Weapons/base_weapon.tscn" id="1_cgrcf"]
 [ext_resource type="Texture2D" uid="uid://iro2pd1blvre" path="res://Textures/Items/Weapons/Swords/WoodenSword.png" id="2_012t7"]
-[ext_resource type="Script" uid="uid://csgfgsv6k63dh" path="res://Scripts/Items/Weapons/Swords/WoodenSword.cs" id="2_an771"]
+[ext_resource type="Script" uid="uid://bjthpbhn5x80m" path="res://Scripts/Items/Weapons/Swords/TrainingSword.cs" id="2_an771"]
 
-[node name="WoodenSword" unique_id=839299820 node_paths=PackedStringArray("Icon") instance=ExtResource("1_cgrcf")]
+[node name="TrainingSword" unique_id=839299820 node_paths=PackedStringArray("Icon") instance=ExtResource("1_cgrcf")]
 script = ExtResource("2_an771")
-MinDamage = 5
-MaxDamage = 8
-SwingCooldownSec = 1.4
+MinDamage = 3
+MaxDamage = 7
+SwingCooldownSec = 0.7
 WeaponType = 1
-WieldStrategie = 1
+WieldStrategie = 2
 CriticalHitChance = 5.0
 Requirements = Dictionary[int, int]({
 0: 1,
@@ -22,3 +22,4 @@ Icon = NodePath("Icon")
 offset_right = 128.0
 offset_bottom = 128.0
 texture = ExtResource("2_012t7")
+metadata/_edit_use_anchors_ = true
