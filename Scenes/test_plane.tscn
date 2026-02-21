@@ -14,9 +14,19 @@
 [ext_resource type="PackedScene" uid="uid://carsjy7sm2ntw" path="res://Scenes/UI/hotkey_info.tscn" id="10_v18oo"]
 [ext_resource type="AudioStream" uid="uid://dxpktdn4a3wtf" path="res://Audio/Background/guess what.mp3" id="11_olf6n"]
 
+[sub_resource type="Environment" id="Environment_bjuw8"]
+background_mode = 3
+tonemap_mode = 3
+glow_enabled = true
+glow_intensity = 0.6
+glow_strength = 2.0
+
 [node name="Test Plane" type="Node" unique_id=807554671 node_paths=PackedStringArray("backgroundPlayer")]
 script = ExtResource("1_qf8p0")
 backgroundPlayer = NodePath("AudioStreamPlayer2D")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1774986347]
+environment = SubResource("Environment_bjuw8")
 
 [node name="Environment" type="Node2D" parent="." unique_id=1968535861]
 y_sort_enabled = true

@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://dhahe4svwhyf3"]
+
+[ext_resource type="Script" uid="uid://d26guso4scs4w" path="res://VeryCoolCircle.cs" id="1_keaii"]
+[ext_resource type="Shader" uid="uid://ceusmchheajrs" path="res://cool.tres" id="1_vq5du"]
+[ext_resource type="Texture2D" uid="uid://dha4dmsjhrjen" path="res://Textures/Cool/frame0000.png" id="2_keaii"]
+[ext_resource type="Texture2D" uid="uid://84vtqj8g7sa1" path="res://Textures/Cool/frame0001.png" id="3_gugoe"]
+[ext_resource type="Texture2D" uid="uid://8dwyjnkv4hke" path="res://Textures/Cool/frame0002.png" id="4_unyea"]
+[ext_resource type="Texture2D" uid="uid://d0axcs7px0vlo" path="res://Textures/Cool/frame0003.png" id="5_giyd2"]
+[ext_resource type="Texture2D" uid="uid://c8y0hb65hucar" path="res://Textures/Cool/frame0004.png" id="6_jxlmn"]
+[ext_resource type="Texture2D" uid="uid://b715amleecy0a" path="res://Textures/Cool/frame0005.png" id="7_kxrff"]
+[ext_resource type="Texture2D" uid="uid://cd32v6tdlgq76" path="res://Textures/Cool/frame0006.png" id="8_di1e3"]
+[ext_resource type="Texture2D" uid="uid://c4n5x3rds83ko" path="res://Textures/Cool/frame0007.png" id="9_wr3mm"]
+[ext_resource type="Texture2D" uid="uid://dcc6xpo72gkfo" path="res://Textures/Cool/frame0008.png" id="10_pc17f"]
+[ext_resource type="Texture2D" uid="uid://bbdkngtfcenvx" path="res://Textures/Cool/frame0009.png" id="11_dpicq"]
+[ext_resource type="Texture2D" uid="uid://d2ipq8ngbh4ok" path="res://Textures/Cool/frame0010.png" id="12_dyqlb"]
+[ext_resource type="Texture2D" uid="uid://bbpgxhwfymtdi" path="res://Textures/Cool/frame0011.png" id="13_hy6dp"]
+[ext_resource type="Texture2D" uid="uid://bdr3xoj45emnx" path="res://Textures/Cool/frame0012.png" id="14_sekq0"]
+[ext_resource type="Texture2D" uid="uid://bbjgn2c8502ig" path="res://Textures/Cool/frame0013.png" id="15_quoa5"]
+[ext_resource type="Texture2D" uid="uid://dc3ancrcbivwo" path="res://Textures/Cool/frame0014.png" id="16_ctt86"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_auknl"]
+shader = ExtResource("1_vq5du")
+shader_parameter/Glow_Color2 = Color(0, 0.478401, 0.891977, 1)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_8sbdn"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_keaii")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_gugoe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_unyea")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_giyd2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_jxlmn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_kxrff")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_di1e3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_wr3mm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_pc17f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_dpicq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_dyqlb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_hy6dp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_sekq0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_quoa5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_ctt86")
+}],
+"loop": false,
+"name": &"Cool",
+"speed": 60.0
+}]
+
+[node name="VeryCoolCircle" type="Node2D" unique_id=177069399]
+scale = Vector2(1.5, 0.75)
+script = ExtResource("1_keaii")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=680389538]
+material = SubResource("ShaderMaterial_auknl")
+sprite_frames = SubResource("SpriteFrames_8sbdn")
+animation = &"Cool"
+speed_scale = 0.5
