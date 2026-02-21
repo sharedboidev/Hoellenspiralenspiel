@@ -18,6 +18,9 @@
 [ext_resource type="Texture2D" uid="uid://bbjgn2c8502ig" path="res://Textures/Cool/frame0013.png" id="15_quoa5"]
 [ext_resource type="Texture2D" uid="uid://dc3ancrcbivwo" path="res://Textures/Cool/frame0014.png" id="16_ctt86"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_keaii"]
+radius = 242.77654
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_auknl"]
 shader = ExtResource("1_vq5du")
 shader_parameter/Glow_Color2 = Color(0, 0.478401, 0.891977, 1)
@@ -75,11 +78,16 @@ animations = [{
 "speed": 60.0
 }]
 
-[node name="VeryCoolCircle" type="Node2D" unique_id=177069399]
+[node name="VeryCoolCircle" type="Area2D" unique_id=1587881378]
 scale = Vector2(1.5, 0.75)
+collision_layer = 4
+collision_mask = 15
 script = ExtResource("1_keaii")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=680389538]
+[node name="Collision" type="CollisionShape2D" parent="." unique_id=1643339724]
+shape = SubResource("CircleShape2D_keaii")
+
+[node name="Animation" type="AnimatedSprite2D" parent="." unique_id=680389538]
 material = SubResource("ShaderMaterial_auknl")
 sprite_frames = SubResource("SpriteFrames_8sbdn")
 animation = &"Cool"

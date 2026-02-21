@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Abilities;
 using Hoellenspiralenspiel.Scripts.Abilities.Spells;
@@ -14,6 +15,8 @@ public partial class TestEnemy : BaseEnemy
 
 		ChasedPlayer = CurrentScene.GetNode<Player2D>("%Player 2D");
 	}
+
+	protected override Sprite2D MovementSprite => throw new NotImplementedException("Noone cares");
 
 	protected override void ExecuteAttack()
 	{

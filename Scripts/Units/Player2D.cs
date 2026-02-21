@@ -159,13 +159,15 @@ public partial class Player2D : BaseUnit
 		if (Input.IsMouseButtonPressed(MouseButton.Left))
 		{
 			veryCoolThing?.StickToCurrentPosition();
-			veryCoolThing?.BeCool();
+			veryCoolThing?.BeCool(CleanupCoolthingy);
 		}
 		if (Input.IsMouseButtonPressed(MouseButton.Right) && veryCoolThing != null)
-		{
-			veryCoolThing?.QueueFree();
-			veryCoolThing = null;
-		}
+			CleanupCoolthingy();
+	}
+	
+	private void CleanupCoolthingy(){
+		veryCoolThing?.QueueFree();
+		veryCoolThing = null;
 	}
 
 	private VeryCoolCircle      veryCoolThing = null;

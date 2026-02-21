@@ -73,7 +73,14 @@ public abstract partial class BaseEnemy : BaseUnit
                 break;
         }
     }
+    
+    protected abstract Sprite2D MovementSprite { get; }
 
+    public void SetHighlight(bool active)   
+    {
+        MovementSprite.SelfModulate = active ? new Color(3f,1f, 2.0f, 1.0f) : new Color(1, 1, 1, 1);
+    }
+    
     private void AnimationTreeOnAnimationFinished(StringName animname)
     {
         if (animname == Animation.DieLeft || animname == Animation.DieRight || animname == Animation.DieTop || animname == Animation.DieDown)

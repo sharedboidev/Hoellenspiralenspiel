@@ -13,5 +13,7 @@ public partial class YellowBlob : BaseEnemy
         ChasedPlayer = CurrentScene.GetNode<Player2D>("%Player 2D");
     }
 
+    protected override Sprite2D MovementSprite => GetNode<Sprite2D>("RunSprite");
+
     protected override void ExecuteAttack() { }
 }

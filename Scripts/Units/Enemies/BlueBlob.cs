@@ -15,6 +15,8 @@ public partial class BlueBlob : BaseEnemy
         RandomizeAnimation();
     }
 
+    protected override Sprite2D MovementSprite => GetNode<Sprite2D>("RunSprite");
+
     private void RandomizeAnimation()
     {
         AnimationTree.Active = false;
