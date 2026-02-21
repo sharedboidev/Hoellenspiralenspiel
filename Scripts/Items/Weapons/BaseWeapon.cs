@@ -77,6 +77,24 @@ public abstract partial class BaseWeapon : BaseItem
         }
     }
 
+    protected override bool IsRare
+    {
+        get
+        {
+            var prefixAmount = WeaponStatModifiers.Count(mod => mod.AffixType == AffixType.Prefix);
+
+            if (prefixAmount > 1)
+                return true;
+
+            var suffixAmount = WeaponStatModifiers.Count(mod => mod.AffixType == AffixType.Suffix);
+
+            if (suffixAmount > 1)
+                return true;
+
+            return prefixAmount + suffixAmount > 2;
+        }
+    }
+
     public bool CanBeEquipedBy(Player2D player)
     {
         var canWield = true;
@@ -98,20 +116,22 @@ public abstract partial class BaseWeapon : BaseItem
         SetDamagetypeByWeapon();
         RollModifiers();
         SetAffixedItembaseName();
-        SetUniqueName();
+        SetExceptionalName();
     }
 
     private void RollModifiers()
     {
         var normalizedAffixCount = GetNormalizedAffixAmount();
         var rng                  = new Random();
+        var nextAffixToRoll      = rng.Next(0, 2) == 0 ? AffixType.Prefix : AffixType.Suffix;
 
         for (var i = 0; i < normalizedAffixCount; i++)
         {
-            var nextAffixToRoll = rng.Next(0, 2) == 0 ? AffixType.Prefix : AffixType.Suffix;
-            var newAffix        = AffixDispenser.GetWeaponAffix(nextAffixToRoll);
+            var newAffix = AffixDispenser.GetWeaponAffix(nextAffixToRoll);
 
             WeaponStatModifiers.Add(newAffix);
+
+            nextAffixToRoll = nextAffixToRoll == AffixType.Prefix ? AffixType.Suffix : AffixType.Prefix;
         }
     }
 
@@ -129,24 +149,24 @@ public abstract partial class BaseWeapon : BaseItem
         => ItemLevel switch
         {
             >= 0 and <= 10 => 3,
-            <= 25          => 5,
-            <= 40          => 6,
-            <= 50          => 7,
-            <= 60          => 8,
-            <= 70          => 9,
-            <= 80          => 10,
-            <= 90          => 11,
-            <= 100         => 12,
-            _              => throw new ArgumentOutOfRangeException()
+            <= 25 => 5,
+            <= 40 => 6,
+            <= 50 => 7,
+            <= 60 => 8,
+            <= 70 => 9,
+            <= 80 => 10,
+            <= 90 => 11,
+            <= 100 => 12,
+            _ => throw new ArgumentOutOfRangeException()
         };
 
-    protected override void SetUniqueName() { }
+    protected override void SetExceptionalName() => ExceptionalName = NameGenerator.GenerateRare();
 
     protected override void SetAffixedItembaseName()
     {
         var prefix = WeaponStatModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Prefix);
         var suffix = WeaponStatModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Suffix);
-        
+
         var prefixName = prefix is null ? string.Empty : AffixDispenser.ItemnameMap[prefix.WeaponStat];
         var suffixName = suffix is null ? string.Empty : AffixDispenser.ItemnameMap[suffix.WeaponStat];
 
@@ -247,10 +267,10 @@ public abstract partial class BaseWeapon : BaseItem
         => DamageType = WeaponType switch
         {
             WeaponType.Sword => new SlashDamage(),
-            WeaponType.Axe   => new SlashDamage(),
+            WeaponType.Axe => new SlashDamage(),
             WeaponType.Flail => new CrushDamage(),
             WeaponType.Staff => new CrushDamage(),
-            WeaponType.Bow   => new PierceDamage(),
-            _                => null
+            WeaponType.Bow => new PierceDamage(),
+            _ => null
         };
 }

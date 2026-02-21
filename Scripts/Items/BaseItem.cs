@@ -17,6 +17,7 @@ public abstract partial class BaseItem
     protected          string AffixedItembaseName { get; set; }
     protected          string ExceptionalName     { get; set; }
     protected abstract bool   IsMagic             { get; }
+    protected abstract bool   IsRare             { get; }
 
     public virtual string GetTooltipDescription()
         => string.Empty;
@@ -26,20 +27,25 @@ public abstract partial class BaseItem
         var emil = new StringBuilder();
         emil.Append("[center]");
 
-        if (!string.IsNullOrWhiteSpace(ExceptionalName))
-            emil.AppendLine($"[u]{ExceptionalName}[/u]");
-
         if (IsMagic)
-            emil.AppendLine(AffixedItembaseName);
+            emil.AppendLine($"[color=dodger_blue]{AffixedItembaseName}[/color]");
         else
-            emil.AppendLine($"{ItembaseName}");
+        {
+            if (IsRare)
+            {
+                emil.AppendLine($"[color=yellow]{ExceptionalName}[/color]");
+                emil.AppendLine($"[color=yellow]{ItembaseName}[/color]");
+            }
+            else
+                emil.AppendLine($"{ItembaseName}");
+        }
         
         emil.Append("[/center]");
 
         return emil.ToString();
     }
 
-    protected virtual void SetUniqueName()  { }
+    protected virtual void SetExceptionalName()  { }
     protected virtual void SetAffixedItembaseName() { }
 
     public virtual void Init() { }

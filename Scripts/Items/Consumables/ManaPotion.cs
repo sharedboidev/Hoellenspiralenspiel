@@ -11,6 +11,7 @@ public partial class ManaPotion : ConsumableItem
     public override string ItembaseName => "Mana Potion";
 
     protected override bool IsMagic => false;
+    protected override bool IsRare  => false;
 
     public override string GetTooltipDescription() => $"Restores {TotalManaRestoredPercentage:N0}% of your maximum Mana.";
 

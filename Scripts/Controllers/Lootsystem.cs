@@ -1,8 +1,8 @@
 ﻿using Godot;
 using Godot.Collections;
-using Hoellenspiralenspiel.Resources;
 using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
+using LootTable = Hoellenspiralenspiel.Resources.LootTable;
 
 namespace Hoellenspiralenspiel.Scripts.Controllers;
 
