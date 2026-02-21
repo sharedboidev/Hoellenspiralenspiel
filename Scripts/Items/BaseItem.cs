@@ -30,7 +30,7 @@ public abstract partial class BaseItem
             emil.AppendLine($"[u]{ExceptionalName}[/u]");
 
         if (IsMagic)
-            emil.Append(AffixedItembaseName);
+            emil.AppendLine(AffixedItembaseName);
         else
             emil.AppendLine($"{ItembaseName}");
         
