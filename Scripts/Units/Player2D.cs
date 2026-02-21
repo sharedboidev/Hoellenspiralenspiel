@@ -18,7 +18,9 @@ public partial class Player2D : BaseUnit
 {
 	private readonly PackedScene     skillBarIcon = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
 	private readonly List<BaseSkill> skills       = new();
+	
 	// private          Node2D          Flamethrower;
+	
 	// [Export] private PackedScene     FlamethrowerScene = ResourceLoader.Load<PackedScene>("res://Scenes/Spells/nova.tscn");
 	[Export] private ResourceOrb     lifeOrb;
 	private          float           manaCurrent;
@@ -84,15 +86,20 @@ public partial class Player2D : BaseUnit
 	{
 		skills.Add(new FireballSkill(this));
 		skills.Add(new FrostNovaSkill(this));
-
+		skills.Add(new LightningStrikeSkill(this));
+		
 		var fireballActionBarItem = skillBarIcon.Instantiate<CooldownSkill>();
-		fireballActionBarItem.Init(skills.First(), "res://Scenes/Spells/fireball.tscn", Key.F);
+		fireballActionBarItem.Init(skills.ElementAt(0), "res://Scenes/Spells/fireball.tscn", Key.F);
 
 		var frostNovaActionBarItem = skillBarIcon.Instantiate<CooldownSkill>();
-		frostNovaActionBarItem.Init(skills.Last(), "res://Scenes/Spells/frost_nova.tscn", Key.E);
+		frostNovaActionBarItem.Init(skills.ElementAt(1), "res://Scenes/Spells/frost_nova.tscn", Key.E); 
+
+		var lightningStrikeActionBarItem = skillBarIcon.Instantiate<CooldownSkill>();
+		lightningStrikeActionBarItem.Init(skills.ElementAt(2), "res://very_cool_circle.tscn", Key.R);
 
 		SkillBar.AddChild(fireballActionBarItem);
 		SkillBar.AddChild(frostNovaActionBarItem);
+		SkillBar.AddChild(lightningStrikeActionBarItem);
 	}
 
 	public bool IsInAggroRangeOf(BaseEnemy enemy)
@@ -142,37 +149,31 @@ public partial class Player2D : BaseUnit
 				lifeOrb.SetRessource(LifeCurrent);
 			}
 		}
-		
-		if (veryCoolThing != null)
-			veryCoolThing.UpdateGlobalPosition(GetViewport().GetCamera2D().GetGlobalMousePosition());
-		
-		else if(Input.IsActionJustPressed("do_something_very_cool")) 
-		{
-			veryCoolThing                = coolThing.Instantiate<VeryCoolCircle>();
-			//Quick fix für "coole sache bewegt sich nach der fixierung mit der Kamera mit"
-			veryCoolThing.TopLevel       = true;
-			veryCoolThing.GlobalPosition = GetViewport().GetCamera2D().GetGlobalMousePosition();
-			
-			GetNode("SpellsContainer").AddChild(veryCoolThing);
-		}
 
-		if (Input.IsMouseButtonPressed(MouseButton.Left))
-		{
-			veryCoolThing?.StickToCurrentPosition();
-			veryCoolThing?.BeCool(CleanupCoolthingy);
-		}
-		if (Input.IsMouseButtonPressed(MouseButton.Right) && veryCoolThing != null)
-			CleanupCoolthingy();
+		// if (veryCoolThing != null)
+		// 	veryCoolThing.UpdateGlobalPosition(GetViewport().GetCamera2D().GetGlobalMousePosition());
+		//
+		// else if(Input.IsActionJustPressed("do_something_very_cool")) 
+		// {
+		// 	veryCoolThing                = coolThing.Instantiate<VeryCoolCircle>();
+		// 	//Quick fix für "coole sache bewegt sich nach der fixierung mit der Kamera mit"
+		// 	veryCoolThing.TopLevel       = true;
+		// 	veryCoolThing.GlobalPosition = GetViewport().GetCamera2D().GetGlobalMousePosition();
+		// 	
+		// 	GetNode("SpellsContainer").AddChild(veryCoolThing);
+		// }
+		//
+		// if (Input.IsMouseButtonPressed(MouseButton.Left))
+		// {
+		// 	veryCoolThing?.StickToCurrentPosition();
+		// 	veryCoolThing?.BeCool();
+		// 	veryCoolThing = null;
+		// }
 	}
-	
-	private void CleanupCoolthingy(){
-		veryCoolThing?.QueueFree();
-		veryCoolThing = null;
-	}
-
-	private VeryCoolCircle      veryCoolThing = null;
-	private PackedScene coolThing = ResourceLoader.Load<PackedScene>("res://very_cool_circle.tscn");
-	
+	//
+	// private VeryCoolCircle      veryCoolThing = null;
+	// private PackedScene coolThing = ResourceLoader.Load<PackedScene>("res://very_cool_circle.tscn");
+	//
 	public bool CanUseAbility(float manaCost)
 		=> ManaCurrent >= manaCost;
 

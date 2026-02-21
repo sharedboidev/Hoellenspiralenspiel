@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dhahe4svwhyf3"]
 
-[ext_resource type="Script" uid="uid://d26guso4scs4w" path="res://VeryCoolCircle.cs" id="1_keaii"]
+[ext_resource type="Script" uid="uid://yd05wg2cty3n" path="res://Scripts/Abilities/Spells/VeryCoolCircle.cs" id="1_keaii"]
 [ext_resource type="Shader" uid="uid://ceusmchheajrs" path="res://cool.tres" id="1_vq5du"]
 [ext_resource type="Texture2D" uid="uid://dha4dmsjhrjen" path="res://Textures/Cool/frame0000.png" id="2_keaii"]
 [ext_resource type="Texture2D" uid="uid://84vtqj8g7sa1" path="res://Textures/Cool/frame0001.png" id="3_gugoe"]
@@ -79,7 +79,9 @@ animations = [{
 }]
 
 [node name="VeryCoolCircle" type="Area2D" unique_id=1587881378]
-scale = Vector2(1.5, 0.75)
+z_index = -1
+y_sort_enabled = true
+scale = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 15
 script = ExtResource("1_keaii")
