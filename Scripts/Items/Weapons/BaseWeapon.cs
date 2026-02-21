@@ -59,6 +59,24 @@ public abstract partial class BaseWeapon : BaseItem
     public          DamageType               DamageType          { get; private set; }
     public override bool                     IsStackable         => false;
 
+    protected override bool IsMagic
+    {
+        get
+        {
+            var prefixAmount = WeaponStatModifiers.Count(mod => mod.AffixType == AffixType.Prefix);
+
+            if (prefixAmount > 1)
+                return false;
+
+            var suffixAmount = WeaponStatModifiers.Count(mod => mod.AffixType == AffixType.Suffix);
+
+            if (suffixAmount > 1)
+                return false;
+
+            return prefixAmount + suffixAmount is <= 2 and > 0;
+        }
+    }
+
     public bool CanBeEquipedBy(Player2D player)
     {
         var canWield = true;
@@ -79,7 +97,8 @@ public abstract partial class BaseWeapon : BaseItem
 
         SetDamagetypeByWeapon();
         RollModifiers();
-        SetExceptionalName();
+        SetAffixedItembaseName();
+        SetUniqueName();
     }
 
     private void RollModifiers()
@@ -121,9 +140,17 @@ public abstract partial class BaseWeapon : BaseItem
             _              => throw new ArgumentOutOfRangeException()
         };
 
-    protected override void SetExceptionalName()
+    protected override void SetUniqueName() { }
+
+    protected override void SetAffixedItembaseName()
     {
+        var prefix = WeaponStatModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Prefix);
+        var suffix = WeaponStatModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Suffix);
         
+        var prefixName = prefix is null ? string.Empty : AffixDispenser.ItemnameMap[prefix.WeaponStat];
+        var suffixName = suffix is null ? string.Empty : AffixDispenser.ItemnameMap[suffix.WeaponStat];
+
+        AffixedItembaseName = prefixName + ItembaseName + suffixName;
     }
 
     public override string GetTooltipDescription()
