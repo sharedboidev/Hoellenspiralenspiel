@@ -59,18 +59,36 @@ public abstract partial class BaseWeapon : BaseItem
     public          DamageType               DamageType          { get; private set; }
     public override bool                     IsStackable         => false;
 
+    protected override bool IsMagic
+    {
+        get
+        {
+            var prefixAmount = WeaponStatModifiers.Count(mod => mod.AffixType == AffixType.Prefix);
+
+            if (prefixAmount > 1)
+                return false;
+
+            var suffixAmount = WeaponStatModifiers.Count(mod => mod.AffixType == AffixType.Suffix);
+
+            if (suffixAmount > 1)
+                return false;
+
+            return prefixAmount + suffixAmount is <= 2 and > 0;
+        }
+    }
+
     public bool CanBeEquipedBy(Player2D player)
     {
-        var canWear = true;
+        var canWield = true;
 
         foreach (var requirement in Requirements)
         {
             var requiredAttributevalue = player.GetRequiredAttributevalue(requirement.Key);
 
-            canWear &= requirement.Value <= requiredAttributevalue;
+            canWield &= requirement.Value <= requiredAttributevalue;
         }
 
-        return canWear;
+        return canWield;
     }
 
     public override void Init()
@@ -79,7 +97,8 @@ public abstract partial class BaseWeapon : BaseItem
 
         SetDamagetypeByWeapon();
         RollModifiers();
-        SetExceptionalName();
+        SetAffixedItembaseName();
+        SetUniqueName();
     }
 
     private void RollModifiers()
@@ -106,19 +125,33 @@ public abstract partial class BaseWeapon : BaseItem
         return Math.Min(totalAffixes, maximumAffixes);
     }
 
-    private int FindAffixProbability() => ItemLevel switch
+    private int FindAffixProbability()
+        => ItemLevel switch
+        {
+            >= 0 and <= 10 => 3,
+            <= 25          => 5,
+            <= 40          => 6,
+            <= 50          => 7,
+            <= 60          => 8,
+            <= 70          => 9,
+            <= 80          => 10,
+            <= 90          => 11,
+            <= 100         => 12,
+            _              => throw new ArgumentOutOfRangeException()
+        };
+
+    protected override void SetUniqueName() { }
+
+    protected override void SetAffixedItembaseName()
     {
-        >= 0 and <= 10 => 3,
-        <= 25 => 5,
-        <= 40 => 6,
-        <= 50 => 7,
-        <= 60 => 8,
-        <= 70 => 9,
-        <= 80 => 10,
-        <= 90 => 11,
-        <= 100 => 12,
-        _ => throw new ArgumentOutOfRangeException()
-    };
+        var prefix = WeaponStatModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Prefix);
+        var suffix = WeaponStatModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Suffix);
+        
+        var prefixName = prefix is null ? string.Empty : AffixDispenser.ItemnameMap[prefix.WeaponStat];
+        var suffixName = suffix is null ? string.Empty : AffixDispenser.ItemnameMap[suffix.WeaponStat];
+
+        AffixedItembaseName = prefixName + ItembaseName + suffixName;
+    }
 
     public override string GetTooltipDescription()
     {
@@ -142,18 +175,23 @@ public abstract partial class BaseWeapon : BaseItem
             {
                 case ModificationType.Flat when affix.WeaponStat == WeaponStat.AttackSpeed:
                     emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##} to Attacks per Second[/color]");
+
                     break;
                 case ModificationType.Flat when affix.WeaponStat == WeaponStat.CriticalHitChance:
                     emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##}% to Critical Hit Chance[/color]");
+
                     break;
                 case ModificationType.Flat:
                     emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##} to {affix.WeaponStat.GetDescription()}[/color]");
+
                     break;
                 case ModificationType.Percentage:
                     emil.AppendLine($"[color=dodger_blue]{affix.Value * 100:N0}% increased {affix.WeaponStat.GetDescription()}[/color]");
+
                     break;
                 case ModificationType.More:
                     emil.AppendLine($"[color=dodger_blue]{affix.Value * 100:N0}% More {affix.WeaponStat.GetDescription()}[/color]");
+
                     break;
                 default: throw new ArgumentOutOfRangeException();
             }
@@ -174,15 +212,15 @@ public abstract partial class BaseWeapon : BaseItem
             emil.AppendLine($"Required {requirement.Key.GetDescription()}: {requirement.Value:N0}");
     }
 
-    private string GetStyledValue(double finalValue, double propertyToCompareValueWith)
+    private string GetStyledValue(double finalValue, double baseValue)
     {
-        finalValue                 = Math.Round(finalValue, 2);
-        propertyToCompareValueWith = Math.Round(propertyToCompareValueWith, 2);
+        finalValue = Math.Round(finalValue, 2);
+        baseValue  = Math.Round(baseValue, 2);
 
-        if (finalValue < propertyToCompareValueWith)
+        if (finalValue < baseValue)
             return $"[color=firebrick]{finalValue}[/color]";
 
-        if (finalValue > propertyToCompareValueWith)
+        if (finalValue > baseValue)
             return $"[color=dodger_blue]{finalValue}[/color]";
 
         return $"{finalValue}";
@@ -205,13 +243,14 @@ public abstract partial class BaseWeapon : BaseItem
         => WeaponStatModifiers.Where(mod => mod.WeaponStat == weaponStat &&
                                             mod.ModificationType == modificationType);
 
-    private void SetDamagetypeByWeapon() => DamageType = WeaponType switch
-    {
-        WeaponType.Sword => new SlashDamage(),
-        WeaponType.Axe => new SlashDamage(),
-        WeaponType.Flail => new CrushDamage(),
-        WeaponType.Staff => new CrushDamage(),
-        WeaponType.Bow => new PierceDamage(),
-        _ => null
-    };
+    private void SetDamagetypeByWeapon()
+        => DamageType = WeaponType switch
+        {
+            WeaponType.Sword => new SlashDamage(),
+            WeaponType.Axe   => new SlashDamage(),
+            WeaponType.Flail => new CrushDamage(),
+            WeaponType.Staff => new CrushDamage(),
+            WeaponType.Bow   => new PierceDamage(),
+            _                => null
+        };
 }

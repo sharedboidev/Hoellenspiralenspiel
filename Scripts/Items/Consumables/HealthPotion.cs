@@ -13,6 +13,8 @@ public partial class HealthPotion : ConsumableItem
 
     public override string ItembaseName => "Health Potion";
 
+    protected override bool IsMagic => false;
+
     public override string GetTooltipDescription() => $"Restores {TotalHealthRestoredPercentage:N0}% of your maximum Life.";
 
     protected override void ApplyEffectOfConsumption(BaseUnit consumee)

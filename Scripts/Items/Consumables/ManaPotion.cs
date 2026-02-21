@@ -10,6 +10,8 @@ public partial class ManaPotion : ConsumableItem
 
     public override string ItembaseName => "Mana Potion";
 
+    protected override bool IsMagic => false;
+
     public override string GetTooltipDescription() => $"Restores {TotalManaRestoredPercentage:N0}% of your maximum Mana.";
 
     protected override void ApplyEffectOfConsumption(BaseUnit consumee)
