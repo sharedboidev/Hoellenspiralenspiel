@@ -652,7 +652,7 @@ manaOrb = NodePath("CanvasLayer/ManaOrb")
 SkillBar = NodePath("CanvasLayer/SkillBar")
 NoManaSound = NodePath("NoManaSound")
 LifeBase = 128
-Movementspeed = 700.0
+Movementspeed = 1000.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1710998304]
 position = Vector2(0, -23)
