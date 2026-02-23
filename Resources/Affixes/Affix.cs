@@ -17,5 +17,8 @@ public abstract partial class Affix : Resource
     public Array<ItemType> AffectableItemTypes { get; set; } = new();
 
     [Export]
+    public bool AllowFractions { get; set; }
+
+    [Export]
     public Array<AffixTier> Tiers { get; set; } = new();
 }

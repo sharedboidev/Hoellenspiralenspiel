@@ -31,7 +31,8 @@ public partial class Lootsystem : Node
     [Export]
     public string AffixesPath { get; set; } = "res://Resources/Affixes";
 
-    public override void _Ready() => LoadAllTables();
+    public override void _Ready()
+        => LoadAllTables();
 
     public BaseItem[] GenerateLoot(BaseEnemy enemy)
     {
@@ -55,7 +56,7 @@ public partial class Lootsystem : Node
 
     private void RollModifier(BaseItem item)
     {
-        if(item is ConsumableItem)
+        if (item is ConsumableItem)
             return;
 
         var normalizedAffixCount = GetNormalizedAffixAmount(item);
@@ -66,7 +67,7 @@ public partial class Lootsystem : Node
             var newModifier = item switch
             {
                 BaseWeapon => RollWeaponAffix(nextAffixToRoll, item.ItemLevel),
-                _ => throw new ArgumentOutOfRangeException(nameof(item), item, null)
+                _          => throw new ArgumentOutOfRangeException(nameof(item), item, null)
             };
 
             item.AddModifier(newModifier);
@@ -80,6 +81,7 @@ public partial class Lootsystem : Node
     private AffixType RollNextAffixType()
     {
         var nextAffixToRoll = Rng.Randi() % 2 == 0 ? AffixType.Prefix : AffixType.Suffix;
+
         return nextAffixToRoll;
     }
 
@@ -125,8 +127,11 @@ public partial class Lootsystem : Node
                 if (fileName != "." && fileName != "..")
                     LoadResourcesFromDirectory(fullPath + "/", loadAction);
             }
-            else if (fileName.EndsWith(".tres") || fileName.EndsWith(".res"))
-                loadAction(fullPath);
+            else
+            {
+                if (fileName.EndsWith(".tres") || fileName.EndsWith(".res"))
+                    loadAction(fullPath);
+            }
 
             fileName = directory.GetNext();
         }
@@ -140,6 +145,7 @@ public partial class Lootsystem : Node
             throw new IOException($"Failed to open directory: {path}");
 
         var fileName = GetFileName(directory);
+
         return fileName;
     }
 
@@ -172,22 +178,14 @@ public partial class Lootsystem : Node
     {
         directory.ListDirBegin();
         var fileName = directory.GetNext();
+
         return fileName;
     }
 
     private ItemModifier RollWeaponAffix(AffixType affixType, int itemLevel)
     {
-        var filteredAffixes = affixType switch
-        {
-            AffixType.Prefix => Affixes.Where(a => a.GetType() == typeof(Prefix)).ToArray(),
-            AffixType.Suffix => Affixes.Where(a => a.GetType() == typeof(Suffix)).ToArray(),
-            _ => throw new ArgumentOutOfRangeException(nameof(affixType), affixType, null)
-        };
-
-        var possibleAffixTiers = filteredAffixes.SelectMany(affix => affix.Tiers)
-                                                .Where(tier => tier.MinItemLevelToAppearOn <= itemLevel)
-                                                .Shuffle()
-                                                .ToArray();
+        var filteredAffixes = FilterAffixesByType(affixType);
+        var possibleAffixTiers = FindPossibleAffixTiers(itemLevel, filteredAffixes);
 
         var totalWeight      = possibleAffixTiers.Sum(pat => pat.Weight) + 1;
         var luckyNumber      = GD.Randi() % totalWeight;
@@ -207,7 +205,7 @@ public partial class Lootsystem : Node
             if (kongruentAffix is null)
                 break;
 
-            var affixValue = (float)GD.RandRange(affixTier.MinValue, affixTier.MaxValue);
+            var affixValue = RollAffixValue(kongruentAffix, affixTier);
 
             finalModifier = new ItemModifier(affixType, kongruentAffix.AffectedCombatStat, kongruentAffix.ModificationType, affixValue, affixTier.ItemnameAddition);
 
@@ -217,18 +215,52 @@ public partial class Lootsystem : Node
         return finalModifier;
     }
 
+    private static AffixTier[] FindPossibleAffixTiers(int itemLevel, Affix[] filteredAffixes)
+    {
+        var possibleAffixTiers = filteredAffixes.SelectMany(affix => affix.Tiers)
+                                                .Where(tier => tier.MinItemLevelToAppearOn <= itemLevel)
+                                                .Shuffle()
+                                                .ToArray();
+
+        return possibleAffixTiers;
+    }
+
+    private Affix[] FilterAffixesByType(AffixType affixType)
+    {
+        var filteredAffixes = affixType switch
+        {
+            AffixType.Prefix => Affixes.Where(a => a.GetType() == typeof(Prefix)).ToArray(),
+            AffixType.Suffix => Affixes.Where(a => a.GetType() == typeof(Suffix)).ToArray(),
+            _                => throw new ArgumentOutOfRangeException(nameof(affixType), affixType, null)
+        };
+
+        return filteredAffixes;
+    }
+
+    private static float RollAffixValue(Affix kongruentAffix, AffixTier affixTier)
+    {
+        float affixValue;
+
+        if (kongruentAffix.AllowFractions)
+            affixValue = (float)GD.RandRange(affixTier.MinValue, affixTier.MaxValue);
+        else
+            affixValue = GD.Randi() % (affixTier.MaxValue + 1) + affixTier.MinValue;
+
+        return affixValue;
+    }
+
     private int GetAffixCountCeilingByItemlevel(BaseItem item)
         => item.ItemLevel switch
         {
             >= 0 and <= 10 => 3,
-            <= 25 => 5,
-            <= 40 => 6,
-            <= 50 => 7,
-            <= 60 => 8,
-            <= 70 => 9,
-            <= 80 => 10,
-            <= 90 => 11,
-            <= 100 => 12,
-            _ => throw new ArgumentOutOfRangeException()
+            <= 25          => 5,
+            <= 40          => 6,
+            <= 50          => 7,
+            <= 60          => 8,
+            <= 70          => 9,
+            <= 80          => 10,
+            <= 90          => 11,
+            <= 100         => 12,
+            _              => throw new ArgumentOutOfRangeException()
         };
 }
