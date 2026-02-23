@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Godot;
+using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
 
 namespace Hoellenspiralenspiel.Scripts.Items;
@@ -11,13 +12,14 @@ public abstract partial class BaseItem
     [Export]
     public TextureRect Icon { get; set; }
 
-    public             int    ItemLevel           { get; set; }
-    public abstract    bool   IsStackable         { get; }
-    public abstract    string ItembaseName        { get; }
-    protected          string AffixedItembaseName { get; set; }
-    protected          string ExceptionalName     { get; set; }
-    protected abstract bool   IsMagic             { get; }
-    protected abstract bool   IsRare             { get; }
+    public             int      ItemLevel           { get; set; }
+    public abstract    bool     IsStackable         { get; }
+    public abstract    string   ItembaseName        { get; }
+    protected          string   AffixedItembaseName { get; set; }
+    protected          string   ExceptionalName     { get; set; }
+    protected abstract bool     IsMagic             { get; }
+    protected abstract bool     IsRare              { get; }
+    protected abstract ItemType ItemType            { get; }
 
     public virtual string GetTooltipDescription()
         => string.Empty;
@@ -39,13 +41,14 @@ public abstract partial class BaseItem
             else
                 emil.AppendLine($"{ItembaseName}");
         }
-        
+
         emil.Append("[/center]");
 
         return emil.ToString();
     }
 
-    protected virtual void SetExceptionalName()  { }
+    protected virtual void SetExceptionalName() { }
+
     protected virtual void SetAffixedItembaseName() { }
 
     public virtual void Init() { }

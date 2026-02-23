@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="Prefix" format=3 uid="uid://dspc0avx8dyyv"]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_luu2i"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_vvv5g"]
+
+[sub_resource type="Resource" id="Resource_luu2i"]
+script = ExtResource("1_luu2i")
+Weight = 100
+MinValue = 1.0
+MaxValue = 5.0
+ItemnameAddition = "Rough"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_vvv5g"]
+script = ExtResource("1_luu2i")
+Tier = 2
+MinItemLevelToAppearOn = 15
+Weight = 80
+MinValue = 6.0
+MaxValue = 12.0
+ItemnameAddition = "Brutal"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_vvv5g")
+AffectedCombatStat = 8
+AffectableItemTypes = Array[int]([0])
+Tiers = Array[ExtResource("1_luu2i")]([SubResource("Resource_luu2i"), SubResource("Resource_vvv5g")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

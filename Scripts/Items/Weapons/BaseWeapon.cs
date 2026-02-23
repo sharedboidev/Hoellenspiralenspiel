@@ -55,9 +55,10 @@ public abstract partial class BaseWeapon : BaseItem
     [Export]
     public Godot.Collections.Dictionary<Requirement, int> Requirements { get; set; } = new();
 
-    public          List<WeaponStatModifier> WeaponStatModifiers { get; } = new();
-    public          DamageType               DamageType          { get; private set; }
-    public override bool                     IsStackable         => false;
+    public             List<WeaponStatModifier> WeaponStatModifiers { get; } = new();
+    public             DamageType               DamageType          { get; private set; }
+    public override    bool                     IsStackable         => false;
+    protected override ItemType                 ItemType            => ItemType.Weapon;
 
     protected override bool IsMagic
     {

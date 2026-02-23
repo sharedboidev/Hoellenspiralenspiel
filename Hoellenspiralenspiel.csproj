@@ -6,8 +6,6 @@
         <LangVersion>default</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        <Folder Include="Resources\Affixes\Prefixes\" />
-        <Folder Include="Resources\Affixes\Suffixes\" />
         <Folder Include="Resources\LootTables\" />
         <Folder Include="Scenes\Items\Weapons\Swords\" />
         <Folder Include="Scripts\Items\Weapons\Staffs\"/>

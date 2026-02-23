@@ -52,7 +52,7 @@ unique_name_in_owner = true
 y_sort_enabled = true
 
 [node name="CanvasModulate" type="CanvasModulate" parent="Environment" unique_id=2038441828]
-color = Color(0.41062272, 0.41062272, 0.41062272, 1)
+color = Color(0.39841205, 0.39841217, 0.39841193, 1)
 
 [node name="SpawnMarker" type="Node2D" parent="." unique_id=1148664553]
 
