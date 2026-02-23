@@ -7,6 +7,7 @@ using Hoellenspiralenspiel.Resources.Affixes;
 using Hoellenspiralenspiel.Resources.Affixes.Prefixes;
 using Hoellenspiralenspiel.Resources.Affixes.Suffixes;
 using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Items.Consumables;
 using Hoellenspiralenspiel.Scripts.Items.Weapons;
 using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Models.Weapons;
@@ -54,6 +55,9 @@ public partial class Lootsystem : Node
 
     private void RollModifier(BaseItem item)
     {
+        if(item is ConsumableItem)
+            return;
+
         var normalizedAffixCount = GetNormalizedAffixAmount(item);
         var nextAffixToRoll      = RollNextAffixType();
 
