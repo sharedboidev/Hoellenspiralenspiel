@@ -36,7 +36,7 @@ public static class NameGenerator
         "Tooth"
     ];
 
-    public static string GenerateRare()
+    public static string GenerateRareWeapon()
     {
         var ersterTeil  = worte1[Rng.Next(0, worte1.Length)];
         var zweiterTeil = worte2[Rng.Next(0, worte2.Length)];

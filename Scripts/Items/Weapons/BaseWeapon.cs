@@ -5,7 +5,7 @@ using System.Text;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Configuration;
-using Hoellenspiralenspiel.Scripts.Models.Weapons;
+using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Utils;
 
@@ -16,34 +16,34 @@ public abstract partial class BaseWeapon : BaseItem
     [Export]
     public int MinDamageBase { get; private set; }
 
-    private float MinDamageAddedFlat            => GetModifierSumOf(ModificationType.Flat, WeaponStat.PhysicalDamage);
-    private float MinDamagePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, WeaponStat.PhysicalDamage);
-    private float MinDamageMoreMultiplierTotal  => GetTotalMoreMultiplierOf(WeaponStat.PhysicalDamage);
+    private float MinDamageAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.PhysicalDamage);
+    private float MinDamagePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.PhysicalDamage);
+    private float MinDamageMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.PhysicalDamage);
     public  int   MinDamageFinal                => (int)((MinDamageBase + MinDamageAddedFlat) * MinDamagePercentageMultiplier * MinDamageMoreMultiplierTotal);
 
     [Export]
     public int MaxDamageBase { get; set; }
 
-    private float MaxDamageAddedFlat            => GetModifierSumOf(ModificationType.Flat, WeaponStat.PhysicalDamage);
-    private float MaxDamagePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, WeaponStat.PhysicalDamage);
-    private float MaxDamageMoreMultiplierTotal  => GetTotalMoreMultiplierOf(WeaponStat.PhysicalDamage);
+    private float MaxDamageAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.PhysicalDamage);
+    private float MaxDamagePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.PhysicalDamage);
+    private float MaxDamageMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.PhysicalDamage);
     public  int   MaxDamageFinal                => (int)((MaxDamageBase + MaxDamageAddedFlat) * MaxDamagePercentageMultiplier * MaxDamageMoreMultiplierTotal);
 
     [Export]
     public float AttacksPerSecondBase { get; set; } = 1f;
 
-    private float  AttacksPerSecondAddedFlat            => GetModifierSumOf(ModificationType.Flat, WeaponStat.AttackSpeed);
-    private float  AttacksPerSecondPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, WeaponStat.AttackSpeed);
-    private float  AttacksPerSecondMoreMultiplierTotal  => GetTotalMoreMultiplierOf(WeaponStat.AttackSpeed);
+    private float  AttacksPerSecondAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Attackspeed);
+    private float  AttacksPerSecondPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Attackspeed);
+    private float  AttacksPerSecondMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Attackspeed);
     public  double AttacksPerSecondFinal                => Math.Round((AttacksPerSecondBase + AttacksPerSecondAddedFlat) * AttacksPerSecondPercentageMultiplier * AttacksPerSecondMoreMultiplierTotal, 2);
     public  double SwingCooldownSec                     => 1 / AttacksPerSecondFinal;
 
     [Export(PropertyHint.Range, "0.0, 100.0,")]
     public float CriticalHitChanceBase { get; set; }
 
-    private float  CriticalHitChanceAddedFlat            => GetModifierSumOf(ModificationType.Flat, WeaponStat.CriticalHitChance);
-    private float  CriticalHitChancePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, WeaponStat.CriticalHitChance);
-    private float  CriticalHitChanceMoreMultiplierTotal  => GetTotalMoreMultiplierOf(WeaponStat.CriticalHitChance);
+    private float  CriticalHitChanceAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.CriticalHitChance);
+    private float  CriticalHitChancePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.CriticalHitChance);
+    private float  CriticalHitChanceMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.CriticalHitChance);
     public  double CriticalHitChanceFinal                => Math.Round((CriticalHitChanceBase + CriticalHitChanceAddedFlat) * CriticalHitChancePercentageMultiplier * CriticalHitChanceMoreMultiplierTotal, 2);
 
     [Export]
@@ -55,46 +55,9 @@ public abstract partial class BaseWeapon : BaseItem
     [Export]
     public Godot.Collections.Dictionary<Requirement, int> Requirements { get; set; } = new();
 
-    public             List<WeaponStatModifier> WeaponStatModifiers { get; } = new();
-    public             DamageType               DamageType          { get; private set; }
-    public override    bool                     IsStackable         => false;
-    protected override ItemType                 ItemType            => ItemType.Weapon;
-
-    protected override bool IsMagic
-    {
-        get
-        {
-            var prefixAmount = WeaponStatModifiers.Count(mod => mod.AffixType == AffixType.Prefix);
-
-            if (prefixAmount > 1)
-                return false;
-
-            var suffixAmount = WeaponStatModifiers.Count(mod => mod.AffixType == AffixType.Suffix);
-
-            if (suffixAmount > 1)
-                return false;
-
-            return prefixAmount + suffixAmount is <= 2 and > 0;
-        }
-    }
-
-    protected override bool IsRare
-    {
-        get
-        {
-            var prefixAmount = WeaponStatModifiers.Count(mod => mod.AffixType == AffixType.Prefix);
-
-            if (prefixAmount > 1)
-                return true;
-
-            var suffixAmount = WeaponStatModifiers.Count(mod => mod.AffixType == AffixType.Suffix);
-
-            if (suffixAmount > 1)
-                return true;
-
-            return prefixAmount + suffixAmount > 2;
-        }
-    }
+    public             DamageType DamageType  { get; private set; }
+    public override    bool       IsStackable => false;
+    protected override ItemType   ItemType    => ItemType.Weapon;
 
     public bool CanBeEquipedBy(Player2D player)
     {
@@ -115,64 +78,11 @@ public abstract partial class BaseWeapon : BaseItem
         base.Init();
 
         SetDamagetypeByWeapon();
-        RollModifiers();
         SetAffixedItembaseName();
         SetExceptionalName();
     }
 
-    private void RollModifiers()
-    {
-        var normalizedAffixCount = GetNormalizedAffixAmount();
-        var rng                  = new Random();
-        var nextAffixToRoll      = rng.Next(0, 2) == 0 ? AffixType.Prefix : AffixType.Suffix;
-
-        for (var i = 0; i < normalizedAffixCount; i++)
-        {
-            var newAffix = AffixDispenser.GetWeaponAffix(nextAffixToRoll);
-
-            WeaponStatModifiers.Add(newAffix);
-
-            nextAffixToRoll = nextAffixToRoll == AffixType.Prefix ? AffixType.Suffix : AffixType.Prefix;
-        }
-    }
-
-    private int GetNormalizedAffixAmount()
-    {
-        var possibleAffixProbabilityCeiling = FindAffixProbability();
-
-        var maximumAffixes = 8;
-        var totalAffixes   = new Random().Next(0, possibleAffixProbabilityCeiling + 1);
-
-        return Math.Min(totalAffixes, maximumAffixes);
-    }
-
-    private int FindAffixProbability()
-        => ItemLevel switch
-        {
-            >= 0 and <= 10 => 3,
-            <= 25 => 5,
-            <= 40 => 6,
-            <= 50 => 7,
-            <= 60 => 8,
-            <= 70 => 9,
-            <= 80 => 10,
-            <= 90 => 11,
-            <= 100 => 12,
-            _ => throw new ArgumentOutOfRangeException()
-        };
-
-    protected override void SetExceptionalName() => ExceptionalName = NameGenerator.GenerateRare();
-
-    protected override void SetAffixedItembaseName()
-    {
-        var prefix = WeaponStatModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Prefix);
-        var suffix = WeaponStatModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Suffix);
-
-        var prefixName = prefix is null ? string.Empty : AffixDispenser.ItemnameMap[prefix.WeaponStat];
-        var suffixName = suffix is null ? string.Empty : AffixDispenser.ItemnameMap[suffix.WeaponStat];
-
-        AffixedItembaseName = prefixName + ItembaseName + suffixName;
-    }
+    protected override void SetExceptionalName() => ExceptionalName = NameGenerator.GenerateRareWeapon();
 
     public override string GetTooltipDescription()
     {
@@ -190,28 +100,28 @@ public abstract partial class BaseWeapon : BaseItem
 
     private void AppendAffixes(StringBuilder emil)
     {
-        foreach (var affix in WeaponStatModifiers.OrderBy(a => a.AffixType))
+        foreach (var affix in ItemModifiers.OrderBy(a => a.AffixType))
         {
             switch (affix.ModificationType)
             {
-                case ModificationType.Flat when affix.WeaponStat == WeaponStat.AttackSpeed:
+                case ModificationType.Flat when affix.CombatStat == CombatStat.Attackspeed:
                     emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##} to Attacks per Second[/color]");
 
                     break;
-                case ModificationType.Flat when affix.WeaponStat == WeaponStat.CriticalHitChance:
+                case ModificationType.Flat when affix.CombatStat == CombatStat.CriticalHitChance:
                     emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##}% to Critical Hit Chance[/color]");
 
                     break;
                 case ModificationType.Flat:
-                    emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##} to {affix.WeaponStat.GetDescription()}[/color]");
+                    emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##} to {affix.CombatStat.GetDescription()}[/color]");
 
                     break;
                 case ModificationType.Percentage:
-                    emil.AppendLine($"[color=dodger_blue]{affix.Value * 100:N0}% increased {affix.WeaponStat.GetDescription()}[/color]");
+                    emil.AppendLine($"[color=dodger_blue]{affix.Value * 100:N0}% increased {affix.CombatStat.GetDescription()}[/color]");
 
                     break;
                 case ModificationType.More:
-                    emil.AppendLine($"[color=dodger_blue]{affix.Value * 100:N0}% More {affix.WeaponStat.GetDescription()}[/color]");
+                    emil.AppendLine($"[color=dodger_blue]{affix.Value * 100:N0}% More {affix.CombatStat.GetDescription()}[/color]");
 
                     break;
                 default: throw new ArgumentOutOfRangeException();
@@ -247,22 +157,22 @@ public abstract partial class BaseWeapon : BaseItem
         return $"{finalValue}";
     }
 
-    private float GetTotalMoreMultiplierOf(WeaponStat weaponStat)
+    private float GetTotalMoreMultiplierOf(CombatStat combatStat)
     {
         var totalMoreMultiplier = 1f;
 
-        foreach (var modifier in GetModifierOf(ModificationType.More, weaponStat))
+        foreach (var modifier in GetModifierOf(ModificationType.More, combatStat))
             totalMoreMultiplier *= 1 + modifier.Value;
 
         return totalMoreMultiplier;
     }
 
-    private float GetModifierSumOf(ModificationType modificationType, WeaponStat weaponStat)
-        => GetModifierOf(modificationType, weaponStat).Sum(mod => mod.Value);
+    private float GetModifierSumOf(ModificationType modificationType, CombatStat combatStat)
+        => GetModifierOf(modificationType, combatStat).Sum(mod => mod.Value);
 
-    private IEnumerable<WeaponStatModifier> GetModifierOf(ModificationType modificationType, WeaponStat weaponStat)
-        => WeaponStatModifiers.Where(mod => mod.WeaponStat == weaponStat &&
-                                            mod.ModificationType == modificationType);
+    private IEnumerable<ItemModifier> GetModifierOf(ModificationType modificationType, CombatStat combatStat)
+        => ItemModifiers.Where(mod => mod.CombatStat == combatStat &&
+                                      mod.ModificationType == modificationType);
 
     private void SetDamagetypeByWeapon()
         => DamageType = WeaponType switch

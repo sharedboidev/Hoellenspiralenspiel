@@ -1,9 +1,15 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Godot;
 using Godot.Collections;
 using Hoellenspiralenspiel.Resources.Affixes;
+using Hoellenspiralenspiel.Resources.Affixes.Prefixes;
+using Hoellenspiralenspiel.Resources.Affixes.Suffixes;
 using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Items.Weapons;
+using Hoellenspiralenspiel.Scripts.Models;
+using Hoellenspiralenspiel.Scripts.Models.Weapons;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
 using LootTable = Hoellenspiralenspiel.Resources.LootTable;
 
@@ -13,6 +19,10 @@ public partial class Lootsystem : Node
 {
     private Dictionary<string, LootTable> Tables  { get; set; } = new();
     private Array<Affix>                  Affixes { get; set; } = new();
+    public  RandomNumberGenerator         Rng     { get; set; } = new();
+
+    [Export]
+    public int MaximumAffixesPerItem { get; set; } = 8;
 
     [Export]
     public string LootTablesPath { get; set; } = "res://Resources/LootTables/";
@@ -29,14 +39,52 @@ public partial class Lootsystem : Node
 
         var loot = fittingTable.RollLoot();
 
-        RollModifierFor(loot);
+        RollModifiersFor(loot);
 
         return loot;
     }
 
-    private void RollModifierFor(BaseItem[] loot)
+    private void RollModifiersFor(BaseItem[] loot)
     {
+        Rng.Randomize();
 
+        foreach (var item in loot)
+            RollModifier(item);
+    }
+
+    private void RollModifier(BaseItem item)
+    {
+        var normalizedAffixCount = GetNormalizedAffixAmount(item);
+        var nextAffixToRoll      = RollNextAffixType();
+
+        for (var i = 0; i < normalizedAffixCount; i++)
+        {
+            var newModifier = item switch
+            {
+                BaseWeapon => RollWeaponAffix(nextAffixToRoll, item.ItemLevel),
+                _ => throw new ArgumentOutOfRangeException(nameof(item), item, null)
+            };
+
+            item.AddModifier(newModifier);
+
+            nextAffixToRoll = nextAffixToRoll == AffixType.Prefix ? AffixType.Suffix : AffixType.Prefix;
+        }
+
+        item.Init();
+    }
+
+    private AffixType RollNextAffixType()
+    {
+        var nextAffixToRoll = Rng.Randi() % 2 == 0 ? AffixType.Prefix : AffixType.Suffix;
+        return nextAffixToRoll;
+    }
+
+    private int GetNormalizedAffixAmount(BaseItem item)
+    {
+        var possibleAffixCountCeiling = GetAffixCountCeilingByItemlevel(item) + 1;
+        var totalAffixes              = (int)(Rng.Randi() % possibleAffixCountCeiling);
+
+        return Math.Min(totalAffixes, MaximumAffixesPerItem);
     }
 
     private void LoadAllTables()
@@ -62,11 +110,11 @@ public partial class Lootsystem : Node
     private void LoadResourcesFromDirectory(string path, Action<string> loadAction)
     {
         using var directory = DirAccess.Open(path);
-        var fileName = GetDirectoryFilename(path, directory);
+        var       fileName  = GetDirectoryFilename(path, directory);
 
         while (!string.IsNullOrWhiteSpace(fileName))
         {
-            var fullPath =Path.Combine(path, fileName);
+            var fullPath = Path.Combine(path, fileName);
 
             if (directory.CurrentIsDir())
             {
@@ -107,7 +155,7 @@ public partial class Lootsystem : Node
     {
         var affix = GD.Load<Affix>(fullPath);
 
-        if(affix is null)
+        if (affix is null)
             return;
 
         Affixes.Add(affix);
@@ -121,4 +169,61 @@ public partial class Lootsystem : Node
         var fileName = directory.GetNext();
         return fileName;
     }
+
+    private ItemModifier RollWeaponAffix(AffixType affixType, int itemLevel)
+    {
+        var filteredAffixes = affixType switch
+        {
+            AffixType.Prefix => Affixes.Where(a => a.GetType() == typeof(Prefix)).ToArray(),
+            AffixType.Suffix => Affixes.Where(a => a.GetType() == typeof(Suffix)).ToArray(),
+            _ => throw new ArgumentOutOfRangeException(nameof(affixType), affixType, null)
+        };
+
+        var possibleAffixTiers = filteredAffixes.SelectMany(affix => affix.Tiers)
+                                                .Where(tier => tier.MinItemLevelToAppearOn <= itemLevel)
+                                                .Shuffle()
+                                                .ToArray();
+
+        var totalWeight      = possibleAffixTiers.Sum(pat => pat.Weight) + 1;
+        var luckyNumber      = GD.Randi() % totalWeight;
+        var cumulativeWeight = 0f;
+
+        ItemModifier finalModifier = null;
+
+        foreach (var affixTier in possibleAffixTiers)
+        {
+            cumulativeWeight += affixTier.Weight;
+
+            if (cumulativeWeight < luckyNumber)
+                continue;
+
+            var kongruentAffix = filteredAffixes.FirstOrDefault(affix => affix.Tiers.Contains(affixTier));
+
+            if (kongruentAffix is null)
+                break;
+
+            var affixValue = (float)GD.RandRange(affixTier.MinValue, affixTier.MaxValue);
+
+            finalModifier = new ItemModifier(affixType, kongruentAffix.AffectedCombatStat, kongruentAffix.ModificationType, affixValue, affixTier.ItemnameAddition);
+
+            break;
+        }
+
+        return finalModifier;
+    }
+
+    private int GetAffixCountCeilingByItemlevel(BaseItem item)
+        => item.ItemLevel switch
+        {
+            >= 0 and <= 10 => 3,
+            <= 25 => 5,
+            <= 40 => 6,
+            <= 50 => 7,
+            <= 60 => 8,
+            <= 70 => 9,
+            <= 80 => 10,
+            <= 90 => 11,
+            <= 100 => 12,
+            _ => throw new ArgumentOutOfRangeException()
+        };
 }

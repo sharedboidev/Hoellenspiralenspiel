@@ -1,7 +1,11 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
+using Hoellenspiralenspiel.Scripts.Models;
+using Hoellenspiralenspiel.Scripts.Models.Weapons;
 
 namespace Hoellenspiralenspiel.Scripts.Items;
 
@@ -12,14 +16,49 @@ public abstract partial class BaseItem
     [Export]
     public TextureRect Icon { get; set; }
 
-    public             int      ItemLevel           { get; set; }
-    public abstract    bool     IsStackable         { get; }
-    public abstract    string   ItembaseName        { get; }
-    protected          string   AffixedItembaseName { get; set; }
-    protected          string   ExceptionalName     { get; set; }
-    protected abstract bool     IsMagic             { get; }
-    protected abstract bool     IsRare              { get; }
-    protected abstract ItemType ItemType            { get; }
+    public             int                ItemLevel           { get; set; }
+    public abstract    bool               IsStackable         { get; }
+    public abstract    string             ItembaseName        { get; }
+    protected          string             AffixedItembaseName { get; set; }
+    protected          string             ExceptionalName     { get; set; }
+    protected abstract ItemType           ItemType            { get; }
+    protected          List<ItemModifier> ItemModifiers       { get; } = new();
+
+    protected virtual bool IsMagic
+    {
+        get
+        {
+            var prefixAmount = ItemModifiers.Count(mod => mod.AffixType == AffixType.Prefix);
+
+            if (prefixAmount > 1)
+                return false;
+
+            var suffixAmount = ItemModifiers.Count(mod => mod.AffixType == AffixType.Suffix);
+
+            if (suffixAmount > 1)
+                return false;
+
+            return prefixAmount + suffixAmount is <= 2 and > 0;
+        }
+    }
+
+    protected virtual bool IsRare
+    {
+        get
+        {
+            var prefixAmount = ItemModifiers.Count(mod => mod.AffixType == AffixType.Prefix);
+
+            if (prefixAmount > 1)
+                return true;
+
+            var suffixAmount = ItemModifiers.Count(mod => mod.AffixType == AffixType.Suffix);
+
+            if (suffixAmount > 1)
+                return true;
+
+            return prefixAmount + suffixAmount > 2;
+        }
+    }
 
     public virtual string GetTooltipDescription()
         => string.Empty;
@@ -47,9 +86,17 @@ public abstract partial class BaseItem
         return emil.ToString();
     }
 
-    protected virtual void SetExceptionalName() { }
+    protected void SetAffixedItembaseName()
+    {
+        var prefix = ItemModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Prefix);
+        var suffix = ItemModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Suffix);
 
-    protected virtual void SetAffixedItembaseName() { }
+        AffixedItembaseName = $"{prefix?.ItemnameAddition} " + ItembaseName + $" {suffix?.ItemnameAddition}";
+    }
+
+    public void AddModifier(ItemModifier modifier) => ItemModifiers.Add(modifier);
+
+    protected virtual void SetExceptionalName() { }
 
     public virtual void Init() { }
 
