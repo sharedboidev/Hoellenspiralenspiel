@@ -164,7 +164,8 @@ public partial class Lootsystem : Node
 
         Affixes.Add(affix);
 
-        GD.Print($"Loaded Affix: {affix.ResourceName}");
+        var resourceName = affix.ResourcePath.Split('/').Last();
+        GD.Print($"Loaded Affix: {resourceName}");
     }
 
     private static string GetFileName(DirAccess directory)

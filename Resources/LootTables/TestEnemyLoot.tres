@@ -1,29 +1,25 @@
 [gd_resource type="Resource" script_class="LootTable" format=3 uid="uid://bxcn40lenvjbt"]
 
-[ext_resource type="Script" uid="uid://dovuo5xiwuhtc" path="res://Resources/LootEntry.cs" id="1_oa5wn"]
-[ext_resource type="Script" uid="uid://butusdti7dpn" path="res://Resources/LootTable.cs" id="2_7xqkj"]
+[ext_resource type="Script" uid="uid://bg22hx7k8vipe" path="res://Resources/LootEntry.cs" id="1_oa5wn"]
+[ext_resource type="Script" uid="uid://bmef8b2b0wodq" path="res://Resources/LootTable.cs" id="2_7xqkj"]
 [ext_resource type="PackedScene" uid="uid://cphtaoh2o6ddc" path="res://Scenes/Items/Consumables/health_potion.tscn" id="2_qbgce"]
 [ext_resource type="PackedScene" uid="uid://bafd40n3y6xtn" path="res://Scenes/Items/Weapons/Staffs/staff.tscn" id="3_qxger"]
 
 [sub_resource type="Resource" id="Resource_oa5wn"]
 script = ExtResource("1_oa5wn")
 ItemScene = ExtResource("2_qbgce")
-Weight = 6.0
+Weight = 7.0
 QuantityMax = 5
-metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
 
 [sub_resource type="Resource" id="Resource_7xqkj"]
 script = ExtResource("1_oa5wn")
 Type = 2
-metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
 
 [sub_resource type="Resource" id="Resource_qbgce"]
 script = ExtResource("1_oa5wn")
 ItemScene = ExtResource("3_qxger")
-metadata/_custom_type_script = "uid://dovuo5xiwuhtc"
 
 [resource]
 script = ExtResource("2_7xqkj")
 TableId = "test_loot"
 Entries = Array[ExtResource("1_oa5wn")]([SubResource("Resource_oa5wn"), SubResource("Resource_7xqkj"), SubResource("Resource_qbgce")])
-metadata/_custom_type_script = "uid://butusdti7dpn"
