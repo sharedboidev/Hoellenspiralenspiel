@@ -8,7 +8,7 @@ script = ExtResource("1_luu2i")
 Tier = 2
 Weight = 100
 MinValue = 1.0
-MaxValue = 5.0
+MaxValue = 6.0
 ItemnameAddition = "Rough"
 metadata/_custom_type_script = "uid://sdx5y8g2wvor"
 

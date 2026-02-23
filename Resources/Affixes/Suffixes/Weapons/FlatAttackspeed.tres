@@ -8,7 +8,7 @@ script = ExtResource("1_5ilmo")
 Tier = 2
 Weight = 100
 MinValue = 0.05
-MaxValue = 0.1
+MaxValue = 0.15
 ItemnameAddition = "of Expediency"
 metadata/_custom_type_script = "uid://sdx5y8g2wvor"
 
