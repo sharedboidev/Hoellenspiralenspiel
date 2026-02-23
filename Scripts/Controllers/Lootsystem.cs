@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Godot;
 using Godot.Collections;
+using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Resources.Affixes;
 using Hoellenspiralenspiel.Resources.Affixes.Prefixes;
 using Hoellenspiralenspiel.Resources.Affixes.Suffixes;
@@ -184,7 +185,7 @@ public partial class Lootsystem : Node
 
     private ItemModifier RollWeaponAffix(AffixType affixType, int itemLevel)
     {
-        var filteredAffixes = FilterAffixesByType(affixType);
+        var filteredAffixes    = FilterAffixesByType(affixType);
         var possibleAffixTiers = FindPossibleAffixTiers(itemLevel, filteredAffixes);
 
         var totalWeight      = possibleAffixTiers.Sum(pat => pat.Weight) + 1;
@@ -244,8 +245,11 @@ public partial class Lootsystem : Node
         if (kongruentAffix.AllowFractions)
             affixValue = (float)GD.RandRange(affixTier.MinValue, affixTier.MaxValue);
         else
-            affixValue = GD.Randi() % (affixTier.MaxValue + 1) + affixTier.MinValue;
+            affixValue = GD.Randi() % (affixTier.MaxValue - affixTier.MinValue + 1) + affixTier.MinValue;
 
+        if (kongruentAffix.ModificationType is ModificationType.Percentage or ModificationType.More)
+            affixValue /= 100;
+        
         return affixValue;
     }
 
