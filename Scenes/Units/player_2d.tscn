@@ -659,10 +659,13 @@ position = Vector2(0, -23)
 shape = SubResource("CapsuleShape2D_djq3p")
 
 [node name="PlayerNEW" type="Sprite2D" parent="." unique_id=1159204750]
+visible = false
 texture = ExtResource("6_2lps2")
 hframes = 160
+frame = 63
 
 [node name="ShadowCasterLight" type="PointLight2D" parent="PlayerNEW" unique_id=788829554]
+visible = false
 position = Vector2(-2, 190)
 energy = 0.48
 shadow_enabled = true
@@ -671,6 +674,7 @@ texture = ExtResource("3_e2uij")
 height = 512.0
 
 [node name="ShadowlessLight" type="PointLight2D" parent="PlayerNEW/ShadowCasterLight" unique_id=522418940]
+visible = false
 light_mask = 2
 visibility_layer = 2
 range_item_cull_mask = 2
@@ -678,7 +682,6 @@ texture = ExtResource("3_e2uij")
 height = 512.0
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1968664450]
-visible = false
 light_mask = 2
 y_sort_enabled = true
 position = Vector2(2, -213)
@@ -750,9 +753,11 @@ volume_db = -20.0
 [node name="SpellsContainer" type="Node2D" parent="." unique_id=27157321]
 
 [node name="AnimationPlayerNEW" type="AnimationPlayer" parent="." unique_id=1598130360]
+active = false
 libraries/ = SubResource("AnimationLibrary_vi2ay")
 
 [node name="AnimationTreeNEW" type="AnimationTree" parent="." unique_id=769190104]
+active = false
 tree_root = SubResource("AnimationNodeBlendSpace2D_a3thm")
 anim_player = NodePath("../AnimationPlayerNEW")
 parameters/blend_position = Vector2(-0.7797435, -0.40979016)
