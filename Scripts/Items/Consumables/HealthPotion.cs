@@ -14,6 +14,7 @@ public partial class HealthPotion : ConsumableItem
     public override string ItembaseName => "Health Potion";
 
     protected override bool IsMagic => false;
+    protected override bool IsRare  => false;
 
     public override string GetTooltipDescription() => $"Restores {TotalHealthRestoredPercentage:N0}% of your maximum Life.";
 

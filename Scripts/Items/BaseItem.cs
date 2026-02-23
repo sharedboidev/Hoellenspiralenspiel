@@ -1,6 +1,11 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Godot;
+using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
+using Hoellenspiralenspiel.Scripts.Models;
+using Hoellenspiralenspiel.Scripts.Models.Weapons;
 
 namespace Hoellenspiralenspiel.Scripts.Items;
 
@@ -11,12 +16,49 @@ public abstract partial class BaseItem
     [Export]
     public TextureRect Icon { get; set; }
 
-    public             int    ItemLevel           { get; set; }
-    public abstract    bool   IsStackable         { get; }
-    public abstract    string ItembaseName        { get; }
-    protected          string AffixedItembaseName { get; set; }
-    protected          string ExceptionalName     { get; set; }
-    protected abstract bool   IsMagic             { get; }
+    public             int                ItemLevel           { get; set; }
+    public abstract    bool               IsStackable         { get; }
+    public abstract    string             ItembaseName        { get; }
+    protected          string             AffixedItembaseName { get; set; }
+    protected          string             ExceptionalName     { get; set; }
+    protected abstract ItemType           ItemType            { get; }
+    protected          List<ItemModifier> ItemModifiers       { get; } = new();
+
+    protected virtual bool IsMagic
+    {
+        get
+        {
+            var prefixAmount = ItemModifiers.Count(mod => mod.AffixType == AffixType.Prefix);
+
+            if (prefixAmount > 1)
+                return false;
+
+            var suffixAmount = ItemModifiers.Count(mod => mod.AffixType == AffixType.Suffix);
+
+            if (suffixAmount > 1)
+                return false;
+
+            return prefixAmount + suffixAmount is <= 2 and > 0;
+        }
+    }
+
+    protected virtual bool IsRare
+    {
+        get
+        {
+            var prefixAmount = ItemModifiers.Count(mod => mod.AffixType == AffixType.Prefix);
+
+            if (prefixAmount > 1)
+                return true;
+
+            var suffixAmount = ItemModifiers.Count(mod => mod.AffixType == AffixType.Suffix);
+
+            if (suffixAmount > 1)
+                return true;
+
+            return prefixAmount + suffixAmount > 2;
+        }
+    }
 
     public virtual string GetTooltipDescription()
         => string.Empty;
@@ -26,21 +68,35 @@ public abstract partial class BaseItem
         var emil = new StringBuilder();
         emil.Append("[center]");
 
-        if (!string.IsNullOrWhiteSpace(ExceptionalName))
-            emil.AppendLine($"[u]{ExceptionalName}[/u]");
-
         if (IsMagic)
-            emil.AppendLine(AffixedItembaseName);
+            emil.AppendLine($"[color=dodger_blue]{AffixedItembaseName}[/color]");
         else
-            emil.AppendLine($"{ItembaseName}");
-        
+        {
+            if (IsRare)
+            {
+                emil.AppendLine($"[color=yellow]{ExceptionalName}[/color]");
+                emil.AppendLine($"[color=yellow]{ItembaseName}[/color]");
+            }
+            else
+                emil.AppendLine($"{ItembaseName}");
+        }
+
         emil.Append("[/center]");
 
         return emil.ToString();
     }
 
-    protected virtual void SetUniqueName()  { }
-    protected virtual void SetAffixedItembaseName() { }
+    protected void SetAffixedItembaseName()
+    {
+        var prefix = ItemModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Prefix);
+        var suffix = ItemModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Suffix);
+
+        AffixedItembaseName = $"{prefix?.ItemnameAddition} " + ItembaseName + $" {suffix?.ItemnameAddition}";
+    }
+
+    public void AddModifier(ItemModifier modifier) => ItemModifiers.Add(modifier);
+
+    protected virtual void SetExceptionalName() { }
 
     public virtual void Init() { }
 

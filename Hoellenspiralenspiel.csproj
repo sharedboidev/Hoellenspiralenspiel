@@ -6,7 +6,7 @@
         <LangVersion>default</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        <Folder Include="Resources\LootTables\"/>
+        <Folder Include="Resources\LootTables\" />
         <Folder Include="Scenes\Items\Weapons\Swords\" />
         <Folder Include="Scripts\Items\Weapons\Staffs\"/>
     </ItemGroup>
