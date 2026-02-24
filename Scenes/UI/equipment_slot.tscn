@@ -1,8 +1,14 @@
 [gd_scene format=3 uid="uid://cgggertpat65k"]
 
-[ext_resource type="StyleBox" uid="uid://d0lsfuyas70d8" path="res://Resources/Themes/boxes_stylebox.tres" id="1_j83b3"]
 [ext_resource type="Script" uid="uid://ddjp3cfijveiv" path="res://Scripts/UI/EquipmentSlot.cs" id="1_x82i5"]
 [ext_resource type="Texture2D" uid="uid://dxdttrmghay8k" path="res://icon.svg" id="3_byr6a"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x82i5"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
 
 [node name="EquipmentSlot" type="PanelContainer" unique_id=1132550517]
 custom_minimum_size = Vector2(64, 64)
@@ -23,14 +29,15 @@ theme_override_constants/margin_bottom = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer" unique_id=1393992125]
 layout_mode = 2
-theme_override_styles/panel = ExtResource("1_j83b3")
+theme_override_styles/panel = SubResource("StyleBoxFlat_x82i5")
 
-[node name="TextureRect" type="TextureRect" parent="MarginContainer/PanelContainer" unique_id=398056469]
+[node name="Icon" type="TextureRect" parent="MarginContainer/PanelContainer" unique_id=398056469]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("3_byr6a")
 expand_mode = 1
 stretch_mode = 5
 
-[connection signal="gui_input" from="MarginContainer/PanelContainer/TextureRect" to="." method="_on_texture_rect_gui_input"]
-[connection signal="mouse_entered" from="MarginContainer/PanelContainer/TextureRect" to="." method="_on_texture_rect_mouse_entered"]
-[connection signal="mouse_exited" from="MarginContainer/PanelContainer/TextureRect" to="." method="_on_texture_rect_mouse_exited"]
+[connection signal="gui_input" from="MarginContainer/PanelContainer/Icon" to="." method="_on_texture_rect_gui_input"]
+[connection signal="mouse_entered" from="MarginContainer/PanelContainer/Icon" to="." method="_on_texture_rect_mouse_entered"]
+[connection signal="mouse_exited" from="MarginContainer/PanelContainer/Icon" to="." method="_on_texture_rect_mouse_exited"]
