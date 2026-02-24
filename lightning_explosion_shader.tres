@@ -1,4 +1,4 @@
-[gd_resource type="VisualShader" format=3 uid="uid://b0earpqjvkt1c"]
+[gd_resource type="VisualShader" format=3 uid="uid://cv7wecfijy8c3"]
 
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_sfq58"]
 input_name = "texture"
