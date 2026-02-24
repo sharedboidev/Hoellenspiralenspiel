@@ -733,18 +733,18 @@ size_flags_horizontal = 4
 [node name="LifeOrb" parent="CanvasLayer" unique_id=1740844714 instance=ExtResource("3_o57mx")]
 z_index = 10
 y_sort_enabled = true
-offset_left = -1056.0
-offset_top = 573.0
-offset_right = -869.0
-offset_bottom = 760.0
+offset_left = -1181.0
+offset_top = -1287.0
+offset_right = -994.0
+offset_bottom = -1100.0
 
 [node name="ManaOrb" parent="CanvasLayer" unique_id=235976386 instance=ExtResource("3_o57mx")]
 z_index = 10
 y_sort_enabled = true
-offset_left = 854.0
-offset_top = 569.0
-offset_right = 1045.0
-offset_bottom = 760.0
+offset_left = 729.0
+offset_top = -1291.0
+offset_right = 920.0
+offset_bottom = -1100.0
 
 [node name="NoManaSound" type="AudioStreamPlayer2D" parent="." unique_id=236623057]
 stream = ExtResource("4_rl3bg")

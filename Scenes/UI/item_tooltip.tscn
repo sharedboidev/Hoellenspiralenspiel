@@ -1,13 +1,7 @@
 [gd_scene format=3 uid="uid://c7cdly8lgcdqk"]
 
 [ext_resource type="Script" uid="uid://dnr61tex5k42p" path="res://Scripts/UI/Tooltips/ItemTooltip.cs" id="1_ri6pb"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ri6pb"]
-bg_color = Color(0.13464907, 0.1346491, 0.1346491, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
+[ext_resource type="StyleBox" uid="uid://d0lsfuyas70d8" path="res://Resources/Themes/boxes_stylebox.tres" id="1_ui1il"]
 
 [node name="ItemTooltip" type="PanelContainer" unique_id=1060802189]
 z_index = 15
@@ -16,7 +10,7 @@ custom_minimum_size = Vector2(500, 0)
 offset_right = 50.0
 offset_bottom = 76.0
 size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_ri6pb")
+theme_override_styles/panel = ExtResource("1_ui1il")
 script = ExtResource("1_ri6pb")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=2079933430]

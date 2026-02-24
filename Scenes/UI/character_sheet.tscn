@@ -1,0 +1,184 @@
+[gd_scene format=3 uid="uid://82m36ij72ark"]
+
+[ext_resource type="StyleBox" uid="uid://d0lsfuyas70d8" path="res://Resources/Themes/boxes_stylebox.tres" id="1_xyk0e"]
+[ext_resource type="PackedScene" uid="uid://cgggertpat65k" path="res://Scenes/UI/equipment_slot.tscn" id="2_4dpr5"]
+
+[node name="CharacterSheet" type="PanelContainer" unique_id=1502199728]
+offset_right = 108.0
+offset_bottom = 68.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("1_xyk0e")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=872608323]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=1522187069]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="VBoxRight" type="VBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=855689080]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="MarginContainer/HBoxContainer/VBoxRight" unique_id=428074971]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+
+[node name="WeaponRight" parent="MarginContainer/HBoxContainer/VBoxRight" unique_id=1132550517 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(192, 576)
+layout_mode = 2
+SlotWidth = 2
+SlotHeight = 6
+
+[node name="VBoxCenterRight" type="VBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=1923068027]
+layout_mode = 2
+
+[node name="Spacer2" type="Control" parent="MarginContainer/HBoxContainer/VBoxCenterRight" unique_id=1841043616]
+custom_minimum_size = Vector2(0, 192)
+layout_mode = 2
+
+[node name="Trinkets" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxCenterRight" unique_id=390622439]
+visible = false
+layout_mode = 2
+alignment = 2
+
+[node name="Trinket1" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Trinkets" unique_id=1751060673 instance=ExtResource("2_4dpr5")]
+layout_mode = 2
+
+[node name="Trinket2" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Trinkets" unique_id=734258668 instance=ExtResource("2_4dpr5")]
+layout_mode = 2
+
+[node name="Shoulders" parent="MarginContainer/HBoxContainer/VBoxCenterRight" unique_id=2041580660 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(192, 192)
+layout_mode = 2
+SlotWidth = 2
+SlotHeight = 2
+
+[node name="Spacer" type="Control" parent="MarginContainer/HBoxContainer/VBoxCenterRight" unique_id=638957039]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+
+[node name="Rings" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxCenterRight" unique_id=355616087]
+layout_mode = 2
+alignment = 2
+
+[node name="Ring1" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Rings" unique_id=1436956560 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(94, 94)
+layout_mode = 2
+pxDimension = 94
+
+[node name="Ring3" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Rings" unique_id=2087633347 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(94, 94)
+layout_mode = 2
+pxDimension = 94
+
+[node name="Gloves" parent="MarginContainer/HBoxContainer/VBoxCenterRight" unique_id=1899852876 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(192, 192)
+layout_mode = 2
+SlotWidth = 2
+SlotHeight = 2
+
+[node name="VBoxCenter" type="VBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=1626991869]
+layout_mode = 2
+
+[node name="Helmet" parent="MarginContainer/HBoxContainer/VBoxCenter" unique_id=821111005 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(192, 192)
+layout_mode = 2
+SlotWidth = 2
+SlotHeight = 2
+
+[node name="Chest" parent="MarginContainer/HBoxContainer/VBoxCenter" unique_id=1315549643 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(192, 288)
+layout_mode = 2
+SlotWidth = 2
+SlotHeight = 3
+
+[node name="Belt" parent="MarginContainer/HBoxContainer/VBoxCenter" unique_id=1715704133 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(192, 48)
+layout_mode = 2
+pxDimension = 48
+SlotWidth = 4
+
+[node name="Pants" parent="MarginContainer/HBoxContainer/VBoxCenter" unique_id=349361393 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(192, 288)
+layout_mode = 2
+SlotWidth = 2
+SlotHeight = 3
+
+[node name="Boots" parent="MarginContainer/HBoxContainer/VBoxCenter" unique_id=321301331 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(192, 192)
+layout_mode = 2
+SlotWidth = 2
+SlotHeight = 2
+
+[node name="VBoxCenterLeft" type="VBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=365633460]
+layout_mode = 2
+
+[node name="Spacer2" type="Control" parent="MarginContainer/HBoxContainer/VBoxCenterLeft" unique_id=511853841]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+
+[node name="Amulett" parent="MarginContainer/HBoxContainer/VBoxCenterLeft" unique_id=2942835 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Cape" parent="MarginContainer/HBoxContainer/VBoxCenterLeft" unique_id=958908806 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(192, 192)
+layout_mode = 2
+SlotWidth = 2
+SlotHeight = 2
+
+[node name="Spacer" type="Control" parent="MarginContainer/HBoxContainer/VBoxCenterLeft" unique_id=1814468291]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+
+[node name="Rings" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxCenterLeft" unique_id=2104094970]
+layout_mode = 2
+
+[node name="Ring2" parent="MarginContainer/HBoxContainer/VBoxCenterLeft/Rings" unique_id=1164359294 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(94, 94)
+layout_mode = 2
+pxDimension = 94
+
+[node name="Ring4" parent="MarginContainer/HBoxContainer/VBoxCenterLeft/Rings" unique_id=1879463389 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(94, 94)
+layout_mode = 2
+pxDimension = 94
+
+[node name="Wrists" parent="MarginContainer/HBoxContainer/VBoxCenterLeft" unique_id=1441012198 instance=ExtResource("2_4dpr5")]
+custom_minimum_size = Vector2(192, 192)
+layout_mode = 2
+SlotWidth = 2
+SlotHeight = 2
+
+[node name="VBoxLeft" type="VBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=1618807591]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="MarginContainer/HBoxContainer/VBoxLeft" unique_id=1666287650]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+
+[node name="WeaponLeft" parent="MarginContainer/HBoxContainer/VBoxLeft" unique_id=2083229247 instance=ExtResource("2_4dpr5")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(192, 576)
+layout_mode = 2
+SlotWidth = 2
+SlotHeight = 6
