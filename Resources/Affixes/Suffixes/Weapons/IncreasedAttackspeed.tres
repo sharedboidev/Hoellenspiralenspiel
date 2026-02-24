@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="Suffix" format=3 uid="uid://dh24pn1vacpi0"]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_u0mfe"]
+[ext_resource type="Script" uid="uid://bwwyi50jc5koy" path="res://Resources/Affixes/Suffixes/Suffix.cs" id="2_lmnml"]
+
+[sub_resource type="Resource" id="Resource_u0mfe"]
+script = ExtResource("1_u0mfe")
+Tier = 2
+Weight = 100
+MinValue = 5.0
+MaxValue = 15.0
+ItemnameAddition = "of Quickness"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_lmnml"]
+script = ExtResource("1_u0mfe")
+MinItemLevelToAppearOn = 15
+Weight = 80
+MinValue = 15.0
+MaxValue = 25.0
+ItemnameAddition = "of Hase"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_lmnml")
+AffectedCombatStat = 9
+ModificationType = 1
+AffectableItemTypes = Array[int]([1])
+Tiers = Array[ExtResource("1_u0mfe")]([SubResource("Resource_u0mfe"), SubResource("Resource_lmnml")])
+metadata/_custom_type_script = "uid://bwwyi50jc5koy"
