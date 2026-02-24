@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dxdttrmghay8k" path="res://icon.svg" id="3_byr6a"]
 
 [node name="EquipmentSlot" type="PanelContainer" unique_id=1132550517]
-custom_minimum_size = Vector2(96, 96)
+custom_minimum_size = Vector2(64, 64)
 offset_left = 1.0
 offset_right = 65.0
 offset_bottom = 64.0
@@ -31,5 +31,6 @@ texture = ExtResource("3_byr6a")
 expand_mode = 1
 stretch_mode = 5
 
-[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
-[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
+[connection signal="gui_input" from="MarginContainer/PanelContainer/TextureRect" to="." method="_on_texture_rect_gui_input"]
+[connection signal="mouse_entered" from="MarginContainer/PanelContainer/TextureRect" to="." method="_on_texture_rect_mouse_entered"]
+[connection signal="mouse_exited" from="MarginContainer/PanelContainer/TextureRect" to="." method="_on_texture_rect_mouse_exited"]

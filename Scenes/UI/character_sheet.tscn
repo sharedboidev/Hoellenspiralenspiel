@@ -48,9 +48,11 @@ layout_mode = 2
 alignment = 2
 
 [node name="Trinket1" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Trinkets" unique_id=1751060673 instance=ExtResource("2_4dpr5")]
+custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 
 [node name="Trinket2" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Trinkets" unique_id=734258668 instance=ExtResource("2_4dpr5")]
+custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 
 [node name="Shoulders" parent="MarginContainer/HBoxContainer/VBoxCenterRight" unique_id=2041580660 instance=ExtResource("2_4dpr5")]
@@ -134,6 +136,7 @@ layout_mode = 2
 
 [node name="Amulett" parent="MarginContainer/HBoxContainer/VBoxCenterLeft" unique_id=2942835 instance=ExtResource("2_4dpr5")]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 0
 

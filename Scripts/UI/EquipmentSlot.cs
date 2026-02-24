@@ -31,7 +31,8 @@ public partial class EquipmentSlot : PanelContainer
         }
     }
 
-    public override void _Ready() => SetScaledSize();
+    public override void _Ready()
+        => SetScaledSize();
 
     private void SetScaledSize()
     {
@@ -42,7 +43,17 @@ public partial class EquipmentSlot : PanelContainer
         CustomMinimumSize = newSize;
     }
 
-    public void _on_mouse_exited() => GD.Print($"Mouse entered Slot {Name}");
+    public void _on_texture_rect_gui_input(InputEvent @event)
+    {
+        if (@event is not InputEventMouseButton {ButtonIndex:MouseButton.Left, Pressed:true} mouseEvent)
+            return;
 
-    public void _on_mouse_entered() => GD.Print($"Mouse exited Slot {Name}");
+        GD.Print($"Clicked Slot {Name}");
+    }
+
+    public void _on_texture_rect_mouse_exited()
+        => GD.Print($"Mouse exited Slot {Name}");
+
+    public void _on_texture_rect_mouse_entered()
+        => GD.Print($"Mouse entered Slot {Name}");
 }
