@@ -16,6 +16,9 @@ public partial class Inventory : PanelContainer
     private MouseObject   MouseObject => GetNode<MouseObject>(nameof(MouseObject));
 
     [Export]
+    public PackedScene SlotScene { get; set; }
+
+    [Export]
     public int AmountSlots { get; set; } = 30;
 
     public GridContainer ItemGrid
@@ -63,11 +66,9 @@ public partial class Inventory : PanelContainer
         if (slotsGenerated)
             return;
 
-        var slotScene = ResourceLoader.Load<PackedScene>("res://Scenes/UI/inventory_slot.tscn");
-
         for (var i = 0; i < AmountSlots; i++)
         {
-            var inventorySlot = slotScene.Instantiate<InventorySlot>();
+            var inventorySlot = SlotScene.Instantiate<InventorySlot>();
 
             inventorySlot.Inventory       =  this;
             inventorySlot.SlotEmptied     += InventorySlotOnSlotEmptied;
