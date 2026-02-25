@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://dpai8eumf00w0" path="res://Scenes/UI/spawn_marker.tscn" id="6_7imrf"]
 [ext_resource type="PackedScene" uid="uid://b8q3plajba8gb" path="res://Scenes/UI/character_sheet.tscn" id="9_2sot3"]
 [ext_resource type="Script" uid="uid://v5paruy0b76n" path="res://Scripts/UI/OverlayMapViewport.cs" id="9_db61r"]
+[ext_resource type="PackedScene" uid="uid://bapl2sjbv6xe6" path="res://Scenes/UI/resource_orb.tscn" id="9_vle2j"]
 [ext_resource type="PackedScene" uid="uid://carsjy7sm2ntw" path="res://Scenes/UI/hotkey_info.tscn" id="10_v18oo"]
 [ext_resource type="AudioStream" uid="uid://dxpktdn4a3wtf" path="res://Audio/Background/guess what.mp3" id="11_olf6n"]
 [ext_resource type="PackedScene" path="res://Scenes/Spells/lightning_strike.tscn" id="14_2sot3"]
@@ -53,10 +54,13 @@ y_sort_enabled = true
 tile_map_data = PackedByteArray("AAAHAAEAJgADAAAAAAAHAAIAJgACAAEAAAAJAP3/JgADAAIAAAAGAAwAJgADAAEAAAAEAAgAJgABAAIAAAA=")
 tile_set = ExtResource("1_vglo3")
 
-[node name="Player 2D" parent="Environment" unique_id=809220738 instance=ExtResource("3_35xgq")]
+[node name="Player 2D" parent="Environment" unique_id=809220738 node_paths=PackedStringArray("lifeOrb", "manaOrb", "SkillBar") instance=ExtResource("3_35xgq")]
 unique_name_in_owner = true
 y_sort_enabled = false
 position = Vector2(741, 887)
+lifeOrb = NodePath("../../CanvasLayer/LifeOrb")
+manaOrb = NodePath("../../CanvasLayer/ManaOrb")
+SkillBar = NodePath("../../CanvasLayer/SkillBar")
 
 [node name="Enemies" type="Node2D" parent="Environment" unique_id=845394208]
 unique_name_in_owner = true
@@ -109,16 +113,37 @@ MinDistanceToPlayer = 300.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1293480226]
 
-[node name="CharacterSheet" parent="CanvasLayer" unique_id=325839181 instance=ExtResource("9_2sot3")]
-visible = false
-
 [node name="ItemTooltip" parent="CanvasLayer" unique_id=832974172 instance=ExtResource("1_bidin")]
 unique_name_in_owner = true
 visible = false
 offset_left = 1000.0
 offset_top = 1000.0
-offset_right = 1150.0
+offset_right = 1500.0
+offset_bottom = 1268.0
+
+[node name="SkillBar" type="HBoxContainer" parent="CanvasLayer" unique_id=2086531179]
+offset_left = 959.0
+offset_top = 1025.0
+offset_right = 959.0
 offset_bottom = 1080.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 4
+
+[node name="LifeOrb" parent="CanvasLayer" unique_id=1740844714 instance=ExtResource("9_vle2j")]
+offset_left = -1181.0
+offset_top = -1287.0
+offset_right = -994.0
+offset_bottom = -1100.0
+
+[node name="ManaOrb" parent="CanvasLayer" unique_id=793234548 instance=ExtResource("9_vle2j")]
+offset_left = 729.0
+offset_top = -1291.0
+offset_right = 920.0
+offset_bottom = -1100.0
+
+[node name="CharacterSheet" parent="CanvasLayer" unique_id=325839181 instance=ExtResource("9_2sot3")]
+visible = false
 
 [node name="OverlayMapContainer" type="SubViewportContainer" parent="CanvasLayer" unique_id=909995035]
 visible = false
