@@ -14,7 +14,7 @@
 [ext_resource type="PackedScene" uid="uid://bapl2sjbv6xe6" path="res://Scenes/UI/resource_orb.tscn" id="9_vle2j"]
 [ext_resource type="PackedScene" uid="uid://carsjy7sm2ntw" path="res://Scenes/UI/hotkey_info.tscn" id="10_v18oo"]
 [ext_resource type="AudioStream" uid="uid://dxpktdn4a3wtf" path="res://Audio/Background/guess what.mp3" id="11_olf6n"]
-[ext_resource type="PackedScene" path="res://Scenes/Spells/lightning_strike.tscn" id="14_2sot3"]
+[ext_resource type="PackedScene" uid="uid://ce03tbl6it2fh" path="res://Scenes/Spells/lightning_strike.tscn" id="14_2sot3"]
 
 [sub_resource type="Environment" id="Environment_bjuw8"]
 background_mode = 3

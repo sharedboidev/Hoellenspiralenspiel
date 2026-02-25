@@ -4,7 +4,6 @@
 [ext_resource type="Texture2D" uid="uid://din6ixbiigxo" path="res://Resources/SpriteFrames/playerSheet.tres" id="2_rl3bg"]
 [ext_resource type="Texture2D" uid="uid://cy75cqqe2xi1w" path="res://Textures/UI/light_radius.tres" id="3_e2uij"]
 [ext_resource type="AudioStream" uid="uid://sri6stb07ual" path="res://Audio/no mana.mp3" id="4_rl3bg"]
-[ext_resource type="Texture2D" uid="uid://bnfltqu61p1g0" path="res://Textures/Units/Player/PlayerNEW.png" id="6_2lps2"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_djq3p"]
 radius = 15.0
@@ -656,7 +655,6 @@ shape = SubResource("CapsuleShape2D_djq3p")
 
 [node name="PlayerNEW" type="Sprite2D" parent="." unique_id=1159204750]
 visible = false
-texture = ExtResource("6_2lps2")
 hframes = 160
 frame = 63
 
