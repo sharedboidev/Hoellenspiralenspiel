@@ -10,6 +10,7 @@ namespace Hoellenspiralenspiel.Scripts.UI.Character;
 public partial class EquipmentPanel : PanelContainer
 {
     private Dictionary<ItemType, EquipmentSlot> slotMap = new();
+
     public override void _Ready()
     {
         var alleMeineKinder = this.GetAllChildren<EquipmentSlot>();
@@ -20,7 +21,7 @@ public partial class EquipmentPanel : PanelContainer
     {
         var fittingSlot          = slotMap[itemToEquip.ItemType];
         var formerlyEquippedItem = fittingSlot.RetrieveItem();
-        
+
         fittingSlot.EquipItem(itemToEquip);
 
         return formerlyEquippedItem;

@@ -26,9 +26,10 @@ public partial class CharacterSheet : Control
         if (!item.CanBeEquipedBy(player))
             return;
 
-        var retrievedItem = fromslot.RetrieveItem();
-        
-        equipmentPanel.EquipIntoFittingSlot(retrievedItem);
+        var retrievedItem        = fromslot.RetrieveItem();
+        var formerlyEquippedItem = equipmentPanel.EquipIntoFittingSlot(retrievedItem);
+
+        fromslot.SetItem(formerlyEquippedItem);
     }
 
     private void SetPositionRelativeToViewport()
