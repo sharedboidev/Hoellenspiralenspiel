@@ -6,7 +6,7 @@ namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 public partial class CharacterSheet : Control
 {
-    [Export] private PanelContainer equipmentPanel;
+    [Export] private EquipmentPanel equipmentPanel;
     [Export] private Player2D       player;
     [Export] private int            viewportMarginHeightPx;
     [Export] private int            viewportMarginWidthPx;
@@ -27,6 +27,8 @@ public partial class CharacterSheet : Control
             return;
 
         var retrievedItem = fromslot.RetrieveItem();
+        
+        equipmentPanel.EquipIntoFittingSlot(retrievedItem);
     }
 
     private void SetPositionRelativeToViewport()

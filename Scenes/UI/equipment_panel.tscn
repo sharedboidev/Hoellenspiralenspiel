@@ -44,7 +44,7 @@ layout_mode = 2
 
 [node name="WeaponRight" parent="MarginContainer/HBoxContainer/VBoxRight" unique_id=1132550517 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 480)
+custom_minimum_size = Vector2(128, 384)
 layout_mode = 2
 FittingItemType = 1
 DefaultTexture = ExtResource("4_2vdxq")
@@ -58,24 +58,9 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
 
-[node name="Trinkets" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxCenterRight" unique_id=390622439]
-visible = false
-layout_mode = 2
-alignment = 2
-
-[node name="Trinket1" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Trinkets" unique_id=1751060673 instance=ExtResource("2_w80wf")]
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 2
-script = null
-
-[node name="Trinket2" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Trinkets" unique_id=734258668 instance=ExtResource("2_w80wf")]
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 2
-script = null
-
 [node name="Shoulders" parent="MarginContainer/HBoxContainer/VBoxCenterRight" unique_id=2041580660 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 160)
+custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
 FittingItemType = 2
 DefaultTexture = ExtResource("5_e4sdn")
@@ -93,7 +78,6 @@ alignment = 2
 
 [node name="Ring1" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Rings" unique_id=1436956560 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 pxDimension = 78
 FittingItemType = 8
@@ -101,17 +85,16 @@ DefaultTexture = ExtResource("6_rdsna")
 
 [node name="Ring3" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Rings" unique_id=2087633347 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 pxDimension = 78
-FittingItemType = 8
+FittingItemType = 10
 DefaultTexture = ExtResource("6_rdsna")
 
 [node name="Gloves" parent="MarginContainer/HBoxContainer/VBoxCenterRight" unique_id=1899852876 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 160)
+custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
-FittingItemType = 9
+FittingItemType = 12
 DefaultTexture = ExtResource("7_xpouk")
 SlotWidth = 2
 SlotHeight = 2
@@ -121,7 +104,7 @@ layout_mode = 2
 
 [node name="Helmet" parent="MarginContainer/HBoxContainer/VBoxCenter" unique_id=821111005 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 160)
+custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
 FittingItemType = 4
 DefaultTexture = ExtResource("8_g86ie")
@@ -130,16 +113,16 @@ SlotHeight = 2
 
 [node name="Chest" parent="MarginContainer/HBoxContainer/VBoxCenter" unique_id=1315549643 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 240)
+custom_minimum_size = Vector2(128, 192)
 layout_mode = 2
-FittingItemType = 12
+FittingItemType = 15
 DefaultTexture = ExtResource("9_711yl")
 SlotWidth = 2
 SlotHeight = 3
 
 [node name="Belt" parent="MarginContainer/HBoxContainer/VBoxCenter" unique_id=1715704133 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 40)
+custom_minimum_size = Vector2(256, 64)
 layout_mode = 2
 pxDimension = 40
 FittingItemType = 7
@@ -148,18 +131,18 @@ SlotWidth = 4
 
 [node name="Pants" parent="MarginContainer/HBoxContainer/VBoxCenter" unique_id=349361393 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 240)
+custom_minimum_size = Vector2(128, 192)
 layout_mode = 2
-FittingItemType = 13
+FittingItemType = 16
 DefaultTexture = ExtResource("10_td2u5")
 SlotWidth = 2
 SlotHeight = 3
 
 [node name="Boots" parent="MarginContainer/HBoxContainer/VBoxCenter" unique_id=321301331 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 160)
+custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
-FittingItemType = 10
+FittingItemType = 13
 DefaultTexture = ExtResource("11_y15lq")
 SlotWidth = 2
 SlotHeight = 2
@@ -173,7 +156,6 @@ layout_mode = 2
 
 [node name="Amulett" parent="MarginContainer/HBoxContainer/VBoxCenterLeft" unique_id=2942835 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(79, 79)
 layout_mode = 2
 size_flags_horizontal = 0
 pxDimension = 79
@@ -182,8 +164,9 @@ DefaultTexture = ExtResource("12_w80wf")
 
 [node name="Cape" parent="MarginContainer/HBoxContainer/VBoxCenterLeft" unique_id=958908806 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 160)
+custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
+FittingItemType = 5
 DefaultTexture = ExtResource("13_fmq6w")
 SlotWidth = 2
 SlotHeight = 2
@@ -198,23 +181,22 @@ theme_override_constants/separation = 2
 
 [node name="Ring2" parent="MarginContainer/HBoxContainer/VBoxCenterLeft/Rings" unique_id=1164359294 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(79, 79)
 layout_mode = 2
 pxDimension = 79
-FittingItemType = 8
+FittingItemType = 9
 DefaultTexture = ExtResource("6_rdsna")
 
 [node name="Ring4" parent="MarginContainer/HBoxContainer/VBoxCenterLeft/Rings" unique_id=1879463389 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(79, 79)
 layout_mode = 2
 pxDimension = 79
-FittingItemType = 8
+FittingItemType = 11
 DefaultTexture = ExtResource("6_rdsna")
 
 [node name="Wrists" parent="MarginContainer/HBoxContainer/VBoxCenterLeft" unique_id=1441012198 instance=ExtResource("2_w80wf")]
-custom_minimum_size = Vector2(160, 160)
+custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
+FittingItemType = 14
 DefaultTexture = ExtResource("14_y15lq")
 SlotWidth = 2
 SlotHeight = 2
@@ -228,7 +210,7 @@ layout_mode = 2
 
 [node name="WeaponLeft" parent="MarginContainer/HBoxContainer/VBoxLeft" unique_id=2083229247 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 480)
+custom_minimum_size = Vector2(128, 384)
 layout_mode = 2
 FittingItemType = 6
 DefaultTexture = ExtResource("15_w80wf")

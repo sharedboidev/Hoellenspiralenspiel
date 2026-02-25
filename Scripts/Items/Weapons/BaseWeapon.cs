@@ -51,9 +51,9 @@ public abstract partial class BaseWeapon : BaseItem
     [Export]
     public WieldStrategy WieldStrategie { get; set; }
 
-    public             DamageType DamageType  { get; private set; }
-    public override    bool       IsStackable => false;
-    protected override ItemType   ItemType    => ItemType.Weapon;
+    public          DamageType DamageType  { get; private set; }
+    public override bool       IsStackable => false;
+    public override ItemType   ItemType    => ItemType.Weapon;
 
     public override void Init()
     {

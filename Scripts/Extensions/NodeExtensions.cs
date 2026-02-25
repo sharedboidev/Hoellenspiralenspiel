@@ -13,12 +13,23 @@ public static class NodeExtensions
                              .Where(mc => mc is T)
                              .Cast<T>()
                              .ToList();
-
+        
         var retVal = new List<T>();
 
         foreach (var child in myChildren)
         {
             var grandChildren = child.GetAllChildren<T>().ToList();
+
+            retVal.AddRange(grandChildren);
+        }
+
+        var myOtherChildren = node.GetChildren()
+                                  .Except(myChildren)
+                                  .ToList();
+
+        foreach (var otherChild in myOtherChildren)
+        {
+            var grandChildren = otherChild.GetAllChildren<T>().ToList();
 
             retVal.AddRange(grandChildren);
         }

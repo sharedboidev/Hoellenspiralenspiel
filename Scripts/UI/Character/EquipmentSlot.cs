@@ -1,5 +1,6 @@
 using Godot;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Items;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
@@ -7,6 +8,7 @@ namespace Hoellenspiralenspiel.Scripts.UI.Character;
 public partial class EquipmentSlot : PanelContainer
 {
     private          Texture2D defaultTexture;
+    private          BaseItem  equipedItem;
     [Export] private int       pxDimension = 64;
     private          int       slotHeight  = 1;
     private          int       slotWidth   = 1;
@@ -21,7 +23,7 @@ public partial class EquipmentSlot : PanelContainer
         set
         {
             defaultTexture = value;
-            SetSlotTexture();
+            SetDefaultTexture();
         }
     }
 
@@ -59,7 +61,24 @@ public partial class EquipmentSlot : PanelContainer
         CustomMinimumSize = newSize;
     }
 
-    private void SetSlotTexture()
+    public BaseItem RetrieveItem()
+    {
+        var itemToRetrieve = equipedItem;
+        equipedItem = null;
+        
+        SetDefaultTexture();
+
+        return itemToRetrieve;
+    }
+
+    public void EquipItem(BaseItem item)
+    {
+        equipedItem = item;
+        var textureNode = GetNode<TextureRect>("%Icon");
+        textureNode.Texture = equipedItem.Icon.Texture;
+    }
+
+    private void SetDefaultTexture()
     {
         var textureNode = GetNode<TextureRect>("%Icon");
         var texture     = DefaultTexture ?? GD.Load<Texture2D>("res://icon.svg");

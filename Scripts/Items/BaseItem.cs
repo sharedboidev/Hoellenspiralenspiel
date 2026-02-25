@@ -18,13 +18,13 @@ public abstract partial class BaseItem
     [Export]
     public TextureRect Icon { get; set; }
 
-    public             int                ItemLevel           { get; set; }
-    public abstract    bool               IsStackable         { get; }
-    public abstract    string             ItembaseName        { get; }
-    protected          string             AffixedItembaseName { get; set; }
-    protected          string             ExceptionalName     { get; set; }
-    protected abstract ItemType           ItemType            { get; }
-    protected          List<ItemModifier> ItemModifiers       { get; } = new();
+    public          int                ItemLevel           { get; set; }
+    public abstract bool               IsStackable         { get; }
+    public abstract string             ItembaseName        { get; }
+    protected       string             AffixedItembaseName { get; set; }
+    protected       string             ExceptionalName     { get; set; }
+    public abstract ItemType           ItemType            { get; }
+    protected       List<ItemModifier> ItemModifiers       { get; } = new();
 
     [Export]
     public Godot.Collections.Dictionary<Requirement, int> Requirements { get; set; } = new();
@@ -95,7 +95,7 @@ public abstract partial class BaseItem
     {
         if (player is null)
             return false;
-        
+
         var canWield = true;
 
         foreach (var requirement in Requirements)

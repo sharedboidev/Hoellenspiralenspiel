@@ -142,8 +142,9 @@ offset_top = -1291.0
 offset_right = 920.0
 offset_bottom = -1100.0
 
-[node name="CharacterSheet" parent="CanvasLayer" unique_id=325839181 instance=ExtResource("9_2sot3")]
+[node name="CharacterSheet" parent="CanvasLayer" unique_id=325839181 node_paths=PackedStringArray("player") instance=ExtResource("9_2sot3")]
 visible = false
+player = NodePath("../../Environment/Player 2D")
 
 [node name="OverlayMapContainer" type="SubViewportContainer" parent="CanvasLayer" unique_id=909995035]
 visible = false
