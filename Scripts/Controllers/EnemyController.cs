@@ -30,7 +30,7 @@ public partial class EnemyController : Node
 	public Lootsystem Lootsystem { get; set; }
 
 	[Export]
-	public Inventory Inventory { get; set; }
+	public CharacterSheet CharacterSheet { get; set; }
 
 	private PackedScene LootbagScene { get; set; }
 
@@ -143,7 +143,8 @@ public partial class EnemyController : Node
 	{
 		GD.Print($"{lootedItem?.Name ?? "Nothing"} looted.");
 
-		Inventory.SetItem(lootedItem);
+		var inventory = CharacterSheet.GetNode<Inventory>("%"+nameof(Inventory));
+		inventory.SetItem(lootedItem);
 
 		sender?.QueueFree();
 	}

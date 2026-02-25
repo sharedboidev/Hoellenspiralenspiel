@@ -18,7 +18,7 @@ offset_bottom = 64.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 script = ExtResource("1_x82i5")
-pxDimension = 96
+pxDimension = 80
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1543300706]
 layout_mode = 2

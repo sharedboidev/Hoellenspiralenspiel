@@ -6,10 +6,10 @@
 [ext_resource type="TileSet" uid="uid://bjrvhfwxc86rt" path="res://Resources/Desert.tres" id="1_vglo3"]
 [ext_resource type="PackedScene" uid="uid://c8hx5eg0q1vct" path="res://Scenes/Units/player_2d.tscn" id="3_35xgq"]
 [ext_resource type="PackedScene" uid="uid://cnxyy07a3er8q" path="res://Scenes/Units/Enemies/blue_blob.tscn" id="4_db61r"]
-[ext_resource type="PackedScene" uid="uid://6yhxh7p0ijv4" path="res://Scenes/UI/inventory.tscn" id="5_h4q4d"]
 [ext_resource type="PackedScene" uid="uid://bg8s6qmxf15f8" path="res://Scripts/Controllers/enemy_controller.tscn" id="5_vglo3"]
 [ext_resource type="PackedScene" uid="uid://v011gi31s48p" path="res://Scenes/Units/Enemies/yellow_blob.tscn" id="6_2sot3"]
 [ext_resource type="PackedScene" uid="uid://dpai8eumf00w0" path="res://Scenes/UI/spawn_marker.tscn" id="6_7imrf"]
+[ext_resource type="PackedScene" uid="uid://b8q3plajba8gb" path="res://Scenes/UI/character_sheet.tscn" id="9_2sot3"]
 [ext_resource type="Script" uid="uid://v5paruy0b76n" path="res://Scripts/UI/OverlayMapViewport.cs" id="9_db61r"]
 [ext_resource type="PackedScene" uid="uid://carsjy7sm2ntw" path="res://Scenes/UI/hotkey_info.tscn" id="10_v18oo"]
 [ext_resource type="AudioStream" uid="uid://dxpktdn4a3wtf" path="res://Audio/Background/guess what.mp3" id="11_olf6n"]
@@ -99,22 +99,18 @@ AmountToSpawn = 15
 [node name="Lootsystem" parent="." unique_id=1477031551 instance=ExtResource("1_h4q4d")]
 unique_name_in_owner = true
 
-[node name="EnemyController" parent="." unique_id=722604080 node_paths=PackedStringArray("Lootsystem", "Inventory") instance=ExtResource("5_vglo3")]
+[node name="EnemyController" parent="." unique_id=722604080 node_paths=PackedStringArray("Lootsystem", "CharacterSheet") instance=ExtResource("5_vglo3")]
 unique_name_in_owner = true
 EnemiesToSpawn = Array[PackedScene]([ExtResource("4_db61r")])
 Lootsystem = NodePath("../Lootsystem")
-Inventory = NodePath("../CanvasLayer/Inventory")
+CharacterSheet = NodePath("../CanvasLayer/CharacterSheet")
 SpawnIntervallSec = 0.5
 MinDistanceToPlayer = 300.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1293480226]
 
-[node name="Inventory" parent="CanvasLayer" unique_id=567735017 instance=ExtResource("5_h4q4d")]
-offset_left = 1034.0
-offset_top = 565.0
-offset_right = 1074.0
-offset_bottom = 605.0
-AmountSlots = 60
+[node name="CharacterSheet" parent="CanvasLayer" unique_id=325839181 instance=ExtResource("9_2sot3")]
+visible = false
 
 [node name="ItemTooltip" parent="CanvasLayer" unique_id=832974172 instance=ExtResource("1_bidin")]
 unique_name_in_owner = true
