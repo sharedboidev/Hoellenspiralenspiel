@@ -42,12 +42,25 @@ public partial class Inventory : PanelContainer
 
     public override void _Input(InputEvent @event)
     {
-        if (@event is not InputEventMouseButton { ButtonIndex: MouseButton.Left } mouseEvent)
+        if (@event is not InputEventMouseButton mouseEvent)
             return;
 
-        var clickedOutside = CheckClickedOutsideInventory(mouseEvent);
+        switch (mouseEvent.ButtonIndex)
+        {
+            case MouseButton.Left:
+                TryDropItem(mouseEvent);
+                break;
+            case MouseButton.Right:
+                TryEquipItem();
+                break;
+        }
+    }
 
-        if (clickedOutside)
+    private void TryEquipItem() { }
+
+    private void TryDropItem(InputEventMouseButton mouseEvent)
+    {
+        if (CheckClickedOutsideInventory(mouseEvent))
             MouseObject.DropItem();
     }
 
