@@ -2,7 +2,7 @@ using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Units;
 
-namespace Hoellenspiralenspiel.Scripts.UI;
+namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 public enum ResourceType
 {

@@ -4,8 +4,10 @@ using System.Text;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
+using Hoellenspiralenspiel.Scripts.Items.Weapons;
 using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Models.Weapons;
+using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.Items;
 
@@ -23,6 +25,9 @@ public abstract partial class BaseItem
     protected          string             ExceptionalName     { get; set; }
     protected abstract ItemType           ItemType            { get; }
     protected          List<ItemModifier> ItemModifiers       { get; } = new();
+
+    [Export]
+    public Godot.Collections.Dictionary<Requirement, int> Requirements { get; set; } = new();
 
     protected virtual bool IsMagic
     {
@@ -86,6 +91,23 @@ public abstract partial class BaseItem
         return emil.ToString();
     }
 
+    public bool CanBeEquipedBy(Player2D player)
+    {
+        if (player is null)
+            return false;
+        
+        var canWield = true;
+
+        foreach (var requirement in Requirements)
+        {
+            var requiredAttributevalue = player.GetRequiredAttributevalue(requirement.Key);
+
+            canWield &= requirement.Value <= requiredAttributevalue;
+        }
+
+        return canWield;
+    }
+
     protected void SetAffixedItembaseName()
     {
         var prefix = ItemModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Prefix);
@@ -94,7 +116,8 @@ public abstract partial class BaseItem
         AffixedItembaseName = $"{prefix?.ItemnameAddition} " + ItembaseName + $" {suffix?.ItemnameAddition}";
     }
 
-    public void AddModifier(ItemModifier modifier) => ItemModifiers.Add(modifier);
+    public void AddModifier(ItemModifier modifier)
+        => ItemModifiers.Add(modifier);
 
     protected virtual void SetExceptionalName() { }
 

@@ -6,10 +6,12 @@ using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Items.Consumables;
 using Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
-namespace Hoellenspiralenspiel.Scripts.UI;
+namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 public partial class Inventory : PanelContainer
 {
+    public delegate void EquippingItemEventHandler(InventorySlot fromSlot);
+
     private GridContainer itemGrid;
     private bool          slotsGenerated;
     private BaseTooltip   Tooltip     => GetTree().CurrentScene.GetNode<ItemTooltip>("%" + nameof(ItemTooltip));
@@ -31,7 +33,10 @@ public partial class Inventory : PanelContainer
         }
     }
 
-    public override void _Ready() => BuildInventory();
+    public event EquippingItemEventHandler EquippingItem;
+
+    public override void _Ready()
+        => BuildInventory();
 
     public void SetItem(BaseItem item)
     {
@@ -49,14 +54,11 @@ public partial class Inventory : PanelContainer
         {
             case MouseButton.Left:
                 TryDropItem(mouseEvent);
+
                 break;
-            case MouseButton.Right:
-                TryEquipItem();
-                break;
+            case MouseButton.Right: break;
         }
     }
-
-    private void TryEquipItem() { }
 
     private void TryDropItem(InputEventMouseButton mouseEvent)
     {
@@ -65,10 +67,7 @@ public partial class Inventory : PanelContainer
     }
 
     private bool CheckClickedOutsideInventory(InputEventMouseButton mouseEvent)
-        => mouseEvent.GlobalPosition.X < GlobalPosition.X
-           || mouseEvent.GlobalPosition.Y < GlobalPosition.Y
-           || mouseEvent.GlobalPosition.Y > GlobalPosition.Y + Size.Y
-           || mouseEvent.GlobalPosition.X > GlobalPosition.X + Size.X;
+        => mouseEvent.GlobalPosition.X < GlobalPosition.X || mouseEvent.GlobalPosition.Y < GlobalPosition.Y || mouseEvent.GlobalPosition.Y > GlobalPosition.Y + Size.Y || mouseEvent.GlobalPosition.X > GlobalPosition.X + Size.X;
 
     private void BuildInventory()
     {
@@ -83,6 +82,7 @@ public partial class Inventory : PanelContainer
             inventorySlot.SlotEmptied     += InventorySlotOnSlotEmptied;
             inventorySlot.MouseMoving     += InventorySlotOnMouseMoving;
             inventorySlot.WithdrawingItem += InventorySlotOnWithdrawingItem;
+            inventorySlot.EquippingItem   += InventorySlotOnEquippingItem;
 
             ItemGrid.AddChild(inventorySlot);
         }
@@ -90,9 +90,14 @@ public partial class Inventory : PanelContainer
         slotsGenerated = true;
     }
 
-    private void InventorySlotOnWithdrawingItem(BaseItem withdrawnitem) => MouseObject.Show(withdrawnitem);
+    private void InventorySlotOnEquippingItem(InventorySlot fromSlot)
+        => EquippingItem?.Invoke(fromSlot);
 
-    private void InventorySlotOnSlotEmptied(InventorySlot inventoryslot) => Tooltip.Hide();
+    private void InventorySlotOnWithdrawingItem(BaseItem withdrawnitem)
+        => MouseObject.Show(withdrawnitem);
+
+    private void InventorySlotOnSlotEmptied(InventorySlot inventoryslot)
+        => Tooltip.Hide();
 
     private void InventorySlotOnMouseMoving(MousemovementDirection mousemovementdirection, InventorySlot inventoryslot)
     {
@@ -103,12 +108,15 @@ public partial class Inventory : PanelContainer
                     return;
 
                 Tooltip.Show(inventoryslot);
+
                 break;
             case MousemovementDirection.Left:
                 if (inventoryslot.ContainedItem == null)
 
                     return;
+
                 Tooltip.Hide();
+
                 break;
         }
     }
@@ -124,9 +132,7 @@ public partial class Inventory : PanelContainer
             if (nextSlot.ContainedItem is null)
                 return nextSlot;
 
-            if (incomingItem is ConsumableItem incomingConsumable
-                && nextSlot.ContainedItem is ConsumableItem { IsStackable: true } containedConsumable
-                && containedConsumable.CanFit(incomingConsumable))
+            if (incomingItem is ConsumableItem incomingConsumable && nextSlot.ContainedItem is ConsumableItem { IsStackable: true } containedConsumable && containedConsumable.CanFit(incomingConsumable))
                 return nextSlot;
         }
 

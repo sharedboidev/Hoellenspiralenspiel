@@ -1,14 +1,18 @@
 using Godot;
+using Hoellenspiralenspiel.Enums;
 
-namespace Hoellenspiralenspiel.Scripts.UI;
+namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 [Tool]
 public partial class EquipmentSlot : PanelContainer
 {
+    private          Texture2D defaultTexture;
     [Export] private int       pxDimension = 64;
     private          int       slotHeight  = 1;
     private          int       slotWidth   = 1;
-    private          Texture2D defaultTexture;
+
+    [Export]
+    public ItemType FittingItemType { get; private set; }
 
     [Export]
     public Texture2D DefaultTexture
@@ -57,15 +61,15 @@ public partial class EquipmentSlot : PanelContainer
 
     private void SetSlotTexture()
     {
-        var textureNode    = GetNode<TextureRect>("%Icon");
-        var texture = DefaultTexture ?? GD.Load<Texture2D>("res://icon.svg");
-        
+        var textureNode = GetNode<TextureRect>("%Icon");
+        var texture     = DefaultTexture ?? GD.Load<Texture2D>("res://icon.svg");
+
         textureNode.Texture = texture;
     }
 
     public void _on_texture_rect_gui_input(InputEvent @event)
     {
-        if (@event is not InputEventMouseButton {ButtonIndex:MouseButton.Left, Pressed:true} mouseEvent)
+        if (@event is not InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true } mouseEvent)
             return;
 
         GD.Print($"Clicked Slot {Name}");

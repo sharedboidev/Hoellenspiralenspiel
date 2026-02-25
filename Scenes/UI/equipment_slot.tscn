@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cgggertpat65k"]
 
-[ext_resource type="Script" uid="uid://ddjp3cfijveiv" path="res://Scripts/UI/EquipmentSlot.cs" id="1_x82i5"]
+[ext_resource type="Script" uid="uid://bckvlj4u8es8k" path="res://Scripts/UI/Character/EquipmentSlot.cs" id="1_x82i5"]
 [ext_resource type="Texture2D" uid="uid://dxdttrmghay8k" path="res://icon.svg" id="3_byr6a"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x82i5"]

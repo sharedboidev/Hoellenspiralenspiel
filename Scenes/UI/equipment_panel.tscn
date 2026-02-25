@@ -1,19 +1,20 @@
 [gd_scene format=3 uid="uid://82m36ij72ark"]
 
 [ext_resource type="StyleBox" uid="uid://d0lsfuyas70d8" path="res://Resources/Themes/boxes_stylebox.tres" id="1_y15lq"]
+[ext_resource type="Script" uid="uid://btmmhf34ykf4i" path="res://Scripts/UI/Character/EquipmentPanel.cs" id="2_eecfs"]
 [ext_resource type="PackedScene" uid="uid://cgggertpat65k" path="res://Scenes/UI/equipment_slot.tscn" id="2_w80wf"]
-[ext_resource type="Texture2D" uid="uid://c100oogpw4urn" path="res://Textures/UI/CharacterSheet/melee_background.png" id="3_fmq6w"]
-[ext_resource type="Texture2D" uid="uid://do45kcegspvyp" path="res://Textures/UI/CharacterSheet/shoulder_background.png" id="4_ls1hb"]
-[ext_resource type="Texture2D" uid="uid://cobfrkew47b44" path="res://Textures/UI/CharacterSheet/ring_background.png" id="5_wge2d"]
-[ext_resource type="Texture2D" uid="uid://bllq5ihr0hk0h" path="res://Textures/UI/CharacterSheet/gloves_background.png" id="6_dgu7o"]
-[ext_resource type="Texture2D" uid="uid://dlce4im3gclah" path="res://Textures/UI/CharacterSheet/helm_background.png" id="7_kunr1"]
-[ext_resource type="Texture2D" uid="uid://ccnuysvh47cmj" path="res://Textures/UI/CharacterSheet/chest_background.png" id="8_x1hpk"]
-[ext_resource type="Texture2D" uid="uid://pxkx5rgrhstm" path="res://Textures/UI/CharacterSheet/pants_background.png" id="9_an6ie"]
-[ext_resource type="Texture2D" uid="uid://bsa0g0rv51ksq" path="res://Textures/UI/CharacterSheet/boots_background.png" id="10_vwtht"]
-[ext_resource type="Texture2D" uid="uid://bmje41mjcfmp3" path="res://Textures/UI/CharacterSheet/neck_background.png" id="11_t3pfg"]
-[ext_resource type="Texture2D" uid="uid://tmt0png0jjl6" path="res://Textures/UI/CharacterSheet/back_background.png" id="12_4cv2v"]
-[ext_resource type="Texture2D" uid="uid://b4t3sirpmbj33" path="res://Textures/UI/CharacterSheet/bracers_background.png" id="13_q8xcd"]
-[ext_resource type="Texture2D" uid="uid://cvtsy2su3mkm0" path="res://Textures/UI/CharacterSheet/shield_background.png" id="14_j0usx"]
+[ext_resource type="Texture2D" uid="uid://c100oogpw4urn" path="res://Textures/UI/CharacterSheet/melee_background.png" id="4_2vdxq"]
+[ext_resource type="Texture2D" uid="uid://do45kcegspvyp" path="res://Textures/UI/CharacterSheet/shoulder_background.png" id="5_e4sdn"]
+[ext_resource type="Texture2D" uid="uid://cobfrkew47b44" path="res://Textures/UI/CharacterSheet/ring_background.png" id="6_rdsna"]
+[ext_resource type="Texture2D" uid="uid://bllq5ihr0hk0h" path="res://Textures/UI/CharacterSheet/gloves_background.png" id="7_xpouk"]
+[ext_resource type="Texture2D" uid="uid://dlce4im3gclah" path="res://Textures/UI/CharacterSheet/helm_background.png" id="8_g86ie"]
+[ext_resource type="Texture2D" uid="uid://ccnuysvh47cmj" path="res://Textures/UI/CharacterSheet/chest_background.png" id="9_711yl"]
+[ext_resource type="Texture2D" uid="uid://pxkx5rgrhstm" path="res://Textures/UI/CharacterSheet/pants_background.png" id="10_td2u5"]
+[ext_resource type="Texture2D" uid="uid://bsa0g0rv51ksq" path="res://Textures/UI/CharacterSheet/boots_background.png" id="11_y15lq"]
+[ext_resource type="Texture2D" uid="uid://bmje41mjcfmp3" path="res://Textures/UI/CharacterSheet/neck_background.png" id="12_w80wf"]
+[ext_resource type="Texture2D" uid="uid://tmt0png0jjl6" path="res://Textures/UI/CharacterSheet/back_background.png" id="13_fmq6w"]
+[ext_resource type="Texture2D" uid="uid://b4t3sirpmbj33" path="res://Textures/UI/CharacterSheet/bracers_background.png" id="14_y15lq"]
+[ext_resource type="Texture2D" uid="uid://cvtsy2su3mkm0" path="res://Textures/UI/CharacterSheet/shield_background.png" id="15_w80wf"]
 
 [node name="EquipmentPanel" type="PanelContainer" unique_id=1502199728]
 offset_right = 108.0
@@ -21,6 +22,7 @@ offset_bottom = 68.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = ExtResource("1_y15lq")
+script = ExtResource("2_eecfs")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=872608323]
 layout_mode = 2
@@ -44,7 +46,8 @@ layout_mode = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 480)
 layout_mode = 2
-DefaultTexture = ExtResource("3_fmq6w")
+FittingItemType = 1
+DefaultTexture = ExtResource("4_2vdxq")
 SlotWidth = 2
 SlotHeight = 6
 
@@ -63,16 +66,19 @@ alignment = 2
 [node name="Trinket1" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Trinkets" unique_id=1751060673 instance=ExtResource("2_w80wf")]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
+script = null
 
 [node name="Trinket2" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Trinkets" unique_id=734258668 instance=ExtResource("2_w80wf")]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
+script = null
 
 [node name="Shoulders" parent="MarginContainer/HBoxContainer/VBoxCenterRight" unique_id=2041580660 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
-DefaultTexture = ExtResource("4_ls1hb")
+FittingItemType = 2
+DefaultTexture = ExtResource("5_e4sdn")
 SlotWidth = 2
 SlotHeight = 2
 
@@ -82,27 +88,31 @@ layout_mode = 2
 
 [node name="Rings" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxCenterRight" unique_id=355616087]
 layout_mode = 2
+theme_override_constants/separation = 2
 alignment = 2
 
 [node name="Ring1" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Rings" unique_id=1436956560 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(79, 79)
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
-pxDimension = 79
-DefaultTexture = ExtResource("5_wge2d")
+pxDimension = 78
+FittingItemType = 8
+DefaultTexture = ExtResource("6_rdsna")
 
 [node name="Ring3" parent="MarginContainer/HBoxContainer/VBoxCenterRight/Rings" unique_id=2087633347 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(79, 79)
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
-pxDimension = 79
-DefaultTexture = ExtResource("5_wge2d")
+pxDimension = 78
+FittingItemType = 8
+DefaultTexture = ExtResource("6_rdsna")
 
 [node name="Gloves" parent="MarginContainer/HBoxContainer/VBoxCenterRight" unique_id=1899852876 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
-DefaultTexture = ExtResource("6_dgu7o")
+FittingItemType = 9
+DefaultTexture = ExtResource("7_xpouk")
 SlotWidth = 2
 SlotHeight = 2
 
@@ -113,7 +123,8 @@ layout_mode = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
-DefaultTexture = ExtResource("7_kunr1")
+FittingItemType = 4
+DefaultTexture = ExtResource("8_g86ie")
 SlotWidth = 2
 SlotHeight = 2
 
@@ -121,7 +132,8 @@ SlotHeight = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 240)
 layout_mode = 2
-DefaultTexture = ExtResource("8_x1hpk")
+FittingItemType = 12
+DefaultTexture = ExtResource("9_711yl")
 SlotWidth = 2
 SlotHeight = 3
 
@@ -130,14 +142,16 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 40)
 layout_mode = 2
 pxDimension = 40
-DefaultTexture = ExtResource("5_wge2d")
+FittingItemType = 7
+DefaultTexture = ExtResource("6_rdsna")
 SlotWidth = 4
 
 [node name="Pants" parent="MarginContainer/HBoxContainer/VBoxCenter" unique_id=349361393 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 240)
 layout_mode = 2
-DefaultTexture = ExtResource("9_an6ie")
+FittingItemType = 13
+DefaultTexture = ExtResource("10_td2u5")
 SlotWidth = 2
 SlotHeight = 3
 
@@ -145,7 +159,8 @@ SlotHeight = 3
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
-DefaultTexture = ExtResource("10_vwtht")
+FittingItemType = 10
+DefaultTexture = ExtResource("11_y15lq")
 SlotWidth = 2
 SlotHeight = 2
 
@@ -162,13 +177,14 @@ custom_minimum_size = Vector2(79, 79)
 layout_mode = 2
 size_flags_horizontal = 0
 pxDimension = 79
-DefaultTexture = ExtResource("11_t3pfg")
+FittingItemType = 3
+DefaultTexture = ExtResource("12_w80wf")
 
 [node name="Cape" parent="MarginContainer/HBoxContainer/VBoxCenterLeft" unique_id=958908806 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
-DefaultTexture = ExtResource("12_4cv2v")
+DefaultTexture = ExtResource("13_fmq6w")
 SlotWidth = 2
 SlotHeight = 2
 
@@ -178,25 +194,28 @@ layout_mode = 2
 
 [node name="Rings" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxCenterLeft" unique_id=2104094970]
 layout_mode = 2
+theme_override_constants/separation = 2
 
 [node name="Ring2" parent="MarginContainer/HBoxContainer/VBoxCenterLeft/Rings" unique_id=1164359294 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(79, 79)
 layout_mode = 2
 pxDimension = 79
-DefaultTexture = ExtResource("5_wge2d")
+FittingItemType = 8
+DefaultTexture = ExtResource("6_rdsna")
 
 [node name="Ring4" parent="MarginContainer/HBoxContainer/VBoxCenterLeft/Rings" unique_id=1879463389 instance=ExtResource("2_w80wf")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(79, 79)
 layout_mode = 2
 pxDimension = 79
-DefaultTexture = ExtResource("5_wge2d")
+FittingItemType = 8
+DefaultTexture = ExtResource("6_rdsna")
 
 [node name="Wrists" parent="MarginContainer/HBoxContainer/VBoxCenterLeft" unique_id=1441012198 instance=ExtResource("2_w80wf")]
 custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
-DefaultTexture = ExtResource("13_q8xcd")
+DefaultTexture = ExtResource("14_y15lq")
 SlotWidth = 2
 SlotHeight = 2
 
@@ -211,6 +230,7 @@ layout_mode = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 480)
 layout_mode = 2
-DefaultTexture = ExtResource("14_j0usx")
+FittingItemType = 6
+DefaultTexture = ExtResource("15_w80wf")
 SlotWidth = 2
 SlotHeight = 6
