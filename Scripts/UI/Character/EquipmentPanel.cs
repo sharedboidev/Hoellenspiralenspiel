@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Extensions;
@@ -10,7 +9,7 @@ namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 public partial class EquipmentPanel : PanelContainer
 {
-    private Dictionary<ItemSlot, EquipmentSlot> slotMap = new();
+    private readonly Dictionary<ItemSlot, EquipmentSlot> slotMap = new();
 
     [Export]
     public Inventory Inventory { get; set; }
@@ -39,7 +38,6 @@ public partial class EquipmentPanel : PanelContainer
                 break;
             case MousemovementDirection.Left:
                 if (equipmentslot.IsEmpty)
-
                     return;
 
                 Tooltip.Hide();

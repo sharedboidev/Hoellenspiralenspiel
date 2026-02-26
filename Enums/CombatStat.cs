@@ -14,5 +14,6 @@ public enum CombatStat
     Attackspeed,
     CriticalHitChance,
     CriticalDamage,
-    Range
+    Range,
+    Armor
 }

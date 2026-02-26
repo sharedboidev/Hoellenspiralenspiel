@@ -68,6 +68,7 @@ public partial class Lootsystem : Node
             var newModifier = item switch
             {
                 BaseWeapon => RollWeaponAffix(nextAffixToRoll, item.ItemLevel),
+                //Armor LETSGOOO 
                 _          => throw new ArgumentOutOfRangeException(nameof(item), item, null)
             };
 

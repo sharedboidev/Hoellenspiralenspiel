@@ -70,20 +70,6 @@ public abstract partial class BaseWeapon : BaseItem
         emil.AppendLine($"Critical Hit Chance: {GetStyledValue(CriticalHitChanceFinal, CriticalHitChanceBase):0.##}%");
     }
 
-    private string GetStyledValue(double finalValue, double baseValue)
-    {
-        finalValue = Math.Round(finalValue, 2);
-        baseValue  = Math.Round(baseValue, 2);
-
-        if (finalValue < baseValue)
-            return $"[color=firebrick]{finalValue}[/color]";
-
-        if (finalValue > baseValue)
-            return $"[color=dodger_blue]{finalValue}[/color]";
-
-        return $"{finalValue}";
-    }
-
     private void SetDamagetypeByWeapon()
         => DamageType = WeaponType switch
         {

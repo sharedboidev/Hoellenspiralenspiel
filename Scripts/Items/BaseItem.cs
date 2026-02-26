@@ -120,6 +120,31 @@ public abstract partial class BaseItem
             emil.AppendLine($"Required {requirement.Key.GetDescription()}: {requirement.Value:N0}");
     }
 
+    public virtual void Init()
+    {
+        SetAffixedItembaseName();
+        SetExceptionalName();
+    }
+
+    public void AddModifier(ItemModifier modifier)
+        => ItemModifiers.Add(modifier);
+
+    public bool CanBeEquipedBy(Player2D player)
+    {
+        if (player is null)
+            return false;
+
+        var canWield = true;
+
+        foreach (var requirement in Requirements)
+        {
+            var requiredAttributevalue = player.GetRequiredAttributevalue(requirement.Key);
+
+            canWield &= requirement.Value <= requiredAttributevalue;
+        }
+
+        return canWield;
+    }
     public virtual string GetTooltipTitle()
     {
         var emil = new StringBuilder();
@@ -143,22 +168,20 @@ public abstract partial class BaseItem
         return emil.ToString();
     }
 
-    public bool CanBeEquipedBy(Player2D player)
+    protected string GetStyledValue(double finalValue, double baseValue)
     {
-        if (player is null)
-            return false;
+        finalValue = Math.Round(finalValue, 2);
+        baseValue  = Math.Round(baseValue, 2);
 
-        var canWield = true;
+        if (finalValue < baseValue)
+            return $"[color=firebrick]{finalValue}[/color]";
 
-        foreach (var requirement in Requirements)
-        {
-            var requiredAttributevalue = player.GetRequiredAttributevalue(requirement.Key);
+        if (finalValue > baseValue)
+            return $"[color=dodger_blue]{finalValue}[/color]";
 
-            canWield &= requirement.Value <= requiredAttributevalue;
-        }
-
-        return canWield;
+        return $"{finalValue}";
     }
+
 
     protected void SetAffixedItembaseName()
     {
@@ -168,16 +191,8 @@ public abstract partial class BaseItem
         AffixedItembaseName = $"{prefix?.ItemnameAddition} " + ItembaseName + $" {suffix?.ItemnameAddition}";
     }
 
-    public void AddModifier(ItemModifier modifier)
-        => ItemModifiers.Add(modifier);
-
     protected virtual void SetExceptionalName() { }
 
-    public virtual void Init()
-    {
-        SetAffixedItembaseName();
-        SetExceptionalName();
-    }
 
     protected float GetTotalMoreMultiplierOf(CombatStat combatStat)
     {
