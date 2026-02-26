@@ -1,17 +1,21 @@
 using Godot;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Scripts.Items;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 [Tool]
-public partial class EquipmentSlot : PanelContainer
+public partial class EquipmentSlot : PanelContainer,
+                                     ITooltipObjectContainer
 {
-    private          Texture2D      defaultTexture;
-    private          BaseItem       equipedItem;
-    [Export] private int            pxDimension = 64;
-    private          int            slotHeight  = 1;
-    private          int            slotWidth   = 1;
+    public delegate void MouseMovementEventHandler(MousemovementDirection mousemovementDirection, EquipmentSlot equipmentSlot);
+
+    private          Texture2D defaultTexture;
+    [Export] private int       pxDimension = 64;
+    private          int       slotHeight  = 1;
+    private          int       slotWidth   = 1;
+    public           bool      IsEmpty => ContainedItem is null;
 
     [Export]
     public ItemType FittingItemType { get; private set; }
@@ -49,6 +53,8 @@ public partial class EquipmentSlot : PanelContainer
         }
     }
 
+    public event MouseMovementEventHandler MouseMoving;
+
     public override void _Ready()
         => SetScaledSize();
 
@@ -63,19 +69,19 @@ public partial class EquipmentSlot : PanelContainer
 
     public BaseItem RetrieveItem()
     {
-        var itemToRetrieve = equipedItem;
-        equipedItem = null;
+        var itemToRetrieve = ContainedItem;
+        ContainedItem = null;
 
         SetDefaultTexture();
 
-        return itemToRetrieve;
+        return (BaseItem)itemToRetrieve;
     }
 
     public void EquipItem(BaseItem item)
     {
-        equipedItem = item;
+        ContainedItem = item;
         var textureNode = GetNode<TextureRect>("%Icon");
-        textureNode.Texture = equipedItem.Icon.Texture;
+        textureNode.Texture = ((BaseItem)ContainedItem).Icon.Texture;
     }
 
     private void SetDefaultTexture()
@@ -92,15 +98,15 @@ public partial class EquipmentSlot : PanelContainer
 
         switch (inputEvent)
         {
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when equipedItem is not null && !mouseObject.HasItem:
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is not null && !mouseObject.HasItem:
                 WithdrawItem(mouseObject);
 
                 break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when equipedItem is null && mouseObject.HasItem:
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is null && mouseObject.HasItem && ((BaseItem)mouseObject.ContainedItem).ItemType == FittingItemType:
                 PutItemIntoSlot(mouseObject);
 
                 break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && equipedItem is not null:
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && ContainedItem is not null && ((BaseItem)mouseObject.ContainedItem).ItemType == FittingItemType:
                 SwapItems(mouseObject);
 
                 break;
@@ -113,7 +119,10 @@ public partial class EquipmentSlot : PanelContainer
         var slotItem = RetrieveItem();
 
         EquipItem(mousItem);
+        
         mouseObject.Show(slotItem);
+        
+        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
     }
 
     private void WithdrawItem(MouseObject mouseObject)
@@ -131,8 +140,11 @@ public partial class EquipmentSlot : PanelContainer
     }
 
     public void _on_texture_rect_mouse_exited()
-        => GD.Print($"Mouse exited Slot {Name}");
+        => MouseMoving?.Invoke(MousemovementDirection.Left, this);
 
     public void _on_texture_rect_mouse_entered()
-        => GD.Print($"Mouse entered Slot {Name}");
+        => MouseMoving?.Invoke(MousemovementDirection.Entered, this);
+
+    public ITooltipObject ContainedItem      { get; set; }
+    public Vector2        TooltipAnchorPoint => GlobalPosition;
 }
