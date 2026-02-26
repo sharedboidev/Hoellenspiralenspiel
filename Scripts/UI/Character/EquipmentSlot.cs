@@ -7,11 +7,11 @@ namespace Hoellenspiralenspiel.Scripts.UI.Character;
 [Tool]
 public partial class EquipmentSlot : PanelContainer
 {
-    private          Texture2D defaultTexture;
-    private          BaseItem  equipedItem;
-    [Export] private int       pxDimension = 64;
-    private          int       slotHeight  = 1;
-    private          int       slotWidth   = 1;
+    private          Texture2D      defaultTexture;
+    private          BaseItem       equipedItem;
+    [Export] private int            pxDimension = 64;
+    private          int            slotHeight  = 1;
+    private          int            slotWidth   = 1;
 
     [Export]
     public ItemType FittingItemType { get; private set; }
@@ -65,7 +65,7 @@ public partial class EquipmentSlot : PanelContainer
     {
         var itemToRetrieve = equipedItem;
         equipedItem = null;
-        
+
         SetDefaultTexture();
 
         return itemToRetrieve;
@@ -86,12 +86,48 @@ public partial class EquipmentSlot : PanelContainer
         textureNode.Texture = texture;
     }
 
-    public void _on_texture_rect_gui_input(InputEvent @event)
+    public void _on_texture_rect_gui_input(InputEvent inputEvent)
     {
-        if (@event is not InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true } mouseEvent)
-            return;
+        var mouseObject = ((EquipmentPanel)Owner).Inventory.GetNode<MouseObject>(nameof(MouseObject));
 
-        GD.Print($"Clicked Slot {Name}");
+        switch (inputEvent)
+        {
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when equipedItem is not null && !mouseObject.HasItem:
+                WithdrawItem(mouseObject);
+
+                break;
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when equipedItem is null && mouseObject.HasItem:
+                PutItemIntoSlot(mouseObject);
+
+                break;
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && equipedItem is not null:
+                SwapItems(mouseObject);
+
+                break;
+        }
+    }
+
+    private void SwapItems(MouseObject mouseObject)
+    {
+        var mousItem = mouseObject.RetrieveItem();
+        var slotItem = RetrieveItem();
+
+        EquipItem(mousItem);
+        mouseObject.Show(slotItem);
+    }
+
+    private void WithdrawItem(MouseObject mouseObject)
+    {
+        var item = RetrieveItem();
+
+        mouseObject.Show(item);
+    }
+
+    private void PutItemIntoSlot(MouseObject mouseObject)
+    {
+        var item = mouseObject.RetrieveItem();
+
+        EquipItem(item);
     }
 
     public void _on_texture_rect_mouse_exited()

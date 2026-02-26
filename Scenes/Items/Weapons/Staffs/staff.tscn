@@ -11,11 +11,11 @@ AttacksPerSecondBase = 0.33
 CriticalHitChanceBase = 3.0
 WeaponType = 4
 WieldStrategie = 4
-Requirements = Dictionary[int, int]({
-2: 2,
-5: 3
-})
 Icon = NodePath("Icon")
+Requirements = Dictionary[int, int]({
+2: 1,
+5: 1
+})
 
 [node name="Icon" type="TextureRect" parent="." unique_id=177823713]
 offset_right = 40.0

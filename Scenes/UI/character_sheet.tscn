@@ -18,9 +18,10 @@ offset_right = 918.0
 offset_bottom = 914.0
 theme_override_constants/separation = 0
 
-[node name="EquipmentPanel" parent="HBoxContainer" unique_id=1502199728 instance=ExtResource("1_4dpr5")]
+[node name="EquipmentPanel" parent="HBoxContainer" unique_id=1502199728 node_paths=PackedStringArray("Inventory") instance=ExtResource("1_4dpr5")]
 unique_name_in_owner = true
 layout_mode = 2
+Inventory = NodePath("../Inventory")
 
 [node name="Inventory" parent="HBoxContainer" unique_id=2062578477 instance=ExtResource("2_kqng3")]
 unique_name_in_owner = true

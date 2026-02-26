@@ -11,6 +11,9 @@ public partial class EquipmentPanel : PanelContainer
 {
     private Dictionary<ItemType, EquipmentSlot> slotMap = new();
 
+    [Export]
+    public Inventory Inventory { get; set; }
+
     public override void _Ready()
     {
         var alleMeineKinder = this.GetAllChildren<EquipmentSlot>();

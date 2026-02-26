@@ -67,7 +67,13 @@ public partial class Inventory : PanelContainer
     }
 
     private bool CheckClickedOutsideInventory(InputEventMouseButton mouseEvent)
-        => mouseEvent.GlobalPosition.X < GlobalPosition.X || mouseEvent.GlobalPosition.Y < GlobalPosition.Y || mouseEvent.GlobalPosition.Y > GlobalPosition.Y + Size.Y || mouseEvent.GlobalPosition.X > GlobalPosition.X + Size.X;
+    {
+        var parent        = GetParent<VBoxContainer>();
+        var parentSIze    = parent.Size;
+        var prentPosition = parent.GlobalPosition;
+        
+        return mouseEvent.GlobalPosition.X < prentPosition.X || mouseEvent.GlobalPosition.Y < prentPosition.Y || mouseEvent.GlobalPosition.Y > prentPosition.Y + parentSIze.Y || mouseEvent.GlobalPosition.X > prentPosition.X + parentSIze.X;
+    }
 
     private void BuildInventory()
     {
