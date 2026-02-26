@@ -137,6 +137,8 @@ public partial class EquipmentSlot : PanelContainer,
         var item = mouseObject.RetrieveItem();
 
         EquipItem(item);
+
+        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
     }
 
     public void _on_texture_rect_mouse_exited()
