@@ -8,6 +8,7 @@ using Hoellenspiralenspiel.Resources.Affixes;
 using Hoellenspiralenspiel.Resources.Affixes.Prefixes;
 using Hoellenspiralenspiel.Resources.Affixes.Suffixes;
 using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Items.Armors;
 using Hoellenspiralenspiel.Scripts.Items.Consumables;
 using Hoellenspiralenspiel.Scripts.Items.Weapons;
 using Hoellenspiralenspiel.Scripts.Models;
@@ -68,7 +69,7 @@ public partial class Lootsystem : Node
             var newModifier = item switch
             {
                 BaseWeapon => RollWeaponAffix(nextAffixToRoll, item.ItemLevel),
-                //Armor LETSGOOO 
+                BaseArmor  => RollArmorAffix(nextAffixToRoll, item.ItemLevel),
                 _          => throw new ArgumentOutOfRangeException(nameof(item), item, null)
             };
 
@@ -78,6 +79,11 @@ public partial class Lootsystem : Node
         }
 
         item.Init();
+    }
+
+    private ItemModifier RollArmorAffix(AffixType nextAffixToRoll, int itemItemLevel)
+    {
+        return new ItemModifier(AffixType.Prefix, CombatStat.Damagereduction, ModificationType.Percentage, 10f, "Edgelord's");
     }
 
     private AffixType RollNextAffixType()
