@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Configuration;
-using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.Items.Weapons;
@@ -60,70 +57,17 @@ public abstract partial class BaseWeapon : BaseItem
         base.Init();
 
         SetDamagetypeByWeapon();
-        SetAffixedItembaseName();
-        SetExceptionalName();
     }
 
     protected override void SetExceptionalName()
         => ExceptionalName = NameGenerator.GenerateRareWeapon();
 
-    public override string GetTooltipDescription()
-    {
-        var emil = new StringBuilder();
-        emil.Append("[center]");
-
-        AppendStats(emil);
-        AppendRequirements(emil);
-        AppendAffixes(emil);
-
-        emil.Append("[/center]");
-
-        return emil.ToString();
-    }
-
-    private void AppendAffixes(StringBuilder emil)
-    {
-        foreach (var affix in ItemModifiers.OrderBy(a => a.AffixType))
-        {
-            switch (affix.ModificationType)
-            {
-                case ModificationType.Flat when affix.CombatStat == CombatStat.Attackspeed:
-                    emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##} to Attacks per Second[/color]");
-
-                    break;
-                case ModificationType.Flat when affix.CombatStat == CombatStat.CriticalHitChance:
-                    emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##}% to Critical Hit Chance[/color]");
-
-                    break;
-                case ModificationType.Flat:
-                    emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##} to {affix.CombatStat.GetDescription()}[/color]");
-
-                    break;
-                case ModificationType.Percentage:
-                    emil.AppendLine($"[color=dodger_blue]{affix.Value * 100:N0}% increased {affix.CombatStat.GetDescription()}[/color]");
-
-                    break;
-                case ModificationType.More:
-                    emil.AppendLine($"[color=dodger_blue]{affix.Value * 100:N0}% More {affix.CombatStat.GetDescription()}[/color]");
-
-                    break;
-                default: throw new ArgumentOutOfRangeException();
-            }
-        }
-    }
-
-    private void AppendStats(StringBuilder emil)
+    protected override void AppendItembaseStats(StringBuilder emil)
     {
         emil.AppendLine($"{WieldStrategie.GetDescription()} {WeaponType.GetDescription()}");
         emil.AppendLine($"{DamageType.Name} Damage: {GetStyledValue(MinDamageFinal, MinDamageBase):N0} to {GetStyledValue(MaxDamageFinal, MaxDamageBase):N0}");
         emil.AppendLine($"Attacks per Second: {GetStyledValue(AttacksPerSecondFinal, AttacksPerSecondBase):0.##}");
         emil.AppendLine($"Critical Hit Chance: {GetStyledValue(CriticalHitChanceFinal, CriticalHitChanceBase):0.##}%");
-    }
-
-    private void AppendRequirements(StringBuilder emil)
-    {
-        foreach (var requirement in Requirements)
-            emil.AppendLine($"Required {requirement.Key.GetDescription()}: {requirement.Value:N0}");
     }
 
     private string GetStyledValue(double finalValue, double baseValue)
@@ -139,23 +83,6 @@ public abstract partial class BaseWeapon : BaseItem
 
         return $"{finalValue}";
     }
-
-    private float GetTotalMoreMultiplierOf(CombatStat combatStat)
-    {
-        var totalMoreMultiplier = 1f;
-
-        foreach (var modifier in GetModifierOf(ModificationType.More, combatStat))
-            totalMoreMultiplier *= 1 + modifier.Value;
-
-        return totalMoreMultiplier;
-    }
-
-    private float GetModifierSumOf(ModificationType modificationType, CombatStat combatStat)
-        => GetModifierOf(modificationType, combatStat).Sum(mod => mod.Value);
-
-    private IEnumerable<ItemModifier> GetModifierOf(ModificationType modificationType, CombatStat combatStat)
-        => ItemModifiers.Where(mod => mod.CombatStat == combatStat &&
-                                      mod.ModificationType == modificationType);
 
     private void SetDamagetypeByWeapon()
         => DamageType = WeaponType switch

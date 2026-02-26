@@ -1,3 +1,4 @@
+using System.Text;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Extensions;
@@ -16,7 +17,8 @@ public partial class HealthPotion : ConsumableItem
     protected override bool IsMagic => false;
     protected override bool IsRare  => false;
 
-    public override string GetTooltipDescription() => $"Restores {TotalHealthRestoredPercentage:N0}% of your maximum Life.";
+    protected override void AppendItembaseStats(StringBuilder emil)
+        => emil.AppendLine($"Recovered Life: [color=lime_green]{TotalHealthRestoredPercentage:N0}[/color]%");
 
     protected override void ApplyEffectOfConsumption(BaseUnit consumee)
     {

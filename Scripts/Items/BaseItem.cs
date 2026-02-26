@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Godot;
@@ -8,6 +9,7 @@ using Hoellenspiralenspiel.Scripts.Items.Weapons;
 using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Models.Weapons;
 using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.Items;
 
@@ -66,7 +68,57 @@ public abstract partial class BaseItem
     }
 
     public virtual string GetTooltipDescription()
-        => string.Empty;
+    {
+        var emil = new StringBuilder();
+        emil.Append("[center]");
+
+        AppendItembaseStats(emil);
+        AppendRequirements(emil);
+        AppendAffixes(emil);
+
+        emil.Append("[/center]");
+
+        return emil.ToString();
+    }
+
+    private void AppendAffixes(StringBuilder emil)
+    {
+        foreach (var affix in ItemModifiers.OrderBy(a => a.AffixType))
+        {
+            switch (affix.ModificationType)
+            {
+                case ModificationType.Flat when affix.CombatStat == CombatStat.Attackspeed:
+                    emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##} to Attacks per Second[/color]");
+
+                    break;
+                case ModificationType.Flat when affix.CombatStat == CombatStat.CriticalHitChance:
+                    emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##}% to Critical Hit Chance[/color]");
+
+                    break;
+                case ModificationType.Flat:
+                    emil.AppendLine($"[color=dodger_blue]+{affix.Value:0.##} to {affix.CombatStat.GetDescription()}[/color]");
+
+                    break;
+                case ModificationType.Percentage:
+                    emil.AppendLine($"[color=dodger_blue]{affix.Value * 100:N0}% increased {affix.CombatStat.GetDescription()}[/color]");
+
+                    break;
+                case ModificationType.More:
+                    emil.AppendLine($"[color=dodger_blue]{affix.Value * 100:N0}% More {affix.CombatStat.GetDescription()}[/color]");
+
+                    break;
+                default: throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
+
+    protected abstract void AppendItembaseStats(StringBuilder emil);
+
+    private void AppendRequirements(StringBuilder emil)
+    {
+        foreach (var requirement in Requirements)
+            emil.AppendLine($"Required {requirement.Key.GetDescription()}: {requirement.Value:N0}");
+    }
 
     public virtual string GetTooltipTitle()
     {
@@ -121,8 +173,28 @@ public abstract partial class BaseItem
 
     protected virtual void SetExceptionalName() { }
 
-    public virtual void Init() { }
+    public virtual void Init()
+    {
+        SetAffixedItembaseName();
+        SetExceptionalName();
+    }
 
+    protected float GetTotalMoreMultiplierOf(CombatStat combatStat)
+    {
+        var totalMoreMultiplier = 1f;
+
+        foreach (var modifier in GetModifierOf(ModificationType.More, combatStat))
+            totalMoreMultiplier *= 1 + modifier.Value;
+
+        return totalMoreMultiplier;
+    }
+
+    protected float GetModifierSumOf(ModificationType modificationType, CombatStat combatStat)
+        => GetModifierOf(modificationType, combatStat).Sum(mod => mod.Value);
+
+    private IEnumerable<ItemModifier> GetModifierOf(ModificationType modificationType, CombatStat combatStat)
+        => ItemModifiers.Where(mod => mod.CombatStat == combatStat &&
+                                      mod.ModificationType == modificationType);
     public override void _Ready()
         => Icon = GetNode<TextureRect>("Icon");
 }
