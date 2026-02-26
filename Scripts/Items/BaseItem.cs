@@ -25,7 +25,7 @@ public abstract partial class BaseItem
     public abstract string             ItembaseName        { get; }
     protected       string             AffixedItembaseName { get; set; }
     protected       string             ExceptionalName     { get; set; }
-    public abstract ItemType           ItemType            { get; }
+    public abstract ItemSlot           ItemSlot            { get; }
     protected       List<ItemModifier> ItemModifiers       { get; } = new();
 
     [Export]

@@ -18,7 +18,7 @@ public partial class EquipmentSlot : PanelContainer,
     public           bool      IsEmpty => ContainedItem is null;
 
     [Export]
-    public ItemType FittingItemType { get; private set; }
+    public ItemSlot FittingItemSlot { get; private set; }
 
     [Export]
     public Texture2D DefaultTexture
@@ -102,11 +102,11 @@ public partial class EquipmentSlot : PanelContainer,
                 WithdrawItem(mouseObject);
 
                 break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is null && mouseObject.HasItem && ((BaseItem)mouseObject.ContainedItem).ItemType == FittingItemType:
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is null && mouseObject.HasItem && ((BaseItem)mouseObject.ContainedItem).ItemSlot == FittingItemSlot:
                 PutItemIntoSlot(mouseObject);
 
                 break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && ContainedItem is not null && ((BaseItem)mouseObject.ContainedItem).ItemType == FittingItemType:
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && ContainedItem is not null && ((BaseItem)mouseObject.ContainedItem).ItemSlot == FittingItemSlot:
                 SwapItems(mouseObject);
 
                 break;

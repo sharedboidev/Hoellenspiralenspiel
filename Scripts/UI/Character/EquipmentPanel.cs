@@ -10,7 +10,7 @@ namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 public partial class EquipmentPanel : PanelContainer
 {
-    private Dictionary<ItemType, EquipmentSlot> slotMap = new();
+    private Dictionary<ItemSlot, EquipmentSlot> slotMap = new();
 
     [Export]
     public Inventory Inventory { get; set; }
@@ -22,7 +22,7 @@ public partial class EquipmentPanel : PanelContainer
         foreach (var equipmentSlot in this.GetAllChildren<EquipmentSlot>())
         {
             equipmentSlot.MouseMoving += EquipmentSlotOnMouseMoving;
-            slotMap.Add(equipmentSlot.FittingItemType, equipmentSlot);
+            slotMap.Add(equipmentSlot.FittingItemSlot, equipmentSlot);
         }
     }
 
@@ -50,7 +50,7 @@ public partial class EquipmentPanel : PanelContainer
 
     public BaseItem EquipIntoFittingSlot(BaseItem itemToEquip)
     {
-        var fittingSlot          = slotMap[itemToEquip.ItemType];
+        var fittingSlot          = slotMap[itemToEquip.ItemSlot];
         var formerlyEquippedItem = fittingSlot.RetrieveItem();
 
         fittingSlot.EquipItem(itemToEquip);

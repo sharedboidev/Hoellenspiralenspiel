@@ -1,6 +1,6 @@
 ﻿namespace Hoellenspiralenspiel.Enums;
 
-public enum ItemType
+public enum ItemSlot
 {
     Undefined,
     Weapon,

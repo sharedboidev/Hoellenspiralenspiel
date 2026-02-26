@@ -14,7 +14,7 @@ public abstract partial class Affix : Resource
     public ModificationType ModificationType { get; set; }
 
     [Export]
-    public Array<ItemType> AffectableItemTypes { get; set; } = new();
+    public Array<ItemSlot> AffectableItemTypes { get; set; } = new();
 
     [Export]
     public bool AllowFractions { get; set; }
