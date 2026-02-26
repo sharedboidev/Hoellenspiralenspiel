@@ -83,7 +83,7 @@ public partial class Lootsystem : Node
 
     private ItemModifier RollArmorAffix(AffixType nextAffixToRoll, int itemItemLevel)
     {
-        return new ItemModifier(AffixType.Prefix, CombatStat.Damagereduction, ModificationType.Percentage, 10f, "Edgelord's");
+        return new ItemModifier(AffixType.Prefix, CombatStat.Damagereduction, ModificationType.Percentage, .1f, "Edgelord's");
     }
 
     private AffixType RollNextAffixType()
