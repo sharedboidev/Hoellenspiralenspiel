@@ -20,7 +20,7 @@ public abstract partial class BaseItem
     [Export]
     public TextureRect Icon { get; set; }
 
-    public          int                ItemLevel           { get; set; }
+    public          int                ItemLevel           { get; set; } = 1;
     public abstract bool               IsStackable         { get; }
     public abstract string             ItembaseName        { get; }
     protected       string             AffixedItembaseName { get; set; }

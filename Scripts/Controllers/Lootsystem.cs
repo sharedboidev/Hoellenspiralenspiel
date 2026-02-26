@@ -66,12 +66,7 @@ public partial class Lootsystem : Node
 
         for (var i = 0; i < normalizedAffixCount; i++)
         {
-            var newModifier = item switch
-            {
-                BaseWeapon => RollWeaponAffix(nextAffixToRoll, item.ItemLevel),
-                BaseArmor  => RollArmorAffix(nextAffixToRoll, item.ItemLevel),
-                _          => throw new ArgumentOutOfRangeException(nameof(item), item, null)
-            };
+            var newModifier = RollAffix(nextAffixToRoll, item);
 
             item.AddModifier(newModifier);
 
@@ -79,11 +74,6 @@ public partial class Lootsystem : Node
         }
 
         item.Init();
-    }
-
-    private ItemModifier RollArmorAffix(AffixType nextAffixToRoll, int itemItemLevel)
-    {
-        return new ItemModifier(AffixType.Prefix, CombatStat.Damagereduction, ModificationType.Percentage, .1f, "Edgelord's");
     }
 
     private AffixType RollNextAffixType()
@@ -190,10 +180,14 @@ public partial class Lootsystem : Node
         return fileName;
     }
 
-    private ItemModifier RollWeaponAffix(AffixType affixType, int itemLevel)
+    private ItemModifier RollAffix(AffixType affixType, BaseItem item)
     {
-        var filteredAffixes    = FilterAffixesByType(affixType);
-        var possibleAffixTiers = FindPossibleAffixTiers(itemLevel, filteredAffixes);
+        if (item is BaseArmor)
+        {
+            
+        }
+        var filteredAffixes    = FilterAffixesByType(affixType, item);
+        var possibleAffixTiers = FindPossibleAffixTiers(item.ItemLevel, filteredAffixes);
 
         var totalWeight      = possibleAffixTiers.Sum(pat => pat.Weight) + 1;
         var luckyNumber      = GD.Randi() % totalWeight;
@@ -233,12 +227,12 @@ public partial class Lootsystem : Node
         return possibleAffixTiers;
     }
 
-    private Affix[] FilterAffixesByType(AffixType affixType)
+    private Affix[] FilterAffixesByType(AffixType affixType, BaseItem item)
     {
         var filteredAffixes = affixType switch
         {
-            AffixType.Prefix => Affixes.Where(a => a.GetType() == typeof(Prefix)).ToArray(),
-            AffixType.Suffix => Affixes.Where(a => a.GetType() == typeof(Suffix)).ToArray(),
+            AffixType.Prefix => Affixes.Where(a => a.GetType() == typeof(Prefix) && a.AffectableItemTypes.Contains(item.ItemSlot)).ToArray(),
+            AffixType.Suffix => Affixes.Where(a => a.GetType() == typeof(Suffix) && a.AffectableItemTypes.Contains(item.ItemSlot)).ToArray(),
             _                => throw new ArgumentOutOfRangeException(nameof(affixType), affixType, null)
         };
 

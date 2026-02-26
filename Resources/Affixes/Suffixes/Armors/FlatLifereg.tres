@@ -1,0 +1,100 @@
+[gd_resource type="Resource" script_class="Suffix" format=3 uid="uid://cbg2ymro7o408"]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_42r58"]
+[ext_resource type="Script" uid="uid://bwwyi50jc5koy" path="res://Resources/Affixes/Suffixes/Suffix.cs" id="2_oxlts"]
+
+[sub_resource type="Resource" id="Resource_42r58"]
+script = ExtResource("1_42r58")
+MinItemLevelToAppearOn = 78
+Weight = 1000
+MinValue = 96.0
+MaxValue = 128.0
+ItemnameAddition = "of Recuperation"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_oxlts"]
+script = ExtResource("1_42r58")
+Tier = 2
+MinItemLevelToAppearOn = 74
+Weight = 1000
+MinValue = 64.0
+MaxValue = 96.0
+ItemnameAddition = "of the Phoenix"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_d3m6s"]
+script = ExtResource("1_42r58")
+Tier = 3
+MinItemLevelToAppearOn = 68
+Weight = 1000
+MinValue = 48.0
+MaxValue = 64.0
+ItemnameAddition = " of Ryslatha"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_1jgm8"]
+script = ExtResource("1_42r58")
+Tier = 4
+MinItemLevelToAppearOn = 55
+Weight = 1000
+MinValue = 32.0
+MaxValue = 48.0
+ItemnameAddition = "of the Troll"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_w56ef"]
+script = ExtResource("1_42r58")
+Tier = 5
+MinItemLevelToAppearOn = 44
+Weight = 1000
+MinValue = 24.0
+MaxValue = 32.0
+ItemnameAddition = " of the Hydra"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_ghpuy"]
+script = ExtResource("1_42r58")
+Tier = 6
+MinItemLevelToAppearOn = 31
+Weight = 1000
+MinValue = 16.0
+MaxValue = 24.0
+ItemnameAddition = "of the Starfish"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_un1bv"]
+script = ExtResource("1_42r58")
+Tier = 7
+MinItemLevelToAppearOn = 19
+Weight = 1000
+MinValue = 8.0
+MaxValue = 16.0
+ItemnameAddition = "of the Flatworm"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_wuw5a"]
+script = ExtResource("1_42r58")
+Tier = 8
+MinItemLevelToAppearOn = 7
+Weight = 1000
+MinValue = 2.0
+MaxValue = 8.0
+ItemnameAddition = "of the Lizard"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_cu301"]
+script = ExtResource("1_42r58")
+Tier = 9
+MinItemLevelToAppearOn = 1
+Weight = 1000
+MinValue = 1.0
+MaxValue = 2.0
+ItemnameAddition = "of the Newt"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_oxlts")
+AffectedCombatStat = 5
+AffectableItemTypes = Array[int]([2, 4, 14, 15, 16])
+Tiers = Array[ExtResource("1_42r58")]([SubResource("Resource_42r58"), SubResource("Resource_oxlts"), SubResource("Resource_d3m6s"), SubResource("Resource_1jgm8"), SubResource("Resource_w56ef"), SubResource("Resource_ghpuy"), SubResource("Resource_un1bv"), SubResource("Resource_wuw5a"), SubResource("Resource_cu301")])
+metadata/_custom_type_script = "uid://bwwyi50jc5koy"
