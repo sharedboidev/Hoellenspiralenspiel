@@ -1,24 +1,13 @@
 [gd_scene format=3 uid="uid://bmhe4oqmcd326"]
 
-[ext_resource type="Script" uid="uid://faijsg66lsgi" path="res://Scripts/UI/InventorySlot.cs" id="1_brh76"]
+[ext_resource type="Script" uid="uid://m81vx2r1yuv5" path="res://Scripts/UI/Character/InventorySlot.cs" id="1_brh76"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_brh76"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.14622876, 0.14622876, 0.14622873, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.8569272, 0.8569273, 0.85692716, 1)
-border_blend = true
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-corner_detail = 5
+bg_color = Color(0.13501218, 0.135012, 0.13501209, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
 
 [node name="InventorySlot" type="PanelContainer" unique_id=812413707]
 custom_minimum_size = Vector2(64, 64)
@@ -28,10 +17,6 @@ script = ExtResource("1_brh76")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=147247687]
 layout_mode = 2
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
 
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer" unique_id=1076404156]
 layout_mode = 2

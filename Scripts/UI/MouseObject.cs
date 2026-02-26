@@ -73,7 +73,7 @@ public partial class MouseObject : PanelContainer,
     {
         GD.Print($"{lootedItem?.Name ?? "Nothing"} looted.");
 
-        GetParent<Inventory>().SetItem(lootedItem);
+        GetParent<Character.Inventory>().SetItem(lootedItem);
 
         sender?.QueueFree();
     }

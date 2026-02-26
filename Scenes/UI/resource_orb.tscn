@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bapl2sjbv6xe6"]
 
-[ext_resource type="Script" uid="uid://dwcyh745542nv" path="res://Scripts/UI/ResourceOrb.cs" id="1_6a6dy"]
-[ext_resource type="Shader" path="res://Scenes/UI/resource_orb.gdshader" id="2_4ikmt"]
+[ext_resource type="Script" uid="uid://b37givbgebcpv" path="res://Scripts/UI/Character/ResourceOrb.cs" id="1_0pnap"]
+[ext_resource type="Shader" uid="uid://c104sas7p10vg" path="res://Scenes/UI/resource_orb.gdshader" id="2_4ikmt"]
 [ext_resource type="Texture2D" uid="uid://ddfxuf4tdeldx" path="res://Textures/Spells/blank.png" id="3_6lu0o"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_by0lb"]
@@ -17,7 +17,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 190.0
 offset_bottom = 190.0
-script = ExtResource("1_6a6dy")
+script = ExtResource("1_0pnap")
 OrbTexture = NodePath("Orb")
 ResourceText = NodePath("ResourceText")
 

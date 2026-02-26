@@ -8,7 +8,9 @@ using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Items.Weapons;
 using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.UI;
+using Hoellenspiralenspiel.Scripts.UI.Character;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
+using ResourceOrb = Hoellenspiralenspiel.Scripts.UI.Character.ResourceOrb;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 

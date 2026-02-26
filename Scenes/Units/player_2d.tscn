@@ -3,9 +3,7 @@
 [ext_resource type="Script" uid="uid://bwt2hw5i1cwjn" path="res://Scripts/Units/Player2D.cs" id="1_nnb5g"]
 [ext_resource type="Texture2D" uid="uid://din6ixbiigxo" path="res://Resources/SpriteFrames/playerSheet.tres" id="2_rl3bg"]
 [ext_resource type="Texture2D" uid="uid://cy75cqqe2xi1w" path="res://Textures/UI/light_radius.tres" id="3_e2uij"]
-[ext_resource type="PackedScene" uid="uid://bapl2sjbv6xe6" path="res://Scenes/UI/resource_orb.tscn" id="3_o57mx"]
 [ext_resource type="AudioStream" uid="uid://sri6stb07ual" path="res://Audio/no mana.mp3" id="4_rl3bg"]
-[ext_resource type="Texture2D" uid="uid://bnfltqu61p1g0" path="res://Textures/Units/Player/PlayerNEW.png" id="6_2lps2"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_djq3p"]
 radius = 15.0
@@ -639,7 +637,7 @@ blend_point_7/pos = Vector2(0, 1)
 blend_point_8/node = SubResource("AnimationNodeAnimation_c71sn")
 blend_point_8/pos = Vector2(-0.5, 0.5)
 
-[node name="Player2D" type="CharacterBody2D" unique_id=1421126971 node_paths=PackedStringArray("lifeOrb", "manaOrb", "SkillBar", "NoManaSound")]
+[node name="Player2D" type="CharacterBody2D" unique_id=1421126971 node_paths=PackedStringArray("NoManaSound")]
 z_index = 1
 y_sort_enabled = true
 collision_mask = 10
@@ -647,9 +645,6 @@ motion_mode = 1
 platform_on_leave = 2
 platform_floor_layers = 0
 script = ExtResource("1_nnb5g")
-lifeOrb = NodePath("CanvasLayer/LifeOrb")
-manaOrb = NodePath("CanvasLayer/ManaOrb")
-SkillBar = NodePath("CanvasLayer/SkillBar")
 NoManaSound = NodePath("NoManaSound")
 LifeBase = 128
 Movementspeed = 1000.0
@@ -660,7 +655,6 @@ shape = SubResource("CapsuleShape2D_djq3p")
 
 [node name="PlayerNEW" type="Sprite2D" parent="." unique_id=1159204750]
 visible = false
-texture = ExtResource("6_2lps2")
 hframes = 160
 frame = 63
 
@@ -682,7 +676,6 @@ texture = ExtResource("3_e2uij")
 height = 512.0
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1968664450]
-light_mask = 2
 y_sort_enabled = true
 position = Vector2(2, -213)
 texture = ExtResource("2_rl3bg")
@@ -700,6 +693,7 @@ height = 512.0
 [node name="ShadowlessLight" type="PointLight2D" parent="Sprite2D/ShadowCasterLight" unique_id=538577359]
 light_mask = 2
 visibility_layer = 2
+energy = 0.5
 range_item_cull_mask = 2
 texture = ExtResource("3_e2uij")
 height = 512.0
@@ -720,31 +714,6 @@ parameters/StateMachine/MoveState/RunState/blend_position = Vector2(-0.18877888,
 [node name="Fireballs" type="Node2D" parent="." unique_id=489826101]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=887654130]
-
-[node name="SkillBar" type="HBoxContainer" parent="CanvasLayer" unique_id=1930834205]
-offset_left = 959.0
-offset_top = 1025.0
-offset_right = 959.0
-offset_bottom = 1080.0
-grow_horizontal = 2
-grow_vertical = 0
-size_flags_horizontal = 4
-
-[node name="LifeOrb" parent="CanvasLayer" unique_id=1740844714 instance=ExtResource("3_o57mx")]
-z_index = 10
-y_sort_enabled = true
-offset_left = -1056.0
-offset_top = 573.0
-offset_right = -869.0
-offset_bottom = 760.0
-
-[node name="ManaOrb" parent="CanvasLayer" unique_id=235976386 instance=ExtResource("3_o57mx")]
-z_index = 10
-y_sort_enabled = true
-offset_left = 854.0
-offset_top = 569.0
-offset_right = 1045.0
-offset_bottom = 760.0
 
 [node name="NoManaSound" type="AudioStreamPlayer2D" parent="." unique_id=236623057]
 stream = ExtResource("4_rl3bg")

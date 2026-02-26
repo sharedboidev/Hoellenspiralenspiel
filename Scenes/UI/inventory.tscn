@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://6yhxh7p0ijv4"]
 
-[ext_resource type="Script" uid="uid://bj1cq12utb6ep" path="res://Scripts/UI/Inventory.cs" id="1_s6m5x"]
+[ext_resource type="Script" uid="uid://ktwxm7l1b22f" path="res://Scripts/UI/Character/Inventory.cs" id="1_dt15g"]
 [ext_resource type="PackedScene" uid="uid://devwjm5t1shxy" path="res://Scenes/UI/mouse_object.tscn" id="2_dt15g"]
+[ext_resource type="PackedScene" uid="uid://bmhe4oqmcd326" path="res://Scenes/UI/inventory_slot.tscn" id="2_osrsm"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dt15g"]
 content_margin_left = 0.0
@@ -27,8 +28,8 @@ y_sort_enabled = true
 offset_right = 40.0
 offset_bottom = 40.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_dt15g")
-script = ExtResource("1_s6m5x")
-AmountSlots = 32
+script = ExtResource("1_dt15g")
+SlotScene = ExtResource("2_osrsm")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=365297740]
 layout_mode = 2
@@ -40,9 +41,9 @@ theme_override_constants/margin_bottom = 10
 [node name="ItemGrid" type="GridContainer" parent="MarginContainer" unique_id=1934794965]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 4
-theme_override_constants/v_separation = 4
-columns = 12
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 0
+columns = 14
 
 [node name="MouseObject" parent="." unique_id=145715296 instance=ExtResource("2_dt15g")]
 top_level = true

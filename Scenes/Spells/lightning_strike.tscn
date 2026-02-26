@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://ce03tbl6it2fh"]
 
 [ext_resource type="Script" uid="uid://bc7wbw4icxxo0" path="res://Scenes/Spells/LightningStrike.cs" id="1_hq3sb"]
-[ext_resource type="Shader" uid="uid://3eoq2jwm73qd" path="res://lightning_strike_shader.tres" id="1_rnkpb"]
+[ext_resource type="Shader" uid="uid://diinf238ekasm" path="res://lightning_strike_shader.tres" id="1_rnkpb"]
 [ext_resource type="Texture2D" uid="uid://b4unb85r0i63g" path="res://Textures/simple lightning.png" id="2_hq3sb"]
-[ext_resource type="Shader" uid="uid://b0earpqjvkt1c" path="res://lightning_explosion_shader.tres" id="3_cyali"]
+[ext_resource type="Shader" uid="uid://cv7wecfijy8c3" path="res://lightning_explosion_shader.tres" id="3_cyali"]
 [ext_resource type="Texture2D" uid="uid://d0vfgatwdk11o" path="res://Textures/explosion.png" id="4_y76ib"]
 [ext_resource type="AudioStream" uid="uid://cm8hjy265nqd0" path="res://Audio/lightning strike.mp3" id="6_cyali"]
 

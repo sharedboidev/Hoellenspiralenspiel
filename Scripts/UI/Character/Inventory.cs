@@ -6,14 +6,19 @@ using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Items.Consumables;
 using Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
-namespace Hoellenspiralenspiel.Scripts.UI;
+namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 public partial class Inventory : PanelContainer
 {
+    public delegate void EquippingItemEventHandler(InventorySlot fromSlot);
+
     private GridContainer itemGrid;
     private bool          slotsGenerated;
     private BaseTooltip   Tooltip     => GetTree().CurrentScene.GetNode<ItemTooltip>("%" + nameof(ItemTooltip));
     private MouseObject   MouseObject => GetNode<MouseObject>(nameof(MouseObject));
+
+    [Export]
+    public PackedScene SlotScene { get; set; }
 
     [Export]
     public int AmountSlots { get; set; } = 30;
@@ -28,11 +33,10 @@ public partial class Inventory : PanelContainer
         }
     }
 
+    public event EquippingItemEventHandler EquippingItem;
+
     public override void _Ready()
-    {
-        BuildInventory();
-        ToggleVisibility();
-    }
+        => BuildInventory();
 
     public void SetItem(BaseItem item)
     {
@@ -43,36 +47,48 @@ public partial class Inventory : PanelContainer
 
     public override void _Input(InputEvent @event)
     {
-        if (@event is not InputEventMouseButton { ButtonIndex: MouseButton.Left } mouseEvent)
+        if (@event is not InputEventMouseButton mouseEvent)
             return;
 
-        var clickedOutside = CheckClickedOutsideInventory(mouseEvent);
+        switch (mouseEvent.ButtonIndex)
+        {
+            case MouseButton.Left:
+                TryDropItem(mouseEvent);
 
-        if (clickedOutside)
+                break;
+            case MouseButton.Right: break;
+        }
+    }
+
+    private void TryDropItem(InputEventMouseButton mouseEvent)
+    {
+        if (CheckClickedOutsideInventory(mouseEvent))
             MouseObject.DropItem();
     }
 
     private bool CheckClickedOutsideInventory(InputEventMouseButton mouseEvent)
-        => mouseEvent.GlobalPosition.X < GlobalPosition.X
-           || mouseEvent.GlobalPosition.Y < GlobalPosition.Y
-           || mouseEvent.GlobalPosition.Y > GlobalPosition.Y + Size.Y
-           || mouseEvent.GlobalPosition.X > GlobalPosition.X + Size.X;
+    {
+        var parent        = GetParent<VBoxContainer>();
+        var parentSIze    = parent.Size;
+        var prentPosition = parent.GlobalPosition;
+        
+        return mouseEvent.GlobalPosition.X < prentPosition.X || mouseEvent.GlobalPosition.Y < prentPosition.Y || mouseEvent.GlobalPosition.Y > prentPosition.Y + parentSIze.Y || mouseEvent.GlobalPosition.X > prentPosition.X + parentSIze.X;
+    }
 
     private void BuildInventory()
     {
         if (slotsGenerated)
             return;
 
-        var slotScene = ResourceLoader.Load<PackedScene>("res://Scenes/UI/inventory_slot.tscn");
-
         for (var i = 0; i < AmountSlots; i++)
         {
-            var inventorySlot = slotScene.Instantiate<InventorySlot>();
+            var inventorySlot = SlotScene.Instantiate<InventorySlot>();
 
             inventorySlot.Inventory       =  this;
             inventorySlot.SlotEmptied     += InventorySlotOnSlotEmptied;
             inventorySlot.MouseMoving     += InventorySlotOnMouseMoving;
             inventorySlot.WithdrawingItem += InventorySlotOnWithdrawingItem;
+            inventorySlot.EquippingItem   += InventorySlotOnEquippingItem;
 
             ItemGrid.AddChild(inventorySlot);
         }
@@ -80,9 +96,14 @@ public partial class Inventory : PanelContainer
         slotsGenerated = true;
     }
 
-    private void InventorySlotOnWithdrawingItem(BaseItem withdrawnitem) => MouseObject.Show(withdrawnitem);
+    private void InventorySlotOnEquippingItem(InventorySlot fromSlot)
+        => EquippingItem?.Invoke(fromSlot);
 
-    private void InventorySlotOnSlotEmptied(InventorySlot inventoryslot) => Tooltip.Hide();
+    private void InventorySlotOnWithdrawingItem(BaseItem withdrawnitem)
+        => MouseObject.Show(withdrawnitem);
+
+    private void InventorySlotOnSlotEmptied(InventorySlot inventoryslot)
+        => Tooltip.Hide();
 
     private void InventorySlotOnMouseMoving(MousemovementDirection mousemovementdirection, InventorySlot inventoryslot)
     {
@@ -93,36 +114,17 @@ public partial class Inventory : PanelContainer
                     return;
 
                 Tooltip.Show(inventoryslot);
+
                 break;
             case MousemovementDirection.Left:
                 if (inventoryslot.ContainedItem == null)
 
                     return;
+
                 Tooltip.Hide();
+
                 break;
         }
-    }
-
-    public override void _Process(double delta)
-    {
-        if (Input.IsActionJustPressed("B"))
-            ToggleVisibility();
-    }
-
-    private void ToggleVisibility()
-    {
-        ModifyVisibilityThroughSelfModulate(this);
-
-        foreach (var inventorySlot in ItemGrid.GetAllChildren<InventorySlot>())
-            inventorySlot.SetVisible(!inventorySlot.IsVisible());
-    }
-
-    private void ModifyVisibilityThroughSelfModulate(PanelContainer panelContainer)
-    {
-        var newSelfModulate = panelContainer.SelfModulate;
-        newSelfModulate.A = newSelfModulate.A == 0 ? 1 : 0;
-
-        panelContainer.SetSelfModulate(newSelfModulate);
     }
 
     public InventorySlot GetNextFreeSlotOrDefaultFor(BaseItem incomingItem)
@@ -136,9 +138,7 @@ public partial class Inventory : PanelContainer
             if (nextSlot.ContainedItem is null)
                 return nextSlot;
 
-            if (incomingItem is ConsumableItem incomingConsumable
-                && nextSlot.ContainedItem is ConsumableItem { IsStackable: true } containedConsumable
-                && containedConsumable.CanFit(incomingConsumable))
+            if (incomingItem is ConsumableItem incomingConsumable && nextSlot.ContainedItem is ConsumableItem { IsStackable: true } containedConsumable && containedConsumable.CanFit(incomingConsumable))
                 return nextSlot;
         }
 

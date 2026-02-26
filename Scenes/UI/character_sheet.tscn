@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://b8q3plajba8gb"]
+
+[ext_resource type="PackedScene" uid="uid://82m36ij72ark" path="res://Scenes/UI/equipment_panel.tscn" id="1_4dpr5"]
+[ext_resource type="Script" uid="uid://ctwl54kxvrexp" path="res://Scripts/UI/Character/CharacterSheet.cs" id="1_kqng3"]
+[ext_resource type="PackedScene" uid="uid://6yhxh7p0ijv4" path="res://Scenes/UI/inventory.tscn" id="2_kqng3"]
+
+[node name="CharacterSheet" type="Control" unique_id=325839181 node_paths=PackedStringArray("equipmentPanel")]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_kqng3")
+equipmentPanel = NodePath("HBoxContainer/EquipmentPanel")
+viewportMarginHeightPx = 30
+viewportMarginWidthPx = 30
+
+[node name="HBoxContainer" type="VBoxContainer" parent="." unique_id=745077026]
+layout_mode = 0
+offset_right = 918.0
+offset_bottom = 914.0
+theme_override_constants/separation = 0
+
+[node name="EquipmentPanel" parent="HBoxContainer" unique_id=1502199728 node_paths=PackedStringArray("Inventory") instance=ExtResource("1_4dpr5")]
+unique_name_in_owner = true
+layout_mode = 2
+Inventory = NodePath("../Inventory")
+
+[node name="Inventory" parent="HBoxContainer" unique_id=2062578477 instance=ExtResource("2_kqng3")]
+unique_name_in_owner = true
+layout_mode = 2
+AmountSlots = 70

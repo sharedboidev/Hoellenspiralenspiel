@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="LootTable" format=3 uid="uid://b3jr0cbor0v5q"]
 
-[ext_resource type="Script" uid="uid://bg22hx7k8vipe" path="res://Resources/LootEntry.cs" id="1_lvq8t"]
+[ext_resource type="Script" uid="uid://dovuo5xiwuhtc" path="res://Resources/LootEntry.cs" id="1_lvq8t"]
 [ext_resource type="Script" uid="uid://bmef8b2b0wodq" path="res://Resources/LootTable.cs" id="2_5w23i"]
 [ext_resource type="PackedScene" uid="uid://bafd40n3y6xtn" path="res://Scenes/Items/Weapons/Staffs/staff.tscn" id="2_e2jip"]
 [ext_resource type="PackedScene" uid="uid://cphtaoh2o6ddc" path="res://Scenes/Items/Consumables/health_potion.tscn" id="3_e2jip"]

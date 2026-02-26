@@ -6,7 +6,6 @@ using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Configuration;
 using Hoellenspiralenspiel.Scripts.Models;
-using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.Items.Weapons;
@@ -52,26 +51,9 @@ public abstract partial class BaseWeapon : BaseItem
     [Export]
     public WieldStrategy WieldStrategie { get; set; }
 
-    [Export]
-    public Godot.Collections.Dictionary<Requirement, int> Requirements { get; set; } = new();
-
-    public             DamageType DamageType  { get; private set; }
-    public override    bool       IsStackable => false;
-    protected override ItemType   ItemType    => ItemType.Weapon;
-
-    public bool CanBeEquipedBy(Player2D player)
-    {
-        var canWield = true;
-
-        foreach (var requirement in Requirements)
-        {
-            var requiredAttributevalue = player.GetRequiredAttributevalue(requirement.Key);
-
-            canWield &= requirement.Value <= requiredAttributevalue;
-        }
-
-        return canWield;
-    }
+    public          DamageType DamageType  { get; private set; }
+    public override bool       IsStackable => false;
+    public override ItemType   ItemType    => ItemType.Weapon;
 
     public override void Init()
     {
@@ -82,7 +64,8 @@ public abstract partial class BaseWeapon : BaseItem
         SetExceptionalName();
     }
 
-    protected override void SetExceptionalName() => ExceptionalName = NameGenerator.GenerateRareWeapon();
+    protected override void SetExceptionalName()
+        => ExceptionalName = NameGenerator.GenerateRareWeapon();
 
     public override string GetTooltipDescription()
     {
@@ -178,10 +161,10 @@ public abstract partial class BaseWeapon : BaseItem
         => DamageType = WeaponType switch
         {
             WeaponType.Sword => new SlashDamage(),
-            WeaponType.Axe => new SlashDamage(),
+            WeaponType.Axe   => new SlashDamage(),
             WeaponType.Flail => new CrushDamage(),
             WeaponType.Staff => new CrushDamage(),
-            WeaponType.Bow => new PierceDamage(),
-            _ => null
+            WeaponType.Bow   => new PierceDamage(),
+            _                => null
         };
 }
