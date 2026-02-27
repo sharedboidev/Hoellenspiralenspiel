@@ -9,7 +9,7 @@ y_sort_enabled = true
 custom_minimum_size = Vector2(500, 0)
 offset_right = 50.0
 offset_bottom = 76.0
-size_flags_horizontal = 3
+size_flags_vertical = 0
 theme_override_styles/panel = ExtResource("1_ui1il")
 script = ExtResource("1_ri6pb")
 
@@ -22,6 +22,7 @@ theme_override_constants/margin_bottom = 5
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=856167468]
 layout_mode = 2
+size_flags_vertical = 0
 
 [node name="ObjectTitle" type="RichTextLabel" parent="MarginContainer/VBoxContainer" unique_id=1548258217]
 unique_name_in_owner = true

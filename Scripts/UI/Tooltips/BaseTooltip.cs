@@ -37,12 +37,19 @@ public abstract partial class BaseTooltip : PanelContainer
 
     private void SetPositionByNode(ITooltipObjectContainer container)
     {
-        var xPosition = container.TooltipAnchorPoint.X + container.Size.X; // - + 10;
-        var yPosition = container.TooltipAnchorPoint.Y;                    // - Size.Y + 10;
+        var viewportRectSize = GetViewportRect().Size;
+        var xPosition    = container.TooltipAnchorPoint.X + container.Size.X; 
+        var yPosition    = container.TooltipAnchorPoint.Y;
 
-        if (xPosition <= 0) xPosition = container.TooltipAnchorPoint.X + container.Size.X + 20;
-        if (yPosition <= 0) yPosition = container.TooltipAnchorPoint.Y + container.Size.Y + 20;
+        var viewportDeltaX = xPosition + Size.X - viewportRectSize.X;
+        var viewportDeltaY = yPosition + Size.Y - viewportRectSize.Y;
 
+        if (viewportDeltaX > 0)
+            xPosition = container.TooltipAnchorPoint.X- Size.X;
+
+        if (viewportDeltaY > 0)
+            yPosition = container.TooltipAnchorPoint.Y - Size.Y + container.Size.Y;
+        
         Position = new Vector2(xPosition, yPosition);
     }
 
