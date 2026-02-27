@@ -171,7 +171,10 @@ public partial class InventorySlot
     }
 
     private void EquipItem()
-        => EquippingItem?.Invoke(this);
+    {
+        EquippingItem?.Invoke(this);
+        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
+    }
 
     private void SwapItems(MouseObject mouseObject)
     {

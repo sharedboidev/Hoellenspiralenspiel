@@ -8,7 +8,6 @@
     <ItemGroup>
         <Folder Include="Resources\LootTables\" />
         <Folder Include="Scenes\Items\Weapons\Swords\" />
-        <Folder Include="Scripts\Items\Armors\Helmets\" />
         <Folder Include="Scripts\Items\Weapons\Staffs\"/>
     </ItemGroup>
     <ItemGroup>
