@@ -5,12 +5,9 @@ namespace Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
 public abstract partial class BaseTooltip : PanelContainer
 {
-    public const string        TitlePlaceholder = "Shown Object Title";
-    private      RichTextLabel ObjectDescriptionLabel { get; set; }
-    private      RichTextLabel ObjectTitleLabel       { get; set; }
-    public       VBoxContainer Container              { get; set; }
-    public       Color         ColorRed               => new(0.86f, 0.09f, 0.09f);
-    public       Color         ColorGreen             => new(0.02f, 0.7f, 0.08f);
+    private RichTextLabel ObjectDescriptionLabel { get; set; }
+    private RichTextLabel ObjectTitleLabel       { get; set; }
+    public  VBoxContainer Container              { get; set; }
 
     public virtual void Show(ITooltipObjectContainer objectContainer)
     {
@@ -19,7 +16,7 @@ public abstract partial class BaseTooltip : PanelContainer
 
         FindUIComponents();
         SetDisplayedDataByItem(objectContainer.ContainedItem);
-        SetPositionByNode(objectContainer);
+        SetPositionByContainer(objectContainer);
 
         Visible = true;
     }
@@ -36,11 +33,11 @@ public abstract partial class BaseTooltip : PanelContainer
         ObjectTitleLabel.Text                    = tooltipObject.GetTooltipTitle();
         ObjectDescriptionLabel.CustomMinimumSize = Vector2.Zero;
         ObjectDescriptionLabel.Text              = tooltipObject.GetTooltipDescription();
-        
+
         ResetSize();
     }
 
-    private void SetPositionByNode(ITooltipObjectContainer container)
+    private void SetPositionByContainer(ITooltipObjectContainer container)
     {
         var viewportRectSize = GetViewportRect().Size;
         var xPosition        = container.TooltipAnchorPoint.X + container.Size.X;

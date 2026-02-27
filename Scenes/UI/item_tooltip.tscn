@@ -35,6 +35,7 @@ theme_override_font_sizes/normal_font_size = 36
 bbcode_enabled = true
 text = "[center]Title[/center]"
 fit_content = true
+autowrap_mode = 0
 
 [node name="ObjectDescription" type="RichTextLabel" parent="MarginContainer/VBoxContainer" unique_id=1942957644]
 unique_name_in_owner = true
