@@ -24,32 +24,37 @@ public abstract partial class BaseTooltip : PanelContainer
         Visible = true;
     }
 
-    public new virtual void Hide() => Visible = false;
+    public new virtual void Hide()
+        => Visible = false;
 
     private void SetDisplayedDataByItem(ITooltipObject tooltipObject)
     {
         if (ObjectTitleLabel is null || ObjectDescriptionLabel is null || tooltipObject is null)
             return;
 
-        ObjectTitleLabel.Text = tooltipObject.GetTooltipTitle();
-        ObjectDescriptionLabel.Text = tooltipObject.GetTooltipDescription();
+        ObjectTitleLabel.CustomMinimumSize       = Vector2.Zero;
+        ObjectTitleLabel.Text                    = tooltipObject.GetTooltipTitle();
+        ObjectDescriptionLabel.CustomMinimumSize = Vector2.Zero;
+        ObjectDescriptionLabel.Text              = tooltipObject.GetTooltipDescription();
+        
+        ResetSize();
     }
 
     private void SetPositionByNode(ITooltipObjectContainer container)
     {
         var viewportRectSize = GetViewportRect().Size;
-        var xPosition    = container.TooltipAnchorPoint.X + container.Size.X; 
-        var yPosition    = container.TooltipAnchorPoint.Y;
+        var xPosition        = container.TooltipAnchorPoint.X + container.Size.X;
+        var yPosition        = container.TooltipAnchorPoint.Y;
 
         var viewportDeltaX = xPosition + Size.X - viewportRectSize.X;
         var viewportDeltaY = yPosition + Size.Y - viewportRectSize.Y;
 
         if (viewportDeltaX > 0)
-            xPosition = container.TooltipAnchorPoint.X- Size.X;
+            xPosition = container.TooltipAnchorPoint.X - Size.X;
 
         if (viewportDeltaY > 0)
             yPosition = container.TooltipAnchorPoint.Y - Size.Y + container.Size.Y;
-        
+
         Position = new Vector2(xPosition, yPosition);
     }
 

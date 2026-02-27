@@ -15,6 +15,7 @@ script = ExtResource("1_ri6pb")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=2079933430]
 layout_mode = 2
+size_flags_vertical = 0
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
