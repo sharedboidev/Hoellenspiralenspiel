@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Extensions;
@@ -11,8 +12,12 @@ public partial class EquipmentPanel : PanelContainer
 {
     private readonly Dictionary<ItemSlot, EquipmentSlot> slotMap = new();
 
+    public delegate void ItemEquippedEventHandler();
+
+    public event ItemEquippedEventHandler ItemEquipped;
     [Export]
     public Inventory Inventory { get; set; }
+    
 
     private BaseTooltip Tooltip => GetTree().CurrentScene.GetNode<ItemTooltip>("%" + nameof(ItemTooltip));
 
@@ -21,8 +26,15 @@ public partial class EquipmentPanel : PanelContainer
         foreach (var equipmentSlot in this.GetAllChildren<EquipmentSlot>())
         {
             equipmentSlot.MouseMoving += EquipmentSlotOnMouseMoving;
+            equipmentSlot.PropertyChanged += EquipmentSlotOnPropertyChanged;
+            
             slotMap.Add(equipmentSlot.FittingItemSlot, equipmentSlot);
         }
+    }
+
+    private void EquipmentSlotOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        //todo new/old value verlgeich, dann equipped Invoken   
     }
 
     private void EquipmentSlotOnMouseMoving(MousemovementDirection mousemovementdirection, EquipmentSlot equipmentslot)

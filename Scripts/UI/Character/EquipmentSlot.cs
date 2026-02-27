@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
@@ -6,10 +9,14 @@ using Hoellenspiralenspiel.Scripts.Items;
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 [Tool]
-public partial class EquipmentSlot : PanelContainer,
-                                     ITooltipObjectContainer
+public partial class EquipmentSlot
+        : PanelContainer,
+          ITooltipObjectContainer,
+          INotifyPropertyChanged
 {
     public delegate void MouseMovementEventHandler(MousemovementDirection mousemovementDirection, EquipmentSlot equipmentSlot);
+
+    private ITooltipObject containedItem;
 
     private          Texture2D defaultTexture;
     [Export] private int       pxDimension = 64;
@@ -52,6 +59,16 @@ public partial class EquipmentSlot : PanelContainer,
             SetScaledSize();
         }
     }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public ITooltipObject ContainedItem
+    {
+        get => containedItem;
+        set => SetField(ref containedItem, value);
+    }
+
+    public Vector2 TooltipAnchorPoint => GlobalPosition;
 
     public event MouseMovementEventHandler MouseMoving;
 
@@ -119,9 +136,9 @@ public partial class EquipmentSlot : PanelContainer,
         var slotItem = RetrieveItem();
 
         EquipItem(mousItem);
-        
+
         mouseObject.Show(slotItem);
-        
+
         MouseMoving?.Invoke(MousemovementDirection.Entered, this);
     }
 
@@ -147,6 +164,17 @@ public partial class EquipmentSlot : PanelContainer,
     public void _on_texture_rect_mouse_entered()
         => MouseMoving?.Invoke(MousemovementDirection.Entered, this);
 
-    public ITooltipObject ContainedItem      { get; set; }
-    public Vector2        TooltipAnchorPoint => GlobalPosition;
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value))
+            return false;
+
+        field = value;
+        OnPropertyChanged(propertyName);
+
+        return true;
+    }
 }
