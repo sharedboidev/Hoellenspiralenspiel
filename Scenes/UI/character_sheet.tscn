@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://82m36ij72ark" path="res://Scenes/UI/equipment_panel.tscn" id="1_4dpr5"]
 [ext_resource type="Script" uid="uid://ddist31l2rnnm" path="res://Scripts/UI/Character/CharacterSheet.cs" id="1_kqng3"]
 [ext_resource type="PackedScene" uid="uid://6yhxh7p0ijv4" path="res://Scenes/UI/inventory.tscn" id="2_kqng3"]
+[ext_resource type="PackedScene" uid="uid://dfow3txum7iel" path="res://Scenes/UI/statdisplay.tscn" id="4_dwqj4"]
 
 [node name="CharacterSheet" type="Control" unique_id=325839181 node_paths=PackedStringArray("equipmentPanel")]
 layout_mode = 3
@@ -27,3 +28,10 @@ Inventory = NodePath("../Inventory")
 unique_name_in_owner = true
 layout_mode = 2
 AmountSlots = 70
+
+[node name="Statdisplay" parent="." unique_id=322490862 instance=ExtResource("4_dwqj4")]
+z_index = -1
+layout_mode = 0
+offset_left = -295.0
+offset_right = 5.0
+offset_bottom = 474.0
