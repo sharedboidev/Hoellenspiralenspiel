@@ -5,6 +5,7 @@ using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Utils.EventArgs;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
@@ -164,16 +165,19 @@ public partial class EquipmentSlot
     public void _on_texture_rect_mouse_entered()
         => MouseMoving?.Invoke(MousemovementDirection.Entered, this);
 
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    protected virtual void OnPropertyChanged<T>(T oldValue, T newValue, [CallerMemberName] string propertyName = null)
+        => PropertyChanged?.Invoke(this, new CustomPropertyChangedEventArgs(oldValue, newValue, propertyName));
 
+    
     protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value))
             return false;
 
+        var oldValue = field;
         field = value;
-        OnPropertyChanged(propertyName);
+        
+        OnPropertyChanged(oldValue, value, propertyName);
 
         return true;
     }

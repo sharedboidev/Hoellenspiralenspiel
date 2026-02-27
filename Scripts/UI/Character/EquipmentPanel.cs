@@ -5,6 +5,7 @@ using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.UI.Tooltips;
+using Hoellenspiralenspiel.Scripts.Utils.EventArgs;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
@@ -12,9 +13,9 @@ public partial class EquipmentPanel : PanelContainer
 {
     private readonly Dictionary<ItemSlot, EquipmentSlot> slotMap = new();
 
-    public delegate void ItemEquippedEventHandler();
+    public delegate void EquipmentChangedEventHandler();
 
-    public event ItemEquippedEventHandler ItemEquipped;
+    public event EquipmentChangedEventHandler EquipmentChanged;
     [Export]
     public Inventory Inventory { get; set; }
     
@@ -34,7 +35,11 @@ public partial class EquipmentPanel : PanelContainer
 
     private void EquipmentSlotOnPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        //todo new/old value verlgeich, dann equipped Invoken   
+        if(e is not CustomPropertyChangedEventArgs customArg)
+            return;
+        
+        if(customArg.OldValue != customArg.NewValue)
+            EquipmentChanged?.Invoke();
     }
 
     private void EquipmentSlotOnMouseMoving(MousemovementDirection mousemovementdirection, EquipmentSlot equipmentslot)

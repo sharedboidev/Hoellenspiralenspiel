@@ -10,12 +10,26 @@ public partial class CharacterSheet : Control
     [Export] private Player2D       player;
     [Export] private int            viewportMarginHeightPx;
     [Export] private int            viewportMarginWidthPx;
+    private          Statdisplay    statdisplay;
 
     public override void _Ready()
     {
         SetPositionRelativeToViewport();
 
-        GetNode<Inventory>("%" + nameof(Inventory)).EquippingItem += OnEquippingItem;
+        statdisplay = GetNode<Statdisplay>(nameof(Statdisplay));
+        
+        GetNode<EquipmentPanel>("%" + nameof(EquipmentPanel)).EquipmentChanged += OnEquipmentChanged;
+        GetNode<Inventory>("%" + nameof(Inventory)).EquippingItem              += OnEquippingItem;
+    }
+
+    private void OnEquipmentChanged() => RerenderStatdisplay();
+
+    private void RerenderStatdisplay()
+    {
+        if (player is null)
+            return;
+        
+        statdisplay.Render(player);
     }
 
     private void OnEquippingItem(InventorySlot fromslot)
