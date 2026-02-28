@@ -28,6 +28,11 @@ public partial class Statdisplay : PanelContainer
 
     public void Render(Player2D player)
     {
+        strengthLabel.Text  = player.StrengthFinal.ToString("N0");
+        dexLabel.Text       = player.DexterityFinal.ToString("N0");
+        intLabel.Text       = player.IntelligenceFinal.ToString("N0");
+        constiLabel.Text    = player.ConstitutionFinal.ToString("N0");
+        awarenessLabel.Text = player.AwarenessFinal.ToString("N0");
     }
     
     private void FindUtilities()

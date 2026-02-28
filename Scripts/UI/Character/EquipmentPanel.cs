@@ -5,6 +5,7 @@ using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.UI.Tooltips;
+using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Utils.EventArgs;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
@@ -18,15 +19,16 @@ public partial class EquipmentPanel : PanelContainer
     public event EquipmentChangedEventHandler EquipmentChanged;
     [Export]
     public Inventory Inventory { get; set; }
-    
 
+    private Player2D    Player  => GetTree().CurrentScene.GetNode<Player2D>("%Player 2D");
     private BaseTooltip Tooltip => GetTree().CurrentScene.GetNode<ItemTooltip>("%" + nameof(ItemTooltip));
 
     public override void _Ready()
     {
         foreach (var equipmentSlot in this.GetAllChildren<EquipmentSlot>())
         {
-            equipmentSlot.MouseMoving += EquipmentSlotOnMouseMoving;
+            equipmentSlot.Player          =  Player;
+            equipmentSlot.MouseMoving     += EquipmentSlotOnMouseMoving;
             equipmentSlot.PropertyChanged += EquipmentSlotOnPropertyChanged;
             
             slotMap.Add(equipmentSlot.FittingItemSlot, equipmentSlot);
@@ -49,14 +51,10 @@ public partial class EquipmentPanel : PanelContainer
             case MousemovementDirection.Entered:
                 if (equipmentslot.IsEmpty)
                     return;
-
                 Tooltip.Show(equipmentslot);
 
                 break;
             case MousemovementDirection.Left:
-                if (equipmentslot.IsEmpty)
-                    return;
-
                 Tooltip.Hide();
 
                 break;

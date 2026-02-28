@@ -21,5 +21,10 @@ public enum CombatStat
     [Description("Critical Damage")]
     CriticalDamage,
     Range,
-    Armor
+    Armor,
+    Strength,
+    Dexterity,
+    Intelligence,
+    Constitution,
+    Awareness
 }

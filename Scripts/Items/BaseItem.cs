@@ -19,7 +19,6 @@ public abstract partial class BaseItem
 {
     [Export]
     public TextureRect Icon { get; set; }
-
     public          int                ItemLevel           { get; set; } = 1;
     public abstract bool               IsStackable         { get; }
     public abstract string             ItembaseName        { get; }
@@ -81,6 +80,29 @@ public abstract partial class BaseItem
         return emil.ToString();
     }
 
+    public virtual string GetTooltipTitle()
+    {
+        var emil = new StringBuilder();
+        emil.Append("[center]");
+
+        if (IsMagic)
+            emil.AppendLine($"[color=dodger_blue]{AffixedItembaseName}[/color]");
+        else
+        {
+            if (IsRare)
+            {
+                emil.AppendLine($"[color=yellow]{ExceptionalName}[/color]");
+                emil.AppendLine($"[color=yellow]{ItembaseName}[/color]");
+            }
+            else
+                emil.AppendLine($"{ItembaseName}");
+        }
+
+        emil.Append("[/center]");
+
+        return emil.ToString();
+    }
+
     private void AppendAffixes(StringBuilder emil)
     {
         foreach (var affix in ItemModifiers.OrderBy(a => a.AffixType))
@@ -129,6 +151,9 @@ public abstract partial class BaseItem
     public void AddModifier(ItemModifier modifier)
         => ItemModifiers.Add(modifier);
 
+    public ItemModifier[] GetModifiers()
+        => ItemModifiers.ToArray();
+
     public bool CanBeEquipedBy(Player2D player)
     {
         if (player is null)
@@ -145,28 +170,6 @@ public abstract partial class BaseItem
 
         return canWield;
     }
-    public virtual string GetTooltipTitle()
-    {
-        var emil = new StringBuilder();
-        emil.Append("[center]");
-
-        if (IsMagic)
-            emil.AppendLine($"[color=dodger_blue]{AffixedItembaseName}[/color]");
-        else
-        {
-            if (IsRare)
-            {
-                emil.AppendLine($"[color=yellow]{ExceptionalName}[/color]");
-                emil.AppendLine($"[color=yellow]{ItembaseName}[/color]");
-            }
-            else
-                emil.AppendLine($"{ItembaseName}");
-        }
-
-        emil.Append("[/center]");
-
-        return emil.ToString();
-    }
 
     protected string GetStyledValue(double finalValue, double baseValue)
     {
@@ -182,7 +185,6 @@ public abstract partial class BaseItem
         return $"{finalValue}";
     }
 
-
     protected void SetAffixedItembaseName()
     {
         var prefix = ItemModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Prefix);
@@ -192,7 +194,6 @@ public abstract partial class BaseItem
     }
 
     protected virtual void SetExceptionalName() { }
-
 
     protected float GetTotalMoreMultiplierOf(CombatStat combatStat)
     {
@@ -210,6 +211,7 @@ public abstract partial class BaseItem
     private IEnumerable<ItemModifier> GetModifierOf(ModificationType modificationType, CombatStat combatStat)
         => ItemModifiers.Where(mod => mod.CombatStat == combatStat &&
                                       mod.ModificationType == modificationType);
+
     public override void _Ready()
         => Icon = GetNode<TextureRect>("Icon");
 }

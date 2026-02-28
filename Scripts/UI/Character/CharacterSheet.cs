@@ -17,6 +17,7 @@ public partial class CharacterSheet : Control
         SetPositionRelativeToViewport();
 
         statdisplay = GetNode<Statdisplay>(nameof(Statdisplay));
+        statdisplay.Render(player);
         
         GetNode<EquipmentPanel>("%" + nameof(EquipmentPanel)).EquipmentChanged += OnEquipmentChanged;
         GetNode<Inventory>("%" + nameof(Inventory)).EquippingItem              += OnEquippingItem;
@@ -41,6 +42,8 @@ public partial class CharacterSheet : Control
             return;
 
         var retrievedItem        = fromslot.RetrieveItem();
+        //player.EquipItem(retrievedItem);
+        
         var formerlyEquippedItem = equipmentPanel.EquipIntoFittingSlot(retrievedItem);
 
         fromslot.SetItem(formerlyEquippedItem);

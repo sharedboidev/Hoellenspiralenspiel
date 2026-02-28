@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dfow3txum7iel"]
 
 [ext_resource type="StyleBox" uid="uid://d0lsfuyas70d8" path="res://Resources/Themes/boxes_stylebox.tres" id="1_8uisl"]
+[ext_resource type="Script" uid="uid://cklbnsdykwg6e" path="res://Scripts/UI/Character/Statdisplay.cs" id="2_dix5n"]
 [ext_resource type="StyleBox" uid="uid://cv8o42523wbtf" path="res://Resources/Themes/stat_underscore.tres" id="2_hbpk6"]
 
 [node name="Statdisplay" type="PanelContainer" unique_id=322490862]
@@ -8,6 +9,7 @@ custom_minimum_size = Vector2(300, 0)
 offset_right = 40.0
 offset_bottom = 40.0
 theme_override_styles/panel = ExtResource("1_8uisl")
+script = ExtResource("2_dix5n")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1018213379]
 layout_mode = 2

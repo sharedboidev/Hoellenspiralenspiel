@@ -5,6 +5,7 @@ using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Utils.EventArgs;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
@@ -24,6 +25,7 @@ public partial class EquipmentSlot
     private          int       slotHeight  = 1;
     private          int       slotWidth   = 1;
     public           bool      IsEmpty => ContainedItem is null;
+    public           Player2D         Player      { get; set; }
 
     [Export]
     public ItemSlot FittingItemSlot { get; private set; }
@@ -97,7 +99,9 @@ public partial class EquipmentSlot
 
     public void EquipItem(BaseItem item)
     {
+        Player.EquipItem(item);
         ContainedItem = item;
+        
         var textureNode = GetNode<TextureRect>("%Icon");
         textureNode.Texture = ((BaseItem)ContainedItem).Icon.Texture;
     }
@@ -146,6 +150,8 @@ public partial class EquipmentSlot
     private void WithdrawItem(MouseObject mouseObject)
     {
         var item = RetrieveItem();
+        
+        MouseMoving?.Invoke(MousemovementDirection.Left, this);
 
         mouseObject.Show(item);
     }
