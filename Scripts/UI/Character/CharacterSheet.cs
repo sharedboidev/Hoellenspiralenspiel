@@ -1,5 +1,6 @@
 using Godot;
 using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.UI.Buttons;
 using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
@@ -21,7 +22,11 @@ public partial class CharacterSheet : Control
 
         GetNode<EquipmentPanel>("%" + nameof(EquipmentPanel)).EquipmentChanged += OnEquipmentChanged;
         GetNode<Inventory>("%" + nameof(Inventory)).EquippingItem              += OnEquippingItem;
+        GetNode<StatdisplayButton>(nameof(StatdisplayButton)).Pressed          += OnPressed;
     }
+
+    private void OnPressed(bool isToggledOpen)
+        => statdisplay.Visible = isToggledOpen;
 
     private void OnEquipmentChanged(object formerlyEqipped, object newlyEquipped)
     {

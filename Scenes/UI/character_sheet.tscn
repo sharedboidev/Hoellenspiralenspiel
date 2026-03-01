@@ -4,6 +4,9 @@
 [ext_resource type="Script" uid="uid://ddist31l2rnnm" path="res://Scripts/UI/Character/CharacterSheet.cs" id="1_kqng3"]
 [ext_resource type="PackedScene" uid="uid://6yhxh7p0ijv4" path="res://Scenes/UI/inventory.tscn" id="2_kqng3"]
 [ext_resource type="PackedScene" uid="uid://dfow3txum7iel" path="res://Scenes/UI/statdisplay.tscn" id="4_dwqj4"]
+[ext_resource type="Texture2D" uid="uid://yynk3vg0ysux" path="res://Textures/UI/Buttons/Mini_arrow_left2.png" id="5_khxyl"]
+[ext_resource type="Texture2D" uid="uid://bvrchl6rqwbnk" path="res://Textures/UI/Buttons/Mini_arrow_left2_t.png" id="6_nfwpk"]
+[ext_resource type="Script" uid="uid://f2ew6yv6qad" path="res://Scripts/UI/Buttons/StatdisplayButton.cs" id="7_gx1ge"]
 
 [node name="CharacterSheet" type="Control" unique_id=325839181 node_paths=PackedStringArray("equipmentPanel")]
 layout_mode = 3
@@ -30,9 +33,22 @@ layout_mode = 2
 AmountSlots = 70
 
 [node name="Statdisplay" parent="." unique_id=322490862 node_paths=PackedStringArray("equipmentPanel") instance=ExtResource("4_dwqj4")]
+visible = false
 z_index = -1
 layout_mode = 0
-offset_left = -295.0
-offset_right = 5.0
-offset_bottom = 474.0
+offset_left = -444.0
+offset_right = 6.0
+offset_bottom = 670.0
 equipmentPanel = NodePath("../HBoxContainer/EquipmentPanel")
+
+[node name="StatdisplayButton" type="TextureButton" parent="." unique_id=1686612181]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 45.0
+offset_bottom = 45.0
+texture_normal = ExtResource("5_khxyl")
+texture_pressed = ExtResource("6_nfwpk")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("7_gx1ge")
