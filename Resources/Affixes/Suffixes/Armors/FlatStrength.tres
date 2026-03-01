@@ -1,0 +1,100 @@
+[gd_resource type="Resource" script_class="Suffix" format=3 uid="uid://dg7ia6uwpjbbo"]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_7oljd"]
+[ext_resource type="Script" uid="uid://bwwyi50jc5koy" path="res://Resources/Affixes/Suffixes/Suffix.cs" id="2_iajdi"]
+
+[sub_resource type="Resource" id="Resource_7oljd"]
+script = ExtResource("1_7oljd")
+MinItemLevelToAppearOn = 82
+Weight = 1000
+MinValue = 20.0
+MaxValue = 22.0
+ItemnameAddition = "of Gods"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_iajdi"]
+script = ExtResource("1_7oljd")
+Tier = 2
+MinItemLevelToAppearOn = 74
+Weight = 1000
+MinValue = 16.0
+MaxValue = 19.0
+ItemnameAddition = "of The Titans"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_12qu3"]
+script = ExtResource("1_7oljd")
+Tier = 3
+MinItemLevelToAppearOn = 66
+Weight = 1000
+MinValue = 13.0
+MaxValue = 15.0
+ItemnameAddition = "of the Gargantuan"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_eme8m"]
+script = ExtResource("1_7oljd")
+Tier = 4
+MinItemLevelToAppearOn = 55
+Weight = 1000
+MinValue = 11.0
+MaxValue = 12.0
+ItemnameAddition = "of the Ant"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_8sj0s"]
+script = ExtResource("1_7oljd")
+Tier = 5
+MinItemLevelToAppearOn = 44
+Weight = 1000
+MinValue = 9.0
+MaxValue = 10.0
+ItemnameAddition = "of the Bruiser"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_eoa54"]
+script = ExtResource("1_7oljd")
+Tier = 6
+MinItemLevelToAppearOn = 33
+Weight = 1000
+MinValue = 7.0
+MaxValue = 8.0
+ItemnameAddition = "of the Ogre"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_rw6t3"]
+script = ExtResource("1_7oljd")
+Tier = 7
+MinItemLevelToAppearOn = 22
+Weight = 1000
+MinValue = 5.0
+MaxValue = 6.0
+ItemnameAddition = "of the Bear"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_7un37"]
+script = ExtResource("1_7oljd")
+Tier = 8
+MinItemLevelToAppearOn = 11
+Weight = 1000
+MinValue = 3.0
+MaxValue = 4.0
+ItemnameAddition = "of the Ape"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_hnb7d"]
+script = ExtResource("1_7oljd")
+Tier = 9
+MinItemLevelToAppearOn = 1
+Weight = 1000
+MinValue = 1.0
+MaxValue = 2.0
+ItemnameAddition = "of the Wrestler"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_iajdi")
+AffectedCombatStat = 14
+AffectableItemTypes = Array[int]([4, 7, 3, 8, 9, 10, 11])
+Tiers = Array[ExtResource("1_7oljd")]([SubResource("Resource_7oljd"), SubResource("Resource_iajdi"), SubResource("Resource_12qu3"), SubResource("Resource_eme8m"), SubResource("Resource_8sj0s"), SubResource("Resource_eoa54"), SubResource("Resource_rw6t3"), SubResource("Resource_7un37"), SubResource("Resource_hnb7d")])
+metadata/_custom_type_script = "uid://bwwyi50jc5koy"
