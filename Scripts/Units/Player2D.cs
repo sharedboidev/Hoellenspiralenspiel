@@ -19,6 +19,8 @@ public class FireballContainer { }
 
 public partial class Player2D : BaseUnit
 {
+    public delegate void EquipmentChangedEventHandler();
+
     private readonly PackedScene     skillBarIcon = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
     private readonly List<BaseSkill> skills       = new();
     [Export] private ResourceOrb     lifeOrb;
@@ -40,6 +42,8 @@ public partial class Player2D : BaseUnit
 
     [Export]
     public float ManaMaximum { get; set; } = 100;
+
+    public event EquipmentChangedEventHandler EquipmentChanged;
 
     public override void _Ready()
     {
@@ -184,11 +188,15 @@ public partial class Player2D : BaseUnit
             var newModifier = item.CreateCombatStatModifier(modifier);
             CombatStatModifiers.Add(newModifier);
         }
+
+        EquipmentChanged?.Invoke();
     }
 
     public void UnequipItem(BaseItem item)
     {
         var modifierToRemove = CombatStatModifiers.Where(mod => mod.OriginId == item.ToString()).ToList();
         CombatStatModifiers = CombatStatModifiers.Except(modifierToRemove).ToList();
+
+        EquipmentChanged?.Invoke();
     }
 }

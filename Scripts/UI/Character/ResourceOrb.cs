@@ -35,8 +35,15 @@ public partial class ResourceOrb : Control
 		SetPositionInViewport(resourceTypetype);
 
 		player.PropertyChanged += PlayerOnPropertyChanged;
+		player.EquipmentChanged += PlayerOnEquipmentChanged;
 
 		ApplyColor();
+		SetRessource(current);
+	}
+
+	private void PlayerOnEquipmentChanged()
+	{
+		SetRessourceValues(type);
 		SetRessource(current);
 	}
 
@@ -80,8 +87,14 @@ public partial class ResourceOrb : Control
 			case ResourceType.Life when e.PropertyName == nameof(BaseUnit.LifeCurrent):
 				SetRessource(player.LifeCurrent);
 				break;
+			case ResourceType.Life when e.PropertyName == nameof(BaseUnit.LifeMaximum):
+				SetRessourceValues(ResourceType.Life);
+				break;
 			case ResourceType.Mana when e.PropertyName == nameof(Player2D.ManaCurrent):
 				SetRessource(player.ManaCurrent);
+				break;
+			case ResourceType.Mana when e.PropertyName == nameof(Player2D.ManaMaximum):
+				SetRessourceValues(ResourceType.Mana);
 				break;
 		}
 	}
