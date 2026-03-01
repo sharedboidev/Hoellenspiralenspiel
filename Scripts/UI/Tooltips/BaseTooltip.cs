@@ -5,12 +5,9 @@ namespace Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
 public abstract partial class BaseTooltip : PanelContainer
 {
-    public const string        TitlePlaceholder = "Shown Object Title";
-    private      RichTextLabel ObjectDescriptionLabel { get; set; }
-    private      RichTextLabel ObjectTitleLabel       { get; set; }
-    public       VBoxContainer Container              { get; set; }
-    public       Color         ColorRed               => new(0.86f, 0.09f, 0.09f);
-    public       Color         ColorGreen             => new(0.02f, 0.7f, 0.08f);
+    private RichTextLabel ObjectDescriptionLabel { get; set; }
+    private RichTextLabel ObjectTitleLabel       { get; set; }
+    public  VBoxContainer Container              { get; set; }
 
     public virtual void Show(ITooltipObjectContainer objectContainer)
     {
@@ -19,29 +16,41 @@ public abstract partial class BaseTooltip : PanelContainer
 
         FindUIComponents();
         SetDisplayedDataByItem(objectContainer.ContainedItem);
-        SetPositionByNode(objectContainer);
+        SetPositionByContainer(objectContainer);
 
         Visible = true;
     }
 
-    public new virtual void Hide() => Visible = false;
+    public new virtual void Hide()
+        => Visible = false;
 
     private void SetDisplayedDataByItem(ITooltipObject tooltipObject)
     {
         if (ObjectTitleLabel is null || ObjectDescriptionLabel is null || tooltipObject is null)
             return;
 
-        ObjectTitleLabel.Text = tooltipObject.GetTooltipTitle();
-        ObjectDescriptionLabel.Text = tooltipObject.GetTooltipDescription();
+        ObjectTitleLabel.CustomMinimumSize       = Vector2.Zero;
+        ObjectTitleLabel.Text                    = tooltipObject.GetTooltipTitle();
+        ObjectDescriptionLabel.CustomMinimumSize = Vector2.Zero;
+        ObjectDescriptionLabel.Text              = tooltipObject.GetTooltipDescription();
+
+        ResetSize();
     }
 
-    private void SetPositionByNode(ITooltipObjectContainer container)
+    private void SetPositionByContainer(ITooltipObjectContainer container)
     {
-        var xPosition = container.TooltipAnchorPoint.X + container.Size.X; // - + 10;
-        var yPosition = container.TooltipAnchorPoint.Y;                    // - Size.Y + 10;
+        var viewportRectSize = GetViewportRect().Size;
+        var xPosition        = container.TooltipAnchorPoint.X + container.Size.X;
+        var yPosition        = container.TooltipAnchorPoint.Y;
 
-        if (xPosition <= 0) xPosition = container.TooltipAnchorPoint.X + container.Size.X + 20;
-        if (yPosition <= 0) yPosition = container.TooltipAnchorPoint.Y + container.Size.Y + 20;
+        var viewportDeltaX = xPosition + Size.X - viewportRectSize.X;
+        var viewportDeltaY = yPosition + Size.Y - viewportRectSize.Y;
+
+        if (viewportDeltaX > 0)
+            xPosition = container.TooltipAnchorPoint.X - Size.X;
+
+        if (viewportDeltaY > 0)
+            yPosition = container.TooltipAnchorPoint.Y - Size.Y + container.Size.Y;
 
         Position = new Vector2(xPosition, yPosition);
     }

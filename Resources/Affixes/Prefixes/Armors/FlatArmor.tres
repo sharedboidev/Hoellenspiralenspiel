@@ -1,0 +1,90 @@
+[gd_resource type="Resource" script_class="Prefix" format=3 uid="uid://ct8w5gwsk4id1"]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_3ww73"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_q5i8j"]
+
+[sub_resource type="Resource" id="Resource_3ww73"]
+script = ExtResource("1_3ww73")
+MinItemLevelToAppearOn = 51
+Weight = 1000
+MinValue = 151.0
+MaxValue = 200.0
+ItemnameAddition = "Enveloped"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_q5i8j"]
+script = ExtResource("1_3ww73")
+Tier = 2
+MinItemLevelToAppearOn = 43
+Weight = 1000
+MinValue = 121.0
+MaxValue = 150.0
+ItemnameAddition = "Encased"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_ak7wi"]
+script = ExtResource("1_3ww73")
+Tier = 3
+MinItemLevelToAppearOn = 35
+Weight = 1000
+MinValue = 102.0
+MaxValue = 120.0
+ItemnameAddition = "Carapaced"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_2ylu8"]
+script = ExtResource("1_3ww73")
+Tier = 4
+MinItemLevelToAppearOn = 29
+Weight = 1000
+MinValue = 83.0
+MaxValue = 101.0
+ItemnameAddition = "Plated"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_seq0k"]
+script = ExtResource("1_3ww73")
+Tier = 5
+MinItemLevelToAppearOn = 23
+Weight = 1000
+MinValue = 64.0
+MaxValue = 82.0
+ItemnameAddition = "Fortified"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_304jp"]
+script = ExtResource("1_3ww73")
+Tier = 6
+MinItemLevelToAppearOn = 17
+Weight = 1000
+MinValue = 36.0
+MaxValue = 63.0
+ItemnameAddition = "Ribbed"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_jv5bc"]
+script = ExtResource("1_3ww73")
+Tier = 7
+MinItemLevelToAppearOn = 11
+Weight = 1000
+MinValue = 13.0
+MaxValue = 35.0
+ItemnameAddition = "Studded"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_1r2cw"]
+script = ExtResource("1_3ww73")
+Tier = 8
+MinItemLevelToAppearOn = 1
+Weight = 1000
+MinValue = 6.0
+MaxValue = 12.0
+ItemnameAddition = "Lacqered"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_q5i8j")
+AffectedCombatStat = 13
+AffectableItemTypes = Array[int]([2, 4, 12, 13, 14, 15, 16])
+Tiers = Array[ExtResource("1_3ww73")]([SubResource("Resource_3ww73"), SubResource("Resource_q5i8j"), SubResource("Resource_ak7wi"), SubResource("Resource_2ylu8"), SubResource("Resource_seq0k"), SubResource("Resource_304jp"), SubResource("Resource_jv5bc"), SubResource("Resource_1r2cw")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

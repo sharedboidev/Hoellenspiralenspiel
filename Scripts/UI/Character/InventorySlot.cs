@@ -160,6 +160,8 @@ public partial class InventorySlot
         var item = mouseObject.RetrieveItem();
 
         SetItem(item);
+
+        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
     }
 
     private void WithdrawItem()
@@ -169,7 +171,10 @@ public partial class InventorySlot
     }
 
     private void EquipItem()
-        => EquippingItem?.Invoke(this);
+    {
+        EquippingItem?.Invoke(this);
+        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
+    }
 
     private void SwapItems(MouseObject mouseObject)
     {
@@ -178,6 +183,7 @@ public partial class InventorySlot
 
         SetItem(mousItem);
         mouseObject.Show(slotItem);
+        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
     }
 
     private void MergeItems(MouseObject mouseObject)

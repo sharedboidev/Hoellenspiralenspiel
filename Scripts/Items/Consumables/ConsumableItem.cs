@@ -17,7 +17,7 @@ public abstract partial class ConsumableItem : BaseItem
     public int StacksizeCurrent { get; set; } = 1;
 
     public          bool          IsFull   => StacksizeCurrent == StacksizeMax;
-    public override ItemType      ItemType => ItemType.Consumable;
+    public override ItemSlot      ItemSlot => ItemSlot.Consumable;
     public event StacksizeReduced OnStacksizeReduced;
 
     protected abstract void ApplyEffectOfConsumption(BaseUnit consumee);

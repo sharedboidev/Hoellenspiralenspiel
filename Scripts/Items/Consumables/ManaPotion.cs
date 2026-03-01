@@ -1,3 +1,4 @@
+using System.Text;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Units;
 
@@ -13,7 +14,8 @@ public partial class ManaPotion : ConsumableItem
     protected override bool IsMagic => false;
     protected override bool IsRare  => false;
 
-    public override string GetTooltipDescription() => $"Restores {TotalManaRestoredPercentage:N0}% of your maximum Mana.";
+    protected override void AppendItembaseStats(StringBuilder emil)
+        => emil.AppendLine($"Recovered Mana: [color=royal_blue]{TotalManaRestoredPercentage:N0}[/color]%");
 
     protected override void ApplyEffectOfConsumption(BaseUnit consumee)
     {

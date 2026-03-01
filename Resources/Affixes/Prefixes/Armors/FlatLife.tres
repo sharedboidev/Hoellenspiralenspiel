@@ -1,0 +1,109 @@
+[gd_resource type="Resource" script_class="Prefix" format=3 uid="uid://0vc356lql3ud"]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_wrujq"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_dcbfn"]
+
+[sub_resource type="Resource" id="Resource_wrujq"]
+script = ExtResource("1_wrujq")
+MinItemLevelToAppearOn = 63
+Weight = 1000
+MinValue = 130.0
+MaxValue = 144.0
+ItemnameAddition = "Prolific"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_dcbfn"]
+script = ExtResource("1_wrujq")
+Tier = 2
+MinItemLevelToAppearOn = 54
+Weight = 1000
+MinValue = 115.0
+MaxValue = 129.0
+ItemnameAddition = "Muscular"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_8xlr5"]
+script = ExtResource("1_wrujq")
+Tier = 3
+MinItemLevelToAppearOn = 44
+Weight = 1000
+MinValue = 100.0
+MaxValue = 114.0
+ItemnameAddition = "Lusty"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_1u8aa"]
+script = ExtResource("1_wrujq")
+Tier = 4
+MinItemLevelToAppearOn = 36
+Weight = 1000
+MinValue = 85.0
+MaxValue = 99.0
+ItemnameAddition = "Rotund"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_ifbc7"]
+script = ExtResource("1_wrujq")
+Tier = 5
+MinItemLevelToAppearOn = 30
+Weight = 1000
+MinValue = 70.0
+MaxValue = 84.0
+ItemnameAddition = "Vigorous"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_lkxho"]
+script = ExtResource("1_wrujq")
+Tier = 6
+MinItemLevelToAppearOn = 24
+Weight = 1000
+MinValue = 55.0
+MaxValue = 69.0
+ItemnameAddition = "Hefty"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_e8pfq"]
+script = ExtResource("1_wrujq")
+Tier = 7
+MinItemLevelToAppearOn = 18
+Weight = 1000
+MinValue = 40.0
+MaxValue = 54.0
+ItemnameAddition = "Sturdy"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_skw80"]
+script = ExtResource("1_wrujq")
+Tier = 8
+MinItemLevelToAppearOn = 11
+Weight = 1000
+MinValue = 25.0
+MaxValue = 39.0
+ItemnameAddition = "Sanguine"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_fphuj"]
+script = ExtResource("1_wrujq")
+Tier = 9
+MinItemLevelToAppearOn = 5
+Weight = 1000
+MinValue = 10.0
+MaxValue = 24.0
+ItemnameAddition = "Vital"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_14tdd"]
+script = ExtResource("1_wrujq")
+Tier = 10
+MinItemLevelToAppearOn = 1
+Weight = 1000
+MinValue = 3.0
+MaxValue = 9.0
+ItemnameAddition = "Hearty"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_dcbfn")
+AffectableItemTypes = Array[int]([2, 3, 4, 15, 16])
+Tiers = Array[ExtResource("1_wrujq")]([SubResource("Resource_wrujq"), SubResource("Resource_dcbfn"), SubResource("Resource_8xlr5"), SubResource("Resource_1u8aa"), SubResource("Resource_ifbc7"), SubResource("Resource_lkxho"), SubResource("Resource_e8pfq"), SubResource("Resource_skw80"), SubResource("Resource_fphuj"), SubResource("Resource_14tdd")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

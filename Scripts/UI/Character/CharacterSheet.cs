@@ -8,6 +8,7 @@ public partial class CharacterSheet : Control
 {
     [Export] private EquipmentPanel equipmentPanel;
     [Export] private Player2D       player;
+    private          Statdisplay    statdisplay;
     [Export] private int            viewportMarginHeightPx;
     [Export] private int            viewportMarginWidthPx;
 
@@ -15,8 +16,26 @@ public partial class CharacterSheet : Control
     {
         SetPositionRelativeToViewport();
 
-        GetNode<Inventory>("%" + nameof(Inventory)).EquippingItem += OnEquippingItem;
+        statdisplay = GetNode<Statdisplay>(nameof(Statdisplay));
+        statdisplay.Render(player);
+
+        GetNode<EquipmentPanel>("%" + nameof(EquipmentPanel)).EquipmentChanged += OnEquipmentChanged;
+        GetNode<Inventory>("%" + nameof(Inventory)).EquippingItem              += OnEquippingItem;
     }
+
+    private void OnEquipmentChanged(object formerlyEqipped, object newlyEquipped)
+    {
+        if (player is null)
+            return;
+
+        if (formerlyEqipped is BaseItem item)
+            player.UnequipItem(item);
+
+        RerenderStatdisplay();
+    }
+
+    private void RerenderStatdisplay()
+        => statdisplay.Render(player);
 
     private void OnEquippingItem(InventorySlot fromslot)
     {
@@ -50,8 +69,6 @@ public partial class CharacterSheet : Control
     private void ToggleVisibility()
         => Visible = !Visible;
 
-    // foreach (var inventorySlot in ItemGrid.GetAllChildren<InventorySlot>())
-    //     inventorySlot.SetVisible(!inventorySlot.IsVisible());
     private void ModifyVisibilityThroughSelfModulate(Control control)
     {
         var newSelfModulate = control.SelfModulate;

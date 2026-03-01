@@ -9,12 +9,13 @@ y_sort_enabled = true
 custom_minimum_size = Vector2(500, 0)
 offset_right = 50.0
 offset_bottom = 76.0
-size_flags_horizontal = 3
+size_flags_vertical = 0
 theme_override_styles/panel = ExtResource("1_ui1il")
 script = ExtResource("1_ri6pb")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=2079933430]
 layout_mode = 2
+size_flags_vertical = 0
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
@@ -22,6 +23,7 @@ theme_override_constants/margin_bottom = 5
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=856167468]
 layout_mode = 2
+size_flags_vertical = 0
 
 [node name="ObjectTitle" type="RichTextLabel" parent="MarginContainer/VBoxContainer" unique_id=1548258217]
 unique_name_in_owner = true
@@ -33,6 +35,7 @@ theme_override_font_sizes/normal_font_size = 36
 bbcode_enabled = true
 text = "[center]Title[/center]"
 fit_content = true
+autowrap_mode = 0
 
 [node name="ObjectDescription" type="RichTextLabel" parent="MarginContainer/VBoxContainer" unique_id=1942957644]
 unique_name_in_owner = true

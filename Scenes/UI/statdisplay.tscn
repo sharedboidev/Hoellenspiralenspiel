@@ -1,0 +1,350 @@
+[gd_scene format=3 uid="uid://dfow3txum7iel"]
+
+[ext_resource type="StyleBox" uid="uid://d0lsfuyas70d8" path="res://Resources/Themes/boxes_stylebox.tres" id="1_8uisl"]
+[ext_resource type="Script" uid="uid://cklbnsdykwg6e" path="res://Scripts/UI/Character/Statdisplay.cs" id="2_dix5n"]
+[ext_resource type="StyleBox" uid="uid://cv8o42523wbtf" path="res://Resources/Themes/stat_underscore.tres" id="2_hbpk6"]
+
+[node name="Statdisplay" type="PanelContainer" unique_id=322490862]
+custom_minimum_size = Vector2(300, 0)
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_styles/panel = ExtResource("1_8uisl")
+script = ExtResource("2_dix5n")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1018213379]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 5
+
+[node name="GroupContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1920418893]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Attributes" type="VBoxContainer" parent="MarginContainer/GroupContainer" unique_id=1575597368]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Attributes" unique_id=1018403806]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Attributes"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Attribute1" type="HBoxContainer" parent="MarginContainer/GroupContainer/Attributes" unique_id=1672614836]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Attributes/Attribute1" unique_id=1402915205]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 16
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Strength"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Strength" type="RichTextLabel" parent="MarginContainer/GroupContainer/Attributes/Attribute1" unique_id=967106175]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "0"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Attribute2" type="HBoxContainer" parent="MarginContainer/GroupContainer/Attributes" unique_id=871660657]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Attributes/Attribute2" unique_id=229196805]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 16
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Dexterity
+"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Dexterity" type="RichTextLabel" parent="MarginContainer/GroupContainer/Attributes/Attribute2" unique_id=1979505100]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "0
+"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Attribute3" type="HBoxContainer" parent="MarginContainer/GroupContainer/Attributes" unique_id=2146188115]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Attributes/Attribute3" unique_id=773112686]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 16
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Intelligence"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Intelligence" type="RichTextLabel" parent="MarginContainer/GroupContainer/Attributes/Attribute3" unique_id=1635363625]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "0"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Attribute4" type="HBoxContainer" parent="MarginContainer/GroupContainer/Attributes" unique_id=1330117010]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Attributes/Attribute4" unique_id=2133515574]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 16
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Constitution"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Constitution" type="RichTextLabel" parent="MarginContainer/GroupContainer/Attributes/Attribute4" unique_id=1901257736]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "0"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Attribute5" type="HBoxContainer" parent="MarginContainer/GroupContainer/Attributes" unique_id=214388915]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Attributes/Attribute5" unique_id=1491362221]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 16
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Awareness"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Awareness" type="RichTextLabel" parent="MarginContainer/GroupContainer/Attributes/Attribute5" unique_id=1946529634]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "0"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Offence" type="VBoxContainer" parent="MarginContainer/GroupContainer" unique_id=89476086]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Offence" unique_id=857377989]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Offence"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Offence1" type="HBoxContainer" parent="MarginContainer/GroupContainer/Offence" unique_id=1786179528]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Offence/Offence1" unique_id=1704005104]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 16
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Melee Critical Hit Chance"
+fit_content = true
+autowrap_mode = 0
+
+[node name="MeleeCritChance" type="RichTextLabel" parent="MarginContainer/GroupContainer/Offence/Offence1" unique_id=1983988842]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Offence2" type="HBoxContainer" parent="MarginContainer/GroupContainer/Offence" unique_id=434840094]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Offence/Offence2" unique_id=49630696]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 16
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Melee Critical Hit Damage"
+fit_content = true
+autowrap_mode = 0
+
+[node name="MeleeCritDamage" type="RichTextLabel" parent="MarginContainer/GroupContainer/Offence/Offence2" unique_id=188203422]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Offence3" type="HBoxContainer" parent="MarginContainer/GroupContainer/Offence" unique_id=646550289]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Offence/Offence3" unique_id=523014161]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 16
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Attackspeed"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Attackspeed" type="RichTextLabel" parent="MarginContainer/GroupContainer/Offence/Offence3" unique_id=553934591]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Defence" type="VBoxContainer" parent="MarginContainer/GroupContainer" unique_id=921518252]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence" unique_id=2137903041]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Defence"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Defence1" type="HBoxContainer" parent="MarginContainer/GroupContainer/Defence" unique_id=31462018]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence1" unique_id=1398172734]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 16
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Life"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Life" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence1" unique_id=2018521637]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "0"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Defence2" type="HBoxContainer" parent="MarginContainer/GroupContainer/Defence" unique_id=1113664262]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence2" unique_id=1076291469]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 16
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Armor"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Armor" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence2" unique_id=2049976926]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "0"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Defence3" type="HBoxContainer" parent="MarginContainer/GroupContainer/Defence" unique_id=1882239461]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence3" unique_id=1900866606]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 16
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Dodge"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Dodge" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence3" unique_id=1407413546]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Utility" type="VBoxContainer" parent="MarginContainer/GroupContainer" unique_id=499258802]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Utility" unique_id=347983005]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Utility"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Utility1" type="HBoxContainer" parent="MarginContainer/GroupContainer/Utility" unique_id=1164675431]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Utility/Utility1" unique_id=1957162166]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 16
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Movementspeed
+"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/GroupContainer/Utility/Utility1" unique_id=1355717858]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "0"
+fit_content = true
+autowrap_mode = 0
