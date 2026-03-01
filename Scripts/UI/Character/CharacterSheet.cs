@@ -8,9 +8,9 @@ public partial class CharacterSheet : Control
 {
     [Export] private EquipmentPanel equipmentPanel;
     [Export] private Player2D       player;
+    private          Statdisplay    statdisplay;
     [Export] private int            viewportMarginHeightPx;
     [Export] private int            viewportMarginWidthPx;
-    private          Statdisplay    statdisplay;
 
     public override void _Ready()
     {
@@ -18,20 +18,24 @@ public partial class CharacterSheet : Control
 
         statdisplay = GetNode<Statdisplay>(nameof(Statdisplay));
         statdisplay.Render(player);
-        
+
         GetNode<EquipmentPanel>("%" + nameof(EquipmentPanel)).EquipmentChanged += OnEquipmentChanged;
         GetNode<Inventory>("%" + nameof(Inventory)).EquippingItem              += OnEquippingItem;
     }
 
-    private void OnEquipmentChanged() => RerenderStatdisplay();
-
-    private void RerenderStatdisplay()
+    private void OnEquipmentChanged(object formerlyEqipped, object newlyEquipped)
     {
         if (player is null)
             return;
-        
-        statdisplay.Render(player);
+
+        if (formerlyEqipped is BaseItem item)
+            player.UnequipItem(item);
+
+        RerenderStatdisplay();
     }
+
+    private void RerenderStatdisplay()
+        => statdisplay.Render(player);
 
     private void OnEquippingItem(InventorySlot fromslot)
     {
@@ -42,8 +46,6 @@ public partial class CharacterSheet : Control
             return;
 
         var retrievedItem        = fromslot.RetrieveItem();
-        //player.EquipItem(retrievedItem);
-        
         var formerlyEquippedItem = equipmentPanel.EquipIntoFittingSlot(retrievedItem);
 
         fromslot.SetItem(formerlyEquippedItem);

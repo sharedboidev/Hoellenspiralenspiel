@@ -14,7 +14,7 @@ public partial class EquipmentPanel : PanelContainer
 {
     private readonly Dictionary<ItemSlot, EquipmentSlot> slotMap = new();
 
-    public delegate void EquipmentChangedEventHandler();
+    public delegate void EquipmentChangedEventHandler(object formerlyEqipped, object newlyEquipped);
 
     public event EquipmentChangedEventHandler EquipmentChanged;
     [Export]
@@ -41,7 +41,7 @@ public partial class EquipmentPanel : PanelContainer
             return;
         
         if(customArg.OldValue != customArg.NewValue)
-            EquipmentChanged?.Invoke();
+            EquipmentChanged?.Invoke(customArg.OldValue, customArg.NewValue);
     }
 
     private void EquipmentSlotOnMouseMoving(MousemovementDirection mousemovementdirection, EquipmentSlot equipmentslot)
