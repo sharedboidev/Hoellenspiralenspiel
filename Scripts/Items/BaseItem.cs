@@ -19,6 +19,7 @@ public abstract partial class BaseItem
 {
     [Export]
     public TextureRect Icon { get; set; }
+
     public          int                ItemLevel           { get; set; } = 1;
     public abstract bool               IsStackable         { get; }
     public abstract string             ItembaseName        { get; }
@@ -154,6 +155,9 @@ public abstract partial class BaseItem
     public ItemModifier[] GetModifiers()
         => ItemModifiers.ToArray();
 
+    public CombatStatModifier CreateCombatStatModifier(ItemModifier modifier)
+        => new(modifier.CombatStat, modifier.ModificationType, modifier.Value, ToString());
+
     public bool CanBeEquipedBy(Player2D player)
     {
         if (player is null)
@@ -195,7 +199,7 @@ public abstract partial class BaseItem
 
     protected virtual void SetExceptionalName() { }
 
-    protected float GetTotalMoreMultiplierOf(CombatStat combatStat)
+    public float GetTotalMoreMultiplierOf(CombatStat combatStat)
     {
         var totalMoreMultiplier = 1f;
 
@@ -205,7 +209,7 @@ public abstract partial class BaseItem
         return totalMoreMultiplier;
     }
 
-    protected float GetModifierSumOf(ModificationType modificationType, CombatStat combatStat)
+    public float GetModifierSumOf(ModificationType modificationType, CombatStat combatStat)
         => GetModifierOf(modificationType, combatStat).Sum(mod => mod.Value);
 
     private IEnumerable<ItemModifier> GetModifierOf(ModificationType modificationType, CombatStat combatStat)

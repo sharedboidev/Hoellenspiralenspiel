@@ -69,8 +69,6 @@ public partial class CharacterSheet : Control
     private void ToggleVisibility()
         => Visible = !Visible;
 
-    // foreach (var inventorySlot in ItemGrid.GetAllChildren<InventorySlot>())
-    //     inventorySlot.SetVisible(!inventorySlot.IsVisible());
     private void ModifyVisibilityThroughSelfModulate(Control control)
     {
         var newSelfModulate = control.SelfModulate;

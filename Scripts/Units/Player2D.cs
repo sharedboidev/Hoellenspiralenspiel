@@ -181,7 +181,7 @@ public partial class Player2D : BaseUnit
     {
         foreach (var modifier in item.GetModifiers())
         {
-            var newModifier = new CombatStatModifier(modifier.CombatStat, modifier.ModificationType, modifier.Value, item.ToString());
+            var newModifier = item.CreateCombatStatModifier(modifier);
             CombatStatModifiers.Add(newModifier);
         }
     }

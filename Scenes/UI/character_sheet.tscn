@@ -29,9 +29,10 @@ unique_name_in_owner = true
 layout_mode = 2
 AmountSlots = 70
 
-[node name="Statdisplay" parent="." unique_id=322490862 instance=ExtResource("4_dwqj4")]
+[node name="Statdisplay" parent="." unique_id=322490862 node_paths=PackedStringArray("equipmentPanel") instance=ExtResource("4_dwqj4")]
 z_index = -1
 layout_mode = 0
 offset_left = -295.0
 offset_right = 5.0
 offset_bottom = 474.0
+equipmentPanel = NodePath("../HBoxContainer/EquipmentPanel")
