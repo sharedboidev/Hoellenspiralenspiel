@@ -12,6 +12,7 @@ CriticalHitChanceBase = 3.0
 WeaponType = 4
 WieldStrategie = 4
 Icon = NodePath("Icon")
+SlotSize = Vector2(1, 4)
 Requirements = Dictionary[int, int]({
 2: 1,
 5: 1

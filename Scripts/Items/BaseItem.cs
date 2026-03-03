@@ -20,13 +20,17 @@ public abstract partial class BaseItem
     [Export]
     public TextureRect Icon { get; set; }
 
-    public          int                ItemLevel           { get; set; } = 1;
-    public abstract bool               IsStackable         { get; }
-    public abstract string             ItembaseName        { get; }
-    protected       string             AffixedItembaseName { get; set; }
-    protected       string             ExceptionalName     { get; set; }
-    public abstract ItemSlot           ItemSlot            { get; }
-    protected       List<ItemModifier> ItemModifiers       { get; } = new();
+    public          int      ItemLevel           { get; set; } = 1;
+    public abstract bool     IsStackable         { get; }
+    public abstract string   ItembaseName        { get; }
+    protected       string   AffixedItembaseName { get; set; }
+    protected       string   ExceptionalName     { get; set; }
+    public abstract ItemSlot ItemSlot            { get; }
+
+    [Export]
+    public Vector2 SlotSize { get; set; } = new(1, 1);
+
+    protected List<ItemModifier> ItemModifiers { get; } = new();
 
     [Export]
     public Godot.Collections.Dictionary<Requirement, int> Requirements { get; set; } = new();
