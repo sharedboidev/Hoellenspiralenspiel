@@ -21,9 +21,10 @@ public partial class InventorySlot
 
     private TextureRect                      icon;
     private Label                            stacksizeDisplay;
-    public  Inventory                        Inventory          { get; set; }
-    public  ITooltipObject                   ContainedItem      { get; set; }
-    public  Vector2                          TooltipAnchorPoint => GlobalPosition;
+    public  Inventory                        Inventory           { get; set; }
+    public  Vector2                          InventoryCoordinate { get; set; }
+    public  ITooltipObject                   ContainedItem       { get; set; }
+    public  Vector2                          TooltipAnchorPoint  => GlobalPosition;
     public event MouseMovementEventHandler   MouseMoving;
     public event WithdrawingItemEventHandler WithdrawingItem;
     public event EquippingItemEventHandler   EquippingItem;

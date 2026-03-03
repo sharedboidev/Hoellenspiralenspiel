@@ -80,17 +80,29 @@ public partial class Inventory : PanelContainer
         if (slotsGenerated)
             return;
 
+        var gridWidth = ItemGrid.Columns;
+        var column    = 0;
+        var row       = 0;
+        
         for (var i = 0; i < AmountSlots; i++)
         {
             var inventorySlot = SlotScene.Instantiate<InventorySlot>();
 
-            inventorySlot.Inventory       =  this;
-            inventorySlot.SlotEmptied     += InventorySlotOnSlotEmptied;
-            inventorySlot.MouseMoving     += InventorySlotOnMouseMoving;
-            inventorySlot.WithdrawingItem += InventorySlotOnWithdrawingItem;
-            inventorySlot.EquippingItem   += InventorySlotOnEquippingItem;
+            inventorySlot.Inventory           =  this;
+            inventorySlot.InventoryCoordinate =  new Vector2(column, row);
+            inventorySlot.SlotEmptied         += InventorySlotOnSlotEmptied;
+            inventorySlot.MouseMoving         += InventorySlotOnMouseMoving;
+            inventorySlot.WithdrawingItem     += InventorySlotOnWithdrawingItem;
+            inventorySlot.EquippingItem       += InventorySlotOnEquippingItem;
 
             ItemGrid.AddChild(inventorySlot);
+            column++;
+
+            if ((i + 1) % gridWidth == 0)
+            {
+                row++;
+                column = 0;
+            }
         }
 
         slotsGenerated = true;
