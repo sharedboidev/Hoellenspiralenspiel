@@ -17,13 +17,11 @@ public partial class InventorySlot
 
     public delegate void WithdrawingItemEventHandler(BaseItem withdrawnItem);
 
-    //private TextureRect                      icon;
     private Label     stacksizeDisplay;
     public  Inventory Inventory           { get; set; }
     public  Vector2   InventoryCoordinate { get; set; }
     public  bool      IsOccupied          { get; set; }
 
-    //public  ITooltipObject                   ContainedItem       { get; set; }
     public InventoryItem                     ContainedInventoryItem { get; set; }
     public Vector2                           TooltipAnchorPoint     => GlobalPosition;
     public event MouseMovementEventHandler   MouseMoving;
@@ -31,9 +29,8 @@ public partial class InventorySlot
     public event EquippingItemEventHandler   EquippingItem;
     public event SlotEmptiedEventHandler     SlotEmptied;
 
-    public override void _Ready() =>
-            //icon             = GetNode<TextureRect>("%Icon");
-            stacksizeDisplay = GetNode<Label>("%StacksizeDisplay");
+    public override void _Ready()
+        => stacksizeDisplay = GetNode<Label>("%StacksizeDisplay");
 
     public bool SetItem(InventoryItem incomingItem)
     {
@@ -50,12 +47,8 @@ public partial class InventorySlot
         }
 
         incomingItem.Init((BaseItem)incomingItem.ContainedItem, CustomMinimumSize);
-        ContainedInventoryItem = incomingItem;
-
-        //ContainedItem = incomingItem;
-        //icon.Texture  = incomingItem.Icon.Texture;
-
         incomingItem.TreeExited += ItemOnTreeExited;
+        ContainedInventoryItem  =  incomingItem;
 
         if (incomingItem.ContainedItem is not ConsumableItem consumable)
             return false;
@@ -97,7 +90,6 @@ public partial class InventorySlot
     public BaseItem RetrieveItem()
     {
         stacksizeDisplay.Visible = false;
-        //icon.Texture             = null;
 
         if (ContainedInventoryItem?.ContainedItem is BaseItem item)
             item.TreeExited -= ItemOnTreeExited;

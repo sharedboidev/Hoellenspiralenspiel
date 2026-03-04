@@ -151,11 +151,13 @@ public partial class EnemyController : Node
     {
         GD.Print($"{lootedItem?.Name ?? "Nothing"} looted.");
 
-        var inventory = CharacterSheet.GetNode<Inventory>("%" + nameof(Inventory));
+        var inventory     = CharacterSheet.GetNode<Inventory>("%" + nameof(Inventory));
         var couldLootItem = inventory.SetItem(lootedItem);
 
-        if(couldLootItem)
+        if (couldLootItem)
             sender?.QueueFree();
+        else
+            sender.BounceAndFlip();
     }
 
     private void MakeEnemiesDoTheirThing(double delta)

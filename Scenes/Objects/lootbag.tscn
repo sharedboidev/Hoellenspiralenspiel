@@ -9,6 +9,12 @@ bg_color = Color(0.6, 0.6, 0.6, 0)
 [node name="Lootbag" type="PanelContainer" unique_id=358972205]
 y_sort_enabled = true
 custom_minimum_size = Vector2(50, 50)
+anchors_preset = -1
+anchor_right = 0.026
+anchor_bottom = 0.035
+offset_right = -49.920002
+offset_bottom = -50.4
+pivot_offset = Vector2(25, 25)
 theme_override_styles/panel = SubResource("StyleBoxFlat_2o4qr")
 script = ExtResource("1_2o4qr")
 

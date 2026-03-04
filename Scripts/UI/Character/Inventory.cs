@@ -215,7 +215,6 @@ public partial class Inventory : PanelContainer
                 }
             }
 
-
             if (adjacentSlotsAreOccupied)
                 continue;
 
@@ -223,19 +222,5 @@ public partial class Inventory : PanelContainer
         }
 
         return null;
-        // var slotsWithSpace = ItemGrid.GetAllChildren<InventorySlot>()
-        //                              .Where(slot => slot.HasSpaceFor(incomingItem))
-        //                              .ToList();
-        //
-        // foreach (var nextSlot in slotsWithSpace)
-        // {
-        //     if (nextSlot.ContainedInventoryItem is null && !nextSlot.IsOccupied)
-        //         return nextSlot;
-        //
-        //     if (incomingItem is ConsumableItem incomingConsumable && nextSlot.ContainedInventoryItem?.ContainedItem is ConsumableItem { IsStackable: true } containedConsumable && containedConsumable.CanFit(incomingConsumable))
-        //         return nextSlot;
-        // }
-        //
-        // return null;
     }
 }
