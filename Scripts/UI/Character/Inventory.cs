@@ -92,7 +92,7 @@ public partial class Inventory : PanelContainer
         inventoryItem.RootSlot = freeSlot;
         inventoryItem.Position = freeSlot.Position;
 
-        freeSlot?.SetItem(inventoryItem);
+        freeSlot.SetItem(inventoryItem);
 
         var occupiedSlots = new List<InventorySlot>();
 

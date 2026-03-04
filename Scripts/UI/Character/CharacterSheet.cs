@@ -60,10 +60,7 @@ public partial class CharacterSheet : Control
         if(formerlyEquippedItem is null)
             return;
 
-        var inventoryItem = inventory.CreateInventoryItem();
-        inventoryItem.ContainedItem = formerlyEquippedItem;
-
-        fromslot.SetItem(inventoryItem);
+        inventory.SetItem(formerlyEquippedItem);
     }
 
     private void SetPositionRelativeToViewport()

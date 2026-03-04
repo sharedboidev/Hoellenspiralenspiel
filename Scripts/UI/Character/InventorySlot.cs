@@ -27,7 +27,7 @@ public partial class InventorySlot
     public void Reset()
     {
         IsOccupied             = false;
-        ContainedInventoryItem = null;
+        //ContainedInventoryItem = null;      
     }
 
     public bool SetItem(InventoryItem incomingItem)
@@ -89,11 +89,11 @@ public partial class InventorySlot
     {
         stacksizeDisplay.Visible = false;
 
-        if (ContainedInventoryItem?.ContainedItem is BaseItem item)
-            item.TreeExited -= ItemOnTreeExited;
-
-        if (ContainedInventoryItem?.ContainedItem is ConsumableItem consumableItem)
-            consumableItem.OnStacksizeReduced -= ConsumableOnStacksizeReduced;
+        // if (ContainedInventoryItem?.ContainedItem is BaseItem item)
+        //     item.TreeExited -= ItemOnTreeExited;
+        //
+        // if (ContainedInventoryItem?.ContainedItem is ConsumableItem consumableItem)
+        //     consumableItem.OnStacksizeReduced -= ConsumableOnStacksizeReduced;
 
         var itemAboutToBeReturned = ContainedInventoryItem?.ContainedItem;
         ContainedInventoryItem?.QueueFree();

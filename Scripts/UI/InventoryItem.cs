@@ -110,7 +110,7 @@ public partial class InventoryItem
                 break;
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } when ContainedItem is not null:
                 EquipItem();
-
+ 
                 break;
         }
     }
