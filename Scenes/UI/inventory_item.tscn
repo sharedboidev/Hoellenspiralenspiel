@@ -19,3 +19,7 @@ layout_mode = 2
 texture = ExtResource("2_avwti")
 expand_mode = 1
 stretch_mode = 5
+
+[connection signal="gui_input" from="Icon" to="." method="_on_gui_input"]
+[connection signal="mouse_entered" from="Icon" to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Icon" to="." method="_on_mouse_exited"]

@@ -2,9 +2,32 @@
 
 [ext_resource type="Script" uid="uid://c6ieb4psqn6s1" path="res://Scripts/Objects/Lootbag.cs" id="1_2o4qr"]
 [ext_resource type="Texture2D" uid="uid://c71vm3fa1p17d" path="res://Textures/Objects/Loot/Lootbag.png" id="2_2o4qr"]
+[ext_resource type="Shader" uid="uid://2jawwqtcvfo7" path="res://Shaders/shine.gdshader" id="2_6clgo"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2o4qr"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j2ms7"]
+shader = ExtResource("2_6clgo")
+shader_parameter/Angle_deg = 55.30700690208249
+shader_parameter/Brightness = 2.5
+shader_parameter/Band_Soft = 0.06
+shader_parameter/Stage_Count = 2
+shader_parameter/Stage1_Duration = 1.0
+shader_parameter/Stage2_Duration = 1.5
+shader_parameter/Stage3_Duration = 1.0
+shader_parameter/Stage1_Width = 0.12
+shader_parameter/Stage2_Width = 0.12
+shader_parameter/Stage3_Width = 0.12
+shader_parameter/Stage1_LeftToRight = true
+shader_parameter/Stage2_LeftToRight = false
+shader_parameter/Stage3_LeftToRight = true
+shader_parameter/One_Shot = false
+shader_parameter/OneShot_Delay = 0.0
+shader_parameter/Phase_Offset = 0.0
+shader_parameter/Wiggle_Angle = false
+shader_parameter/Wiggle_Amount_deg = 15.0
+shader_parameter/Shine_Pause = 0.4
 
 [node name="Lootbag" type="PanelContainer" unique_id=358972205]
 y_sort_enabled = true
@@ -20,6 +43,7 @@ script = ExtResource("1_2o4qr")
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=66317787]
 y_sort_enabled = true
+material = SubResource("ShaderMaterial_j2ms7")
 layout_mode = 2
 texture = ExtResource("2_2o4qr")
 expand_mode = 1

@@ -1,18 +1,12 @@
 using Godot;
-using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Items.Consumables;
-using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 public partial class InventorySlot
         : PanelContainer
 {
-    public delegate void EquippingItemEventHandler(InventorySlot fromSlot);
-
-    public delegate void MouseMovementEventHandler(MousemovementDirection mousemovementDirection, InventorySlot inventorySlot);
-
     public delegate void SlotEmptiedEventHandler(InventorySlot inventorySlot);
 
     public delegate void WithdrawingItemEventHandler(BaseItem withdrawnItem);
@@ -24,13 +18,17 @@ public partial class InventorySlot
 
     public InventoryItem                     ContainedInventoryItem { get; set; }
     public Vector2                           TooltipAnchorPoint     => GlobalPosition;
-    public event MouseMovementEventHandler   MouseMoving;
     public event WithdrawingItemEventHandler WithdrawingItem;
-    public event EquippingItemEventHandler   EquippingItem;
     public event SlotEmptiedEventHandler     SlotEmptied;
 
     public override void _Ready()
         => stacksizeDisplay = GetNode<Label>("%StacksizeDisplay");
+
+    public void Reset()
+    {
+        IsOccupied             = false;
+        ContainedInventoryItem = null;
+    }
 
     public bool SetItem(InventoryItem incomingItem)
     {
@@ -98,6 +96,7 @@ public partial class InventorySlot
             consumableItem.OnStacksizeReduced -= ConsumableOnStacksizeReduced;
 
         var itemAboutToBeReturned = ContainedInventoryItem?.ContainedItem;
+        ContainedInventoryItem?.QueueFree();
         ContainedInventoryItem = null;
 
         SlotEmptied?.Invoke(this);
@@ -122,14 +121,6 @@ public partial class InventorySlot
 
         switch (inputEvent)
         {
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } when ContainedInventoryItem?.ContainedItem is ConsumableItem consumable:
-                ConsumeItem(consumable);
-
-                break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } when ContainedInventoryItem is not null:
-                EquipItem();
-
-                break;
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedInventoryItem is not null && !mouseObject.HasItem:
                 WithdrawItem();
 
@@ -149,13 +140,6 @@ public partial class InventorySlot
         }
     }
 
-    private void ConsumeItem(ConsumableItem consumable)
-    {
-        var player = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D");
-
-        consumable.GetConsumedBy(player);
-    }
-
     private void PutItemIntoSlot(MouseObject mouseObject)
     {
         var item = mouseObject.RetrieveItem();
@@ -163,19 +147,13 @@ public partial class InventorySlot
 
         SetItem(ContainedInventoryItem);
 
-        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
+        //MouseMoving?.Invoke(MousemovementDirection.Entered, this);
     }
 
     private void WithdrawItem()
     {
         var item = RetrieveItem();
         WithdrawingItem?.Invoke(item);
-    }
-
-    private void EquipItem()
-    {
-        EquippingItem?.Invoke(this);
-        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
     }
 
     private void SwapItems(MouseObject mouseObject)
@@ -197,10 +175,4 @@ public partial class InventorySlot
         if (!couldSet)
             mouseObject.Show(item);
     }
-
-    public void _on_mouse_entered()
-        => MouseMoving?.Invoke(MousemovementDirection.Entered, this);
-
-    public void _on_mouse_exited()
-        => MouseMoving?.Invoke(MousemovementDirection.Left, this);
 }

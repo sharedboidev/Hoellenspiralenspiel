@@ -1,16 +1,26 @@
 using System.ComponentModel;
 using Godot;
+using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Items.Consumables;
 using Hoellenspiralenspiel.Scripts.UI.Character;
+using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
 [Tool]
-public partial class InventoryItem : PanelContainer,
-                                     ITooltipObjectContainer,
-                                     INotifyPropertyChanged
+public partial class InventoryItem
+        : PanelContainer,
+          ITooltipObjectContainer,
+          INotifyPropertyChanged
 {
+    public delegate void MouseMovementEventHandler(MousemovementDirection mousemovementDirection, InventoryItem inventoryItem);
+
+    public delegate void WasRightClickedEventHandler(InventorySlot fromRootSlot);
+
+    public event WasRightClickedEventHandler WasRightClicked;
+
     private          Texture2D   defaultTexture;
     private          TextureRect icon;
     [Export] private int         pxDimension = 64;
@@ -56,6 +66,8 @@ public partial class InventoryItem : PanelContainer,
     public ITooltipObject                    ContainedItem      { get; set; }
     public Vector2                           TooltipAnchorPoint => GlobalPosition;
 
+    public event MouseMovementEventHandler MouseMoving;
+
     public override void _Ready()
         => SetScaledSize();
 
@@ -87,4 +99,38 @@ public partial class InventoryItem : PanelContainer,
 
         textureNode.Texture = texture;
     }
+
+    public void _on_gui_input(InputEvent inputEvent)
+    {
+        switch (inputEvent)
+        {
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } when ContainedItem is ConsumableItem consumable:
+                ConsumeItem(consumable);
+
+                break;
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } when ContainedItem is not null:
+                EquipItem();
+
+                break;
+        }
+    }
+
+    private void ConsumeItem(ConsumableItem consumable)
+    {
+        var player = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D");
+
+        consumable.GetConsumedBy(player);
+    }
+
+    private void EquipItem()
+    {
+        WasRightClicked?.Invoke(RootSlot);
+        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
+    }
+    
+    public void _on_mouse_entered()
+        => MouseMoving?.Invoke(MousemovementDirection.Entered, this);
+
+    public void _on_mouse_exited()
+        => MouseMoving?.Invoke(MousemovementDirection.Left, this);
 }

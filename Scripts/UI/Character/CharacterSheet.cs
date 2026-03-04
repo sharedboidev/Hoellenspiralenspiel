@@ -8,6 +8,7 @@ namespace Hoellenspiralenspiel.Scripts.UI.Character;
 public partial class CharacterSheet : Control
 {
     [Export] private EquipmentPanel equipmentPanel;
+    [Export] private Inventory      inventory;
     [Export] private Player2D       player;
     private          Statdisplay    statdisplay;
     [Export] private int            viewportMarginHeightPx;
@@ -20,8 +21,9 @@ public partial class CharacterSheet : Control
         statdisplay = GetNode<Statdisplay>(nameof(Statdisplay));
         statdisplay.Render(player);
 
+        inventory.EquippingItem += OnEquippingItem;
+
         GetNode<EquipmentPanel>("%" + nameof(EquipmentPanel)).EquipmentChanged += OnEquipmentChanged;
-        GetNode<Inventory>("%" + nameof(Inventory)).EquippingItem              += OnEquippingItem;
         GetNode<StatdisplayButton>(nameof(StatdisplayButton)).Pressed          += OnPressed;
 
         SetVisible(false);
@@ -52,10 +54,13 @@ public partial class CharacterSheet : Control
         if (!item.CanBeEquipedBy(player))
             return;
 
-        var retrievedItem        = fromslot.RetrieveItem();
+        var retrievedItem        = inventory.RetrieveItem(fromslot);
         var formerlyEquippedItem = equipmentPanel.EquipIntoFittingSlot(retrievedItem);
+        
+        if(formerlyEquippedItem is null)
+            return;
 
-        var inventoryItem = GetNode<Inventory>("%" + nameof(Inventory)).CreateInventoryItem();
+        var inventoryItem = inventory.CreateInventoryItem();
         inventoryItem.ContainedItem = formerlyEquippedItem;
 
         fromslot.SetItem(inventoryItem);

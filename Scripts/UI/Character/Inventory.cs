@@ -45,9 +45,37 @@ public partial class Inventory : PanelContainer
         GetInventorySlotSize();
     }
 
-    public InventoryItem CreateInventoryItem() => inventoryItemScene.Instantiate<InventoryItem>();
+    public BaseItem RetrieveItem(InventorySlot slot)
+    {
+        var rootCoord     = slot.InventoryCoordinate;
+        var itemDimension = ((BaseItem)slot.ContainedInventoryItem.ContainedItem).SlotSize;
 
-    private void GetInventorySlotSize() => slotSize = this.GetAllChildren<InventorySlot>()[0].Size;
+        BaseItem retrievedItem = null;
+
+        for (var w = 0; w < itemDimension.X; w++)
+        {
+            for (var h = 0; h < itemDimension.Y; h++)
+            {
+                var nextSlotCoord = rootCoord + new Vector2(w, h);
+                var nextSlot      = slotMap[nextSlotCoord];
+
+                if (w == 0 && h == 0)
+                    retrievedItem = nextSlot.RetrieveItem();
+                else
+                    nextSlot.Reset();
+
+                occupationMatrix[nextSlotCoord] = false;
+            }
+        }
+
+        return retrievedItem;
+    }
+
+    public InventoryItem CreateInventoryItem()
+        => inventoryItemScene.Instantiate<InventoryItem>();
+
+    private void GetInventorySlotSize()
+        => slotSize = this.GetAllChildren<InventorySlot>()[0].Size;
 
     public bool SetItem(BaseItem item)
     {
@@ -57,6 +85,9 @@ public partial class Inventory : PanelContainer
             return false;
 
         var inventoryItem = CreateInventoryItem();
+        inventoryItem.MouseMoving     += InventorySlotOnMouseMoving;
+        inventoryItem.WasRightClicked += InventorySlotOnEquippingItem;
+
         inventoryItem.Init(item, freeSlot.CustomMinimumSize);
         inventoryItem.RootSlot = freeSlot;
         inventoryItem.Position = freeSlot.Position;
@@ -129,9 +160,7 @@ public partial class Inventory : PanelContainer
             inventorySlot.Inventory           =  this;
             inventorySlot.InventoryCoordinate =  new Vector2(column, row);
             inventorySlot.SlotEmptied         += InventorySlotOnSlotEmptied;
-            inventorySlot.MouseMoving         += InventorySlotOnMouseMoving;
             inventorySlot.WithdrawingItem     += InventorySlotOnWithdrawingItem;
-            inventorySlot.EquippingItem       += InventorySlotOnEquippingItem;
 
             ItemGrid.AddChild(inventorySlot);
 
@@ -159,19 +188,19 @@ public partial class Inventory : PanelContainer
     private void InventorySlotOnSlotEmptied(InventorySlot inventoryslot)
         => Tooltip.Hide();
 
-    private void InventorySlotOnMouseMoving(MousemovementDirection mousemovementdirection, InventorySlot inventoryslot)
+    private void InventorySlotOnMouseMoving(MousemovementDirection mousemovementdirection, InventoryItem inventoryItem)
     {
         switch (mousemovementdirection)
         {
             case MousemovementDirection.Entered:
-                if (inventoryslot.ContainedInventoryItem?.ContainedItem == null)
+                if (inventoryItem?.ContainedItem == null)
                     return;
 
-                Tooltip.Show(inventoryslot.ContainedInventoryItem);
+                Tooltip.Show(inventoryItem);
 
                 break;
             case MousemovementDirection.Left:
-                if (inventoryslot.ContainedInventoryItem == null)
+                if (inventoryItem.ContainedItem == null)
 
                     return;
 
@@ -194,7 +223,7 @@ public partial class Inventory : PanelContainer
             {
                 for (var h = 0; h < incomingItem.SlotSize.Y; h++)
                 {
-                    if(h == 0 && w == 0)
+                    if (h == 0 && w == 0)
                         continue;
 
                     var nextSlotKey = slotIsOccupied.Key + new Vector2(w, h);
@@ -207,6 +236,7 @@ public partial class Inventory : PanelContainer
                     if (isOutOfBounds)
                     {
                         adjacentSlotsAreOccupied = true;
+
                         continue;
                     }
 

@@ -8,11 +8,12 @@
 [ext_resource type="Texture2D" uid="uid://bvrchl6rqwbnk" path="res://Textures/UI/Buttons/Mini_arrow_left2_t.png" id="6_nfwpk"]
 [ext_resource type="Script" uid="uid://f2ew6yv6qad" path="res://Scripts/UI/Buttons/StatdisplayButton.cs" id="7_gx1ge"]
 
-[node name="CharacterSheet" type="Control" unique_id=325839181 node_paths=PackedStringArray("equipmentPanel")]
+[node name="CharacterSheet" type="Control" unique_id=325839181 node_paths=PackedStringArray("equipmentPanel", "inventory")]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_kqng3")
 equipmentPanel = NodePath("HBoxContainer/EquipmentPanel")
+inventory = NodePath("HBoxContainer/Inventory")
 viewportMarginHeightPx = 30
 viewportMarginWidthPx = 30
 
@@ -30,7 +31,6 @@ Inventory = NodePath("../Inventory")
 [node name="Inventory" parent="HBoxContainer" unique_id=2062578477 instance=ExtResource("2_kqng3")]
 unique_name_in_owner = true
 layout_mode = 2
-AmountSlots = 70
 
 [node name="Statdisplay" parent="." unique_id=322490862 node_paths=PackedStringArray("equipmentPanel") instance=ExtResource("4_dwqj4")]
 visible = false

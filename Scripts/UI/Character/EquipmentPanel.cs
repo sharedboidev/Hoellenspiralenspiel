@@ -98,6 +98,9 @@ public partial class EquipmentPanel : PanelContainer
 
     public BaseItem EquipIntoFittingSlot(BaseItem itemToEquip)
     {
+        if (itemToEquip is null)
+            return null; 
+                    
         var fittingSlot          = slotMap[itemToEquip.ItemSlot];
         var formerlyEquippedItem = fittingSlot.RetrieveItem();
 
