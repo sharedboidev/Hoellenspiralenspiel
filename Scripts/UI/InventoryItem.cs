@@ -2,6 +2,7 @@ using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.UI.Character;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
@@ -10,10 +11,11 @@ public partial class InventoryItem : PanelContainer,
                                      ITooltipObjectContainer,
                                      INotifyPropertyChanged
 {
-    private          Texture2D defaultTexture;
-    [Export] private int       pxDimension = 64;
-    private          int       slotHeight  = 1;
-    private          int       slotWidth   = 1;
+    private          Texture2D   defaultTexture;
+    private          TextureRect icon;
+    [Export] private int         pxDimension = 64;
+    private          int         slotHeight  = 1;
+    private          int         slotWidth   = 1;
 
     [Export]
     public Texture2D DefaultTexture
@@ -48,6 +50,8 @@ public partial class InventoryItem : PanelContainer,
         }
     }
 
+    public InventorySlot                     RootSlot                { get; set; }
+    public Vector2[]                         OccupiedSlotCoordinates { get; set; } = [];
     public event PropertyChangedEventHandler PropertyChanged;
     public ITooltipObject                    ContainedItem      { get; set; }
     public Vector2                           TooltipAnchorPoint => GlobalPosition;
@@ -57,10 +61,14 @@ public partial class InventoryItem : PanelContainer,
 
     public void Init(BaseItem item, Vector2 inventorySlotSize)
     {
+        icon          = GetNode<TextureRect>("%Icon");
+        icon.Texture  = item.Icon.Texture;
         ContainedItem = item;
         pxDimension   = (int)(inventorySlotSize.X + inventorySlotSize.Y) / 2;
         SlotWidth     = (int)item.SlotSize.X;
         SlotHeight    = (int)item.SlotSize.Y;
+
+        SetScaledSize();
     }
 
     private void SetScaledSize()

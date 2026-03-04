@@ -1,9 +1,9 @@
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Items;
-using Hoellenspiralenspiel.Scripts.Items.Consumables;
 using Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
@@ -12,11 +12,14 @@ public partial class Inventory : PanelContainer
 {
     public delegate void EquippingItemEventHandler(InventorySlot fromSlot);
 
-    private GridContainer itemGrid;
-    private bool          slotsGenerated;
-    private Vector2       slotSize;
-    private BaseTooltip   Tooltip     => GetTree().CurrentScene.GetNode<ItemTooltip>("%" + nameof(ItemTooltip));
-    private MouseObject   MouseObject => GetNode<MouseObject>(nameof(MouseObject));
+    private PackedScene                                          inventoryItemScene = GD.Load<PackedScene>("res://Scenes/UI/inventory_item.tscn");
+    private GridContainer                                        itemGrid;
+    private Godot.Collections.Dictionary<Vector2, bool>          occupationMatrix = new();
+    private Godot.Collections.Dictionary<Vector2, InventorySlot> slotMap          = new();
+    private bool                                                 slotsGenerated;
+    private Vector2                                              slotSize;
+    private BaseTooltip                                          Tooltip     => GetTree().CurrentScene.GetNode<ItemTooltip>("%" + nameof(ItemTooltip));
+    private MouseObject                                          MouseObject => GetNode<MouseObject>(nameof(MouseObject));
 
     [Export]
     public PackedScene SlotScene { get; set; }
@@ -42,13 +45,42 @@ public partial class Inventory : PanelContainer
         GetInventorySlotSize();
     }
 
-    private void GetInventorySlotSize() => slotSize = GetChild<InventorySlot>(0).Size;
+    public InventoryItem CreateInventoryItem() => inventoryItemScene.Instantiate<InventoryItem>();
 
-    public void SetItem(BaseItem item)
+    private void GetInventorySlotSize() => slotSize = this.GetAllChildren<InventorySlot>()[0].Size;
+
+    public bool SetItem(BaseItem item)
     {
         var freeSlot = GetNextFreeSlotOrDefaultFor(item);
 
-        freeSlot?.SetItem(item);
+        if (freeSlot is null)
+            return false;
+
+        var inventoryItem = CreateInventoryItem();
+        inventoryItem.Init(item, freeSlot.CustomMinimumSize);
+        inventoryItem.RootSlot = freeSlot;
+        inventoryItem.Position = freeSlot.Position;
+
+        freeSlot?.SetItem(inventoryItem);
+
+        var occupiedSlots = new List<InventorySlot>();
+
+        for (var w = 0; w < inventoryItem.SlotWidth; w++)
+        for (var h = 0; h < inventoryItem.SlotHeight; h++)
+            occupiedSlots.Add(slotMap[freeSlot.InventoryCoordinate + new Vector2(w, h)]);
+
+        var occupiedSlotsCoordinates = occupiedSlots.Select(slot => slot.InventoryCoordinate).ToArray();
+        inventoryItem.OccupiedSlotCoordinates = occupiedSlotsCoordinates;
+
+        foreach (var slotsCoordinate in occupiedSlotsCoordinates)
+        {
+            slotMap[slotsCoordinate].IsOccupied = true;
+            occupationMatrix[slotsCoordinate]   = true;
+        }
+
+        GetNode<MarginContainer>(nameof(MarginContainer)).GetNode<Control>("OverlayLayer").AddChild(inventoryItem);
+
+        return true;
     }
 
     public override void _Input(InputEvent @event)
@@ -77,7 +109,7 @@ public partial class Inventory : PanelContainer
         var parent        = GetParent<VBoxContainer>();
         var parentSIze    = parent.Size;
         var prentPosition = parent.GlobalPosition;
-        
+
         return mouseEvent.GlobalPosition.X < prentPosition.X || mouseEvent.GlobalPosition.Y < prentPosition.Y || mouseEvent.GlobalPosition.Y > prentPosition.Y + parentSIze.Y || mouseEvent.GlobalPosition.X > prentPosition.X + parentSIze.X;
     }
 
@@ -89,7 +121,7 @@ public partial class Inventory : PanelContainer
         var gridWidth = ItemGrid.Columns;
         var column    = 0;
         var row       = 0;
-        
+
         for (var i = 0; i < AmountSlots; i++)
         {
             var inventorySlot = SlotScene.Instantiate<InventorySlot>();
@@ -102,6 +134,10 @@ public partial class Inventory : PanelContainer
             inventorySlot.EquippingItem       += InventorySlotOnEquippingItem;
 
             ItemGrid.AddChild(inventorySlot);
+
+            slotMap.Add(inventorySlot.InventoryCoordinate, inventorySlot);
+            occupationMatrix.Add(inventorySlot.InventoryCoordinate, false);
+
             column++;
 
             if ((i + 1) % gridWidth == 0)
@@ -128,14 +164,14 @@ public partial class Inventory : PanelContainer
         switch (mousemovementdirection)
         {
             case MousemovementDirection.Entered:
-                if (inventoryslot.ContainedItem == null)
+                if (inventoryslot.ContainedInventoryItem?.ContainedItem == null)
                     return;
 
-                Tooltip.Show(inventoryslot);
+                Tooltip.Show(inventoryslot.ContainedInventoryItem);
 
                 break;
             case MousemovementDirection.Left:
-                if (inventoryslot.ContainedItem == null)
+                if (inventoryslot.ContainedInventoryItem == null)
 
                     return;
 
@@ -147,19 +183,59 @@ public partial class Inventory : PanelContainer
 
     public InventorySlot GetNextFreeSlotOrDefaultFor(BaseItem incomingItem)
     {
-        var slotsWithSpace = ItemGrid.GetAllChildren<InventorySlot>()
-                                     .Where(slot => slot.HasSpaceFor(incomingItem))
-                                     .ToList();
-
-        foreach (var nextSlot in slotsWithSpace)
+        foreach (var slotIsOccupied in occupationMatrix)
         {
-            if (nextSlot.ContainedItem is null)
-                return nextSlot;
+            if (slotIsOccupied.Value)
+                continue;
 
-            if (incomingItem is ConsumableItem incomingConsumable && nextSlot.ContainedItem is ConsumableItem { IsStackable: true } containedConsumable && containedConsumable.CanFit(incomingConsumable))
-                return nextSlot;
+            var adjacentSlotsAreOccupied = false;
+
+            for (var w = 0; w < incomingItem.SlotSize.X; w++)
+            {
+                for (var h = 0; h < incomingItem.SlotSize.Y; h++)
+                {
+                    if(h == 0 && w == 0)
+                        continue;
+
+                    var nextSlotKey = slotIsOccupied.Key + new Vector2(w, h);
+
+                    if (nextSlotKey == slotIsOccupied.Key)
+                        continue;
+
+                    var isOutOfBounds = !occupationMatrix.ContainsKey(nextSlotKey);
+
+                    if (isOutOfBounds)
+                    {
+                        adjacentSlotsAreOccupied = true;
+                        continue;
+                    }
+
+                    var nextSlotIsOccupied = occupationMatrix[nextSlotKey];
+                    adjacentSlotsAreOccupied |= nextSlotIsOccupied;
+                }
+            }
+
+
+            if (adjacentSlotsAreOccupied)
+                continue;
+
+            return slotMap[slotIsOccupied.Key];
         }
 
         return null;
+        // var slotsWithSpace = ItemGrid.GetAllChildren<InventorySlot>()
+        //                              .Where(slot => slot.HasSpaceFor(incomingItem))
+        //                              .ToList();
+        //
+        // foreach (var nextSlot in slotsWithSpace)
+        // {
+        //     if (nextSlot.ContainedInventoryItem is null && !nextSlot.IsOccupied)
+        //         return nextSlot;
+        //
+        //     if (incomingItem is ConsumableItem incomingConsumable && nextSlot.ContainedInventoryItem?.ContainedItem is ConsumableItem { IsStackable: true } containedConsumable && containedConsumable.CanFit(incomingConsumable))
+        //         return nextSlot;
+        // }
+        //
+        // return null;
     }
 }

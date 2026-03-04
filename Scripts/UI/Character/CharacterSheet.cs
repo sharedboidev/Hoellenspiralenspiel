@@ -23,6 +23,8 @@ public partial class CharacterSheet : Control
         GetNode<EquipmentPanel>("%" + nameof(EquipmentPanel)).EquipmentChanged += OnEquipmentChanged;
         GetNode<Inventory>("%" + nameof(Inventory)).EquippingItem              += OnEquippingItem;
         GetNode<StatdisplayButton>(nameof(StatdisplayButton)).Pressed          += OnPressed;
+
+        SetVisible(false);
     }
 
     private void OnPressed(bool isToggledOpen)
@@ -44,7 +46,7 @@ public partial class CharacterSheet : Control
 
     private void OnEquippingItem(InventorySlot fromslot)
     {
-        if (fromslot.ContainedItem is not BaseItem item)
+        if (fromslot.ContainedInventoryItem?.ContainedItem is not BaseItem item)
             return;
 
         if (!item.CanBeEquipedBy(player))
@@ -53,7 +55,10 @@ public partial class CharacterSheet : Control
         var retrievedItem        = fromslot.RetrieveItem();
         var formerlyEquippedItem = equipmentPanel.EquipIntoFittingSlot(retrievedItem);
 
-        fromslot.SetItem(formerlyEquippedItem);
+        var inventoryItem = GetNode<Inventory>("%" + nameof(Inventory)).CreateInventoryItem();
+        inventoryItem.ContainedItem = formerlyEquippedItem;
+
+        fromslot.SetItem(inventoryItem);
     }
 
     private void SetPositionRelativeToViewport()

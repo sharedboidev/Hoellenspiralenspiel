@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://dhahe4svwhyf3"]
+[gd_scene format=3 uid="uid://d3ewp4q3ldpru"]
 
 [ext_resource type="Script" uid="uid://yd05wg2cty3n" path="res://Scripts/Abilities/Spells/VeryCoolCircle.cs" id="1_keaii"]
-[ext_resource type="Shader" uid="uid://ceusmchheajrs" path="res://cool.tres" id="1_vq5du"]
+[ext_resource type="Shader" uid="uid://csu07l2uwwqk0" path="res://cool.tres" id="1_vq5du"]
 [ext_resource type="Texture2D" uid="uid://dha4dmsjhrjen" path="res://Textures/Cool/frame0000.png" id="2_keaii"]
 [ext_resource type="Texture2D" uid="uid://84vtqj8g7sa1" path="res://Textures/Cool/frame0001.png" id="3_gugoe"]
 [ext_resource type="Texture2D" uid="uid://8dwyjnkv4hke" path="res://Textures/Cool/frame0002.png" id="4_unyea"]
