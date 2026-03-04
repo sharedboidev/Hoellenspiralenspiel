@@ -50,7 +50,7 @@ public partial class Inventory : PanelContainer
         var rootCoord     = slot.InventoryCoordinate;
         var itemDimension = ((BaseItem)slot.ContainedInventoryItem.ContainedItem).SlotSize;
 
-        BaseItem retrievedItem = null;
+        InventoryItem retrievedItem = null;
 
         for (var w = 0; w < itemDimension.X; w++)
         {
@@ -64,11 +64,15 @@ public partial class Inventory : PanelContainer
                 else
                     nextSlot.Reset();
 
-                occupationMatrix[nextSlotCoord] = false;
+                FreeOccupation(nextSlot);
+                //occupationMatrix[nextSlotCoord] = false;
             }
         }
 
-        return retrievedItem;
+        var actualItem = (BaseItem)retrievedItem?.ContainedItem;
+        retrievedItem?.QueueFree();
+
+        return actualItem;
     }
 
     public InventoryItem CreateInventoryItem()
@@ -87,12 +91,12 @@ public partial class Inventory : PanelContainer
         var inventoryItem = CreateInventoryItem();
         inventoryItem.MouseMoving     += InventorySlotOnMouseMoving;
         inventoryItem.WasRightClicked += InventorySlotOnEquippingItem;
-
+        inventoryItem.ItemConsumed    += InventoryItemOnItemConsumed;
         inventoryItem.Init(item, freeSlot.CustomMinimumSize);
         inventoryItem.RootSlot = freeSlot;
         inventoryItem.Position = freeSlot.Position;
 
-        freeSlot.SetItem(inventoryItem);
+        //freeSlot.SetItem(inventoryItem);
 
         var occupiedSlots = new List<InventorySlot>();
 
@@ -105,6 +109,7 @@ public partial class Inventory : PanelContainer
 
         foreach (var slotsCoordinate in occupiedSlotsCoordinates)
         {
+            slotMap[slotsCoordinate].SetItem(inventoryItem);
             slotMap[slotsCoordinate].IsOccupied = true;
             occupationMatrix[slotsCoordinate]   = true;
         }
@@ -113,6 +118,10 @@ public partial class Inventory : PanelContainer
 
         return true;
     }
+
+    private void InventoryItemOnItemConsumed(InventorySlot fromrootslot) => FreeOccupation(fromrootslot);
+
+    private void FreeOccupation(InventorySlot fromrootslot) => occupationMatrix[fromrootslot.InventoryCoordinate] = false;
 
     public override void _Input(InputEvent @event)
     {
@@ -182,8 +191,8 @@ public partial class Inventory : PanelContainer
     private void InventorySlotOnEquippingItem(InventorySlot fromSlot)
         => EquippingItem?.Invoke(fromSlot);
 
-    private void InventorySlotOnWithdrawingItem(BaseItem withdrawnitem)
-        => MouseObject.Show(withdrawnitem);
+    private void InventorySlotOnWithdrawingItem(InventoryItem withdrawnitem)
+        => MouseObject.Show((BaseItem)withdrawnitem?.ContainedItem);
 
     private void InventorySlotOnSlotEmptied(InventorySlot inventoryslot)
         => Tooltip.Hide();
@@ -212,11 +221,8 @@ public partial class Inventory : PanelContainer
 
     public InventorySlot GetNextFreeSlotOrDefaultFor(BaseItem incomingItem)
     {
-        foreach (var slotIsOccupied in occupationMatrix)
+        foreach (var slotIsOccupied in occupationMatrix.Where(isOccupied => !isOccupied.Value))
         {
-            if (slotIsOccupied.Value)
-                continue;
-
             var adjacentSlotsAreOccupied = false;
 
             for (var w = 0; w < incomingItem.SlotSize.X; w++)
@@ -245,10 +251,8 @@ public partial class Inventory : PanelContainer
                 }
             }
 
-            if (adjacentSlotsAreOccupied)
-                continue;
-
-            return slotMap[slotIsOccupied.Key];
+            if (!adjacentSlotsAreOccupied)
+                return slotMap[slotIsOccupied.Key];
         }
 
         return null;

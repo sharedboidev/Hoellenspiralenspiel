@@ -9,15 +9,14 @@ public partial class InventorySlot
 {
     public delegate void SlotEmptiedEventHandler(InventorySlot inventorySlot);
 
-    public delegate void WithdrawingItemEventHandler(BaseItem withdrawnItem);
+    public delegate void WithdrawingItemEventHandler(InventoryItem withdrawnItem);
 
-    private Label     stacksizeDisplay;
-    public  Inventory Inventory           { get; set; }
-    public  Vector2   InventoryCoordinate { get; set; }
-    public  bool      IsOccupied          { get; set; }
-
-    public InventoryItem                     ContainedInventoryItem { get; set; }
-    public Vector2                           TooltipAnchorPoint     => GlobalPosition;
+    private Label                            stacksizeDisplay;
+    public  Inventory                        Inventory              { get; set; }
+    public  Vector2                          InventoryCoordinate    { get; set; }
+    public  bool                             IsOccupied             { get; set; }
+    public  InventoryItem                    ContainedInventoryItem { get; set; }
+    public  Vector2                          TooltipAnchorPoint     => GlobalPosition;
     public event WithdrawingItemEventHandler WithdrawingItem;
     public event SlotEmptiedEventHandler     SlotEmptied;
 
@@ -27,7 +26,7 @@ public partial class InventorySlot
     public void Reset()
     {
         IsOccupied             = false;
-        //ContainedInventoryItem = null;      
+        ContainedInventoryItem = null;
     }
 
     public bool SetItem(InventoryItem incomingItem)
@@ -85,23 +84,25 @@ public partial class InventorySlot
         UpdateAndShowStacksize(consumable);
     }
 
-    public BaseItem RetrieveItem()
+    public InventoryItem RetrieveItem()
     {
         stacksizeDisplay.Visible = false;
-
+        //
         // if (ContainedInventoryItem?.ContainedItem is BaseItem item)
         //     item.TreeExited -= ItemOnTreeExited;
         //
         // if (ContainedInventoryItem?.ContainedItem is ConsumableItem consumableItem)
         //     consumableItem.OnStacksizeReduced -= ConsumableOnStacksizeReduced;
 
-        var itemAboutToBeReturned = ContainedInventoryItem?.ContainedItem;
-        ContainedInventoryItem?.QueueFree();
-        ContainedInventoryItem = null;
+        var itemAboutToBeReturned = ContainedInventoryItem;
+        //ContainedInventoryItem?.QueueFree();
+        //ContainedInventoryItem = null;
+
+        Reset();
 
         SlotEmptied?.Invoke(this);
 
-        return (BaseItem)itemAboutToBeReturned;
+        return itemAboutToBeReturned;
     }
 
     public bool HasSpaceFor(BaseItem item)
@@ -162,7 +163,7 @@ public partial class InventorySlot
 
         PutItemIntoSlot(mouseObject);
 
-        mouseObject.Show(slotItem);
+        mouseObject.Show((BaseItem)slotItem?.ContainedItem);
     }
 
     private void MergeItems(MouseObject mouseObject)

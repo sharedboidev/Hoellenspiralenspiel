@@ -1,5 +1,6 @@
 using Godot;
 using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.UI.Buttons;
 using Hoellenspiralenspiel.Scripts.Units;
 
@@ -56,11 +57,49 @@ public partial class CharacterSheet : Control
 
         var retrievedItem        = inventory.RetrieveItem(fromslot);
         var formerlyEquippedItem = equipmentPanel.EquipIntoFittingSlot(retrievedItem);
-        
-        if(formerlyEquippedItem is null)
+
+        if (formerlyEquippedItem is null)
             return;
 
-        inventory.SetItem(formerlyEquippedItem);
+        var couldSetItem = inventory.SetItem(formerlyEquippedItem);
+
+        if (!couldSetItem)
+            DropItem(formerlyEquippedItem);
+    }
+
+    public void DropItem(BaseItem item)
+    {
+        if (item is null)
+            return;
+
+        var playerPosition = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D").GlobalPosition;
+        var dropAtPosition = playerPosition;
+
+        InstantiateLootbag(dropAtPosition, item);
+
+        GD.Print($"{item?.Name ?? "Nothing"} dropped by Player.");
+    }
+
+    private void InstantiateLootbag(Vector2 atPosition, BaseItem loot)
+    {
+        var lootbagInstance = GD.Load<PackedScene>("res://Scenes/Objects/lootbag.tscn").Instantiate<Lootbag>();
+        lootbagInstance.GlobalPosition =  atPosition;
+        lootbagInstance.ContainedItem  =  loot;
+        lootbagInstance.LootClicked    += LootbagInstanceOnLootClicked;
+
+        GetTree().CurrentScene.GetNode<Node2D>("Environment").AddChild(lootbagInstance);
+    }
+
+    private void LootbagInstanceOnLootClicked(Lootbag sender, BaseItem lootedItem)
+    {
+        GD.Print($"{lootedItem?.Name ?? "Nothing"} looted.");
+
+        var couldLootItem = inventory.SetItem(lootedItem);
+
+        if (couldLootItem)
+            sender?.QueueFree();
+        else
+            sender.BounceAndFlip();
     }
 
     private void SetPositionRelativeToViewport()

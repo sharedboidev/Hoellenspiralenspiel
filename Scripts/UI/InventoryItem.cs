@@ -18,6 +18,7 @@ public partial class InventoryItem
     public delegate void MouseMovementEventHandler(MousemovementDirection mousemovementDirection, InventoryItem inventoryItem);
 
     public delegate void WasRightClickedEventHandler(InventorySlot fromRootSlot);
+    public delegate void ItemConsumedEventHandler(InventorySlot    fromRootSlot);
 
     public event WasRightClickedEventHandler WasRightClicked;
 
@@ -67,6 +68,7 @@ public partial class InventoryItem
     public Vector2                           TooltipAnchorPoint => GlobalPosition;
 
     public event MouseMovementEventHandler MouseMoving;
+    public event ItemConsumedEventHandler  ItemConsumed;
 
     public override void _Ready()
         => SetScaledSize();
@@ -110,7 +112,7 @@ public partial class InventoryItem
                 break;
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } when ContainedItem is not null:
                 EquipItem();
- 
+
                 break;
         }
     }
@@ -120,6 +122,8 @@ public partial class InventoryItem
         var player = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D");
 
         consumable.GetConsumedBy(player);
+
+        ItemConsumed?.Invoke(RootSlot);
     }
 
     private void EquipItem()
