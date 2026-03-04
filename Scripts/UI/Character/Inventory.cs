@@ -14,6 +14,7 @@ public partial class Inventory : PanelContainer
 
     private GridContainer itemGrid;
     private bool          slotsGenerated;
+    private Vector2       slotSize;
     private BaseTooltip   Tooltip     => GetTree().CurrentScene.GetNode<ItemTooltip>("%" + nameof(ItemTooltip));
     private MouseObject   MouseObject => GetNode<MouseObject>(nameof(MouseObject));
 
@@ -36,7 +37,12 @@ public partial class Inventory : PanelContainer
     public event EquippingItemEventHandler EquippingItem;
 
     public override void _Ready()
-        => BuildInventory();
+    {
+        BuildInventory();
+        GetInventorySlotSize();
+    }
+
+    private void GetInventorySlotSize() => slotSize = GetChild<InventorySlot>(0).Size;
 
     public void SetItem(BaseItem item)
     {

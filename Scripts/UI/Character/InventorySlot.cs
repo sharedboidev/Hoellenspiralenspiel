@@ -179,12 +179,11 @@ public partial class InventorySlot
 
     private void SwapItems(MouseObject mouseObject)
     {
-        var mousItem = mouseObject.RetrieveItem();
         var slotItem = RetrieveItem();
 
-        SetItem(mousItem);
+        PutItemIntoSlot(mouseObject);
+
         mouseObject.Show(slotItem);
-        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
     }
 
     private void MergeItems(MouseObject mouseObject)

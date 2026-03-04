@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://c5agwyw6h5sjs"]
+
+[ext_resource type="Script" uid="uid://bb8awugo1fk4q" path="res://Scripts/UI/InventoryItem.cs" id="1_dv6mf"]
+[ext_resource type="Texture2D" uid="uid://dxdttrmghay8k" path="res://icon.svg" id="2_avwti"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wggey"]
+bg_color = Color(0.08701607, 0.08701607, 0.08701607, 0.62352943)
+
+[node name="InventoryItem" type="PanelContainer" unique_id=122647255]
+custom_minimum_size = Vector2(64, 64)
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_wggey")
+script = ExtResource("1_dv6mf")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=647387403]
+unique_name_in_owner = true
+layout_mode = 2
+texture = ExtResource("2_avwti")
+expand_mode = 1
+stretch_mode = 5
