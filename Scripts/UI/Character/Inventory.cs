@@ -126,7 +126,7 @@ public partial class Inventory : PanelContainer
         var inventoryItem = CreateInventoryItem();
         inventoryItem.Init(item, freeSlot.CustomMinimumSize);
         inventoryItem.RootSlot = freeSlot;
-        inventoryItem.Position = freeSlot.Position;
+        inventoryItem.Position = freeSlot.InventoryCoordinate * freeSlot.CustomMinimumSize;
 
         SubscribeToUseractions(inventoryItem);
 
@@ -163,7 +163,7 @@ public partial class Inventory : PanelContainer
 
         var fits = FitsIntoSlot(itemFromMouseObject, fromrootslot.InventoryCoordinate);
 
-        if(fits)
+        if (fits)
         {
             PutInventoryItemIntoInventory(itemFromMouseObject, fromrootslot);
             MouseObject.Show(itemFromInventory);
@@ -227,15 +227,9 @@ public partial class Inventory : PanelContainer
 
         for (var i = 0; i < AmountSlots; i++)
         {
-            var inventorySlot = SlotScene.Instantiate<InventorySlot>();
-
-            inventorySlot.Inventory           =  this;
-            inventorySlot.InventoryCoordinate =  new Vector2(column, row);
-            inventorySlot.SlotEmptied         += InventorySlotOnSlotEmptied;
-            inventorySlot.PuttingItemIntoSlot += InventorySlotOnPuttingItemIntoSlot;
+            var inventorySlot = CreateInventorySlot(column, row);
 
             ItemGrid.AddChild(inventorySlot);
-
             slotMap.Add(inventorySlot.InventoryCoordinate, inventorySlot);
             occupationMatrix.Add(inventorySlot.InventoryCoordinate, false);
 
@@ -249,6 +243,17 @@ public partial class Inventory : PanelContainer
         }
 
         slotsGenerated = true;
+    }
+
+    private InventorySlot CreateInventorySlot(int column, int row)
+    {
+        var inventorySlot = SlotScene.Instantiate<InventorySlot>();
+
+        inventorySlot.Inventory           =  this;
+        inventorySlot.InventoryCoordinate =  new Vector2(column, row);
+        inventorySlot.SlotEmptied         += InventorySlotOnSlotEmptied;
+        inventorySlot.PuttingItemIntoSlot += InventorySlotOnPuttingItemIntoSlot;
+        return inventorySlot;
     }
 
     private void InventorySlotOnPuttingItemIntoSlot(InventorySlot slottoputitemin)
