@@ -121,15 +121,4 @@ public partial class InventorySlot
     }
 
     private void PutItemIntoSlot() => PuttingItemIntoSlot?.Invoke(this);
-
-    private void MergeItems(MouseObject mouseObject)
-    {
-        var item = mouseObject.RetrieveItem();
-        ContainedInventoryItem.ContainedItem = item;
-
-        var couldSet = SetItem(ContainedInventoryItem);
-
-        if (!couldSet)
-            mouseObject.Show(item);
-    }
 }

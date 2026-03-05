@@ -17,13 +17,15 @@ public partial class InventoryItem
 {
     public delegate void ItemConsumedEventHandler(InventorySlot fromRootSlot);
 
+    public delegate void MergingItemEventHandler(InventorySlot fromRootSlot);
+
     public delegate void MouseMovementEventHandler(MousemovementDirection mousemovementDirection, InventoryItem inventoryItem);
 
     public delegate void SwappingItemEventHandler(InventorySlot fromRootSlot);
 
     public delegate void WasRightClickedEventHandler(InventorySlot fromRootSlot);
 
-    public delegate void WithdrawingItemEventHandler(InventorySlot fromRootSlot);
+    public delegate void WithdrawingItemEventHandler(InventorySlot intoSlot);
 
     private          Texture2D   defaultTexture;
     private          TextureRect icon;
@@ -74,6 +76,7 @@ public partial class InventoryItem
     public event ItemConsumedEventHandler    ItemConsumed;
     public event WithdrawingItemEventHandler WithdrawingItem;
     public event SwappingItemEventHandler    SwappingItem;
+    public event MergingItemEventHandler     MergingItem;
 
     public override void _Ready()
         => SetScaledSize();
@@ -129,10 +132,10 @@ public partial class InventoryItem
                 SwapItems();
 
                 break;
-            // case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && HasSpaceFor((BaseItem)mouseObject.ContainedItem):
-            //     MergeItems(mouseObject);
-            //
-            //     break;
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && HasSpaceFor((BaseItem)mouseObject.ContainedItem):
+                MergeItems();
+
+                break;
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } when ContainedItem is ConsumableItem consumable:
                 ConsumeItem(consumable);
 
@@ -143,6 +146,8 @@ public partial class InventoryItem
                 break;
         }
     }
+
+    private void MergeItems() => MergingItem?.Invoke(RootSlot);
 
     private void SwapItems() => SwappingItem?.Invoke(RootSlot);
 

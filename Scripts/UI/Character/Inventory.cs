@@ -94,17 +94,16 @@ public partial class Inventory : PanelContainer
 
     private void PutInventoryItemIntoInventory(BaseItem item, InventorySlot freeSlot)
     {
-        var inventoryItem = CreateInventoryItem();
-        inventoryItem.MouseMoving     += InventorySlotOnMouseMoving;
-        inventoryItem.WasRightClicked += InventorySlotOnEquippingItem;
-        inventoryItem.ItemConsumed    += InventoryItemOnItemConsumed;
-        inventoryItem.SwappingItem += InventoryItemOnSwappingItem;
-        inventoryItem.WithdrawingItem += InventoryItemOnWithdrawingItem;
+        var inventoryItem = ConfigureInventoryItem(item, freeSlot);
 
-        inventoryItem.Init(item, freeSlot.CustomMinimumSize);
-        inventoryItem.RootSlot = freeSlot;
-        inventoryItem.Position = freeSlot.Position;
+        HandleSlotOccupation(freeSlot, inventoryItem);
+        AddToOverlay(inventoryItem);
+    }
 
+    private void AddToOverlay(InventoryItem inventoryItem) => GetNode<MarginContainer>(nameof(MarginContainer)).GetNode<Control>("OverlayLayer").AddChild(inventoryItem);
+
+    private void HandleSlotOccupation(InventorySlot freeSlot, InventoryItem inventoryItem)
+    {
         var occupiedSlots = new List<InventorySlot>();
 
         for (var w = 0; w < inventoryItem.SlotWidth; w++)
@@ -120,8 +119,41 @@ public partial class Inventory : PanelContainer
             slotMap[slotsCoordinate].IsOccupied = true;
             occupationMatrix[slotsCoordinate]   = true;
         }
+    }
 
-        GetNode<MarginContainer>(nameof(MarginContainer)).GetNode<Control>("OverlayLayer").AddChild(inventoryItem);
+    private InventoryItem ConfigureInventoryItem(BaseItem item, InventorySlot freeSlot)
+    {
+        var inventoryItem = CreateInventoryItem();
+        inventoryItem.Init(item, freeSlot.CustomMinimumSize);
+        inventoryItem.RootSlot = freeSlot;
+        inventoryItem.Position = freeSlot.Position;
+
+        SubscribeToUseractions(inventoryItem);
+
+        return inventoryItem;
+    }
+
+    private void SubscribeToUseractions(InventoryItem inventoryItem)
+    {
+        inventoryItem.MouseMoving     += InventorySlotOnMouseMoving;
+        inventoryItem.WasRightClicked += InventorySlotOnEquippingItem;
+        inventoryItem.ItemConsumed    += InventoryItemOnItemConsumed;
+        inventoryItem.SwappingItem    += InventoryItemOnSwappingItem;
+        inventoryItem.WithdrawingItem += InventoryItemOnWithdrawingItem;
+        inventoryItem.MergingItem     += InventoryItemOnMergingItem;
+    }
+
+    private void InventoryItemOnMergingItem(InventorySlot intoSlot)
+    {
+        var itemToMergeIntoSlot = MouseObject.RetrieveItem();
+
+        var inventoryItem = CreateInventoryItem();
+        inventoryItem.ContainedItem = itemToMergeIntoSlot;
+
+        var couldSet = intoSlot.SetItem(inventoryItem);
+
+        if (!couldSet)
+            MouseObject.Show(itemToMergeIntoSlot);
     }
 
     private void InventoryItemOnSwappingItem(InventorySlot fromrootslot)
