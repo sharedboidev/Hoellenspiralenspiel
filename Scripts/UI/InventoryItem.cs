@@ -8,7 +8,6 @@ using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
-[Tool]
 public partial class InventoryItem
         : PanelContainer,
           ITooltipObjectContainer
@@ -25,12 +24,15 @@ public partial class InventoryItem
 
     public delegate void WithdrawingItemEventHandler(InventorySlot intoSlot);
 
-    private          Texture2D   defaultTexture;
-    private          TextureRect icon;
-    private          Player2D    player;
-    [Export] private int         pxDimension = 64;
-    private          int         slotHeight  = 1;
-    private          int         slotWidth   = 1;
+    private          StyleBoxFlat actionAlldowdStylebox;
+    private          StyleBoxFlat actionForbiddenStylebox;
+    private          StyleBoxFlat defaultStyleBox;
+    private          Texture2D    defaultTexture;
+    private          TextureRect  icon;
+    private          Player2D     player;
+    [Export] private int          pxDimension = 64;
+    private          int          slotHeight  = 1;
+    private          int          slotWidth   = 1;
 
     [Export]
     public Texture2D DefaultTexture
@@ -79,7 +81,20 @@ public partial class InventoryItem
     {
         player = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D");
 
+        ConfigureBackgroundColors();
         SetScaledSize();
+    }
+
+    private void ConfigureBackgroundColors()
+    {
+        var styleboxName = "panel";
+
+        defaultStyleBox         = (StyleBoxFlat)GetThemeStylebox(styleboxName).Duplicate();
+        actionAlldowdStylebox   = (StyleBoxFlat)defaultStyleBox.Duplicate();
+        actionForbiddenStylebox = (StyleBoxFlat)defaultStyleBox.Duplicate();
+
+        actionAlldowdStylebox.BgColor   = new Color(0, 0.25f, 0, .9f); // green
+        actionForbiddenStylebox.BgColor = new Color(0.25f, 0, 0, .9f); // red
     }
 
     public void Init(BaseItem item, Vector2 inventorySlotSize)
@@ -168,8 +183,21 @@ public partial class InventoryItem
     }
 
     public void _on_mouse_entered()
-        => MouseMoving?.Invoke(MousemovementDirection.Entered, this);
+    {
+        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
+
+        if (ContainedItem is not BaseItem item || item is ConsumableItem)
+            return;
+
+        var stylebox = item.CanBeEquipedBy(player) ? actionAlldowdStylebox : actionForbiddenStylebox;
+
+        AddThemeStyleboxOverride("panel", stylebox);
+    }
 
     public void _on_mouse_exited()
-        => MouseMoving?.Invoke(MousemovementDirection.Left, this);
+    {
+        MouseMoving?.Invoke(MousemovementDirection.Left, this);
+
+        AddThemeStyleboxOverride("panel", defaultStyleBox);
+    }
 }

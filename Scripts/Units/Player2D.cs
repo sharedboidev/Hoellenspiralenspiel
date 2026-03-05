@@ -63,13 +63,13 @@ public partial class Player2D : BaseUnit
     public int GetRequiredAttributevalue(Requirement requirement)
         => requirement switch
         {
-            Requirement.Strength       => 1,
-            Requirement.Dexterity      => 1,
-            Requirement.Intelligence   => 1,
-            Requirement.Constitution   => 1,
-            Requirement.Awareness      => 1,
+            Requirement.Strength => StrengthFinal,
+            Requirement.Dexterity => DexterityFinal,
+            Requirement.Intelligence => IntelligenceFinal,
+            Requirement.Constitution => ConstitutionFinal,
+            Requirement.Awareness => AwarenessFinal,
             Requirement.CharacterLevel => Level,
-            _                          => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null)
         };
 
     private void ConfigureSkillbar()

@@ -34,6 +34,8 @@ theme_override_constants/margin_right = 3
 [node name="StacksizeDisplay" type="Label" parent="MarginContainer/PanelContainer/MarginContainer" unique_id=742847753]
 unique_name_in_owner = true
 visible = false
+z_index = 1
+y_sort_enabled = true
 layout_mode = 2
 size_flags_vertical = 8
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
