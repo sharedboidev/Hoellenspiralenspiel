@@ -104,21 +104,28 @@ public partial class Inventory : PanelContainer
 
     private void HandleSlotOccupation(InventorySlot freeSlot, InventoryItem inventoryItem)
     {
+        var occupiedSlotsCoordinates = FindOccupiedCoordinates(freeSlot, inventoryItem);
+
+        foreach (var slotsCoordinate in occupiedSlotsCoordinates)
+            SetSlotOccupied(inventoryItem, slotsCoordinate);
+    }
+
+    private Vector2[] FindOccupiedCoordinates(InventorySlot freeSlot, InventoryItem inventoryItem)
+    {
         var occupiedSlots = new List<InventorySlot>();
 
         for (var w = 0; w < inventoryItem.SlotWidth; w++)
         for (var h = 0; h < inventoryItem.SlotHeight; h++)
             occupiedSlots.Add(slotMap[freeSlot.InventoryCoordinate + new Vector2(w, h)]);
 
-        var occupiedSlotsCoordinates = occupiedSlots.Select(slot => slot.InventoryCoordinate).ToArray();
-        inventoryItem.OccupiedSlotCoordinates = occupiedSlotsCoordinates;
+        return occupiedSlots.Select(slot => slot.InventoryCoordinate).ToArray();
+    }
 
-        foreach (var slotsCoordinate in occupiedSlotsCoordinates)
-        {
-            slotMap[slotsCoordinate].SetItem(inventoryItem);
-            slotMap[slotsCoordinate].IsOccupied = true;
-            occupationMatrix[slotsCoordinate]   = true;
-        }
+    private void SetSlotOccupied(InventoryItem inventoryItem, Vector2 slotsCoordinate)
+    {
+        slotMap[slotsCoordinate].SetItem(inventoryItem);
+        slotMap[slotsCoordinate].IsOccupied = true;
+        occupationMatrix[slotsCoordinate]   = true;
     }
 
     private InventoryItem ConfigureInventoryItem(BaseItem item, InventorySlot freeSlot)

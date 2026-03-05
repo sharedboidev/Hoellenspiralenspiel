@@ -67,7 +67,6 @@ public partial class InventoryItem
     }
 
     public InventorySlot                     RootSlot                { get; set; }
-    public Vector2[]                         OccupiedSlotCoordinates { get; set; } = [];
     public event PropertyChangedEventHandler PropertyChanged;
     public ITooltipObject                    ContainedItem      { get; set; }
     public Vector2                           TooltipAnchorPoint => GlobalPosition;
