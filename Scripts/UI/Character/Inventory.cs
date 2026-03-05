@@ -88,6 +88,13 @@ public partial class Inventory : PanelContainer
         if (freeSlot is null)
             return false;
 
+        PutInventoryItemIntoInventory(item, freeSlot);
+
+        return true;
+    }
+
+    private void PutInventoryItemIntoInventory(BaseItem item, InventorySlot freeSlot)
+    {
         var inventoryItem = CreateInventoryItem();
         inventoryItem.MouseMoving     += InventorySlotOnMouseMoving;
         inventoryItem.WasRightClicked += InventorySlotOnEquippingItem;
@@ -115,8 +122,6 @@ public partial class Inventory : PanelContainer
         }
 
         GetNode<MarginContainer>(nameof(MarginContainer)).GetNode<Control>("OverlayLayer").AddChild(inventoryItem);
-
-        return true;
     }
 
     private void InventoryItemOnItemConsumed(InventorySlot fromrootslot) => FreeOccupation(fromrootslot);
@@ -193,7 +198,12 @@ public partial class Inventory : PanelContainer
     {
         var itemToPutIntoInventory = MouseObject.RetrieveItem();
 
+        var fits = FitsIntoSlot(itemToPutIntoInventory, slottoputitemin.InventoryCoordinate);
 
+        if(fits)
+            PutInventoryItemIntoInventory(itemToPutIntoInventory, slottoputitemin);
+        else
+            MouseObject.Show(itemToPutIntoInventory);
     }
 
     private void InventorySlotOnEquippingItem(InventorySlot fromSlot)
@@ -231,38 +241,47 @@ public partial class Inventory : PanelContainer
     {
         foreach (var slotIsOccupied in occupationMatrix.Where(isOccupied => !isOccupied.Value))
         {
-            var adjacentSlotsAreOccupied = false;
+            var currentSlot = slotIsOccupied.Key;
 
-            for (var w = 0; w < incomingItem.SlotSize.X; w++)
-            {
-                for (var h = 0; h < incomingItem.SlotSize.Y; h++)
-                {
-                    if (h == 0 && w == 0)
-                        continue;
+            var fits = FitsIntoSlot(incomingItem, currentSlot);
 
-                    var nextSlotKey = slotIsOccupied.Key + new Vector2(w, h);
-
-                    if (nextSlotKey == slotIsOccupied.Key)
-                        continue;
-
-                    var isOutOfBounds = !occupationMatrix.ContainsKey(nextSlotKey);
-
-                    if (isOutOfBounds)
-                    {
-                        adjacentSlotsAreOccupied = true;
-
-                        continue;
-                    }
-
-                    var nextSlotIsOccupied = occupationMatrix[nextSlotKey];
-                    adjacentSlotsAreOccupied |= nextSlotIsOccupied;
-                }
-            }
-
-            if (!adjacentSlotsAreOccupied)
-                return slotMap[slotIsOccupied.Key];
+            if (fits)
+                return slotMap[currentSlot];
         }
 
         return null;
+    }
+
+    private bool FitsIntoSlot(BaseItem incomingItem, Vector2 currentSlot)
+    {
+        var adjacentSlotsAreOccupied = false;
+
+        for (var w = 0; w < incomingItem.SlotSize.X; w++)
+        {
+            for (var h = 0; h < incomingItem.SlotSize.Y; h++)
+            {
+                if (h == 0 && w == 0)
+                    continue;
+
+                var nextSlotKey = currentSlot + new Vector2(w, h);
+
+                if (nextSlotKey == currentSlot)
+                    continue;
+
+                var isOutOfBounds = !occupationMatrix.ContainsKey(nextSlotKey);
+
+                if (isOutOfBounds)
+                {
+                    adjacentSlotsAreOccupied = true;
+
+                    continue;
+                }
+
+                var nextSlotIsOccupied = occupationMatrix[nextSlotKey];
+                adjacentSlotsAreOccupied |= nextSlotIsOccupied;
+            }
+        }
+
+        return !adjacentSlotsAreOccupied;
     }
 }
