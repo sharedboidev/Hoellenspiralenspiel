@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dxdttrmghay8k" path="res://icon.svg" id="2_avwti"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wggey"]
-bg_color = Color(0.08701607, 0.08701607, 0.08701607, 0.62352943)
+bg_color = Color(0.05490196, 0.05490196, 0.05490196, 0.87058824)
 
 [node name="InventoryItem" type="PanelContainer" unique_id=122647255]
 custom_minimum_size = Vector2(64, 64)

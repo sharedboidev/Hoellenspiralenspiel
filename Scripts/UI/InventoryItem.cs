@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
@@ -12,8 +11,7 @@ namespace Hoellenspiralenspiel.Scripts.UI;
 [Tool]
 public partial class InventoryItem
         : PanelContainer,
-          ITooltipObjectContainer,
-          INotifyPropertyChanged
+          ITooltipObjectContainer
 {
     public delegate void ItemConsumedEventHandler(InventorySlot fromRootSlot);
 
@@ -29,6 +27,7 @@ public partial class InventoryItem
 
     private          Texture2D   defaultTexture;
     private          TextureRect icon;
+    private          Player2D    player;
     [Export] private int         pxDimension = 64;
     private          int         slotHeight  = 1;
     private          int         slotWidth   = 1;
@@ -66,8 +65,7 @@ public partial class InventoryItem
         }
     }
 
-    public InventorySlot                     RootSlot                { get; set; }
-    public event PropertyChangedEventHandler PropertyChanged;
+    public InventorySlot                     RootSlot           { get; set; }
     public ITooltipObject                    ContainedItem      { get; set; }
     public Vector2                           TooltipAnchorPoint => GlobalPosition;
     public event WasRightClickedEventHandler WasRightClicked;
@@ -78,7 +76,11 @@ public partial class InventoryItem
     public event MergingItemEventHandler     MergingItem;
 
     public override void _Ready()
-        => SetScaledSize();
+    {
+        player = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D");
+
+        SetScaledSize();
+    }
 
     public void Init(BaseItem item, Vector2 inventorySlotSize)
     {
@@ -154,8 +156,6 @@ public partial class InventoryItem
 
     private void ConsumeItem(ConsumableItem consumable)
     {
-        var player = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D");
-
         consumable.GetConsumedBy(player);
 
         ItemConsumed?.Invoke(RootSlot);
