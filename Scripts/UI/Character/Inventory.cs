@@ -170,6 +170,7 @@ public partial class Inventory : PanelContainer
             inventorySlot.InventoryCoordinate =  new Vector2(column, row);
             inventorySlot.SlotEmptied         += InventorySlotOnSlotEmptied;
             inventorySlot.WithdrawingItem     += InventorySlotOnWithdrawingItem;
+            inventorySlot.PuttingItemIntoSlot += InventorySlotOnPuttingItemIntoSlot;
 
             ItemGrid.AddChild(inventorySlot);
 
@@ -186,6 +187,13 @@ public partial class Inventory : PanelContainer
         }
 
         slotsGenerated = true;
+    }
+
+    private void InventorySlotOnPuttingItemIntoSlot(InventorySlot slottoputitemin)
+    {
+        var itemToPutIntoInventory = MouseObject.RetrieveItem();
+
+
     }
 
     private void InventorySlotOnEquippingItem(InventorySlot fromSlot)

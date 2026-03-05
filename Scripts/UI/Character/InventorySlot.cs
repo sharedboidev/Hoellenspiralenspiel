@@ -7,18 +7,21 @@ namespace Hoellenspiralenspiel.Scripts.UI.Character;
 public partial class InventorySlot
         : PanelContainer
 {
+    public delegate void PuttingItemIntoSlotEventHandler(InventorySlot slotToPutItemIn);
+
     public delegate void SlotEmptiedEventHandler(InventorySlot inventorySlot);
 
     public delegate void WithdrawingItemEventHandler(InventoryItem withdrawnItem);
 
-    private Label                            stacksizeDisplay;
-    public  Inventory                        Inventory              { get; set; }
-    public  Vector2                          InventoryCoordinate    { get; set; }
-    public  bool                             IsOccupied             { get; set; }
-    public  InventoryItem                    ContainedInventoryItem { get; set; }
-    public  Vector2                          TooltipAnchorPoint     => GlobalPosition;
-    public event WithdrawingItemEventHandler WithdrawingItem;
-    public event SlotEmptiedEventHandler     SlotEmptied;
+    private Label                                stacksizeDisplay;
+    public  Inventory                            Inventory              { get; set; }
+    public  Vector2                              InventoryCoordinate    { get; set; }
+    public  bool                                 IsOccupied             { get; set; }
+    public  InventoryItem                        ContainedInventoryItem { get; set; }
+    public  Vector2                              TooltipAnchorPoint     => GlobalPosition;
+    public event WithdrawingItemEventHandler     WithdrawingItem;
+    public event PuttingItemIntoSlotEventHandler PuttingItemIntoSlot;
+    public event SlotEmptiedEventHandler         SlotEmptied;
 
     public override void _Ready()
         => stacksizeDisplay = GetNode<Label>("%StacksizeDisplay");
@@ -87,16 +90,8 @@ public partial class InventorySlot
     public InventoryItem RetrieveItem()
     {
         stacksizeDisplay.Visible = false;
-        //
-        // if (ContainedInventoryItem?.ContainedItem is BaseItem item)
-        //     item.TreeExited -= ItemOnTreeExited;
-        //
-        // if (ContainedInventoryItem?.ContainedItem is ConsumableItem consumableItem)
-        //     consumableItem.OnStacksizeReduced -= ConsumableOnStacksizeReduced;
 
         var itemAboutToBeReturned = ContainedInventoryItem;
-        //ContainedInventoryItem?.QueueFree();
-        //ContainedInventoryItem = null;
 
         Reset();
 
@@ -122,31 +117,32 @@ public partial class InventorySlot
 
         switch (inputEvent)
         {
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedInventoryItem is not null && !mouseObject.HasItem:
-                WithdrawItem();
-
-                break;
+            // case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedInventoryItem is not null && !mouseObject.HasItem:
+            //     WithdrawItem();
+            //
+            //     break;
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedInventoryItem is null && mouseObject.HasItem:
-                PutItemIntoSlot(mouseObject);
+                PutItemIntoSlot();
 
                 break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && !HasSpaceFor((BaseItem)mouseObject.ContainedItem):
-                SwapItems(mouseObject);
-
-                break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && HasSpaceFor((BaseItem)mouseObject.ContainedItem):
-                MergeItems(mouseObject);
-
-                break;
+            // case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && !HasSpaceFor((BaseItem)mouseObject.ContainedItem):
+            //     SwapItems(mouseObject);
+            //
+            //     break;
+            // case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && HasSpaceFor((BaseItem)mouseObject.ContainedItem):
+            //     MergeItems(mouseObject);
+            //
+            //     break;
         }
     }
 
-    private void PutItemIntoSlot(MouseObject mouseObject)
+    private void PutItemIntoSlot()
     {
-        var item = mouseObject.RetrieveItem();
-        ContainedInventoryItem.ContainedItem = item;
-
-        SetItem(ContainedInventoryItem);
+        PuttingItemIntoSlot?.Invoke(this);
+        // var item = mouseObject.RetrieveItem();
+        // ContainedInventoryItem.ContainedItem = item;
+        //
+        // SetItem(ContainedInventoryItem);
 
         //MouseMoving?.Invoke(MousemovementDirection.Entered, this);
     }
@@ -161,7 +157,7 @@ public partial class InventorySlot
     {
         var slotItem = RetrieveItem();
 
-        PutItemIntoSlot(mouseObject);
+        PutItemIntoSlot();
 
         mouseObject.Show((BaseItem)slotItem?.ContainedItem);
     }
