@@ -65,7 +65,6 @@ public partial class Inventory : PanelContainer
                     nextSlot.Reset();
 
                 FreeOccupation(nextSlot);
-                //occupationMatrix[nextSlotCoord] = false;
             }
         }
 
@@ -99,11 +98,11 @@ public partial class Inventory : PanelContainer
         inventoryItem.MouseMoving     += InventorySlotOnMouseMoving;
         inventoryItem.WasRightClicked += InventorySlotOnEquippingItem;
         inventoryItem.ItemConsumed    += InventoryItemOnItemConsumed;
+        inventoryItem.WithdrawingItem += InventoryItemOnWithdrawingItem;
+
         inventoryItem.Init(item, freeSlot.CustomMinimumSize);
         inventoryItem.RootSlot = freeSlot;
         inventoryItem.Position = freeSlot.Position;
-
-        //freeSlot.SetItem(inventoryItem);
 
         var occupiedSlots = new List<InventorySlot>();
 
@@ -122,6 +121,13 @@ public partial class Inventory : PanelContainer
         }
 
         GetNode<MarginContainer>(nameof(MarginContainer)).GetNode<Control>("OverlayLayer").AddChild(inventoryItem);
+    }
+
+    private void InventoryItemOnWithdrawingItem(InventorySlot fromrootslot)
+    {
+        var retrievedItem = RetrieveItem(fromrootslot);
+
+        MouseObject.Show(retrievedItem);
     }
 
     private void InventoryItemOnItemConsumed(InventorySlot fromrootslot) => FreeOccupation(fromrootslot);
@@ -174,7 +180,6 @@ public partial class Inventory : PanelContainer
             inventorySlot.Inventory           =  this;
             inventorySlot.InventoryCoordinate =  new Vector2(column, row);
             inventorySlot.SlotEmptied         += InventorySlotOnSlotEmptied;
-            inventorySlot.WithdrawingItem     += InventorySlotOnWithdrawingItem;
             inventorySlot.PuttingItemIntoSlot += InventorySlotOnPuttingItemIntoSlot;
 
             ItemGrid.AddChild(inventorySlot);
@@ -200,7 +205,7 @@ public partial class Inventory : PanelContainer
 
         var fits = FitsIntoSlot(itemToPutIntoInventory, slottoputitemin.InventoryCoordinate);
 
-        if(fits)
+        if (fits)
             PutInventoryItemIntoInventory(itemToPutIntoInventory, slottoputitemin);
         else
             MouseObject.Show(itemToPutIntoInventory);
@@ -208,9 +213,6 @@ public partial class Inventory : PanelContainer
 
     private void InventorySlotOnEquippingItem(InventorySlot fromSlot)
         => EquippingItem?.Invoke(fromSlot);
-
-    private void InventorySlotOnWithdrawingItem(InventoryItem withdrawnitem)
-        => MouseObject.Show((BaseItem)withdrawnitem?.ContainedItem);
 
     private void InventorySlotOnSlotEmptied(InventorySlot inventoryslot)
         => Tooltip.Hide();

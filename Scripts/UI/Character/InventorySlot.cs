@@ -11,7 +11,6 @@ public partial class InventorySlot
 
     public delegate void SlotEmptiedEventHandler(InventorySlot inventorySlot);
 
-    public delegate void WithdrawingItemEventHandler(InventoryItem withdrawnItem);
 
     private Label                                stacksizeDisplay;
     public  Inventory                            Inventory              { get; set; }
@@ -19,7 +18,6 @@ public partial class InventorySlot
     public  bool                                 IsOccupied             { get; set; }
     public  InventoryItem                        ContainedInventoryItem { get; set; }
     public  Vector2                              TooltipAnchorPoint     => GlobalPosition;
-    public event WithdrawingItemEventHandler     WithdrawingItem;
     public event PuttingItemIntoSlotEventHandler PuttingItemIntoSlot;
     public event SlotEmptiedEventHandler         SlotEmptied;
 
@@ -117,10 +115,6 @@ public partial class InventorySlot
 
         switch (inputEvent)
         {
-            // case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedInventoryItem is not null && !mouseObject.HasItem:
-            //     WithdrawItem();
-            //
-            //     break;
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedInventoryItem is null && mouseObject.HasItem:
                 PutItemIntoSlot();
 
@@ -139,18 +133,7 @@ public partial class InventorySlot
     private void PutItemIntoSlot()
     {
         PuttingItemIntoSlot?.Invoke(this);
-        // var item = mouseObject.RetrieveItem();
-        // ContainedInventoryItem.ContainedItem = item;
-        //
-        // SetItem(ContainedInventoryItem);
-
         //MouseMoving?.Invoke(MousemovementDirection.Entered, this);
-    }
-
-    private void WithdrawItem()
-    {
-        var item = RetrieveItem();
-        WithdrawingItem?.Invoke(item);
     }
 
     private void SwapItems(MouseObject mouseObject)

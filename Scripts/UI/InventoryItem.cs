@@ -15,12 +15,13 @@ public partial class InventoryItem
           ITooltipObjectContainer,
           INotifyPropertyChanged
 {
+    public delegate void ItemConsumedEventHandler(InventorySlot fromRootSlot);
+
     public delegate void MouseMovementEventHandler(MousemovementDirection mousemovementDirection, InventoryItem inventoryItem);
 
     public delegate void WasRightClickedEventHandler(InventorySlot fromRootSlot);
-    public delegate void ItemConsumedEventHandler(InventorySlot    fromRootSlot);
 
-    public event WasRightClickedEventHandler WasRightClicked;
+    public delegate void WithdrawingItemEventHandler(InventorySlot fromRootSlot);
 
     private          Texture2D   defaultTexture;
     private          TextureRect icon;
@@ -66,9 +67,10 @@ public partial class InventoryItem
     public event PropertyChangedEventHandler PropertyChanged;
     public ITooltipObject                    ContainedItem      { get; set; }
     public Vector2                           TooltipAnchorPoint => GlobalPosition;
-
-    public event MouseMovementEventHandler MouseMoving;
-    public event ItemConsumedEventHandler  ItemConsumed;
+    public event WasRightClickedEventHandler WasRightClicked;
+    public event MouseMovementEventHandler   MouseMoving;
+    public event ItemConsumedEventHandler    ItemConsumed;
+    public event WithdrawingItemEventHandler WithdrawingItem;
 
     public override void _Ready()
         => SetScaledSize();
@@ -104,8 +106,14 @@ public partial class InventoryItem
 
     public void _on_gui_input(InputEvent inputEvent)
     {
+        var mouseObject = RootSlot.Inventory.GetNode<MouseObject>(nameof(MouseObject));
+
         switch (inputEvent)
         {
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is not null && !mouseObject.HasItem:
+                WithdrawItem();
+
+                break;
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } when ContainedItem is ConsumableItem consumable:
                 ConsumeItem(consumable);
 
@@ -116,6 +124,8 @@ public partial class InventoryItem
                 break;
         }
     }
+
+    private void WithdrawItem() => WithdrawingItem?.Invoke(RootSlot);
 
     private void ConsumeItem(ConsumableItem consumable)
     {
@@ -131,7 +141,7 @@ public partial class InventoryItem
         WasRightClicked?.Invoke(RootSlot);
         MouseMoving?.Invoke(MousemovementDirection.Entered, this);
     }
-    
+
     public void _on_mouse_entered()
         => MouseMoving?.Invoke(MousemovementDirection.Entered, this);
 
