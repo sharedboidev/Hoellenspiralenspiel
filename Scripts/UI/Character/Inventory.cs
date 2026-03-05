@@ -98,6 +98,7 @@ public partial class Inventory : PanelContainer
         inventoryItem.MouseMoving     += InventorySlotOnMouseMoving;
         inventoryItem.WasRightClicked += InventorySlotOnEquippingItem;
         inventoryItem.ItemConsumed    += InventoryItemOnItemConsumed;
+        inventoryItem.SwappingItem += InventoryItemOnSwappingItem;
         inventoryItem.WithdrawingItem += InventoryItemOnWithdrawingItem;
 
         inventoryItem.Init(item, freeSlot.CustomMinimumSize);
@@ -121,6 +122,25 @@ public partial class Inventory : PanelContainer
         }
 
         GetNode<MarginContainer>(nameof(MarginContainer)).GetNode<Control>("OverlayLayer").AddChild(inventoryItem);
+    }
+
+    private void InventoryItemOnSwappingItem(InventorySlot fromrootslot)
+    {
+        var itemFromInventory   = RetrieveItem(fromrootslot);
+        var itemFromMouseObject = MouseObject.RetrieveItem();
+
+        var fits = FitsIntoSlot(itemFromMouseObject, fromrootslot.InventoryCoordinate);
+
+        if(fits)
+        {
+            PutInventoryItemIntoInventory(itemFromMouseObject, fromrootslot);
+            MouseObject.Show(itemFromInventory);
+        }
+        else
+        {
+            PutInventoryItemIntoInventory(itemFromInventory, fromrootslot);
+            MouseObject.Show(itemFromMouseObject);
+        }
     }
 
     private void InventoryItemOnWithdrawingItem(InventorySlot fromrootslot)

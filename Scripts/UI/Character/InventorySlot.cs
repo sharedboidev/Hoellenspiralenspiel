@@ -11,7 +11,6 @@ public partial class InventorySlot
 
     public delegate void SlotEmptiedEventHandler(InventorySlot inventorySlot);
 
-
     private Label                                stacksizeDisplay;
     public  Inventory                            Inventory              { get; set; }
     public  Vector2                              InventoryCoordinate    { get; set; }
@@ -117,33 +116,11 @@ public partial class InventorySlot
         {
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedInventoryItem is null && mouseObject.HasItem:
                 PutItemIntoSlot();
-
                 break;
-            // case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && !HasSpaceFor((BaseItem)mouseObject.ContainedItem):
-            //     SwapItems(mouseObject);
-            //
-            //     break;
-            // case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && HasSpaceFor((BaseItem)mouseObject.ContainedItem):
-            //     MergeItems(mouseObject);
-            //
-            //     break;
         }
     }
 
-    private void PutItemIntoSlot()
-    {
-        PuttingItemIntoSlot?.Invoke(this);
-        //MouseMoving?.Invoke(MousemovementDirection.Entered, this);
-    }
-
-    private void SwapItems(MouseObject mouseObject)
-    {
-        var slotItem = RetrieveItem();
-
-        PutItemIntoSlot();
-
-        mouseObject.Show((BaseItem)slotItem?.ContainedItem);
-    }
+    private void PutItemIntoSlot() => PuttingItemIntoSlot?.Invoke(this);
 
     private void MergeItems(MouseObject mouseObject)
     {

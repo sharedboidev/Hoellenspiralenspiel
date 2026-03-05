@@ -19,6 +19,8 @@ public partial class InventoryItem
 
     public delegate void MouseMovementEventHandler(MousemovementDirection mousemovementDirection, InventoryItem inventoryItem);
 
+    public delegate void SwappingItemEventHandler(InventorySlot fromRootSlot);
+
     public delegate void WasRightClickedEventHandler(InventorySlot fromRootSlot);
 
     public delegate void WithdrawingItemEventHandler(InventorySlot fromRootSlot);
@@ -71,6 +73,7 @@ public partial class InventoryItem
     public event MouseMovementEventHandler   MouseMoving;
     public event ItemConsumedEventHandler    ItemConsumed;
     public event WithdrawingItemEventHandler WithdrawingItem;
+    public event SwappingItemEventHandler    SwappingItem;
 
     public override void _Ready()
         => SetScaledSize();
@@ -104,6 +107,14 @@ public partial class InventoryItem
         textureNode.Texture = texture;
     }
 
+    private bool HasSpaceFor(BaseItem item)
+    {
+        if (item is ConsumableItem newConsumable && ContainedItem is ConsumableItem containedConsumable)
+            return containedConsumable.CanFit(newConsumable);
+
+        return ContainedItem is null;
+    }
+
     public void _on_gui_input(InputEvent inputEvent)
     {
         var mouseObject = RootSlot.Inventory.GetNode<MouseObject>(nameof(MouseObject));
@@ -114,6 +125,14 @@ public partial class InventoryItem
                 WithdrawItem();
 
                 break;
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && !HasSpaceFor((BaseItem)mouseObject.ContainedItem):
+                SwapItems();
+
+                break;
+            // case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && HasSpaceFor((BaseItem)mouseObject.ContainedItem):
+            //     MergeItems(mouseObject);
+            //
+            //     break;
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } when ContainedItem is ConsumableItem consumable:
                 ConsumeItem(consumable);
 
@@ -124,6 +143,8 @@ public partial class InventoryItem
                 break;
         }
     }
+
+    private void SwapItems() => SwappingItem?.Invoke(RootSlot);
 
     private void WithdrawItem() => WithdrawingItem?.Invoke(RootSlot);
 
