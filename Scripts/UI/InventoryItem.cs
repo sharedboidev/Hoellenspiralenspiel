@@ -184,12 +184,14 @@ public partial class InventoryItem
 
     public void _on_mouse_entered()
     {
-        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
-
         if (ContainedItem is not BaseItem item || item is ConsumableItem)
+        {
+            MouseMoving?.Invoke(MousemovementDirection.Entered, this);
             return;
+        }
 
         var stylebox = item.CanBeEquipedBy(player) ? actionAlldowdStylebox : actionForbiddenStylebox;
+        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
 
         AddThemeStyleboxOverride("panel", stylebox);
     }

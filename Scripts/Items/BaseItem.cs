@@ -5,7 +5,6 @@ using System.Text;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
-using Hoellenspiralenspiel.Scripts.Items.Consumables;
 using Hoellenspiralenspiel.Scripts.Items.Weapons;
 using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Models.Weapons;
@@ -18,6 +17,8 @@ public abstract partial class BaseItem
         : Node2D,
           ITooltipObject
 {
+    private readonly List<Requirement> unmetRequirements = new();
+
     [Export]
     public TextureRect Icon { get; set; }
 
@@ -145,7 +146,12 @@ public abstract partial class BaseItem
     private void AppendRequirements(StringBuilder emil)
     {
         foreach (var requirement in Requirements)
-            emil.AppendLine($"Required {requirement.Key.GetDescription()}: {requirement.Value:N0}");
+        {
+            if(unmetRequirements.Any(req => req == requirement.Key))
+                emil.AppendLine($"[color=firebrick]Required {requirement.Key.GetDescription()}: {requirement.Value:N0}[/color]");
+            else
+                emil.AppendLine($"Required {requirement.Key.GetDescription()}: {requirement.Value:N0}");
+        }
     }
 
     public virtual void Init()
@@ -163,18 +169,24 @@ public abstract partial class BaseItem
     public CombatStatModifier CreateCombatStatModifier(ItemModifier modifier)
         => new(modifier.CombatStat, modifier.ModificationType, modifier.Value, ToString());
 
-    public bool CanBeEquipedBy(Player2D player)
+    public bool CanBeEquipedBy(Player2D byPlayer)
     {
-        if (player is null)
+        if (byPlayer is null)
             return false;
+
+        unmetRequirements.Clear();
 
         var canWield = true;
 
         foreach (var requirement in Requirements)
         {
-            var requiredAttributevalue = player.GetRequiredAttributevalue(requirement.Key);
+            var requiredAttributevalue = byPlayer.GetRequiredAttributevalue(requirement.Key);
+            var meetsRequirement       = requirement.Value <= requiredAttributevalue;
 
-            canWield &= requirement.Value <= requiredAttributevalue;
+            if (!meetsRequirement)
+                unmetRequirements.Add(requirement.Key);
+
+            canWield &= meetsRequirement;
         }
 
         return canWield;
