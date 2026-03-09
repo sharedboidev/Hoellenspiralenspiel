@@ -209,7 +209,8 @@ public partial class Lootsystem : Node
 
             var affixValue = RollAffixValue(kongruentAffix, affixTier);
 
-            finalModifier = new ItemModifier(affixType, kongruentAffix.AffectedCombatStat, kongruentAffix.ModificationType, affixValue, affixTier.ItemnameAddition);
+
+            finalModifier = new ItemModifier(affixType, kongruentAffix.AffectedCombatStat, kongruentAffix.ModificationType, affixValue, affixTier.ItemnameAddition, kongruentAffix.IsInherentMod);
 
             break;
         }

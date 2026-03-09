@@ -147,7 +147,7 @@ public abstract partial class BaseItem
     {
         foreach (var requirement in Requirements)
         {
-            if(unmetRequirements.Any(req => req == requirement.Key))
+            if (unmetRequirements.Any(req => req == requirement.Key))
                 emil.AppendLine($"[color=firebrick]Required {requirement.Key.GetDescription()}: {requirement.Value:N0}[/color]");
             else
                 emil.AppendLine($"Required {requirement.Key.GetDescription()}: {requirement.Value:N0}");
@@ -163,11 +163,20 @@ public abstract partial class BaseItem
     public void AddModifier(ItemModifier modifier)
         => ItemModifiers.Add(modifier);
 
-    public ItemModifier[] GetModifiers()
+    public ItemModifier[] GetAllModifiers()
         => ItemModifiers.ToArray();
 
-    public CombatStatModifier CreateCombatStatModifier(ItemModifier modifier)
-        => new(modifier.CombatStat, modifier.ModificationType, modifier.Value, ToString());
+    public ItemModifier[] GetInherentModifiers()
+        => ItemModifiers.Where(mod => mod.IsInherentMod).ToArray();
+
+    public ItemModifier[] GetExtrinsicModifiers()
+        => ItemModifiers.Where(mod => !mod.IsInherentMod).ToArray();
+
+    public CombatStatModifier CreateCombatStatModifier(ItemModifier modifier, float? alternativeValue = null)
+        => new(modifier.CombatStat, modifier.ModificationType, alternativeValue ?? modifier.Value, ToString());
+
+    public CombatStatModifier CreateCombatStatModifier(CombatStat combatStat, ModificationType modificationType, float value)
+        => new(combatStat, modificationType, value, ToString());
 
     public bool CanBeEquipedBy(Player2D byPlayer)
     {

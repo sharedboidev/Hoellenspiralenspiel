@@ -4,8 +4,8 @@ using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Abilities;
-using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Items.Armors;
 using Hoellenspiralenspiel.Scripts.Items.Weapons;
 using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.UI;
@@ -190,7 +190,13 @@ public partial class Player2D : BaseUnit
 
     public void EquipItem(BaseItem item)
     {
-        foreach (var modifier in item.GetModifiers())
+        if (item is BaseArmor armor)
+        {
+            var flatArmorMod = item.CreateCombatStatModifier(CombatStat.Armor, ModificationType.Flat, armor.ArmorvalueFinal);
+            CombatStatModifiers.Add(flatArmorMod);
+        }
+
+        foreach (var modifier in item.GetExtrinsicModifiers())
         {
             var newModifier = item.CreateCombatStatModifier(modifier);
             CombatStatModifiers.Add(newModifier);

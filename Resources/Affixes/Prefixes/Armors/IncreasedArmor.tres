@@ -77,5 +77,6 @@ script = ExtResource("2_rkw4v")
 AffectedCombatStat = 13
 ModificationType = 1
 AffectableItemTypes = Array[int]([2, 4, 12, 13, 14, 15, 16])
+IsInherentMod = true
 Tiers = Array[ExtResource("1_ye3ka")]([SubResource("Resource_ye3ka"), SubResource("Resource_rkw4v"), SubResource("Resource_qgul5"), SubResource("Resource_6wd2q"), SubResource("Resource_0h3oe"), SubResource("Resource_annn1"), SubResource("Resource_h3ajg")])
 metadata/_custom_type_script = "uid://d2himjbu3lvto"
