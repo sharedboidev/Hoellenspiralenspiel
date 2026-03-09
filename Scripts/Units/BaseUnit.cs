@@ -14,8 +14,7 @@ public abstract partial class BaseUnit
         : CharacterBody2D,
           INotifyPropertyChanged
 {
-    private int lifeCurrent;
-
+    private float   lifeCurrent;
     private Vector2 movementDirection = Vector2.Zero;
     private float   AwarenessAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Awareness);
     private float   AwarenessPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Awareness);
@@ -60,17 +59,25 @@ public abstract partial class BaseUnit
     private float LifeAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Life);
     private float LifePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Life);
     private float LifeMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Life);
-    public  int   LifeMaximum              => (int)((LifeBase + LifeAddedFlat) * LifePercentageMultiplier * LifeMoreMultiplierTotal);
+    public  float LifeMaximum              => (int)((LifeBase + LifeAddedFlat) * LifePercentageMultiplier * LifeMoreMultiplierTotal);
 
     [Export]
     public int LifeBase { get; set; } = 1;
 
     [Export]
-    public int LifeCurrent
+    public float LifeCurrent
     {
         get => lifeCurrent;
         set => SetField(ref lifeCurrent, Math.Min(value, LifeMaximum));
     }
+
+    [Export]
+    public int LiferegenerationBase { get; set; }
+
+    private float LiferegenerationAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Liferegeneration);
+    private float LiferegenerationPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Liferegeneration);
+    private float LiferegenerationMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Liferegeneration);
+    public  int   LiferegenerationFinal                => (int)((LiferegenerationBase + LiferegenerationAddedFlat) * LiferegenerationPercentageMultiplier * LiferegenerationMoreMultiplierTotal);
 
     [Export]
     public Vector2 MovementDirection
@@ -85,6 +92,17 @@ public abstract partial class BaseUnit
     public bool                              IsDead              => LifeCurrent <= 0;
     public List<CombatStatModifier>          CombatStatModifiers { get; protected set; } = new();
     public event PropertyChangedEventHandler PropertyChanged;
+
+    public override void _PhysicsProcess(double delta) => ResolveLifeReg(delta);
+
+    protected virtual void ResolveLifeReg(double delta)
+    {
+        if (LifeCurrent < LifeMaximum)
+        {
+            LifeCurrent += LiferegenerationFinal * (float)delta;
+            LifeCurrent =  Mathf.Clamp(LifeCurrent, 0, LifeMaximum);
+        }
+    }
 
     public float GetTotalMoreMultiplierOf(CombatStat combatStat)
     {

@@ -116,6 +116,8 @@ public partial class Player2D : BaseUnit
 
     public override void _PhysicsProcess(double delta)
     {
+        base._PhysicsProcess(delta);
+
         ResolveManareg(delta);
         HandleMovementInputs();
         HandleCollision();
@@ -129,6 +131,13 @@ public partial class Player2D : BaseUnit
             ManaCurrent =  Mathf.Clamp(ManaCurrent, 0, ManaMaximum);
             manaOrb.SetRessource(ManaCurrent);
         }
+    }
+
+    protected override void ResolveLifeReg(double delta)
+    {
+        base.ResolveLifeReg(delta);
+
+        lifeOrb.SetRessource(LifeCurrent);
     }
 
     private void HandleCollision()
