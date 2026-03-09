@@ -266,11 +266,34 @@ text = "0"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Defence2" type="HBoxContainer" parent="MarginContainer/GroupContainer/Defence" unique_id=1113664262]
+[node name="Defence2" type="HBoxContainer" parent="MarginContainer/GroupContainer/Defence" unique_id=1866490260]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence2" unique_id=1076291469]
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence2" unique_id=1126674161]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Liferegeneration"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Liferegeneration" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence2" unique_id=779592074]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Defence3" type="HBoxContainer" parent="MarginContainer/GroupContainer/Defence" unique_id=1113664262]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence3" unique_id=1076291469]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/normal_font_size = 24
@@ -280,7 +303,7 @@ text = "Armor"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Armor" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence2" unique_id=2049976926]
+[node name="Armor" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence3" unique_id=2049976926]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 24
@@ -289,11 +312,11 @@ text = "0"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Defence3" type="HBoxContainer" parent="MarginContainer/GroupContainer/Defence" unique_id=1882239461]
+[node name="Defence4" type="HBoxContainer" parent="MarginContainer/GroupContainer/Defence" unique_id=1882239461]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence3" unique_id=1900866606]
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence4" unique_id=1900866606]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/normal_font_size = 24
@@ -303,7 +326,7 @@ text = "Dodge"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Dodge" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence3" unique_id=1407413546]
+[node name="Dodge" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence4" unique_id=1407413546]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 24
