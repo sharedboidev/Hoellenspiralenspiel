@@ -149,12 +149,10 @@ public partial class Player2D : BaseUnit
 
             if (collider != null && collider.IsInGroup("monsters"))
             {
-                var monsters = collider as BaseUnit;
+                var damageTaken = new HitResult(10, HitType.Normal, LifeModificationMode.Damage, this);
 
-                var damageTaken = new HitResult(1, HitType.Normal, LifeModificationMode.Damage);
-                this.InstatiateFloatingCombatText(damageTaken, GetTree().CurrentScene, new Vector2(0, -60));
+                ReceiveDamage(damageTaken);
 
-                LifeCurrent -= (int)damageTaken.Value;
                 lifeOrb.SetRessource(LifeCurrent);
             }
         }

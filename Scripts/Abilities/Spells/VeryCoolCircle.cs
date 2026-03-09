@@ -94,7 +94,7 @@ public partial class VeryCoolCircle
 				continue;
 
 			var damageResult = lightningStrikeSkill.MakeRealDamage(enemy);
-			enemy.LifeCurrent -= (int)damageResult.Value;
+			enemy.LifeCurrent -= (int)damageResult.RawValue;
 			enemy.InstatiateFloatingCombatText(damageResult, GetTree().CurrentScene, new Vector2(0, -60));
 		}
 	}

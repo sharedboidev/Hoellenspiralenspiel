@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Godot;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
 
@@ -80,6 +81,14 @@ public abstract partial class BaseUnit
     public  int   LiferegenerationFinal                => (int)((LiferegenerationBase + LiferegenerationAddedFlat) * LiferegenerationPercentageMultiplier * LiferegenerationMoreMultiplierTotal);
 
     [Export]
+    public int ArmorBase { get; set; }
+
+    private float ArmorAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Armor);
+    private float ArmorPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Armor);
+    private float ArmorMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Armor);
+    public  int   ArmorFinal                => (int)((ArmorBase + ArmorAddedFlat) * ArmorPercentageMultiplier * ArmorMoreMultiplierTotal);
+
+    [Export]
     public Vector2 MovementDirection
     {
         get => movementDirection;
@@ -94,6 +103,14 @@ public abstract partial class BaseUnit
     public event PropertyChangedEventHandler PropertyChanged;
 
     public override void _PhysicsProcess(double delta) => ResolveLifeReg(delta);
+
+    public virtual void ReceiveDamage(HitResult hit)
+    {
+        var mainScene = GetTree().CurrentScene;
+        this.InstatiateFloatingCombatText(hit, mainScene, new Vector2(0, -60));
+
+        LifeCurrent -= hit.MitigatedDamage;
+    }
 
     protected virtual void ResolveLifeReg(double delta)
     {
