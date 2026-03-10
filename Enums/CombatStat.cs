@@ -27,5 +27,8 @@ public enum CombatStat
     Intelligence,
     Constitution,
     Awareness,
-    AreaOfEffect
+    AreaOfEffect,
+    FireResistance,
+    FrostResistance,
+    LightningResistance
 }
