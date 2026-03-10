@@ -23,10 +23,10 @@ public partial class MouseObject : PanelContainer,
         GlobalPosition = TooltipAnchorPoint;
     }
 
-    public void Show(BaseItem withdrawnItem)
+    public void Show(BaseItem item)
     {
-        ContainedItem = withdrawnItem;
-        Icon.Texture  = withdrawnItem.Icon.Texture;
+        ContainedItem = item;
+        Icon.Texture  = item.Icon.Texture;
 
         SetVisible(true);
     }

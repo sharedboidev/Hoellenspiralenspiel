@@ -16,7 +16,7 @@ public enum CombatStat
     [Description("Physical Damage")]
     PhysicalDamage,
     Attackspeed,
-    [Description("Critical Hit Chance")]
+    [Description("Critical Hitchance")]
     CriticalHitChance,
     [Description("Critical Damage")]
     CriticalDamage,
@@ -26,5 +26,6 @@ public enum CombatStat
     Dexterity,
     Intelligence,
     Constitution,
-    Awareness
+    Awareness,
+    AreaOfEffect
 }

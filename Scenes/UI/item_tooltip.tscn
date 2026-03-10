@@ -4,7 +4,7 @@
 [ext_resource type="StyleBox" uid="uid://d0lsfuyas70d8" path="res://Resources/Themes/boxes_stylebox.tres" id="1_ui1il"]
 
 [node name="ItemTooltip" type="PanelContainer" unique_id=1060802189]
-z_index = 15
+z_index = 14
 y_sort_enabled = true
 custom_minimum_size = Vector2(500, 0)
 offset_right = 50.0

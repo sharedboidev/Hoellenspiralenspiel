@@ -1,5 +1,6 @@
 using Godot;
 using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.UI.Buttons;
 using Hoellenspiralenspiel.Scripts.Units;
 
@@ -8,6 +9,7 @@ namespace Hoellenspiralenspiel.Scripts.UI.Character;
 public partial class CharacterSheet : Control
 {
     [Export] private EquipmentPanel equipmentPanel;
+    [Export] private Inventory      inventory;
     [Export] private Player2D       player;
     private          Statdisplay    statdisplay;
     [Export] private int            viewportMarginHeightPx;
@@ -20,9 +22,12 @@ public partial class CharacterSheet : Control
         statdisplay = GetNode<Statdisplay>(nameof(Statdisplay));
         statdisplay.Render(player);
 
+        inventory.EquippingItem += OnEquippingItem;
+
         GetNode<EquipmentPanel>("%" + nameof(EquipmentPanel)).EquipmentChanged += OnEquipmentChanged;
-        GetNode<Inventory>("%" + nameof(Inventory)).EquippingItem              += OnEquippingItem;
         GetNode<StatdisplayButton>(nameof(StatdisplayButton)).Pressed          += OnPressed;
+
+        SetVisible(false);
     }
 
     private void OnPressed(bool isToggledOpen)
@@ -44,16 +49,57 @@ public partial class CharacterSheet : Control
 
     private void OnEquippingItem(InventorySlot fromslot)
     {
-        if (fromslot.ContainedItem is not BaseItem item)
+        if (fromslot.ContainedInventoryItem?.ContainedItem is not BaseItem item)
             return;
 
         if (!item.CanBeEquipedBy(player))
             return;
 
-        var retrievedItem        = fromslot.RetrieveItem();
+        var retrievedItem        = inventory.RetrieveItem(fromslot);
         var formerlyEquippedItem = equipmentPanel.EquipIntoFittingSlot(retrievedItem);
 
-        fromslot.SetItem(formerlyEquippedItem);
+        if (formerlyEquippedItem is null)
+            return;
+
+        var couldSetItem = inventory.SetItem(formerlyEquippedItem);
+
+        if (!couldSetItem)
+            DropItem(formerlyEquippedItem);
+    }
+
+    public void DropItem(BaseItem item)
+    {
+        if (item is null)
+            return;
+
+        var playerPosition = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D").GlobalPosition;
+        var dropAtPosition = playerPosition;
+
+        InstantiateLootbag(dropAtPosition, item);
+
+        GD.Print($"{item?.Name ?? "Nothing"} dropped by Player.");
+    }
+
+    private void InstantiateLootbag(Vector2 atPosition, BaseItem loot)
+    {
+        var lootbagInstance = GD.Load<PackedScene>("res://Scenes/Objects/lootbag.tscn").Instantiate<Lootbag>();
+        lootbagInstance.GlobalPosition =  atPosition;
+        lootbagInstance.ContainedItem  =  loot;
+        lootbagInstance.LootClicked    += LootbagInstanceOnLootClicked;
+
+        GetTree().CurrentScene.GetNode<Node2D>("Environment").AddChild(lootbagInstance);
+    }
+
+    private void LootbagInstanceOnLootClicked(Lootbag sender, BaseItem lootedItem)
+    {
+        GD.Print($"{lootedItem?.Name ?? "Nothing"} looted.");
+
+        var couldLootItem = inventory.SetItem(lootedItem);
+
+        if (couldLootItem)
+            sender?.QueueFree();
+        else
+            sender.BounceAndFlip();
     }
 
     private void SetPositionRelativeToViewport()

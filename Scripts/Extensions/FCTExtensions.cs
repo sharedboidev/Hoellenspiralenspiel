@@ -10,13 +10,13 @@ public static class FCTExtensions
 {
     private static readonly PackedScene FCTScene = ResourceLoader.Load<PackedScene>("res://Scenes/UI/floating_combat_text.tscn");
 
-    public static void InstatiateFloatingCombatText(this BaseUnit target, HitResult hitResult, Node currentScene, Vector2 offset = default)
+    public static void InstatiateFloatingCombatText(this BaseUnit target, HitResult hitResult, Node mainScene, Vector2 offset = default)
     {
         var floatingCombatTextInstance = FCTScene.Instantiate<FloatingCombatText>();
         floatingCombatTextInstance.Display      = floatingCombatTextInstance.GetNode<Label>(nameof(Label));
-        floatingCombatTextInstance.Value        = (int)hitResult.Value;
+        floatingCombatTextInstance.Value        = hitResult.MitigatedDamage;
         floatingCombatTextInstance.Position     = target.Position + offset;
-        floatingCombatTextInstance.Display.Text = hitResult.Value.ToString("N0");
+        floatingCombatTextInstance.Display.Text = hitResult.MitigatedDamage.ToString("N0");
 
         floatingCombatTextInstance = hitResult.LifeModificationMode switch
         {
@@ -31,7 +31,7 @@ public static class FCTExtensions
 
         floatingCombatTextInstance.Show();
 
-        currentScene.AddChild(floatingCombatTextInstance);
+        mainScene.AddChild(floatingCombatTextInstance);
     }
 
     private static FloatingCombatText AsHeal(this FloatingCombatText floatingCombatText, int fontSize = 36)

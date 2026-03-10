@@ -20,5 +20,8 @@ public abstract partial class Affix : Resource
     public bool AllowFractions { get; set; }
 
     [Export]
+    public bool IsInherentMod { get; set; }
+
+    [Export]
     public Array<AffixTier> Tiers { get; set; } = new();
 }

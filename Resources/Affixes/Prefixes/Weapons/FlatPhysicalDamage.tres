@@ -26,5 +26,6 @@ metadata/_custom_type_script = "uid://sdx5y8g2wvor"
 script = ExtResource("2_vvv5g")
 AffectedCombatStat = 8
 AffectableItemTypes = Array[int]([1])
+IsInherentMod = true
 Tiers = Array[ExtResource("1_luu2i")]([SubResource("Resource_luu2i"), SubResource("Resource_vvv5g")])
 metadata/_custom_type_script = "uid://d2himjbu3lvto"

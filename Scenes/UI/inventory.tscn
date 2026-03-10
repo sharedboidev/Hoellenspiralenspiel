@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://6yhxh7p0ijv4"]
 
-[ext_resource type="Script" uid="uid://ktwxm7l1b22f" path="res://Scripts/UI/Character/Inventory.cs" id="1_dt15g"]
+[ext_resource type="Script" uid="uid://cj22xlufpgeqx" path="res://Scripts/UI/Character/Inventory.cs" id="1_dt15g"]
 [ext_resource type="PackedScene" uid="uid://devwjm5t1shxy" path="res://Scenes/UI/mouse_object.tscn" id="2_dt15g"]
 [ext_resource type="PackedScene" uid="uid://bmhe4oqmcd326" path="res://Scenes/UI/inventory_slot.tscn" id="2_osrsm"]
 
@@ -30,6 +30,7 @@ offset_bottom = 40.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_dt15g")
 script = ExtResource("1_dt15g")
 SlotScene = ExtResource("2_osrsm")
+AmountSlots = 70
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=365297740]
 layout_mode = 2
@@ -38,9 +39,15 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="ItemGrid" type="GridContainer" parent="MarginContainer" unique_id=1934794965]
-unique_name_in_owner = true
+[node name="OverlayLayer" type="Control" parent="MarginContainer" unique_id=2144532379]
+custom_minimum_size = Vector2(896, 320)
 layout_mode = 2
+
+[node name="ItemGrid" type="GridContainer" parent="MarginContainer/OverlayLayer" unique_id=1934794965]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 20.0
+offset_bottom = 20.0
 theme_override_constants/h_separation = 0
 theme_override_constants/v_separation = 0
 columns = 14

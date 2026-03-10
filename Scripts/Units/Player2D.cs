@@ -4,8 +4,8 @@ using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Abilities;
-using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Items.Armors;
 using Hoellenspiralenspiel.Scripts.Items.Weapons;
 using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.UI;
@@ -63,13 +63,13 @@ public partial class Player2D : BaseUnit
     public int GetRequiredAttributevalue(Requirement requirement)
         => requirement switch
         {
-            Requirement.Strength       => 1,
-            Requirement.Dexterity      => 1,
-            Requirement.Intelligence   => 1,
-            Requirement.Constitution   => 1,
-            Requirement.Awareness      => 1,
+            Requirement.Strength => StrengthFinal,
+            Requirement.Dexterity => DexterityFinal,
+            Requirement.Intelligence => IntelligenceFinal,
+            Requirement.Constitution => ConstitutionFinal,
+            Requirement.Awareness => AwarenessFinal,
             Requirement.CharacterLevel => Level,
-            _                          => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null)
         };
 
     private void ConfigureSkillbar()
@@ -116,6 +116,8 @@ public partial class Player2D : BaseUnit
 
     public override void _PhysicsProcess(double delta)
     {
+        base._PhysicsProcess(delta);
+
         ResolveManareg(delta);
         HandleMovementInputs();
         HandleCollision();
@@ -131,6 +133,13 @@ public partial class Player2D : BaseUnit
         }
     }
 
+    protected override void ResolveLifeReg(double delta)
+    {
+        base.ResolveLifeReg(delta);
+
+        lifeOrb.SetRessource(LifeCurrent);
+    }
+
     private void HandleCollision()
     {
         for (var i = 0; i < GetSlideCollisionCount(); i++)
@@ -140,12 +149,10 @@ public partial class Player2D : BaseUnit
 
             if (collider != null && collider.IsInGroup("monsters"))
             {
-                var monsters = collider as BaseUnit;
+                var damageTaken = new HitResult(10, HitType.Normal, LifeModificationMode.Damage, this);
 
-                var damageTaken = new HitResult(1, HitType.Normal, LifeModificationMode.Damage);
-                this.InstatiateFloatingCombatText(damageTaken, GetTree().CurrentScene, new Vector2(0, -60));
+                ReceiveDamage(damageTaken);
 
-                LifeCurrent -= (int)damageTaken.Value;
                 lifeOrb.SetRessource(LifeCurrent);
             }
         }
@@ -183,7 +190,13 @@ public partial class Player2D : BaseUnit
 
     public void EquipItem(BaseItem item)
     {
-        foreach (var modifier in item.GetModifiers())
+        if (item is BaseArmor armor)
+        {
+            var flatArmorMod = item.CreateCombatStatModifier(CombatStat.Armor, ModificationType.Flat, armor.ArmorvalueFinal);
+            CombatStatModifiers.Add(flatArmorMod);
+        }
+
+        foreach (var modifier in item.GetExtrinsicModifiers())
         {
             var newModifier = item.CreateCombatStatModifier(modifier);
             CombatStatModifiers.Add(newModifier);

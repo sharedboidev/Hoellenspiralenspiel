@@ -8,6 +8,7 @@
 script = ExtResource("2_y85un")
 ArmorvalueBase = 10
 Icon = NodePath("Icon")
+SlotSize = Vector2(2, 2)
 Requirements = Dictionary[int, int]({
 0: 1,
 5: 1

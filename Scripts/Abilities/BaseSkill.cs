@@ -31,7 +31,6 @@ public abstract class BaseSkill
     public BaseUnit Owner        { get; }
     public double   RealCooldown { get; }
 
-    //@TODO Nyt do magic
     public HitResult MakeRealDamage(BaseUnit target)
     {
         //HitResult vong schnell her
@@ -46,6 +45,6 @@ public abstract class BaseSkill
 
         //Entweder hier maybe defence vong enemu berücksichtigen
 
-        return new HitResult(realDamage, hitType, LifeModificationMode.Damage);
+        return new HitResult(realDamage, hitType, LifeModificationMode.Damage, target);
     }
 }

@@ -54,7 +54,7 @@ public partial class FrostNova : Area2D,
 		if (body.IsInGroup("monsters") && body is BaseEnemy enemy)
 		{
 			var result = skill.MakeRealDamage(enemy);
-			enemy.LifeCurrent -= (int)result.Value;
+			enemy.LifeCurrent -= (int)result.RawValue;
 			enemy.InstatiateFloatingCombatText(result, GetTree().CurrentScene, new Vector2(0, -60));
 		}
 	}

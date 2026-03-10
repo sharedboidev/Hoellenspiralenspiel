@@ -1,4 +1,4 @@
-[gd_resource type="VisualShader" format=3 uid="uid://ceusmchheajrs"]
+[gd_resource type="VisualShader" format=3 uid="uid://csu07l2uwwqk0"]
 
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_av7eb"]
 input_name = "time"
