@@ -7,7 +7,6 @@ using Hoellenspiralenspiel.Scripts.UI.Character;
 using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
-
 public partial class InventoryItem
         : PanelContainer,
           ITooltipObjectContainer
