@@ -28,7 +28,10 @@ public enum CombatStat
     Constitution,
     Awareness,
     AreaOfEffect,
+    [Description("Fire Resistance")]
     FireResistance,
+    [Description("Frost Resistance")]
     FrostResistance,
+    [Description("Lightning Resistance")]
     LightningResistance
 }

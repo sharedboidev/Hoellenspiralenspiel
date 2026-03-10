@@ -1,0 +1,90 @@
+[gd_resource type="Resource" script_class="Suffix" format=3 uid="uid://bw6dr8huklgjq"]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_ldkf4"]
+[ext_resource type="Script" uid="uid://bwwyi50jc5koy" path="res://Resources/Affixes/Suffixes/Suffix.cs" id="2_i1uhh"]
+
+[sub_resource type="Resource" id="Resource_ldkf4"]
+script = ExtResource("1_ldkf4")
+MinItemLevelToAppearOn = 84
+Weight = 1000
+MinValue = 46.0
+MaxValue = 48.0
+ItemnameAddition = "of near Zero"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_i1uhh"]
+script = ExtResource("1_ldkf4")
+Tier = 2
+MinItemLevelToAppearOn = 72
+Weight = 1000
+MinValue = 42.0
+MaxValue = 45.0
+ItemnameAddition = "of Coldsnap"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_lra3o"]
+script = ExtResource("1_ldkf4")
+Tier = 3
+MinItemLevelToAppearOn = 60
+Weight = 1000
+MinValue = 36.0
+MaxValue = 41.0
+ItemnameAddition = "of the Snowy Owl"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_nibxb"]
+script = ExtResource("1_ldkf4")
+Tier = 4
+MinItemLevelToAppearOn = 50
+Weight = 1000
+MinValue = 30.0
+MaxValue = 35.0
+ItemnameAddition = "of the Walrus"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_keajk"]
+script = ExtResource("1_ldkf4")
+Tier = 5
+MinItemLevelToAppearOn = 38
+Weight = 1000
+MinValue = 24.0
+MaxValue = 29.0
+ItemnameAddition = "of the Sasquatch"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_xmm44"]
+script = ExtResource("1_ldkf4")
+Tier = 6
+MinItemLevelToAppearOn = 26
+Weight = 1000
+MinValue = 18.0
+MaxValue = 23.0
+ItemnameAddition = "of the Narwhal"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_rhnc4"]
+script = ExtResource("1_ldkf4")
+Tier = 7
+MinItemLevelToAppearOn = 14
+Weight = 1000
+MinValue = 12.0
+MaxValue = 17.0
+ItemnameAddition = "of the Beluga"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_8la4f"]
+script = ExtResource("1_ldkf4")
+Tier = 8
+MinItemLevelToAppearOn = 1
+Weight = 1000
+MinValue = 6.0
+MaxValue = 11.0
+ItemnameAddition = "of the Inuit"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_i1uhh")
+AffectedCombatStat = 21
+AffectableItemTypes = Array[int]([4, 15, 16, 14, 12])
+Tiers = Array[ExtResource("1_ldkf4")]([SubResource("Resource_ldkf4"), SubResource("Resource_i1uhh"), SubResource("Resource_lra3o"), SubResource("Resource_nibxb"), SubResource("Resource_keajk"), SubResource("Resource_xmm44"), SubResource("Resource_rhnc4"), SubResource("Resource_8la4f")])
+metadata/_custom_type_script = "uid://bwwyi50jc5koy"
