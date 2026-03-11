@@ -16,7 +16,7 @@ public static class FCTExtensions
         floatingCombatTextInstance.Display      = floatingCombatTextInstance.GetNode<Label>(nameof(Label));
         floatingCombatTextInstance.Value        = hitResult.MitigatedDamage;
         floatingCombatTextInstance.Position     = target.Position + offset;
-        floatingCombatTextInstance.Display.Text = hitResult.MitigatedDamage.ToString("N0");
+        floatingCombatTextInstance.Display.Text = floatingCombatTextInstance.Value.ToString("N0");
 
         floatingCombatTextInstance = hitResult.LifeModificationMode switch
         {

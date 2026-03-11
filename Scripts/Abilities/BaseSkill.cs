@@ -8,22 +8,24 @@ namespace Hoellenspiralenspiel.Scripts.Abilities;
 
 public abstract class BaseSkill
 {
-    private readonly decimal baseCritModifier = 1.3m;
-    private readonly int     baseCritRate;
-    private readonly int     baseDamageMax;
-    private readonly int     baseDamageMin;
-    private readonly Random  baseDamageRng = new();
-    private readonly Random  critRng       = new();
-
+    private readonly decimal    baseCritModifier = 1.3m;
+    private readonly int        baseCritRate;
+    private readonly CombatStat mitigatedBy;
+    private readonly int        baseDamageMax;
+    private readonly int        baseDamageMin;
+    private readonly Random     baseDamageRng = new();
+    private readonly Random     critRng       = new();
     public BaseSkill(int      baseDamageMin,
                      int      baseDamageMax,
                      int      baseCritRate,
                      double   baseCooldown,
+                     CombatStat mitigatedBy,
                      BaseUnit owner)
     {
         this.baseDamageMin = baseDamageMin;
         this.baseDamageMax = baseDamageMax;
         this.baseCritRate  = baseCritRate;
+        this.mitigatedBy   = mitigatedBy;
         RealCooldown       = baseCooldown;
         Owner              = owner;
     }
@@ -45,6 +47,6 @@ public abstract class BaseSkill
 
         //Entweder hier maybe defence vong enemu berücksichtigen
 
-        return new HitResult(realDamage, hitType, LifeModificationMode.Damage, target);
+        return new HitResult(realDamage, hitType, LifeModificationMode.Damage, target, mitigatedBy);
     }
 }

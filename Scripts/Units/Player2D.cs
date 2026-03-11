@@ -149,7 +149,7 @@ public partial class Player2D : BaseUnit
 
             if (collider != null && collider.IsInGroup("monsters"))
             {
-                var damageTaken = new HitResult(10, HitType.Normal, LifeModificationMode.Damage, this);
+                var damageTaken = new HitResult(10, HitType.Normal, LifeModificationMode.Damage, this, CombatStat.Armor);
 
                 ReceiveDamage(damageTaken);
 

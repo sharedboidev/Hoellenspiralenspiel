@@ -41,8 +41,7 @@ public partial class Fireball : Area2D,
 			if (body.IsInGroup("monsters") && ShotBy != body && body is BaseEnemy hitEnemy)
 			{
 				var damageResult = skill.MakeRealDamage(hitEnemy);
-				hitEnemy.LifeCurrent -= (int)damageResult.RawValue;
-				hitEnemy.InstatiateFloatingCombatText(damageResult, GetTree().CurrentScene, new Vector2(0, -60));
+				hitEnemy.ReceiveDamage(damageResult);
 
 				var controller = GetTree().CurrentScene.GetNode<EnemyController>("%" + nameof(EnemyController));
 

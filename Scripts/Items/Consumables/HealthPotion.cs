@@ -25,6 +25,6 @@ public partial class HealthPotion : ConsumableItem
         var healedAmount = consumee.LifeMaximum * TotalHealthRestoredPercentage / 100f;
         consumee.LifeCurrent += (int)healedAmount;
 
-        consumee.InstatiateFloatingCombatText(new HitResult(healedAmount, HitType.Normal, LifeModificationMode.Heal, consumee), consumee.GetParent(), new Vector2(0, -128));
+        consumee.InstatiateFloatingCombatText(new HitResult(healedAmount, HitType.Normal, LifeModificationMode.Heal, consumee, CombatStat.Life), consumee.GetParent(), new Vector2(0, -128));
     }
 }

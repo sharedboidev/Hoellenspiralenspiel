@@ -1,9 +1,10 @@
-﻿using Hoellenspiralenspiel.Scripts.Units;
+﻿using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.Abilities;
 
 public class FireballSkill : BaseSpell
 {
     public FireballSkill(BaseUnit owner)
-            : base(50, 75, 10, 0.25d, owner) { }
+            : base(50, 75, 10, 0.25d,CombatStat.FireResistance, owner) { }
 }

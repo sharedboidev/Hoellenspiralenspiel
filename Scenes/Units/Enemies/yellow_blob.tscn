@@ -363,8 +363,8 @@ _data = {
 scale = Vector2(2, 2)
 script = ExtResource("2_jhcx6")
 LootTableId = "blue_blob_loot"
-LifeBase = 50
-LifeCurrent = 50
+LifeBase = 75
+LightningResiBase = 75
 Movementspeed = 100.0
 
 [node name="IdleSprite" parent="." index="0" unique_id=1122812897]

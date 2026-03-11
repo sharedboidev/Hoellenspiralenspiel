@@ -131,7 +131,7 @@ public abstract partial class BaseUnit
     public virtual void ReceiveDamage(HitResult hit)
     {
         var mainScene = GetTree().CurrentScene;
-        this.InstatiateFloatingCombatText(hit, mainScene, new Vector2(0, -60));
+        this.InstatiateFloatingCombatText(hit, mainScene, new Vector2(0, -75));
 
         LifeCurrent -= hit.MitigatedDamage;
     }
