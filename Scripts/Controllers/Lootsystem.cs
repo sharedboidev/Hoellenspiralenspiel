@@ -182,10 +182,6 @@ public partial class Lootsystem : Node
 
     private ItemModifier RollAffix(AffixType affixType, BaseItem item)
     {
-        if (item is BaseArmor)
-        {
-            
-        }
         var filteredAffixes    = FilterAffixesByType(affixType, item);
         var possibleAffixTiers = FindPossibleAffixTiers(item.ItemLevel, filteredAffixes);
 
@@ -208,7 +204,6 @@ public partial class Lootsystem : Node
                 break;
 
             var affixValue = RollAffixValue(kongruentAffix, affixTier);
-
 
             finalModifier = new ItemModifier(affixType, kongruentAffix.AffectedCombatStat, kongruentAffix.ModificationType, affixValue, affixTier.ItemnameAddition, kongruentAffix.IsInherentMod);
 
@@ -236,6 +231,8 @@ public partial class Lootsystem : Node
             AffixType.Suffix => Affixes.Where(a => a.GetType() == typeof(Suffix) && a.AffectableItemTypes.Contains(item.ItemSlot)).ToArray(),
             _                => throw new ArgumentOutOfRangeException(nameof(affixType), affixType, null)
         };
+
+        //TODO Bug hier
 
         return filteredAffixes;
     }

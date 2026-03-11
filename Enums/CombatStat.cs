@@ -33,5 +33,7 @@ public enum CombatStat
     [Description("Frost Resistance")]
     FrostResistance,
     [Description("Lightning Resistance")]
-    LightningResistance
+    LightningResistance,
+    [Description("Spell Damage")]
+    SpellDamage
 }

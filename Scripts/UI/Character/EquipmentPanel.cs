@@ -34,11 +34,14 @@ public partial class EquipmentPanel : PanelContainer
 
         foreach (var equipmentSlot in equipmentSlots)
         {
-            equipmentSlot.Player          =  Player;
-            equipmentSlot.MouseMoving     += EquipmentSlotOnMouseMoving;
-            equipmentSlot.PropertyChanged += EquipmentSlotOnPropertyChanged;
+            foreach (var fittingItemType in equipmentSlot.FittingItemSlot)
+            {
+                equipmentSlot.Player          =  Player;
+                equipmentSlot.MouseMoving     += EquipmentSlotOnMouseMoving;
+                equipmentSlot.PropertyChanged += EquipmentSlotOnPropertyChanged;
 
-            slotMap.Add(equipmentSlot.FittingItemSlot, equipmentSlot);
+                slotMap.Add(fittingItemType, equipmentSlot);
+            }
         }
     }
 
@@ -57,7 +60,7 @@ public partial class EquipmentPanel : PanelContainer
         => 50;
 
     public float GetTotalMeleeCritChance()
-        => (float)(((BaseWeapon)slotMap[ItemSlot.Weapon].ContainedItem)?.CriticalHitChanceFinal ?? 0);
+        => (float)(((BaseWeapon)slotMap[ItemSlot.PhysicalWeapon].ContainedItem)?.CriticalHitChanceFinal ?? 0);
 
     public float GetTotalDodge()
         => 0f;

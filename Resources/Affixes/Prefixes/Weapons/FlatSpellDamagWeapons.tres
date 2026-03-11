@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="Prefix" format=3 uid="uid://bslkn0jyb8cig"]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_ogi5t"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_cfh8g"]
+
+[sub_resource type="Resource" id="Resource_ogi5t"]
+script = ExtResource("1_ogi5t")
+Tier = 7
+MinItemLevelToAppearOn = 11
+Weight = 1500
+MinValue = 7.0
+MaxValue = 10.0
+ItemnameAddition = "Wizard's"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_aary5"]
+script = ExtResource("1_ogi5t")
+Tier = 8
+MinItemLevelToAppearOn = 1
+Weight = 1500
+MinValue = 3.0
+MaxValue = 6.0
+ItemnameAddition = "Adept's"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_cfh8g")
+AffectedCombatStat = 23
+AffectableItemTypes = Array[int]([18])
+Tiers = Array[ExtResource("1_ogi5t")]([SubResource("Resource_ogi5t"), SubResource("Resource_aary5")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

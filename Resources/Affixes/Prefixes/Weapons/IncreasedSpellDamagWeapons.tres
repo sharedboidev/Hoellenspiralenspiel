@@ -1,0 +1,91 @@
+[gd_resource type="Resource" script_class="Prefix" format=3 uid="uid://dxstfb7cwe7xd"]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_a087j"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_hxvqu"]
+
+[sub_resource type="Resource" id="Resource_o5vpy"]
+script = ExtResource("1_a087j")
+MinItemLevelToAppearOn = 84
+Weight = 40
+MinValue = 150.0
+MaxValue = 164.0
+ItemnameAddition = "Elderscribed"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_sqcrm"]
+script = ExtResource("1_a087j")
+Tier = 2
+MinItemLevelToAppearOn = 79
+Weight = 80
+MinValue = 125.0
+MaxValue = 149.0
+ItemnameAddition = "Hexcarved"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_e7chf"]
+script = ExtResource("1_a087j")
+Tier = 3
+MinItemLevelToAppearOn = 58
+Weight = 150
+MinValue = 105.0
+MaxValue = 124.0
+ItemnameAddition = "Enchanter's"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_kyegc"]
+script = ExtResource("1_a087j")
+Tier = 4
+MinItemLevelToAppearOn = 46
+Weight = 300
+MinValue = 85.0
+MaxValue = 104.0
+ItemnameAddition = "Occultist's"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_02u40"]
+script = ExtResource("1_a087j")
+Tier = 5
+MinItemLevelToAppearOn = 35
+Weight = 600
+MinValue = 60.0
+MaxValue = 84.0
+ItemnameAddition = "Hexling's"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_wt4ar"]
+script = ExtResource("1_a087j")
+Tier = 6
+MinItemLevelToAppearOn = 23
+Weight = 1500
+MinValue = 45.0
+MaxValue = 59.0
+ItemnameAddition = "Arcanist's"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_4aelh"]
+script = ExtResource("1_a087j")
+Tier = 7
+MinItemLevelToAppearOn = 11
+Weight = 1500
+MinValue = 30.0
+MaxValue = 44.0
+ItemnameAddition = "Witchling's"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_mgpg5"]
+script = ExtResource("1_a087j")
+Tier = 8
+MinItemLevelToAppearOn = 1
+Weight = 1500
+MinValue = 15.0
+MaxValue = 29.0
+ItemnameAddition = "Apprentice's"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_hxvqu")
+AffectedCombatStat = 23
+ModificationType = 1
+AffectableItemTypes = Array[int]([18])
+Tiers = Array[ExtResource("1_a087j")]([SubResource("Resource_o5vpy"), SubResource("Resource_sqcrm"), SubResource("Resource_e7chf"), SubResource("Resource_kyegc"), SubResource("Resource_02u40"), SubResource("Resource_wt4ar"), SubResource("Resource_4aelh"), SubResource("Resource_mgpg5")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"
