@@ -13,9 +13,12 @@ public partial class Statdisplay : PanelContainer
     private          RichTextLabel  dexLabel;
     private          RichTextLabel  dodgeLabel;
     [Export] private EquipmentPanel equipmentPanel;
+    private          RichTextLabel  fireResiLabel;
+    private          RichTextLabel  frostResistance;
     private          RichTextLabel  intLabel;
     private          RichTextLabel  lifeLabel;
     private          RichTextLabel  liferegenerationLabel;
+    private          RichTextLabel  lightningResiLabel;
     private          RichTextLabel  meleeCritChanceLabel;
     private          RichTextLabel  movementspeedLabel;
     private          RichTextLabel  strengthLabel;
@@ -40,6 +43,9 @@ public partial class Statdisplay : PanelContainer
         liferegenerationLabel.Text = player.LiferegenerationFinal.ToString("N0");
         armorLabel.Text            = equipmentPanel.GetTotalArmor().ToString("N0");
         dodgeLabel.Text            = equipmentPanel.GetTotalDodge().ToString("0.##") + "%";
+        fireResiLabel.Text         = player.FireResiFinal.ToString("N0") + "%";
+        frostResistance.Text       = player.FrostResiFinal.ToString("N0") + "%";
+        lightningResiLabel.Text    = player.LightningResiFinal.ToString("N0") + "%";
 
         meleeCritChanceLabel.Text = equipmentPanel.GetTotalMeleeCritChance().ToString("0.##") + "%";
         critDamageLabel.Text      = "+" + equipmentPanel.GetTotalCriticalDamage().ToString("N0") + "%";
@@ -57,6 +63,9 @@ public partial class Statdisplay : PanelContainer
         liferegenerationLabel = GetNode<RichTextLabel>("%Liferegeneration");
         armorLabel            = GetNode<RichTextLabel>("%Armor");
         dodgeLabel            = GetNode<RichTextLabel>("%Dodge");
+        fireResiLabel         = GetNode<RichTextLabel>("%FireResistance");
+        frostResistance       = GetNode<RichTextLabel>("%FrostResistance");
+        lightningResiLabel    = GetNode<RichTextLabel>("%LightningResistance");
     }
 
     private void FindOffences()

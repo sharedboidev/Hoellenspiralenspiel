@@ -335,6 +335,75 @@ text = "0%"
 fit_content = true
 autowrap_mode = 0
 
+[node name="Defence5" type="HBoxContainer" parent="MarginContainer/GroupContainer/Defence" unique_id=850058064]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence5" unique_id=271495906]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Fire Resistance"
+fit_content = true
+autowrap_mode = 0
+
+[node name="FireResistance" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence5" unique_id=920616756]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Defence6" type="HBoxContainer" parent="MarginContainer/GroupContainer/Defence" unique_id=1957106983]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence6" unique_id=700656640]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Frost Resistance"
+fit_content = true
+autowrap_mode = 0
+
+[node name="FrostResistance" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence6" unique_id=1161249670]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Defence7" type="HBoxContainer" parent="MarginContainer/GroupContainer/Defence" unique_id=491877563]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence7" unique_id=577419177]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Lightning Resistance"
+fit_content = true
+autowrap_mode = 0
+
+[node name="LightningResistance" type="RichTextLabel" parent="MarginContainer/GroupContainer/Defence/Defence7" unique_id=1816471493]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
 [node name="Utility" type="VBoxContainer" parent="MarginContainer/GroupContainer" unique_id=499258802]
 layout_mode = 2
 theme_override_constants/separation = 0

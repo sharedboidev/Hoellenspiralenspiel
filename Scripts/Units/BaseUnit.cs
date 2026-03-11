@@ -89,6 +89,30 @@ public abstract partial class BaseUnit
     public  int   ArmorFinal                => (int)((ArmorBase + ArmorAddedFlat) * ArmorPercentageMultiplier * ArmorMoreMultiplierTotal);
 
     [Export]
+    public int FireResiBase { get; set; }
+
+    private float FireResiAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.FireResistance);
+    private float FireResiPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.FireResistance);
+    private float FireResiMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.FireResistance);
+    public  int   FireResiFinal                => (int)((FireResiBase + FireResiAddedFlat) * FireResiPercentageMultiplier * FireResiMoreMultiplierTotal);
+
+    [Export]
+    public int FrostResiBase { get; set; }
+
+    private float FrostResiAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.FrostResistance);
+    private float FrostResiPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.FrostResistance);
+    private float FrostResiMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.FrostResistance);
+    public  int   FrostResiFinal                => (int)((FrostResiBase + FrostResiAddedFlat) * FrostResiPercentageMultiplier * FrostResiMoreMultiplierTotal);
+
+    [Export]
+    public int LightningResiBase { get; set; }
+
+    private float LightningResiAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.LightningResistance);
+    private float LightningResiPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.LightningResistance);
+    private float LightningResiMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.LightningResistance);
+    public  int   LightningResiFinal                => (int)((LightningResiBase + LightningResiAddedFlat) * LightningResiPercentageMultiplier * LightningResiMoreMultiplierTotal);
+
+    [Export]
     public Vector2 MovementDirection
     {
         get => movementDirection;

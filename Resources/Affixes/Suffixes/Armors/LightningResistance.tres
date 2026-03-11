@@ -1,0 +1,90 @@
+[gd_resource type="Resource" script_class="Suffix" format=3 uid="uid://bdvua8ne3b72d"]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_njifi"]
+[ext_resource type="Script" uid="uid://bwwyi50jc5koy" path="res://Resources/Affixes/Suffixes/Suffix.cs" id="2_xgb8k"]
+
+[sub_resource type="Resource" id="Resource_njifi"]
+script = ExtResource("1_njifi")
+MinItemLevelToAppearOn = 84
+Weight = 1000
+MinValue = 46.0
+MaxValue = 48.0
+ItemnameAddition = "of the Surge"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_xgb8k"]
+script = ExtResource("1_njifi")
+Tier = 2
+MinItemLevelToAppearOn = 72
+Weight = 1000
+MinValue = 42.0
+MaxValue = 45.0
+ItemnameAddition = "of Ball Lightning"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_2nwy5"]
+script = ExtResource("1_njifi")
+Tier = 3
+MinItemLevelToAppearOn = 60
+Weight = 1000
+MinValue = 36.0
+MaxValue = 41.0
+ItemnameAddition = "of the Maelstrom"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_ldn8e"]
+script = ExtResource("1_njifi")
+Tier = 4
+MinItemLevelToAppearOn = 49
+Weight = 1000
+MinValue = 30.0
+MaxValue = 35.0
+ItemnameAddition = "of Discharge"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_re47o"]
+script = ExtResource("1_njifi")
+Tier = 5
+MinItemLevelToAppearOn = 37
+Weight = 1000
+MinValue = 24.0
+MaxValue = 29.0
+ItemnameAddition = "of Convulsion"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_j1cd2"]
+script = ExtResource("1_njifi")
+Tier = 6
+MinItemLevelToAppearOn = 25
+Weight = 1000
+MinValue = 18.0
+MaxValue = 23.0
+ItemnameAddition = "of the Storm"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_fbu8k"]
+script = ExtResource("1_njifi")
+Tier = 7
+MinItemLevelToAppearOn = 13
+Weight = 1000
+MinValue = 12.0
+MaxValue = 17.0
+ItemnameAddition = "of the Gale"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_g6hdj"]
+script = ExtResource("1_njifi")
+Tier = 8
+MinItemLevelToAppearOn = 1
+Weight = 1000
+MinValue = 6.0
+MaxValue = 11.0
+ItemnameAddition = "of the Gust"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_xgb8k")
+AffectedCombatStat = 22
+AffectableItemTypes = Array[int]([4, 15, 16, 14, 12])
+Tiers = Array[ExtResource("1_njifi")]([SubResource("Resource_njifi"), SubResource("Resource_xgb8k"), SubResource("Resource_2nwy5"), SubResource("Resource_ldn8e"), SubResource("Resource_re47o"), SubResource("Resource_j1cd2"), SubResource("Resource_fbu8k"), SubResource("Resource_g6hdj")])
+metadata/_custom_type_script = "uid://bwwyi50jc5koy"
