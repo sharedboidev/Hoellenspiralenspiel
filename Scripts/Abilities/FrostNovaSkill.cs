@@ -1,9 +1,10 @@
-﻿using Hoellenspiralenspiel.Scripts.Units;
+﻿using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.Abilities;
 
 public class FrostNovaSkill : BaseSpell
 {
     public FrostNovaSkill(BaseUnit owner)
-            : base(10, 50, 10, baseCooldown: .5, owner) { }
+            : base(10, 50, 10, baseCooldown: .5,CombatStat.FrostResistance, owner) { }
 }

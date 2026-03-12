@@ -3,7 +3,7 @@
 public enum ItemSlot
 {
     Undefined,
-    Weapon,
+    PhysicalWeapon,
     Shoulders,
     Neck,
     Helmet,
@@ -20,5 +20,6 @@ public enum ItemSlot
     Torso,
     Legs,
     //...
-    Consumable
+    Consumable,
+    SpellWeapon
 }

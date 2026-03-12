@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dhbbe7mkkfcdl"]
+
+[ext_resource type="PackedScene" uid="uid://cjf203yhhwo42" path="res://Scenes/Items/Weapons/base_weapon.tscn" id="1_y3mfe"]
+[ext_resource type="Script" uid="uid://bhyrx4gvv0ofw" path="res://Scripts/Items/Armors/Torsos/PeasantTunic.cs" id="2_61sgq"]
+[ext_resource type="Texture2D" uid="uid://cyu3672iep1er" path="res://Textures/Items/Armor/Torsos/peasant_tunic.png" id="3_61sgq"]
+
+[node name="PeasantTunic" unique_id=839299820 node_paths=PackedStringArray("Icon") instance=ExtResource("1_y3mfe")]
+script = ExtResource("2_61sgq")
+ArmorvalueBase = 25
+Icon = NodePath("Icon")
+SlotSize = Vector2(2, 3)
+Requirements = Dictionary[int, int]({
+5: 1
+})
+
+[node name="Icon" parent="." index="0" unique_id=732627025]
+texture = ExtResource("3_61sgq")

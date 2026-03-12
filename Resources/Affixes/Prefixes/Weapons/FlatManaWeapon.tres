@@ -1,0 +1,130 @@
+[gd_resource type="Resource" script_class="Prefix" format=3 uid="uid://bf0fwokrqysgu"]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_evmfy"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_1kr2y"]
+
+[sub_resource type="Resource" id="Resource_j5oha"]
+script = ExtResource("1_evmfy")
+MinItemLevelToAppearOn = 81
+Weight = 400
+MinValue = 200.0
+MaxValue = 230.0
+ItemnameAddition = "Sapphire"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_lorbm"]
+script = ExtResource("1_evmfy")
+Tier = 2
+MinItemLevelToAppearOn = 75
+Weight = 800
+MinValue = 180.0
+MaxValue = 199.0
+ItemnameAddition = "Lapis Lazuli"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_ds8oc"]
+script = ExtResource("1_evmfy")
+Tier = 3
+MinItemLevelToAppearOn = 69
+Weight = 800
+MinValue = 16.0
+MaxValue = 179.0
+ItemnameAddition = "Papagoite"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_3yo4w"]
+script = ExtResource("1_evmfy")
+Tier = 4
+MinItemLevelToAppearOn = 60
+Weight = 1000
+MinValue = 140.0
+MaxValue = 159.0
+ItemnameAddition = "Aqua"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_y4nhw"]
+script = ExtResource("1_evmfy")
+Tier = 5
+MinItemLevelToAppearOn = 51
+Weight = 1000
+MinValue = 120.0
+MaxValue = 139.0
+ItemnameAddition = "Sodalite"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_kxuxq"]
+script = ExtResource("1_evmfy")
+Tier = 6
+MinItemLevelToAppearOn = 42
+Weight = 1000
+MinValue = 100.0
+MaxValue = 119.0
+ItemnameAddition = "Lazulite"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_dbi5c"]
+script = ExtResource("1_evmfy")
+Tier = 7
+MinItemLevelToAppearOn = 35
+Weight = 1000
+MinValue = 90.0
+MaxValue = 99.0
+ItemnameAddition = "Turquoise"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_7do3e"]
+script = ExtResource("1_evmfy")
+Tier = 8
+MinItemLevelToAppearOn = 29
+Weight = 1000
+MinValue = 80.0
+MaxValue = 89.0
+ItemnameAddition = "Lazurite"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_h28wa"]
+script = ExtResource("1_evmfy")
+Tier = 9
+MinItemLevelToAppearOn = 23
+Weight = 1000
+MinValue = 70.0
+MaxValue = 79.0
+ItemnameAddition = "Larimar"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_nfk8m"]
+script = ExtResource("1_evmfy")
+Tier = 10
+MinItemLevelToAppearOn = 17
+Weight = 1000
+MinValue = 60.0
+MaxValue = 69.0
+ItemnameAddition = "Kyanite"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_evmfy"]
+script = ExtResource("1_evmfy")
+Tier = 11
+MinItemLevelToAppearOn = 11
+Weight = 1000
+MinValue = 50.0
+MaxValue = 59.0
+ItemnameAddition = "Apatite"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_1kr2y"]
+script = ExtResource("1_evmfy")
+Tier = 12
+MinItemLevelToAppearOn = 1
+Weight = 1000
+MinValue = 40.0
+MaxValue = 49.0
+ItemnameAddition = "Aquamarine"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_1kr2y")
+AffectedCombatStat = 1
+AffectableItemTypes = Array[int]([4, 5, 7, 13, 16, 15])
+Tiers = Array[ExtResource("1_evmfy")]([SubResource("Resource_j5oha"), SubResource("Resource_lorbm"), SubResource("Resource_ds8oc"), SubResource("Resource_3yo4w"), SubResource("Resource_y4nhw"), SubResource("Resource_kxuxq"), SubResource("Resource_dbi5c"), SubResource("Resource_7do3e"), SubResource("Resource_h28wa"), SubResource("Resource_nfk8m"), SubResource("Resource_evmfy"), SubResource("Resource_1kr2y")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

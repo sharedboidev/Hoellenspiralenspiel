@@ -50,7 +50,6 @@ public abstract partial class BaseWeapon : BaseItem
 
     public          DamageType DamageType  { get; private set; }
     public override bool       IsStackable => false;
-    public override ItemSlot   ItemSlot    => ItemSlot.Weapon;
 
     public override void Init()
     {

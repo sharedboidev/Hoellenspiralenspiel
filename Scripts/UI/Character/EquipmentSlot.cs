@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Godot;
+using Godot.Collections;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Scripts.Items;
@@ -28,7 +30,7 @@ public partial class EquipmentSlot
     public           Player2D         Player      { get; set; }
 
     [Export]
-    public ItemSlot FittingItemSlot { get; private set; }
+    public Array<ItemSlot> FittingItemSlot { get; private set; }
 
     [Export]
     public Texture2D DefaultTexture
@@ -124,11 +126,11 @@ public partial class EquipmentSlot
                 WithdrawItem(mouseObject);
 
                 break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is null && mouseObject.HasItem && ((BaseItem)mouseObject.ContainedItem).ItemSlot == FittingItemSlot:
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is null && mouseObject.HasItem && FittingItemSlot.Any(x => x == ((BaseItem)mouseObject.ContainedItem).ItemSlot):
                 PutItemIntoSlot(mouseObject);
 
                 break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && ContainedItem is not null && ((BaseItem)mouseObject.ContainedItem).ItemSlot == FittingItemSlot:
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && ContainedItem is not null && FittingItemSlot.Any(x => x == ((BaseItem)mouseObject.ContainedItem).ItemSlot):
                 SwapItems(mouseObject);
 
                 break;

@@ -267,7 +267,7 @@ collision_layer = 2
 collision_mask = 13
 script = ExtResource("1_e1ef1")
 LootTableId = "blue_blob_loot"
-LifeCurrent = 1
+FrostResiBase = 75
 Movementspeed = 25.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=174800444]

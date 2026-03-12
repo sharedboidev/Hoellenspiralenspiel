@@ -27,5 +27,13 @@ public enum CombatStat
     Intelligence,
     Constitution,
     Awareness,
-    AreaOfEffect
+    AreaOfEffect,
+    [Description("Fire Resistance")]
+    FireResistance,
+    [Description("Frost Resistance")]
+    FrostResistance,
+    [Description("Lightning Resistance")]
+    LightningResistance,
+    [Description("Spell Damage")]
+    SpellDamage
 }

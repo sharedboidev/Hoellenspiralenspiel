@@ -1,0 +1,90 @@
+[gd_resource type="Resource" script_class="Suffix" format=3 uid="uid://dac1k1li3lfe5"]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_pwskp"]
+[ext_resource type="Script" uid="uid://bwwyi50jc5koy" path="res://Resources/Affixes/Suffixes/Suffix.cs" id="2_71hdl"]
+
+[sub_resource type="Resource" id="Resource_pwskp"]
+script = ExtResource("1_pwskp")
+MinItemLevelToAppearOn = 84
+Weight = 1000
+MinValue = 46.0
+MaxValue = 48.0
+ItemnameAddition = "of endless Incineration"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_71hdl"]
+script = ExtResource("1_pwskp")
+Tier = 2
+MinItemLevelToAppearOn = 72
+Weight = 1000
+MinValue = 42.0
+MaxValue = 45.0
+ItemnameAddition = "of Lava"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_7ffmj"]
+script = ExtResource("1_pwskp")
+Tier = 3
+MinItemLevelToAppearOn = 60
+Weight = 1000
+MinValue = 36.0
+MaxValue = 41.0
+ItemnameAddition = "of the Pyre"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_8p7hc"]
+script = ExtResource("1_pwskp")
+Tier = 4
+MinItemLevelToAppearOn = 48
+Weight = 1000
+MinValue = 30.0
+MaxValue = 35.0
+ItemnameAddition = "of the Crucible"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_vuart"]
+script = ExtResource("1_pwskp")
+Tier = 5
+MinItemLevelToAppearOn = 36
+Weight = 1000
+MinValue = 24.0
+MaxValue = 29.0
+ItemnameAddition = "of the Kiln"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_htiri"]
+script = ExtResource("1_pwskp")
+Tier = 6
+MinItemLevelToAppearOn = 24
+Weight = 1000
+MinValue = 18.0
+MaxValue = 23.0
+ItemnameAddition = "of the Draco"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_28n1g"]
+script = ExtResource("1_pwskp")
+Tier = 7
+MinItemLevelToAppearOn = 12
+Weight = 1000
+MinValue = 12.0
+MaxValue = 17.0
+ItemnameAddition = "of the Lizard"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_qpka0"]
+script = ExtResource("1_pwskp")
+Tier = 8
+MinItemLevelToAppearOn = 1
+Weight = 1000
+MinValue = 6.0
+MaxValue = 11.0
+ItemnameAddition = "of the Whelp"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_71hdl")
+AffectedCombatStat = 20
+AffectableItemTypes = Array[int]([4, 15, 16, 14, 12])
+Tiers = Array[ExtResource("1_pwskp")]([SubResource("Resource_pwskp"), SubResource("Resource_71hdl"), SubResource("Resource_7ffmj"), SubResource("Resource_8p7hc"), SubResource("Resource_vuart"), SubResource("Resource_htiri"), SubResource("Resource_28n1g"), SubResource("Resource_qpka0")])
+metadata/_custom_type_script = "uid://bwwyi50jc5koy"

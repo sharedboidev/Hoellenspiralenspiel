@@ -5,7 +5,7 @@ namespace Hoellenspiralenspiel.Resources.Affixes;
 [GlobalClass]
 public partial class AffixTier : Resource
 {
-    [Export(PropertyHint.Range, "1,10,")]
+    [Export(PropertyHint.Range, "1,20,")]
     public int Tier { get; set; }
 
     [Export]

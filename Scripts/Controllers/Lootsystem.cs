@@ -8,9 +8,7 @@ using Hoellenspiralenspiel.Resources.Affixes;
 using Hoellenspiralenspiel.Resources.Affixes.Prefixes;
 using Hoellenspiralenspiel.Resources.Affixes.Suffixes;
 using Hoellenspiralenspiel.Scripts.Items;
-using Hoellenspiralenspiel.Scripts.Items.Armors;
 using Hoellenspiralenspiel.Scripts.Items.Consumables;
-using Hoellenspiralenspiel.Scripts.Items.Weapons;
 using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Models.Weapons;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
@@ -182,16 +180,11 @@ public partial class Lootsystem : Node
 
     private ItemModifier RollAffix(AffixType affixType, BaseItem item)
     {
-        if (item is BaseArmor)
-        {
-            
-        }
         var filteredAffixes    = FilterAffixesByType(affixType, item);
         var possibleAffixTiers = FindPossibleAffixTiers(item.ItemLevel, filteredAffixes);
-
-        var totalWeight      = possibleAffixTiers.Sum(pat => pat.Weight) + 1;
-        var luckyNumber      = GD.Randi() % totalWeight;
-        var cumulativeWeight = 0f;
+        var totalWeight        = possibleAffixTiers.Sum(pat => pat.Weight) + 1;
+        var luckyNumber        = GD.Randi() % totalWeight;
+        var cumulativeWeight   = 0f;
 
         ItemModifier finalModifier = null;
 
@@ -208,7 +201,6 @@ public partial class Lootsystem : Node
                 break;
 
             var affixValue = RollAffixValue(kongruentAffix, affixTier);
-
 
             finalModifier = new ItemModifier(affixType, kongruentAffix.AffectedCombatStat, kongruentAffix.ModificationType, affixValue, affixTier.ItemnameAddition, kongruentAffix.IsInherentMod);
 
@@ -234,7 +226,7 @@ public partial class Lootsystem : Node
         {
             AffixType.Prefix => Affixes.Where(a => a.GetType() == typeof(Prefix) && a.AffectableItemTypes.Contains(item.ItemSlot)).ToArray(),
             AffixType.Suffix => Affixes.Where(a => a.GetType() == typeof(Suffix) && a.AffectableItemTypes.Contains(item.ItemSlot)).ToArray(),
-            _                => throw new ArgumentOutOfRangeException(nameof(affixType), affixType, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(affixType), affixType, null)
         };
 
         return filteredAffixes;
@@ -251,7 +243,7 @@ public partial class Lootsystem : Node
 
         if (kongruentAffix.ModificationType is ModificationType.Percentage or ModificationType.More)
             affixValue /= 100;
-        
+
         return affixValue;
     }
 
@@ -259,14 +251,14 @@ public partial class Lootsystem : Node
         => item.ItemLevel switch
         {
             >= 0 and <= 10 => 3,
-            <= 25          => 5,
-            <= 40          => 6,
-            <= 50          => 7,
-            <= 60          => 8,
-            <= 70          => 9,
-            <= 80          => 10,
-            <= 90          => 11,
-            <= 100         => 12,
-            _              => throw new ArgumentOutOfRangeException()
+            <= 25 => 5,
+            <= 40 => 6,
+            <= 50 => 7,
+            <= 60 => 8,
+            <= 70 => 9,
+            <= 80 => 10,
+            <= 90 => 11,
+            <= 100 => 12,
+            _ => throw new ArgumentOutOfRangeException()
         };
 }
