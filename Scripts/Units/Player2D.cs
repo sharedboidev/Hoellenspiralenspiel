@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Enums;
@@ -11,6 +12,7 @@ using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.UI.Character;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
+using Hoellenspiralenspiel.Scripts.Utils;
 using ResourceOrb = Hoellenspiralenspiel.Scripts.UI.Character.ResourceOrb;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
@@ -28,109 +30,8 @@ public partial class Player2D : BaseUnit
     [Export] private ResourceOrb     manaOrb;
     private          float           manaProSekunde = 5f;
     [Export] public  HBoxContainer   SkillBar;
-    private Dictionary<int, long> xpTable = new()
-    {
-        { 1, 0 },
-        { 2, 525 },
-        { 3, 1760 },
-        { 4, 3781 },
-        { 5, 7184 },
-        { 6, 12186 },
-        { 7, 19324 },
-        { 8, 29377 },
-        { 9, 43181 },
-        { 10, 61693 },
-        { 11, 85990 },
-        { 12, 117506 },
-        { 13, 157384 },
-        { 14, 207736 },
-        { 15, 269997 },
-        { 16, 346462 },
-        { 17, 439268 },
-        { 18, 551295 },
-        { 19, 685171 },
-        { 20, 843709 },
-        { 21, 1030734 },
-        { 22, 1249629 },
-        { 23, 1504995 },
-        { 24, 1800847 },
-        { 25, 2142652 },
-        { 26, 2535122 },
-        { 27, 2984677 },
-        { 28, 3496798 },
-        { 29, 4080655 },
-        { 30, 4742836 },
-        { 31, 5490247 },
-        { 32, 6334393 },
-        { 33, 7283446 },
-        { 34, 8384398 },
-        { 35, 9541110 },
-        { 36, 10874351 },
-        { 37, 12361842 },
-        { 38, 14018289 },
-        { 39, 15859432 },
-        { 40, 17905634 },
-        { 41, 20171471 },
-        { 42, 22679999 },
-        { 43, 25456123 },
-        { 44, 28517857 },
-        { 45, 31897771 },
-        { 46, 35621447 },
-        { 47, 39721017 },
-        { 48, 44225461 },
-        { 49, 49176560 },
-        { 50, 54607467 },
-        { 51, 60565335 },
-        { 52, 67094245 },
-        { 53, 74247659 },
-        { 54, 82075627 },
-        { 55, 90631041 },
-        { 56, 99984974 },
-        { 57, 110197515 },
-        { 58, 121340161 },
-        { 59, 133497202 },
-        { 60, 146749362 },
-        { 61, 161191120 },
-        { 62, 176922628 },
-        { 63, 194049893 },
-        { 64, 212684946 },
-        { 65, 232956711 },
-        { 66, 255001620 },
-        { 67, 278952403 },
-        { 68, 304972236 },
-        { 69, 333233648 },
-        { 70, 363906163 },
-        { 71, 397194041 },
-        { 72, 433312945 },
-        { 73, 472476370 },
-        { 74, 514937180 },
-        { 75, 560961898 },
-        { 76, 610815862 },
-        { 77, 664824416 },
-        { 78, 723298169 },
-        { 79, 786612664 },
-        { 80, 855129128 },
-        { 81, 929261318 },
-        { 82, 1009443795 },
-        { 83, 1096169525 },
-        { 84, 1189918242 },
-        { 85, 1291270350 },
-        { 86, 1400795257 },
-        { 87, 1519130326 },
-        { 88, 1646943474 },
-        { 89, 1784977296 },
-        { 90, 1934009687 },
-        { 91, 2094900291 },
-        { 92, 2268549086 },
-        { 93, 2455921256 },
-        { 94, 2658074992 },
-        { 95, 2876116901 },
-        { 96, 3111280300 },
-        { 97, 3364828162 },
-        { 98, 3638186694 },
-        { 99, 3932818530 },
-        { 100, 4250334444 },
-    };
+    private          long            xpTotal;
+
     private AnimationTree AnimationTree { get; set; }
 
     [Export]
@@ -144,9 +45,14 @@ public partial class Player2D : BaseUnit
     private float ManaMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Mana);
     public  float ManaMaximum              => (int)((ManaBase + ManaAddedFlat) * ManaPercentageMultiplier * ManaMoreMultiplierTotal);
 
-    public int XpCurrent      { get; set; }
-    public int XpForNextLevel { get; set; }
-    public int Level          { get; set; } = 1;
+    public long XpTotal
+    {
+        get => xpTotal;
+        private set => SetField(ref xpTotal, value);
+    }
+
+    public long XpForNextLevel { get; private set; }
+    public int  Level          { get; private set; } = 1;
 
     [Export]
     public float ManaCurrent
@@ -164,12 +70,39 @@ public partial class Player2D : BaseUnit
         lifeOrb.Init(this, ResourceType.Life);
         manaOrb.Init(this, ResourceType.Mana);
 
+        XpForNextLevel  =  XpTable.GetTotalXpNeededForLevel(Level + 1);
+        PropertyChanged += OnPropertyChanged;
+
         base._Ready();
 
         ConfigureSkillbar();
 
         AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
         //AnimationTree = GetNode<AnimationTree>("AnimationTreeNEW");
+    }
+
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(XpTotal) && XpTotal >= XpForNextLevel)
+            LevelUp();
+    }
+
+    public void GainExperience(int experienceGained)
+        => XpTotal += experienceGained;
+
+    public void LoseExperience(int experienceLost)
+    {
+        var xpNeededForCurrentLevel = XpTable.GetTotalXpNeededForLevel(Level);
+        var totalXpDelta            = XpTotal - experienceLost;
+
+        XpTotal = Math.Max(xpNeededForCurrentLevel, totalXpDelta);
+    }
+
+    public void LevelUp()
+    {
+        Level++;
+
+        XpForNextLevel = XpTable.GetTotalXpNeededForLevel(Level + 1);
     }
 
     public int GetRequiredAttributevalue(Requirement requirement)
