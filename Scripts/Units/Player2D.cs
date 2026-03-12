@@ -34,14 +34,20 @@ public partial class Player2D : BaseUnit
     [Export]
     public AudioStreamPlayer2D NoManaSound { get; set; }
 
+    [Export]
+    public int    ManaBase { get; set; } = 60;
+    private float ManaAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Mana);
+    private float ManaPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Mana);
+    private float ManaMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Mana);
+    public  float ManaMaximum              => (int)((ManaBase + ManaAddedFlat) * ManaPercentageMultiplier * ManaMoreMultiplierTotal);
+
+
+    [Export]
     public float ManaCurrent
     {
         get => manaCurrent;
         set => SetField(ref manaCurrent, Math.Min(value, ManaMaximum));
     }
-
-    [Export]
-    public float ManaMaximum { get; set; } = 100;
 
     public event EquipmentChangedEventHandler EquipmentChanged;
 

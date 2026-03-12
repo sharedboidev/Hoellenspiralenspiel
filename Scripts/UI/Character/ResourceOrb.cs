@@ -52,6 +52,12 @@ public partial class ResourceOrb : Control
 		type         = resourceTypetype;
 		MaxRessource = type == ResourceType.Life ? player.LifeMaximum : player.ManaMaximum;
 		current      = type == ResourceType.Life ? player.LifeCurrent : player.ManaCurrent;
+
+		if (player.ManaCurrent > player.ManaMaximum)
+			player.ManaCurrent = player.ManaMaximum;
+
+		if (player.LifeCurrent > player.LifeMaximum)
+			player.LifeCurrent = player.LifeMaximum;
 	}
 
 	private void SetPositionInViewport(ResourceType resourceTypetype)
