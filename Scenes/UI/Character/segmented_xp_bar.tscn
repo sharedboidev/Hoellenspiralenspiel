@@ -23,3 +23,16 @@ value = 34.0
 texture_under = ExtResource("1_gnj7t")
 texture_over = ExtResource("2_heuy4")
 texture_progress = ExtResource("3_254g7")
+
+[node name="XpDisplay" type="Label" parent="PanelContainer" unique_id=1937570093]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 46
+text = "999999/999999"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="mouse_entered" from="PanelContainer/Bar" to="." method="_on_bar_mouse_entered"]
+[connection signal="mouse_exited" from="PanelContainer/Bar" to="." method="_on_bar_mouse_exited"]
