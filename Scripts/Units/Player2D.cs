@@ -22,6 +22,7 @@ public class FireballContainer { }
 public partial class Player2D : BaseUnit
 {
     public delegate void EquipmentChangedEventHandler();
+    public delegate void LeveledUpEventHandler(Player2D player);
 
     private readonly PackedScene     skillBarIcon = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
     private readonly List<BaseSkill> skills       = new();
@@ -65,6 +66,8 @@ public partial class Player2D : BaseUnit
 
     public event EquipmentChangedEventHandler EquipmentChanged;
 
+    public event LeveledUpEventHandler LeveledUp;
+
     public override void _Ready()
     {
         ManaCurrent = ManaMaximum;
@@ -105,6 +108,8 @@ public partial class Player2D : BaseUnit
         Level++;
 
         XpForNextLevel = XpTable.GetTotalXpNeededForLevel(Level + 1);
+
+        LeveledUp?.Invoke(this);
     }
 
     public int GetRequiredAttributevalue(Requirement requirement)
