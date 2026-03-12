@@ -15,6 +15,8 @@ public abstract partial class BaseUnit
         : CharacterBody2D,
           INotifyPropertyChanged
 {
+    public delegate void DiedEventHandler(BaseUnit unit);
+
     private float   lifeCurrent;
     private Vector2 movementDirection = Vector2.Zero;
     private float   AwarenessAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Awareness);
@@ -126,7 +128,10 @@ public abstract partial class BaseUnit
     public List<CombatStatModifier>          CombatStatModifiers { get; protected set; } = new();
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public override void _PhysicsProcess(double delta) => ResolveLifeReg(delta);
+    public event DiedEventHandler Died;
+
+    public override void _PhysicsProcess(double delta)
+        => ResolveLifeReg(delta);
 
     public virtual void ReceiveDamage(HitResult hit)
     {
@@ -185,7 +190,11 @@ public abstract partial class BaseUnit
     }
 
     protected virtual void DieProperly()
-        => QueueFree();
+    {
+        Died?.Invoke(this);
+        
+        QueueFree();
+    }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

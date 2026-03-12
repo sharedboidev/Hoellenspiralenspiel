@@ -51,8 +51,10 @@ public partial class Player2D : BaseUnit
         private set => SetField(ref xpTotal, value);
     }
 
-    public long XpForNextLevel { get; private set; }
-    public int  Level          { get; private set; } = 1;
+    public long XpForNextLevel      { get; private set; }
+    public int  Level               { get; private set; } = 1;
+    public long XpDelta             => XpTotal - XpFloorCurrentLevel;
+    public long XpFloorCurrentLevel => XpTable.GetTotalXpNeededForLevel(Level);
 
     [Export]
     public float ManaCurrent

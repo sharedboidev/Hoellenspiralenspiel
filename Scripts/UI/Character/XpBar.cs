@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Units;
 
@@ -7,11 +8,21 @@ public partial class XpBar : Control
 {
     private TextureProgressBar xpBar;
     private Label              xpDisplayLabel;
+    private Player2D           player;
 
     public override void _Ready()
     {
         LoadNodes();
         SetPositionInViewport();
+        SetValues();
+    }
+
+    private void SetValues()
+    {
+        SetBorderValues();
+        SetCurrentValue();
+
+        xpDisplayLabel.Text = $"{xpBar.Value:N0}/{xpBar.MaxValue:N0}";
     }
 
     private void SetPositionInViewport()
@@ -24,20 +35,33 @@ public partial class XpBar : Control
         Position = new Vector2(xPositionBar, yPositionBar);
     }
 
-    public void SetMaxValue(Player2D player)
+    public void SetBorderValues()
     {
-        
+        xpBar.MinValue = 0;
+        xpBar.MaxValue = player.XpForNextLevel - player.XpFloorCurrentLevel;
     }
 
-    public void SetCurrentValue(Player2D player)
-    {
-        
-    }
+    public void SetCurrentValue()
+        => xpBar.Value = player.XpDelta;
 
     private void LoadNodes()
     {
         xpBar          = GetNode<TextureProgressBar>("%Bar");
         xpDisplayLabel = GetNode<Label>("%XpDisplay");
+        player         = GetTree().CurrentScene.GetNodeOrNull<Player2D>("%Player 2D");
+        
+        if(player is null)
+            return;
+        
+        player.PropertyChanged += PlayerOnPropertyChanged;
+    }
+
+    private void PlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if(e.PropertyName != nameof(Player2D.XpTotal))
+            return;
+
+        SetValues();
     }
 
     public void _on_bar_mouse_exited()

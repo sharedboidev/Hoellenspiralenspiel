@@ -18,6 +18,9 @@ public abstract partial class BaseEnemy : BaseUnit
     public             string         SpawnGroup  { get; set; }
 
     [Export]
+    public int XpGranted { get; set; } = 100;
+
+    [Export]
     public bool IsAggressive { get; set; }
 
     [Export]
@@ -36,6 +39,8 @@ public abstract partial class BaseEnemy : BaseUnit
     public string LootTableId { get; set; }
 
     protected AnimationTree AnimationTree { get; set; }
+
+    protected abstract Sprite2D MovementSprite { get; }
 
     public override void _Ready()
     {
@@ -61,26 +66,26 @@ public abstract partial class BaseEnemy : BaseUnit
             case Animation.DieLeft or Animation.DieRight or Animation.DieTop or Animation.DieDown:
                 healthbar.Visible = false;
                 SetAsOnlyVisibleSprite(deathSprite);
+
                 break;
             case Animation.RunLeft or Animation.RunRight or Animation.RunTop or Animation.RunDown:
                 SetAsOnlyVisibleSprite(runSprite);
+
                 break;
             case Animation.AttackLeft or Animation.AttackRight or Animation.AttackTop or Animation.AttackDown:
                 SetAsOnlyVisibleSprite(attackSprite);
+
                 break;
             case Animation.IdleLeft or Animation.IdleRight or Animation.IdleTop or Animation.IdleDown:
                 SetAsOnlyVisibleSprite(idleSprite);
+
                 break;
         }
     }
-    
-    protected abstract Sprite2D MovementSprite { get; }
 
-    public void SetHighlight(bool active)   
-    {
-        MovementSprite.SelfModulate = active ? new Color(3f,1f, 2.0f, 1.0f) : new Color(1, 1, 1, 1);
-    }
-    
+    public void SetHighlight(bool active)
+        => MovementSprite.SelfModulate = active ? new Color(3f, 1f, 2.0f) : new Color(1, 1, 1);
+
     private void AnimationTreeOnAnimationFinished(StringName animname)
     {
         if (animname == Animation.DieLeft || animname == Animation.DieRight || animname == Animation.DieTop || animname == Animation.DieDown)
@@ -136,8 +141,11 @@ public abstract partial class BaseEnemy : BaseUnit
                 IsAggressive      = true;
             }
         }
-        else if (e.PropertyName == nameof(MovementDirection) && MovementDirection.Length() > 0.0f)
-            SetAsOnlyVisibleSprite(runSprite);//Hack, die Statemachine im Animationtree Startet die Animation nicht mehr
+        else
+        {
+            if (e.PropertyName == nameof(MovementDirection) && MovementDirection.Length() > 0.0f)
+                SetAsOnlyVisibleSprite(runSprite); //Hack, die Statemachine im Animationtree Startet die Animation nicht mehr
+        }
     }
 
     protected override void DieProperly()
@@ -159,6 +167,7 @@ public abstract partial class BaseEnemy : BaseUnit
         if (!IsAggressive || IsDead || ChasedPlayer.IsDead)
         {
             MovementDirection = Vector2.Zero;
+
             return;
         }
 
