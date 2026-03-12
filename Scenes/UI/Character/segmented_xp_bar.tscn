@@ -8,7 +8,7 @@
 [node name="SegmentedXpBar" type="Control" unique_id=843338992]
 layout_mode = 3
 anchors_preset = 0
-scale = Vector2(0.75, 0.75)
+scale = Vector2(0.6, 0.6)
 script = ExtResource("1_heuy4")
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=2077831070]

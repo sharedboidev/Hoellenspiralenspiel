@@ -12,9 +12,9 @@ public partial class XpBar : Control
 
         var viewportSize = GetViewportRect().Size;
 
-        var xPositionBar = viewportSize.X - xpBar.Size.X;
-        var yPositionBar = viewportSize.Y - xpBar.Size.Y +10;
+        var xPositionBar = (viewportSize.X - xpBar.Size.X * Scale.X) / 2;
+        var yPositionBar = viewportSize.Y - xpBar.Size.Y * Scale.Y - 10;
 
-        Position = new Vector2(xPositionBar, yPositionBar);
+        GlobalPosition = new Vector2(xPositionBar, yPositionBar);
     }
 }
