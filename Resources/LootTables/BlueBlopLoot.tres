@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://bmnr4uijb76uv" path="res://Scenes/Items/Weapons/Swords/wooden_sword.tscn" id="5_x3xyj"]
 [ext_resource type="PackedScene" uid="uid://ce6vr0pknckbm" path="res://Scenes/Items/Armors/Helmets/gugel.tscn" id="6_pcy66"]
 [ext_resource type="PackedScene" uid="uid://dhbbe7mkkfcdl" path="res://Scenes/Items/Armors/Torsos/peasant_tunic.tscn" id="7_dgrxi"]
+[ext_resource type="PackedScene" uid="uid://u05e4wlngiwk" path="res://Scenes/Items/Armors/Gloves/wool_gloves.tscn" id="8_b62sa"]
 
 [sub_resource type="Resource" id="Resource_lvq8t"]
 script = ExtResource("1_lvq8t")
@@ -47,7 +48,13 @@ ItemScene = ExtResource("7_dgrxi")
 Weight = 1000.0
 metadata/_custom_type_script = "uid://bg22hx7k8vipe"
 
+[sub_resource type="Resource" id="Resource_7ois7"]
+script = ExtResource("1_lvq8t")
+ItemScene = ExtResource("8_b62sa")
+Weight = 1000.0
+metadata/_custom_type_script = "uid://bg22hx7k8vipe"
+
 [resource]
 script = ExtResource("2_5w23i")
 TableId = "blue_blob_loot"
-Entries = Array[ExtResource("1_lvq8t")]([SubResource("Resource_lvq8t"), SubResource("Resource_5w23i"), SubResource("Resource_g3b5r"), SubResource("Resource_x3xyj"), SubResource("Resource_pcy66"), SubResource("Resource_dgrxi"), SubResource("Resource_b62sa")])
+Entries = Array[ExtResource("1_lvq8t")]([SubResource("Resource_lvq8t"), SubResource("Resource_5w23i"), SubResource("Resource_g3b5r"), SubResource("Resource_x3xyj"), SubResource("Resource_pcy66"), SubResource("Resource_dgrxi"), SubResource("Resource_b62sa"), SubResource("Resource_7ois7")])

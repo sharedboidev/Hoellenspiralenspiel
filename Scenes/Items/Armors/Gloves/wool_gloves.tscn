@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://u05e4wlngiwk"]
+
+[ext_resource type="PackedScene" uid="uid://cjf203yhhwo42" path="res://Scenes/Items/Weapons/base_weapon.tscn" id="1_743jk"]
+[ext_resource type="Script" uid="uid://by73fhhq53xa0" path="res://Scripts/Items/Armors/Gloves/WoolGloves.cs" id="2_loo4a"]
+[ext_resource type="Texture2D" uid="uid://dgsjcn1x6xnn2" path="res://Textures/Items/Armor/Gloves/wool_gloves.png" id="3_pdr4u"]
+
+[node name="WoolGloves" unique_id=839299820 node_paths=PackedStringArray("Icon") instance=ExtResource("1_743jk")]
+script = ExtResource("2_loo4a")
+ArmorvalueBase = 10
+Icon = NodePath("Icon")
+SlotSize = Vector2(2, 2)
+Requirements = Dictionary[int, int]({
+5: 1
+})
+
+[node name="Icon" parent="." index="0" unique_id=732627025]
+texture = ExtResource("3_pdr4u")
