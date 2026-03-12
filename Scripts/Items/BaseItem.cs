@@ -217,10 +217,18 @@ public abstract partial class BaseItem
 
     protected void SetAffixedItembaseName()
     {
-        var prefix = ItemModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Prefix);
-        var suffix = ItemModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Suffix);
+        try
+        {
+            var prefix = ItemModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Prefix);
+            var suffix = ItemModifiers.FirstOrDefault(mod => mod.AffixType == AffixType.Suffix);
 
-        AffixedItembaseName = $"{prefix?.ItemnameAddition} " + ItembaseName + $" {suffix?.ItemnameAddition}";
+            AffixedItembaseName = $"{prefix?.ItemnameAddition} " + ItembaseName + $" {suffix?.ItemnameAddition}";
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     protected virtual void SetExceptionalName() { }

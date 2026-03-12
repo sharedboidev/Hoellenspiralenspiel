@@ -35,7 +35,7 @@ public abstract class BaseSkill
 
     public HitResult MakeRealDamage(BaseUnit target)
     {
-        var val              = critRng.Next(1, 101);
+        var val              = critRng.Next(0, 101);
         var isCrit           = val <= baseCritRate;
         var rolledBaseDamage = (float)baseDamageRng.Next(baseDamageMin, baseDamageMax + 1);
 
