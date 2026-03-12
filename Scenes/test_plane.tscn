@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://carsjy7sm2ntw" path="res://Scenes/UI/hotkey_info.tscn" id="10_v18oo"]
 [ext_resource type="AudioStream" uid="uid://dxpktdn4a3wtf" path="res://Audio/Background/guess what.mp3" id="11_olf6n"]
 [ext_resource type="PackedScene" uid="uid://ce03tbl6it2fh" path="res://Scenes/Spells/lightning_strike.tscn" id="14_2sot3"]
+[ext_resource type="PackedScene" uid="uid://c5g22iexdnhsv" path="res://Scenes/UI/Character/segmented_xp_bar.tscn" id="14_mor0q"]
 
 [sub_resource type="Environment" id="Environment_bjuw8"]
 background_mode = 3
@@ -167,6 +168,8 @@ offset_left = 23.0
 offset_top = 23.0
 offset_right = 233.0
 offset_bottom = 177.0
+
+[node name="SegmentedXpBar" parent="CanvasLayer" unique_id=843338992 instance=ExtResource("14_mor0q")]
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=1896865411]
 stream = ExtResource("11_olf6n")

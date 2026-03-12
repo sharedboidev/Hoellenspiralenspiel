@@ -65,11 +65,12 @@ public partial class ResourceOrb : Control
 		var viewportSize   = GetViewportRect().Size;
 		var viewportWidth  = viewportSize.X;
 		var viewportHeight = viewportSize.Y;
+		var offsetPx       = 64;
 
 		var orbPosition = resourceTypetype switch
 		{
-			ResourceType.Life => new Vector2(viewportWidth / 4 - Size.X / 2, viewportHeight - Size.Y),
-			ResourceType.Mana => new Vector2(viewportWidth * 3 / 4 - Size.X / 2, viewportHeight - Size.Y),
+			ResourceType.Life => new Vector2(viewportWidth / 4 - Size.X / 2, viewportHeight - Size.Y - offsetPx),
+			ResourceType.Mana => new Vector2(viewportWidth * 3 / 4 - Size.X / 2, viewportHeight - Size.Y - offsetPx),
 			_ => Vector2.Zero
 		};
 
