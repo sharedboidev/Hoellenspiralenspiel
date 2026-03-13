@@ -1,5 +1,4 @@
 using Godot;
-using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
@@ -22,8 +21,8 @@ public partial class Statdisplay : PanelContainer
     private          RichTextLabel  lightningResiLabel;
     private          RichTextLabel  meleeCritChanceLabel;
     private          RichTextLabel  movementspeedLabel;
-    private          RichTextLabel  strengthLabel;
     private          RichTextLabel  spellDamageLabel;
+    private          RichTextLabel  strengthLabel;
 
     public override void _Ready()
     {
@@ -48,7 +47,7 @@ public partial class Statdisplay : PanelContainer
         meleeCritChanceLabel.Text = equipmentPanel.GetTotalMeleeCritChance().ToString("0.##") + "%";
         critDamageLabel.Text      = "+" + equipmentPanel.GetTotalCriticalDamage().ToString("N0") + "%";
         attackspeedLabel.Text     = "+" + equipmentPanel.GetTotalIncreasedAttackspeed().ToString("N0") + "%";
-        spellDamageLabel.Text     = "+" + (player.GetModifierSumOf(ModificationType.Percentage, CombatStat.SpellDamage) * 100).ToString("N0") + "%";
+        spellDamageLabel.Text     = "+" + ((1 - player.SpellDamagePercentageMultiplier * player.SpellDamageMoreMultiplierTotal) * 100).ToString("N0") + "%";
     }
 
     private void RenderDefences(Player2D player)

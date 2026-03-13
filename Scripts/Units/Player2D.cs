@@ -22,27 +22,27 @@ public class FireballContainer { }
 public partial class Player2D : BaseUnit
 {
     public delegate void EquipmentChangedEventHandler();
+
     public delegate void LeveledUpEventHandler(Player2D player);
 
     private readonly PackedScene     skillBarIcon = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
     private readonly List<BaseSkill> skills       = new();
+    private          LevelUpEffect   levelUpEffect;
     [Export] private ResourceOrb     lifeOrb;
     private          float           manaCurrent;
     [Export] private ResourceOrb     manaOrb;
     private          float           manaProSekunde = .5f;
     [Export] public  HBoxContainer   SkillBar;
     private          long            xpTotal;
-    private          LevelUpEffect  levelUpEffect;
     private          AnimationTree   AnimationTree { get; set; }
 
     [Export]
     public AudioStreamPlayer2D NoManaSound { get; set; }
 
-    public int ManaBase => 3 + AwarenessFinal + 5 * IntelligenceFinal;
-
+    public  int   ManaBase                 => 3 + AwarenessFinal + 5 * IntelligenceFinal;
     private float ManaAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Mana);
     private float ManaPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Mana);
-    private float ManaMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Mana);
+    public float ManaMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Mana);
     public  float ManaMaximum              => (int)((ManaBase + ManaAddedFlat) * ManaPercentageMultiplier * ManaMoreMultiplierTotal);
 
     public long XpTotal
@@ -64,8 +64,7 @@ public partial class Player2D : BaseUnit
     }
 
     public event EquipmentChangedEventHandler EquipmentChanged;
-
-    public event LeveledUpEventHandler LeveledUp;
+    public event LeveledUpEventHandler        LeveledUp;
 
     public override void _Ready()
     {
@@ -117,13 +116,13 @@ public partial class Player2D : BaseUnit
     public int GetRequiredAttributevalue(Requirement requirement)
         => requirement switch
         {
-            Requirement.Strength       => StrengthFinal,
-            Requirement.Dexterity      => DexterityFinal,
-            Requirement.Intelligence   => IntelligenceFinal,
-            Requirement.Constitution   => ConstitutionFinal,
-            Requirement.Awareness      => AwarenessFinal,
+            Requirement.Strength => StrengthFinal,
+            Requirement.Dexterity => DexterityFinal,
+            Requirement.Intelligence => IntelligenceFinal,
+            Requirement.Constitution => ConstitutionFinal,
+            Requirement.Awareness => AwarenessFinal,
             Requirement.CharacterLevel => Level,
-            _                          => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null)
         };
 
     private void ConfigureSkillbar()
@@ -261,8 +260,9 @@ public partial class Player2D : BaseUnit
 
     public void UnequipItem(BaseItem item)
     {
-        var modifierToRemove = CombatStatModifiers.Where(mod => mod.OriginId == item.ToString()).ToList();
-        CombatStatModifiers = CombatStatModifiers.Except(modifierToRemove).ToList();
+        var itemId = item.ToString();
+
+        RemoveModifiers(itemId);
 
         EquipmentChanged?.Invoke();
     }
