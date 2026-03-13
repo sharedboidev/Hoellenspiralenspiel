@@ -32,8 +32,8 @@ public partial class Player2D : BaseUnit
     private          float           manaProSekunde = 5f;
     [Export] public  HBoxContainer   SkillBar;
     private          long            xpTotal;
-
-    private AnimationTree AnimationTree { get; set; }
+    private          LevelUpEffect  levelUpEffect;
+    private          AnimationTree   AnimationTree { get; set; }
 
     [Export]
     public AudioStreamPlayer2D NoManaSound { get; set; }
@@ -83,6 +83,7 @@ public partial class Player2D : BaseUnit
         ConfigureSkillbar();
 
         AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
+        levelUpEffect = GetNode<LevelUpEffect>(nameof(LevelUpEffect));
         //AnimationTree = GetNode<AnimationTree>("AnimationTreeNEW");
     }
 
@@ -108,6 +109,8 @@ public partial class Player2D : BaseUnit
         Level++;
 
         XpForNextLevel = XpTable.GetTotalXpNeededForLevel(Level + 1);
+
+        levelUpEffect.EmitEffect();
 
         LeveledUp?.Invoke(this);
     }
