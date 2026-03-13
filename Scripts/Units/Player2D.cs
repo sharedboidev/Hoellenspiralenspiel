@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Enums;
@@ -11,6 +12,7 @@ using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.UI.Character;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
+using Hoellenspiralenspiel.Scripts.Utils;
 using ResourceOrb = Hoellenspiralenspiel.Scripts.UI.Character.ResourceOrb;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
@@ -21,26 +23,39 @@ public partial class Player2D : BaseUnit
 {
     public delegate void EquipmentChangedEventHandler();
 
+    public delegate void LeveledUpEventHandler(Player2D player);
+
     private readonly PackedScene     skillBarIcon = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
     private readonly List<BaseSkill> skills       = new();
+    private          LevelUpEffect   levelUpEffect;
     [Export] private ResourceOrb     lifeOrb;
     private          float           manaCurrent;
     [Export] private ResourceOrb     manaOrb;
-    private          float           manaProSekunde = 5f;
+    private          float           manaProSekunde = .5f;
     [Export] public  HBoxContainer   SkillBar;
+    private          long            xpTotal;
     private          AnimationTree   AnimationTree { get; set; }
-    public           int             Level         { get; set; } = 1;
 
     [Export]
     public AudioStreamPlayer2D NoManaSound { get; set; }
 
-    [Export]
-    public int    ManaBase { get; set; } = 60;
+    public  int   ManaBase                 => 3 + AwarenessFinal + 5 * IntelligenceFinal;
     private float ManaAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Mana);
     private float ManaPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Mana);
-    private float ManaMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Mana);
+    public  float ManaMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Mana);
     public  float ManaMaximum              => (int)((ManaBase + ManaAddedFlat) * ManaPercentageMultiplier * ManaMoreMultiplierTotal);
 
+    public long XpTotal
+    {
+        get => xpTotal;
+        private set => SetField(ref xpTotal, value);
+    }
+
+    public long XpForNextLevel                { get; private set; }
+    public int  Level                         { get; private set; } = 1;
+    public long XpDelta                       => XpTotal - XpFloorCurrentLevel;
+    public long XpFloorCurrentLevel           => XpTable.GetTotalXpNeededForLevel(Level);
+    public int  AttributePointsAllowedToSpend { get; set; }
 
     [Export]
     public float ManaCurrent
@@ -50,6 +65,7 @@ public partial class Player2D : BaseUnit
     }
 
     public event EquipmentChangedEventHandler EquipmentChanged;
+    public event LeveledUpEventHandler        LeveledUp;
 
     public override void _Ready()
     {
@@ -58,24 +74,57 @@ public partial class Player2D : BaseUnit
         lifeOrb.Init(this, ResourceType.Life);
         manaOrb.Init(this, ResourceType.Mana);
 
+        XpForNextLevel  =  XpTable.GetTotalXpNeededForLevel(Level + 1);
+        PropertyChanged += OnPropertyChanged;
+
         base._Ready();
 
         ConfigureSkillbar();
 
         AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
+        levelUpEffect = GetNode<LevelUpEffect>(nameof(LevelUpEffect));
         //AnimationTree = GetNode<AnimationTree>("AnimationTreeNEW");
+    }
+
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(XpTotal) && XpTotal >= XpForNextLevel)
+            LevelUp();
+    }
+
+    public void GainExperience(int experienceGained)
+        => XpTotal += experienceGained;
+
+    public void LoseExperience(int experienceLost)
+    {
+        var xpNeededForCurrentLevel = XpTable.GetTotalXpNeededForLevel(Level);
+        var totalXpDelta            = XpTotal - experienceLost;
+
+        XpTotal = Math.Max(xpNeededForCurrentLevel, totalXpDelta);
+    }
+
+    public void LevelUp()
+    {
+        Level++;
+        AttributePointsAllowedToSpend++;
+        
+        XpForNextLevel = XpTable.GetTotalXpNeededForLevel(Level + 1);
+
+        levelUpEffect.Emit();
+        
+        LeveledUp?.Invoke(this);
     }
 
     public int GetRequiredAttributevalue(Requirement requirement)
         => requirement switch
         {
-            Requirement.Strength => StrengthFinal,
-            Requirement.Dexterity => DexterityFinal,
-            Requirement.Intelligence => IntelligenceFinal,
-            Requirement.Constitution => ConstitutionFinal,
-            Requirement.Awareness => AwarenessFinal,
+            Requirement.Strength       => StrengthFinal,
+            Requirement.Dexterity      => DexterityFinal,
+            Requirement.Intelligence   => IntelligenceFinal,
+            Requirement.Constitution   => ConstitutionFinal,
+            Requirement.Awareness      => AwarenessFinal,
             Requirement.CharacterLevel => Level,
-            _ => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null)
+            _                          => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null)
         };
 
     private void ConfigureSkillbar()
@@ -197,10 +246,7 @@ public partial class Player2D : BaseUnit
     public void EquipItem(BaseItem item)
     {
         if (item is BaseArmor armor)
-        {
-            var flatArmorMod = item.CreateCombatStatModifier(CombatStat.Armor, ModificationType.Flat, armor.ArmorvalueFinal);
-            CombatStatModifiers.Add(flatArmorMod);
-        }
+            ArmorBase += armor.ArmorvalueFinal;
 
         foreach (var modifier in item.GetExtrinsicModifiers())
         {
@@ -213,8 +259,12 @@ public partial class Player2D : BaseUnit
 
     public void UnequipItem(BaseItem item)
     {
-        var modifierToRemove = CombatStatModifiers.Where(mod => mod.OriginId == item.ToString()).ToList();
-        CombatStatModifiers = CombatStatModifiers.Except(modifierToRemove).ToList();
+        if (item is BaseArmor armor)
+            ArmorBase -= armor.ArmorvalueFinal;
+        
+        var itemId = item.ToString();
+
+        RemoveModifiers(itemId);
 
         EquipmentChanged?.Invoke();
     }

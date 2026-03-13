@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Godot;
+using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
@@ -35,9 +36,16 @@ public partial class ResourceOrb : Control
 		SetPositionInViewport(resourceTypetype);
 
 		player.PropertyChanged += PlayerOnPropertyChanged;
+		player.AttributeChanged += PlayerOnAttributeChanged;
 		player.EquipmentChanged += PlayerOnEquipmentChanged;
 
 		ApplyColor();
+		SetRessource(current);
+	}
+
+	private void PlayerOnAttributeChanged(CombatStat attribute, int value)
+	{
+		SetRessourceValues(type);
 		SetRessource(current);
 	}
 
@@ -65,11 +73,12 @@ public partial class ResourceOrb : Control
 		var viewportSize   = GetViewportRect().Size;
 		var viewportWidth  = viewportSize.X;
 		var viewportHeight = viewportSize.Y;
+		var offsetPx       = 64;
 
 		var orbPosition = resourceTypetype switch
 		{
-			ResourceType.Life => new Vector2(viewportWidth / 4 - Size.X / 2, viewportHeight - Size.Y),
-			ResourceType.Mana => new Vector2(viewportWidth * 3 / 4 - Size.X / 2, viewportHeight - Size.Y),
+			ResourceType.Life => new Vector2(viewportWidth / 4 - Size.X / 2, viewportHeight - Size.Y - offsetPx),
+			ResourceType.Mana => new Vector2(viewportWidth * 3 / 4 - Size.X / 2, viewportHeight - Size.Y - offsetPx),
 			_ => Vector2.Zero
 		};
 

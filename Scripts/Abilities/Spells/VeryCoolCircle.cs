@@ -1,9 +1,8 @@
 using System;
 using Godot;
-using Hoellenspiralenspiel.Scripts.Abilities;
-using Hoellenspiralenspiel.Scripts.Abilities.Spells;
-using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
+
+namespace Hoellenspiralenspiel.Scripts.Abilities.Spells;
 
 public partial class VeryCoolCircle
         : Area2D,
@@ -26,7 +25,6 @@ public partial class VeryCoolCircle
 
     public override void _Ready()
     {
-        // Signale verbinden
         BodyEntered += OnBodyEntered;
         BodyExited  += OnBodyExited;
     }

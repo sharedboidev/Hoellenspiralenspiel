@@ -10,6 +10,7 @@ public partial class CharacterSheet : Control
 {
     [Export] private EquipmentPanel equipmentPanel;
     [Export] private Inventory      inventory;
+    private          LevelDisplay   levelDisplay;
     [Export] private Player2D       player;
     private          Statdisplay    statdisplay;
     [Export] private int            viewportMarginHeightPx;
@@ -18,20 +19,43 @@ public partial class CharacterSheet : Control
     public override void _Ready()
     {
         SetPositionRelativeToViewport();
-
-        statdisplay = GetNode<Statdisplay>(nameof(Statdisplay));
-        statdisplay.Render(player);
-
-        inventory.EquippingItem += OnEquippingItem;
-
-        GetNode<EquipmentPanel>("%" + nameof(EquipmentPanel)).EquipmentChanged += OnEquipmentChanged;
-        GetNode<StatdisplayButton>(nameof(StatdisplayButton)).Pressed          += OnPressed;
+        ConfigureStatDisplay();
+        SubscribeEquipmentEvents();
+        ConfigureLevelDisplay();
 
         SetVisible(false);
     }
 
+    private void ConfigureStatDisplay()
+    {
+        statdisplay = GetNode<Statdisplay>(nameof(Statdisplay));
+        statdisplay.Render(player);
+    }
+
+    private void SubscribeEquipmentEvents()
+    {
+        inventory.EquippingItem += OnEquippingItem;
+
+        GetNode<EquipmentPanel>("%" + nameof(EquipmentPanel)).EquipmentChanged += OnEquipmentChanged;
+        GetNode<StatdisplayButton>(nameof(StatdisplayButton)).Pressed          += OnPressed;
+    }
+
+    private void ConfigureLevelDisplay()
+    {
+        levelDisplay = GetNode<LevelDisplay>("%" + nameof(LevelDisplay));
+        SetDisplayedLevel();
+        player.LeveledUp += PlayerOnLeveledUp;
+    }
+
+    private void SetDisplayedLevel() => levelDisplay.SetDisplayedValue(player.Level);
+
+    private void PlayerOnLeveledUp(Player2D player2D) => SetDisplayedLevel();
+
     private void OnPressed(bool isToggledOpen)
-        => statdisplay.Visible = isToggledOpen;
+    {
+        statdisplay.Render(player);
+        statdisplay.Visible = isToggledOpen;
+    }
 
     private void OnEquipmentChanged(object formerlyEqipped, object newlyEquipped)
     {

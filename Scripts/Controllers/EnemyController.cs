@@ -97,10 +97,19 @@ public partial class EnemyController : Node
             spawn.Position        =  spawnMarker.GetSpawnlocationFor(i);
             spawn.SpawnGroup      =  spawnMarker.Name;
             spawn.PropertyChanged += SpawnOnPropertyChanged;
+            spawn.Died += SpawnOnDied;
 
             SpawnedEnemies.Add(spawn);
             container.AddChild(spawn);
         }
+    }
+
+    private void SpawnOnDied(BaseUnit unit)
+    {
+        if(unit is not BaseEnemy enemy)
+            return;
+        
+        player.GainExperience(enemy.XpGranted);
     }
 
     private void SpawnOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -112,7 +121,8 @@ public partial class EnemyController : Node
             SpawnLootbag(enemy);
         else
         {
-            if (enemy.LifeCurrent < enemy.LifeMaximum)
+            //if (enemy.LifeCurrent < enemy.LifeMaximum)
+            if (enemy.IsAggressive)
                 AggroMyGroup(enemy);
         }
     }

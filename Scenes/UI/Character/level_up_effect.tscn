@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://7bftruy13awp"]
+
+[ext_resource type="Script" uid="uid://dgdrachl0ntnq" path="res://Scripts/UI/Character/LevelUpEffect.cs" id="1_q6juh"]
+[ext_resource type="Texture2D" uid="uid://r2j056ihtbx7" path="res://Textures/UI/LevelUp/star.png" id="1_y1e3a"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_q8mvb"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="Gradient_q8mvb"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1, 0.9137255, 0.3019608, 1, 1, 0.54901963, 0, 1, 1, 1, 1, 0)
+metadata/_snap_enabled = true
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_q6juh"]
+gradient = SubResource("Gradient_q8mvb")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_q8mvb"]
+particle_flag_disable_z = true
+direction = Vector3(0, -1, 0)
+spread = 90.0
+initial_velocity_min = 100.0
+initial_velocity_max = 400.0
+gravity = Vector3(0, -40, 0)
+scale_min = 0.5
+scale_max = 3.0
+color = Color(1, 1, 0, 1)
+color_ramp = SubResource("GradientTexture1D_q6juh")
+
+[node name="LevelUpEffect" type="GPUParticles2D" unique_id=437055580]
+material = SubResource("CanvasItemMaterial_q8mvb")
+emitting = false
+amount = 128
+texture = ExtResource("1_y1e3a")
+lifetime = 1.2
+one_shot = true
+explosiveness = 0.85
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_q8mvb")
+script = ExtResource("1_q6juh")
