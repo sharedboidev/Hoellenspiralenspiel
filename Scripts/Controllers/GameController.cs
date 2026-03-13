@@ -27,7 +27,13 @@ public partial class GameController : Node
         => levelUpDialog.ShowDialog();
 
     private void PlayerOnLeveledUp(Player2D player2D)
-        => openLevelUpDialogButton.Visible = true;
+    {
+        openLevelUpDialogButton.SpendablePointLabel.Text = player2D.AttributePointsAllowedToSpend < 10 
+                ? $"  {player2D.AttributePointsAllowedToSpend}" 
+                : $"{player2D.AttributePointsAllowedToSpend}";
+
+        openLevelUpDialogButton.Visible = true;
+    }
 
     private void LoadNodes()
     {

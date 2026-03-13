@@ -70,6 +70,8 @@ public partial class LevelUpDialog : Control
 
         GD.Print($"{attribute} raised");
 
-        Visible = false;
+        player.AttributePointsAllowedToSpend--;
+        
+        Visible = player.AttributePointsAllowedToSpend > 0;
     }
 }

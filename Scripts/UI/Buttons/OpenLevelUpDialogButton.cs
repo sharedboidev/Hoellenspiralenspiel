@@ -6,10 +6,16 @@ public partial class OpenLevelUpDialogButton : TextureButton
 {
     public delegate void OpenDialogPressedEventHandler();
 
+    public Label SpendablePointLabel { get; set; }
+
     public event OpenDialogPressedEventHandler OpenDialogPressed;
 
     public override void _Ready()
-        => SetPositionInViewport();
+    {
+        SpendablePointLabel = GetNode<Label>("%SpendablePointsLabel");
+
+        SetPositionInViewport();
+    }
 
     private void SetPositionInViewport()
     {

@@ -42,7 +42,7 @@ public partial class Player2D : BaseUnit
     public  int   ManaBase                 => 3 + AwarenessFinal + 5 * IntelligenceFinal;
     private float ManaAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Mana);
     private float ManaPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Mana);
-    public float ManaMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Mana);
+    public  float ManaMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Mana);
     public  float ManaMaximum              => (int)((ManaBase + ManaAddedFlat) * ManaPercentageMultiplier * ManaMoreMultiplierTotal);
 
     public long XpTotal
@@ -51,10 +51,11 @@ public partial class Player2D : BaseUnit
         private set => SetField(ref xpTotal, value);
     }
 
-    public long XpForNextLevel      { get; private set; }
-    public int  Level               { get; private set; } = 1;
-    public long XpDelta             => XpTotal - XpFloorCurrentLevel;
-    public long XpFloorCurrentLevel => XpTable.GetTotalXpNeededForLevel(Level);
+    public long XpForNextLevel                { get; private set; }
+    public int  Level                         { get; private set; } = 1;
+    public long XpDelta                       => XpTotal - XpFloorCurrentLevel;
+    public long XpFloorCurrentLevel           => XpTable.GetTotalXpNeededForLevel(Level);
+    public int  AttributePointsAllowedToSpend { get; set; }
 
     [Export]
     public float ManaCurrent
@@ -105,24 +106,25 @@ public partial class Player2D : BaseUnit
     public void LevelUp()
     {
         Level++;
-
+        AttributePointsAllowedToSpend++;
+        
         XpForNextLevel = XpTable.GetTotalXpNeededForLevel(Level + 1);
 
-        levelUpEffect.EmitEffect();
-
+        levelUpEffect.Emit();
+        
         LeveledUp?.Invoke(this);
     }
 
     public int GetRequiredAttributevalue(Requirement requirement)
         => requirement switch
         {
-            Requirement.Strength => StrengthFinal,
-            Requirement.Dexterity => DexterityFinal,
-            Requirement.Intelligence => IntelligenceFinal,
-            Requirement.Constitution => ConstitutionFinal,
-            Requirement.Awareness => AwarenessFinal,
+            Requirement.Strength       => StrengthFinal,
+            Requirement.Dexterity      => DexterityFinal,
+            Requirement.Intelligence   => IntelligenceFinal,
+            Requirement.Constitution   => ConstitutionFinal,
+            Requirement.Awareness      => AwarenessFinal,
             Requirement.CharacterLevel => Level,
-            _ => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null)
+            _                          => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null)
         };
 
     private void ConfigureSkillbar()

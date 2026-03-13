@@ -4,7 +4,7 @@ namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 public partial class LevelUpEffect : GpuParticles2D
 {
-    public void EmitEffect()
+    public void Emit()
     {
         // var scaleTween = CreateTween();
         // scaleTween.SetEase(Tween.EaseType.Out);

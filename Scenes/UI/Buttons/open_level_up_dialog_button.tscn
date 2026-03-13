@@ -24,4 +24,20 @@ texture = ExtResource("3_raysm")
 expand_mode = 1
 stretch_mode = 5
 
+[node name="SpendablePointsLabel" type="Label" parent="." unique_id=90044814]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -50.0
+offset_top = -50.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/outline_size = 9
+theme_override_font_sizes/font_size = 36
+text = "99"
+
 [connection signal="button_up" from="." to="." method="_on_open_level_up_dialog_button_up"]
