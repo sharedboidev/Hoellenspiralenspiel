@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://yynk3vg0ysux" path="res://Textures/UI/Buttons/Mini_arrow_left2.png" id="5_khxyl"]
 [ext_resource type="Texture2D" uid="uid://bvrchl6rqwbnk" path="res://Textures/UI/Buttons/Mini_arrow_left2_t.png" id="6_nfwpk"]
 [ext_resource type="Script" uid="uid://f2ew6yv6qad" path="res://Scripts/UI/Buttons/StatdisplayButton.cs" id="7_gx1ge"]
+[ext_resource type="PackedScene" uid="uid://bmjbmby5mg4jb" path="res://Scenes/UI/Character/level_display.tscn" id="8_nfwpk"]
 
 [node name="CharacterSheet" type="Control" unique_id=325839181 node_paths=PackedStringArray("equipmentPanel", "inventory")]
 layout_mode = 3
@@ -44,11 +45,20 @@ equipmentPanel = NodePath("../HBoxContainer/EquipmentPanel")
 [node name="StatdisplayButton" type="TextureButton" parent="." unique_id=1686612181]
 layout_mode = 0
 offset_left = 5.0
-offset_top = 5.0
+offset_top = 709.0
 offset_right = 45.0
-offset_bottom = 45.0
+offset_bottom = 749.0
 texture_normal = ExtResource("5_khxyl")
 texture_pressed = ExtResource("6_nfwpk")
 ignore_texture_size = true
 stretch_mode = 5
 script = ExtResource("7_gx1ge")
+
+[node name="LevelDisplay" parent="." unique_id=2139804953 instance=ExtResource("8_nfwpk")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -21.0
+offset_top = -21.0
+offset_right = 43.0
+offset_bottom = 43.0
+scale = Vector2(1.5, 1.5)

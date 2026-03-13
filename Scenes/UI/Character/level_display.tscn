@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://bmjbmby5mg4jb"]
+
+[ext_resource type="Texture2D" uid="uid://bruddb4xiq71u" path="res://Textures/UI/CharacterSheet/level_frame.png" id="1_3546u"]
+[ext_resource type="Script" uid="uid://dji5qrvnywymj" path="res://Scripts/UI/Character/LevelDisplay.cs" id="1_dx3qe"]
+
+[node name="LevelDisplay" type="PanelContainer" unique_id=2139804953]
+self_modulate = Color(1, 1, 1, 0)
+offset_right = 64.0
+offset_bottom = 64.0
+script = ExtResource("1_dx3qe")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1827175220]
+layout_mode = 2
+texture = ExtResource("1_3546u")
+stretch_mode = 3
+
+[node name="Label" type="Label" parent="." unique_id=1159544528]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 26
+text = "101"
+horizontal_alignment = 1
+vertical_alignment = 1
