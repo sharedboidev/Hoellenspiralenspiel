@@ -52,7 +52,10 @@ public partial class CharacterSheet : Control
     private void PlayerOnLeveledUp(Player2D player2D) => SetDisplayedLevel();
 
     private void OnPressed(bool isToggledOpen)
-        => statdisplay.Visible = isToggledOpen;
+    {
+        statdisplay.Render(player);
+        statdisplay.Visible = isToggledOpen;
+    }
 
     private void OnEquipmentChanged(object formerlyEqipped, object newlyEquipped)
     {

@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://3mk1pcudqb64"]
+
+[ext_resource type="Texture2D" uid="uid://y0iqyuva3bfv" path="res://Textures/UI/Buttons/Mini_add.png" id="1_0uo35"]
+[ext_resource type="Texture2D" uid="uid://buufynkwrhf60" path="res://Textures/UI/Buttons/Mini_add_t.png" id="2_raysm"]
+[ext_resource type="Script" uid="uid://dkk3kil65npf8" path="res://Scripts/UI/Buttons/OpenLevelUpDialogButton.cs" id="3_pej1q"]
+[ext_resource type="Texture2D" uid="uid://bkggweg84ei0q" path="res://Textures/UI/Buttons/double_border.png" id="3_raysm"]
+
+[node name="OpenLevelUpDialogButton" type="TextureButton" unique_id=328365873]
+custom_minimum_size = Vector2(128, 128)
+offset_right = 40.0
+offset_bottom = 40.0
+texture_normal = ExtResource("1_0uo35")
+texture_pressed = ExtResource("2_raysm")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_pej1q")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1190413472]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("3_raysm")
+expand_mode = 1
+stretch_mode = 5
+
+[connection signal="button_up" from="." to="." method="_on_open_level_up_dialog_button_up"]

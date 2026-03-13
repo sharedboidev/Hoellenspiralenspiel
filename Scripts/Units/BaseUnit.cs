@@ -96,7 +96,7 @@ public abstract partial class BaseUnit
     private void OnAttributeChanged(CombatStat attribute, int value)
     {
         var derivedStats = DerivedStatProvider.GetModifiersFor(attribute, value);
-        var modIds      = derivedStats.Select(stat => stat.OriginId).ToArray();
+        var modIds       = derivedStats.Select(stat => stat.OriginId).ToArray();
 
         foreach (var modId in modIds)
             RemoveModifiers(modId);
@@ -142,22 +142,27 @@ public abstract partial class BaseUnit
         {
             case nameof(StrengthBase):
                 AttributeChanged?.Invoke(CombatStat.Strength, StrengthFinal);
+
                 break;
 
             case nameof(DexterityBase):
                 AttributeChanged?.Invoke(CombatStat.Dexterity, DexterityFinal);
+
                 break;
 
             case nameof(IntelligenceBase):
                 AttributeChanged?.Invoke(CombatStat.Intelligence, IntelligenceFinal);
+
                 break;
 
             case nameof(ConstitutionBase):
                 AttributeChanged?.Invoke(CombatStat.Constitution, ConstitutionFinal);
+
                 break;
 
             case nameof(AwarenessBase):
                 AttributeChanged?.Invoke(CombatStat.Awareness, AwarenessFinal);
+
                 break;
         }
 
@@ -297,6 +302,7 @@ public abstract partial class BaseUnit
     public int   ArmorFinal                    => (int)((ArmorBase + ArmorAddedFlat) * ArmorPercentageMultiplier * ArmorMoreMultiplierTotal);
     public float MeleeParryMoreMultiplierTotal => GetTotalMoreMultiplierOf(CombatStat.MeleeParry);
     public float MeleeBlockMoreMultiplierTotal => GetTotalMoreMultiplierOf(CombatStat.MeleeBlock);
+    public float DodgeMoreMultiplierTotal      => GetTotalMoreMultiplierOf(CombatStat.Dodge);
 
     [Export]
     public int FireResiBase { get; set; }

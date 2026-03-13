@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Godot;
+using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
@@ -35,9 +36,16 @@ public partial class ResourceOrb : Control
 		SetPositionInViewport(resourceTypetype);
 
 		player.PropertyChanged += PlayerOnPropertyChanged;
+		player.AttributeChanged += PlayerOnAttributeChanged;
 		player.EquipmentChanged += PlayerOnEquipmentChanged;
 
 		ApplyColor();
+		SetRessource(current);
+	}
+
+	private void PlayerOnAttributeChanged(CombatStat attribute, int value)
+	{
+		SetRessourceValues(type);
 		SetRessource(current);
 	}
 

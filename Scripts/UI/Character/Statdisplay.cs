@@ -47,7 +47,7 @@ public partial class Statdisplay : PanelContainer
         meleeCritChanceLabel.Text = equipmentPanel.GetTotalMeleeCritChance().ToString("0.##") + "%";
         critDamageLabel.Text      = "+" + equipmentPanel.GetTotalCriticalDamage().ToString("N0") + "%";
         attackspeedLabel.Text     = "+" + equipmentPanel.GetTotalIncreasedAttackspeed().ToString("N0") + "%";
-        spellDamageLabel.Text     = "+" + ((1 - player.SpellDamagePercentageMultiplier * player.SpellDamageMoreMultiplierTotal) * 100).ToString("N0") + "%";
+        spellDamageLabel.Text     = "+" + ((player.SpellDamagePercentageMultiplier * player.SpellDamageMoreMultiplierTotal - 1) * 100).ToString("N0") + "%";
     }
 
     private void RenderDefences(Player2D player)

@@ -33,13 +33,13 @@ public static class DerivedStatProvider
     private static CombatStatModifier[] GetDerivedAwarenessStats(int awareness)
     {
         var derivedMeleeParryValue = GetLimitedGrowthValue(awareness, MoreParryChanceCeiling);
-        var meleeParryModifier     = new CombatStatModifier(CombatStat.MeleeParry, ModificationType.More, derivedMeleeParryValue, nameof(BaseUnit.MeleeParryMoreMultiplierTotal));
+        var meleeParryModifier     = new CombatStatModifier(CombatStat.MeleeParry, ModificationType.More, derivedMeleeParryValue / 100, nameof(BaseUnit.MeleeParryMoreMultiplierTotal));
 
         var derivedMeleeBlockValue = GetLimitedGrowthValue(awareness, MoreBlockChanceCeiling);
-        var meleeBlockModifier     = new CombatStatModifier(CombatStat.MeleeBlock, ModificationType.More, derivedMeleeBlockValue, nameof(BaseUnit.MeleeBlockMoreMultiplierTotal));
+        var meleeBlockModifier     = new CombatStatModifier(CombatStat.MeleeBlock, ModificationType.More, derivedMeleeBlockValue / 100, nameof(BaseUnit.MeleeBlockMoreMultiplierTotal));
 
         var derivedCriticalHitChanceValue = GetLimitedGrowthValue(awareness, MoreCriticalHitChanceCeiling);
-        var criticalHitChanceModifier     = new CombatStatModifier(CombatStat.CriticalHitChance, ModificationType.More, derivedCriticalHitChanceValue, nameof(BaseUnit.CriticalHitChanceMoreMultiplierTotal));
+        var criticalHitChanceModifier     = new CombatStatModifier(CombatStat.CriticalHitChance, ModificationType.More, derivedCriticalHitChanceValue / 100, nameof(BaseUnit.CriticalHitChanceMoreMultiplierTotal));
 
         return [meleeParryModifier, meleeBlockModifier, criticalHitChanceModifier];
     }
@@ -47,7 +47,7 @@ public static class DerivedStatProvider
     private static CombatStatModifier[] GetDerivedConstitutionStats(int consti)
     {
         var derivedLifeValue = GetLimitedGrowthValue(consti, MoreLifeCeiling);
-        var lifeModifier     = new CombatStatModifier(CombatStat.Life, ModificationType.More, derivedLifeValue, nameof(BaseUnit.LifeMoreMultiplierTotal));
+        var lifeModifier     = new CombatStatModifier(CombatStat.Life, ModificationType.More, derivedLifeValue / 100, nameof(BaseUnit.LifeMoreMultiplierTotal));
 
         var derivedArmorValue = GetLimitedGrowthValue(consti, FlatArmorCeiling);
         var armorModifier     = new CombatStatModifier(CombatStat.Armor, ModificationType.Flat, derivedArmorValue, nameof(BaseUnit.ArmorMoreMultiplierTotal));
@@ -57,11 +57,11 @@ public static class DerivedStatProvider
 
     private static CombatStatModifier[] GetDerivedIntelligenceStats(int intelligence)
     {
-        var derivedElementalDamageValue = GetLimitedGrowthValue(intelligence, MoreSpellDamageCeiling);
-        var elementalDamageModifier     = new CombatStatModifier(CombatStat.SpellDamage, ModificationType.More, derivedElementalDamageValue, nameof(BaseUnit.SpellDamageMoreMultiplierTotal));
+        var derivedSpellDamageValue = GetLimitedGrowthValue(intelligence, MoreSpellDamageCeiling);
+        var elementalDamageModifier     = new CombatStatModifier(CombatStat.SpellDamage, ModificationType.More, derivedSpellDamageValue / 100, nameof(BaseUnit.SpellDamageMoreMultiplierTotal));
 
         var derivedManaValue = GetLimitedGrowthValue(intelligence, MoreManaCeiling);
-        var manaModifier     = new CombatStatModifier(CombatStat.Mana, ModificationType.More, derivedManaValue, nameof(Player2D.ManaMoreMultiplierTotal));
+        var manaModifier     = new CombatStatModifier(CombatStat.Mana, ModificationType.More, derivedManaValue / 100, nameof(Player2D.ManaMoreMultiplierTotal));
 
         return [elementalDamageModifier, manaModifier];
     }
@@ -69,10 +69,10 @@ public static class DerivedStatProvider
     private static CombatStatModifier[] GetDerivedDexterityStats(int dex)
     {
         var derivedAttackspeedValue = GetLimitedGrowthValue(dex, MoreAttackspeedCeiling);
-        var attackspeedModifier     = new CombatStatModifier(CombatStat.Attackspeed, ModificationType.More, derivedAttackspeedValue, nameof(BaseUnit.AttackspeedMoreMultiplierTotal));
+        var attackspeedModifier     = new CombatStatModifier(CombatStat.Attackspeed, ModificationType.More, derivedAttackspeedValue / 100, nameof(BaseUnit.AttackspeedMoreMultiplierTotal));
 
         var derivedDodgeValue = GetLimitedGrowthValue(dex, MoreDodgeCeiling);
-        var dodgeModifier     = new CombatStatModifier(CombatStat.Dodge, ModificationType.More, derivedDodgeValue);
+        var dodgeModifier     = new CombatStatModifier(CombatStat.Dodge, ModificationType.More, derivedDodgeValue / 100, nameof(BaseUnit.DodgeMoreMultiplierTotal));
 
         return [attackspeedModifier, dodgeModifier];
     }
@@ -80,10 +80,10 @@ public static class DerivedStatProvider
     private static CombatStatModifier[] GetDerivedStrengthStats(int strength)
     {
         var derivedPhysicalDamageValue = GetLimitedGrowthValue(strength, MorePhysicalDamageCeiling);
-        var physicalDamageModifier     = new CombatStatModifier(CombatStat.PhysicalDamage, ModificationType.More, derivedPhysicalDamageValue, nameof(BaseUnit.PhysicalDamageMoreMultiplierTotal));
+        var physicalDamageModifier     = new CombatStatModifier(CombatStat.PhysicalDamage, ModificationType.More, derivedPhysicalDamageValue / 100, nameof(BaseUnit.PhysicalDamageMoreMultiplierTotal));
 
         var derivedArmorValue = GetLimitedGrowthValue(strength, MoreArmorCeiling);
-        var armorModifier     = new CombatStatModifier(CombatStat.Armor, ModificationType.More, derivedArmorValue, nameof(BaseUnit.ArmorMoreMultiplierTotal));
+        var armorModifier     = new CombatStatModifier(CombatStat.Armor, ModificationType.More, derivedArmorValue / 100, nameof(BaseUnit.ArmorMoreMultiplierTotal));
 
         return [physicalDamageModifier, armorModifier];
     }
