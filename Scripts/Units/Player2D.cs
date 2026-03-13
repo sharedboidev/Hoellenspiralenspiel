@@ -246,10 +246,7 @@ public partial class Player2D : BaseUnit
     public void EquipItem(BaseItem item)
     {
         if (item is BaseArmor armor)
-        {
-            var flatArmorMod = item.CreateCombatStatModifier(CombatStat.Armor, ModificationType.Flat, armor.ArmorvalueFinal);
-            CombatStatModifiers.Add(flatArmorMod);
-        }
+            ArmorBase += armor.ArmorvalueFinal;
 
         foreach (var modifier in item.GetExtrinsicModifiers())
         {
@@ -262,6 +259,9 @@ public partial class Player2D : BaseUnit
 
     public void UnequipItem(BaseItem item)
     {
+        if (item is BaseArmor armor)
+            ArmorBase -= armor.ArmorvalueFinal;
+        
         var itemId = item.ToString();
 
         RemoveModifiers(itemId);

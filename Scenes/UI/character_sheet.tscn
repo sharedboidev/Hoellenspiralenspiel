@@ -45,9 +45,9 @@ equipmentPanel = NodePath("../HBoxContainer/EquipmentPanel")
 [node name="StatdisplayButton" type="TextureButton" parent="." unique_id=1686612181]
 layout_mode = 0
 offset_left = 5.0
-offset_top = 709.0
+offset_top = 845.0
 offset_right = 45.0
-offset_bottom = 749.0
+offset_bottom = 885.0
 texture_normal = ExtResource("5_khxyl")
 texture_pressed = ExtResource("6_nfwpk")
 ignore_texture_size = true
@@ -57,8 +57,8 @@ script = ExtResource("7_gx1ge")
 [node name="LevelDisplay" parent="." unique_id=2139804953 instance=ExtResource("8_nfwpk")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = -21.0
-offset_top = -21.0
-offset_right = 43.0
-offset_bottom = 43.0
+offset_left = -14.0
+offset_top = -33.0
+offset_right = 50.0
+offset_bottom = 31.0
 scale = Vector2(1.5, 1.5)

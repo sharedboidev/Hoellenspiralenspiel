@@ -102,7 +102,7 @@ public abstract partial class BaseUnit
             RemoveModifiers(modId);
 
         CombatStatModifiers.AddRange(derivedStats);
-        
+
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LifeMaximum))); //Hack, weil Racecondition zwischen ResourceOrb und Der Zeile hier drüber, obwohl beide Das selbe Event subscriben
     }
 
@@ -287,8 +287,7 @@ public abstract partial class BaseUnit
         set => SetField(ref lifeCurrent, Math.Min(value, LifeMaximum));
     }
 
-    [Export]
-    public int LiferegenerationBase { get; set; }
+    public int LiferegenerationBase => (int)(StrengthFinal / 5f + ConstitutionFinal / 3f);
 
     public float LiferegenerationAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Liferegeneration);
     public float LiferegenerationPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Liferegeneration);
@@ -302,6 +301,8 @@ public abstract partial class BaseUnit
     public float ArmorPercentageMultiplier     => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Armor);
     public float ArmorMoreMultiplierTotal      => GetTotalMoreMultiplierOf(CombatStat.Armor);
     public int   ArmorFinal                    => (int)((ArmorBase + ArmorAddedFlat) * ArmorPercentageMultiplier * ArmorMoreMultiplierTotal);
+    
+    
     public float MeleeParryMoreMultiplierTotal => GetTotalMoreMultiplierOf(CombatStat.MeleeParry);
     public float MeleeBlockMoreMultiplierTotal => GetTotalMoreMultiplierOf(CombatStat.MeleeBlock);
     public float DodgeMoreMultiplierTotal      => GetTotalMoreMultiplierOf(CombatStat.Dodge);

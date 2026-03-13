@@ -121,7 +121,8 @@ public partial class EnemyController : Node
             SpawnLootbag(enemy);
         else
         {
-            if (enemy.LifeCurrent < enemy.LifeMaximum)
+            //if (enemy.LifeCurrent < enemy.LifeMaximum)
+            if (enemy.IsAggressive)
                 AggroMyGroup(enemy);
         }
     }
