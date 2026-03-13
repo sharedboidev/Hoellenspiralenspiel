@@ -20,15 +20,16 @@ public static class DerivedStatProvider
     private const float MoreCriticalHitChanceCeiling = 200f;
     private const float FlatLightRadiusCeiling       = 400f;
 
-    public static CombatStatModifier[] GetModifiersFor(CombatStat combatStat, int value) => combatStat switch
-    {
-        CombatStat.Strength => GetDerivedStrengthStats(value),
-        CombatStat.Dexterity => GetDerivedDexterityStats(value),
-        CombatStat.Intelligence => GetDerivedIntelligenceStats(value),
-        CombatStat.Constitution => GetDerivedConstitutionStats(value),
-        CombatStat.Awareness => GetDerivedAwarenessStats(value),
-        _ => []
-    };
+    public static CombatStatModifier[] GetModifiersFor(CombatStat combatStat, int value)
+        => combatStat switch
+        {
+            CombatStat.Strength     => GetDerivedStrengthStats(value),
+            CombatStat.Dexterity    => GetDerivedDexterityStats(value),
+            CombatStat.Intelligence => GetDerivedIntelligenceStats(value),
+            CombatStat.Constitution => GetDerivedConstitutionStats(value),
+            CombatStat.Awareness    => GetDerivedAwarenessStats(value),
+            _                       => []
+        };
 
     private static CombatStatModifier[] GetDerivedAwarenessStats(int awareness)
     {
@@ -57,8 +58,8 @@ public static class DerivedStatProvider
 
     private static CombatStatModifier[] GetDerivedIntelligenceStats(int intelligence)
     {
-        var derivedSpellDamageValue = GetLimitedGrowthValue(intelligence, MoreSpellDamageCeiling);
-        var elementalDamageModifier     = new CombatStatModifier(CombatStat.SpellDamage, ModificationType.More, derivedSpellDamageValue / 100, nameof(BaseUnit.SpellDamageMoreMultiplierTotal));
+        var spellDamageValue        = GetLimitedGrowthValue(intelligence, MoreSpellDamageCeiling);
+        var elementalDamageModifier = new CombatStatModifier(CombatStat.SpellDamage, ModificationType.More, spellDamageValue / 100, nameof(BaseUnit.SpellDamageMoreMultiplierTotal));
 
         var derivedManaValue = GetLimitedGrowthValue(intelligence, MoreManaCeiling);
         var manaModifier     = new CombatStatModifier(CombatStat.Mana, ModificationType.More, derivedManaValue / 100, nameof(Player2D.ManaMoreMultiplierTotal));
@@ -88,5 +89,6 @@ public static class DerivedStatProvider
         return [physicalDamageModifier, armorModifier];
     }
 
-    private static float GetLimitedGrowthValue(int attributeValue, float modifierCeiling) => (float)(modifierCeiling - modifierCeiling * Math.Exp(-.05f * attributeValue));
+    private static float GetLimitedGrowthValue(int attributeValue, float modifierCeiling)
+        => (float)(modifierCeiling - modifierCeiling * Math.Exp(-.05f * attributeValue));
 }

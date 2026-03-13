@@ -51,7 +51,7 @@ public abstract partial class BaseUnit
 
     protected virtual void ResolveLifeReg(double delta)
     {
-        if (LifeCurrent < LifeMaximum)
+        if (LiferegenerationFinal > 0 && LifeCurrent < LifeMaximum)
         {
             LifeCurrent += LiferegenerationFinal * (float)delta;
             LifeCurrent =  Mathf.Clamp(LifeCurrent, 0, LifeMaximum);
@@ -102,6 +102,8 @@ public abstract partial class BaseUnit
             RemoveModifiers(modId);
 
         CombatStatModifiers.AddRange(derivedStats);
+        
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LifeMaximum))); //Hack, weil Racecondition zwischen ResourceOrb und Der Zeile hier drüber, obwohl beide Das selbe Event subscriben
     }
 
     protected void RemoveModifiers(string modId)
@@ -138,6 +140,8 @@ public abstract partial class BaseUnit
 
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
         switch (propertyName)
         {
             case nameof(StrengthBase):
@@ -165,8 +169,6 @@ public abstract partial class BaseUnit
 
                 break;
         }
-
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     protected void SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
