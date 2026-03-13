@@ -1,0 +1,91 @@
+﻿using System;
+using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Models;
+
+namespace Hoellenspiralenspiel.Scripts.Utils;
+
+public static class DerivedStatProvider
+{
+    private const float MorePhysicalDamageCeiling    = 100f;
+    private const float MoreArmorCeiling             = 300f;
+    private const float MoreAttackspeedCeiling       = 100f;
+    private const float MoreDodgeCeiling             = 100f;
+    private const float MoreElementalDamageCeiling   = 200f;
+    private const float MoreManaCeiling              = 300f;
+    private const float MoreLifeCeiling              = 100f;
+    private const float FlatArmorCeiling             = 1000f;
+    private const float MoreParryChanceCeiling       = 200f;
+    private const float MoreBlockChanceCeiling       = 200f;
+    private const float MoreCriticalHitChanceCeiling = 200f;
+    private const float FlatLightRadiusCeiling       = 400f;
+
+    public static CombatStatModifier[] GetModifiersFor(CombatStat combatStat, int value) => combatStat switch
+    {
+        CombatStat.Strength => GetDerivedStrengthStats(value),
+        CombatStat.Dexterity => GetDerivedDexterityStats(value),
+        CombatStat.Intelligence => GetDerivedIntelligenceStats(value),
+        CombatStat.Constitution => GetDerivedConstitutionStats(value),
+        CombatStat.Awareness => GetDerivedAwarenessStats(value),
+        _ => []
+    };
+
+    private static CombatStatModifier[] GetDerivedAwarenessStats(int awareness)
+    {
+        var derivedMeleeParryValue = GetLimitedGrowthValue(awareness, MoreParryChanceCeiling);
+        var meleeParryModifier     = new CombatStatModifier(CombatStat.MeleeParry, ModificationType.More, derivedMeleeParryValue);
+
+        var derivedMeleeBlockValue = GetLimitedGrowthValue(awareness, MoreBlockChanceCeiling);
+        var meleeBlockModifier     = new CombatStatModifier(CombatStat.MeleeBlock, ModificationType.More, derivedMeleeBlockValue);
+
+        var derivedCriticalHitChanceValue = GetLimitedGrowthValue(awareness, MoreCriticalHitChanceCeiling);
+        var criticalHitChanceModifier     = new CombatStatModifier(CombatStat.CriticalHitChance, ModificationType.More, derivedCriticalHitChanceValue);
+
+        return [meleeParryModifier, meleeBlockModifier, criticalHitChanceModifier];
+    }
+
+    private static CombatStatModifier[] GetDerivedConstitutionStats(int consti)
+    {
+        var derivedLifeValue = GetLimitedGrowthValue(consti, MoreLifeCeiling);
+        var lifeModifier     = new CombatStatModifier(CombatStat.Life, ModificationType.More, derivedLifeValue);
+
+        var derivedArmorValue = GetLimitedGrowthValue(consti, FlatArmorCeiling);
+        var armorModifier     = new CombatStatModifier(CombatStat.Armor, ModificationType.Flat, derivedArmorValue);
+
+        return [lifeModifier, armorModifier];
+    }
+
+    private static CombatStatModifier[] GetDerivedIntelligenceStats(int intelligence)
+    {
+        var derivedElementalDamageValue = GetLimitedGrowthValue(intelligence, MoreElementalDamageCeiling);
+        var elementalDamageModifier     = new CombatStatModifier(CombatStat.ElementalDamage, ModificationType.More, derivedElementalDamageValue);
+
+        var derivedManaValue = GetLimitedGrowthValue(intelligence, MoreManaCeiling);
+        var manaModifier     = new CombatStatModifier(CombatStat.Mana, ModificationType.More, derivedManaValue);
+
+        return [elementalDamageModifier, manaModifier];
+    }
+
+    private static CombatStatModifier[] GetDerivedDexterityStats(int dex)
+    {
+        var derivedAttackspeedValue = GetLimitedGrowthValue(dex, MoreAttackspeedCeiling);
+        var attackspeedModifier     = new CombatStatModifier(CombatStat.Attackspeed, ModificationType.More, derivedAttackspeedValue);
+
+        var derivedDodgeValue = GetLimitedGrowthValue(dex, MoreDodgeCeiling);
+        var dodgeModifier     = new CombatStatModifier(CombatStat.Dodge, ModificationType.More, derivedDodgeValue);
+
+        return [attackspeedModifier, dodgeModifier];
+    }
+
+    private static CombatStatModifier[] GetDerivedStrengthStats(int strength)
+    {
+        var derivedPhysicalDamageValue = GetLimitedGrowthValue(strength, MorePhysicalDamageCeiling);
+        var physicalDamageModifier     = new CombatStatModifier(CombatStat.PhysicalDamage, ModificationType.More, derivedPhysicalDamageValue);
+
+        var derivedArmorValue = GetLimitedGrowthValue(strength, MoreArmorCeiling);
+        var armorModifier     = new CombatStatModifier(CombatStat.Armor, ModificationType.More, derivedArmorValue);
+
+        return [physicalDamageModifier, armorModifier];
+    }
+
+    private static float GetLimitedGrowthValue(int attributeValue, float modifierCeiling) => (float)(modifierCeiling - modifierCeiling * Math.Exp(-.5f * attributeValue));
+}

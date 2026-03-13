@@ -64,8 +64,7 @@ public abstract partial class BaseUnit
     private float LifeMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Life);
     public  float LifeMaximum              => (int)((LifeBase + LifeAddedFlat) * LifePercentageMultiplier * LifeMoreMultiplierTotal);
 
-    [Export]
-    public int LifeBase { get; set; } = 1;
+    public int LifeBase  => 5 + StrengthFinal + 3*ConstitutionFinal;
 
     [Export]
     public float LifeCurrent
@@ -192,7 +191,7 @@ public abstract partial class BaseUnit
     protected virtual void DieProperly()
     {
         Died?.Invoke(this);
-        
+
         QueueFree();
     }
 

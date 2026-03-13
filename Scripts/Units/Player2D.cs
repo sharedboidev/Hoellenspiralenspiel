@@ -29,7 +29,7 @@ public partial class Player2D : BaseUnit
     [Export] private ResourceOrb     lifeOrb;
     private          float           manaCurrent;
     [Export] private ResourceOrb     manaOrb;
-    private          float           manaProSekunde = 5f;
+    private          float           manaProSekunde = .5f;
     [Export] public  HBoxContainer   SkillBar;
     private          long            xpTotal;
     private          LevelUpEffect  levelUpEffect;
@@ -38,8 +38,7 @@ public partial class Player2D : BaseUnit
     [Export]
     public AudioStreamPlayer2D NoManaSound { get; set; }
 
-    [Export]
-    public int ManaBase { get; set; } = 60;
+    public int ManaBase => 3 + AwarenessFinal + 5 * IntelligenceFinal;
 
     private float ManaAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Mana);
     private float ManaPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Mana);

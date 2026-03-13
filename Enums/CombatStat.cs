@@ -35,5 +35,13 @@ public enum CombatStat
     [Description("Lightning Resistance")]
     LightningResistance,
     [Description("Spell Damage")]
-    SpellDamage
+    SpellDamage,
+    [Description("Melee Parry")]
+    MeleeParry,
+    [Description("Spell Parry")]
+    SpellParry,
+    [Description("Melee Block")]
+    MeleeBlock,
+    [Description("Spell Block")]
+    SpellBlock
 }

@@ -38,9 +38,8 @@ public abstract partial class BaseEnemy : BaseUnit
     [Export]
     public string LootTableId { get; set; }
 
-    protected AnimationTree AnimationTree { get; set; }
-
-    protected abstract Sprite2D MovementSprite { get; }
+    protected          AnimationTree AnimationTree  { get; set; }
+    protected abstract Sprite2D      MovementSprite { get; }
 
     public override void _Ready()
     {
@@ -54,9 +53,8 @@ public abstract partial class BaseEnemy : BaseUnit
 
         LoadSpriteNodes();
 
-        PropertyChanged                 += OnPropertyChanged;
-        AnimationTree.AnimationFinished += AnimationTreeOnAnimationFinished;
-        AnimationTree.AnimationStarted  += AnimationTreeOnAnimationStarted;
+        PropertyChanged                += OnPropertyChanged;
+        AnimationTree.AnimationStarted += AnimationTreeOnAnimationStarted;
     }
 
     private void AnimationTreeOnAnimationStarted(StringName animname)
@@ -66,6 +64,7 @@ public abstract partial class BaseEnemy : BaseUnit
             case Animation.DieLeft or Animation.DieRight or Animation.DieTop or Animation.DieDown:
                 healthbar.Visible = false;
                 SetAsOnlyVisibleSprite(deathSprite);
+                DieProperly();
 
                 break;
             case Animation.RunLeft or Animation.RunRight or Animation.RunTop or Animation.RunDown:
@@ -85,12 +84,6 @@ public abstract partial class BaseEnemy : BaseUnit
 
     public void SetHighlight(bool active)
         => MovementSprite.SelfModulate = active ? new Color(3f, 1f, 2.0f) : new Color(1, 1, 1);
-
-    private void AnimationTreeOnAnimationFinished(StringName animname)
-    {
-        if (animname == Animation.DieLeft || animname == Animation.DieRight || animname == Animation.DieTop || animname == Animation.DieDown)
-            DieProperly();
-    }
 
     private void LoadSpriteNodes()
     {
@@ -121,7 +114,7 @@ public abstract partial class BaseEnemy : BaseUnit
 
         if (MovementDirection != Vector2.Zero)
         {
-            var direction = MovementDirection; // * new Vector2(1, -1);
+            var direction = MovementDirection;
 
             AnimationTree.Set("parameters/StateMachine/MoveState/RunState/blend_position", direction);
             AnimationTree.Set("parameters/StateMachine/MoveState/IdleState/blend_position", direction);
@@ -153,9 +146,8 @@ public abstract partial class BaseEnemy : BaseUnit
         var controller = CurrentScene.GetNode<EnemyController>("%" + nameof(EnemyController));
         controller.SpawnedEnemies.Remove(this);
 
-        PropertyChanged                 -= OnPropertyChanged;
-        AnimationTree.AnimationFinished -= AnimationTreeOnAnimationFinished;
-        AnimationTree.AnimationStarted  -= AnimationTreeOnAnimationStarted;
+        PropertyChanged                -= OnPropertyChanged;
+        AnimationTree.AnimationStarted -= AnimationTreeOnAnimationStarted;
 
         base.DieProperly();
     }

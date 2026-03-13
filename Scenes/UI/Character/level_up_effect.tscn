@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://7bftruy13awp"]
 
 [ext_resource type="Script" uid="uid://dgdrachl0ntnq" path="res://Scripts/UI/Character/LevelUpEffect.cs" id="1_q6juh"]
+[ext_resource type="Texture2D" uid="uid://r2j056ihtbx7" path="res://Textures/UI/LevelUp/star.png" id="1_y1e3a"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_q8mvb"]
 blend_mode = 1
@@ -17,18 +18,19 @@ gradient = SubResource("Gradient_q8mvb")
 particle_flag_disable_z = true
 direction = Vector3(0, -1, 0)
 spread = 90.0
-initial_velocity_min = 20.0
+initial_velocity_min = 100.0
 initial_velocity_max = 400.0
 gravity = Vector3(0, -40, 0)
-scale_min = 5.0
-scale_max = 20.0
+scale_min = 0.5
+scale_max = 3.0
 color = Color(1, 1, 0, 1)
 color_ramp = SubResource("GradientTexture1D_q6juh")
 
 [node name="LevelUpEffect" type="GPUParticles2D" unique_id=437055580]
 material = SubResource("CanvasItemMaterial_q8mvb")
 emitting = false
-amount = 256
+amount = 128
+texture = ExtResource("1_y1e3a")
 lifetime = 1.2
 one_shot = true
 explosiveness = 0.85
