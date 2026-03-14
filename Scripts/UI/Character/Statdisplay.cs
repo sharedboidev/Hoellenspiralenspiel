@@ -23,10 +23,13 @@ public partial class Statdisplay : PanelContainer
     private          RichTextLabel  movementspeedLabel;
     private          RichTextLabel  spellDamageLabel;
     private          RichTextLabel  strengthLabel;
+    private          RichTextLabel  manaLabel;
+    private          RichTextLabel  manaregenerationLabel;
 
     public override void _Ready()
     {
         FindAttributes();
+        FindRessources();
         FindOffences();
         FindDefences();
         FindUtilities();
@@ -35,12 +38,15 @@ public partial class Statdisplay : PanelContainer
     public void Render(Player2D player)
     {
         RenderAttributes(player);
+        RenderRessources(player);
         RenderDefences(player);
         RenderOffences(player);
         RenderUtilities(player);
     }
 
-    private void RenderUtilities(Player2D player) => movementspeedLabel.Text = player.Movementspeed.ToString("N0");
+
+    private void RenderUtilities(Player2D player)
+        => movementspeedLabel.Text = player.Movementspeed.ToString("N0");
 
     private void RenderOffences(Player2D player)
     {
@@ -52,15 +58,21 @@ public partial class Statdisplay : PanelContainer
 
     private void RenderDefences(Player2D player)
     {
-        lifeLabel.Text             = player.LifeMaximum.ToString("N0");
-        liferegenerationLabel.Text = player.LiferegenerationFinal.ToString("N0");
-        armorLabel.Text            = equipmentPanel.GetTotalArmor().ToString("N0");
-        dodgeLabel.Text            = equipmentPanel.GetTotalDodge().ToString("0.##") + "%";
-        fireResiLabel.Text         = player.FireResiFinal.ToString("N0") + "%";
-        frostResistance.Text       = player.FrostResiFinal.ToString("N0") + "%";
-        lightningResiLabel.Text    = player.LightningResiFinal.ToString("N0") + "%";
+        armorLabel.Text         = equipmentPanel.GetTotalArmor().ToString("N0");
+        dodgeLabel.Text         = equipmentPanel.GetTotalDodge().ToString("0.##") + "%";
+        fireResiLabel.Text      = player.FireResiFinal.ToString("N0") + "%";
+        frostResistance.Text    = player.FrostResiFinal.ToString("N0") + "%";
+        lightningResiLabel.Text = player.LightningResiFinal.ToString("N0") + "%";
     }
 
+    private void RenderRessources(Player2D player)
+    {
+        lifeLabel.Text             = player.LifeMaximum.ToString("N0");
+        liferegenerationLabel.Text = player.LiferegenerationFinal.ToString("N0");
+        manaLabel.Text             = player.ManaMaximum.ToString("N0");
+        manaregenerationLabel.Text = player.manaProSekunde.ToString("0.##");
+
+    }
     private void RenderAttributes(Player2D player)
     {
         strengthLabel.Text  = player.StrengthFinal.ToString("N0");
@@ -75,13 +87,11 @@ public partial class Statdisplay : PanelContainer
 
     private void FindDefences()
     {
-        lifeLabel             = GetNode<RichTextLabel>("%Life");
-        liferegenerationLabel = GetNode<RichTextLabel>("%Liferegeneration");
-        armorLabel            = GetNode<RichTextLabel>("%Armor");
-        dodgeLabel            = GetNode<RichTextLabel>("%Dodge");
-        fireResiLabel         = GetNode<RichTextLabel>("%FireResistance");
-        frostResistance       = GetNode<RichTextLabel>("%FrostResistance");
-        lightningResiLabel    = GetNode<RichTextLabel>("%LightningResistance");
+        armorLabel         = GetNode<RichTextLabel>("%Armor");
+        dodgeLabel         = GetNode<RichTextLabel>("%Dodge");
+        fireResiLabel      = GetNode<RichTextLabel>("%FireResistance");
+        frostResistance    = GetNode<RichTextLabel>("%FrostResistance");
+        lightningResiLabel = GetNode<RichTextLabel>("%LightningResistance");
     }
 
     private void FindOffences()
@@ -90,6 +100,14 @@ public partial class Statdisplay : PanelContainer
         critDamageLabel      = GetNode<RichTextLabel>("%MeleeCritDamage");
         attackspeedLabel     = GetNode<RichTextLabel>("%Attackspeed");
         spellDamageLabel     = GetNode<RichTextLabel>("%SpellDamage");
+    }
+
+    private void FindRessources()
+    {
+        lifeLabel             = GetNode<RichTextLabel>("%Life");
+        liferegenerationLabel = GetNode<RichTextLabel>("%Liferegeneration");
+        manaLabel             = GetNode<RichTextLabel>("%Mana");
+        manaregenerationLabel = GetNode<RichTextLabel>("%Manaregeneration");
     }
 
     private void FindAttributes()

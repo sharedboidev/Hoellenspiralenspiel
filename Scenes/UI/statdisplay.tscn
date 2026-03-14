@@ -162,150 +162,23 @@ text = "0"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Offence" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer" unique_id=89476086]
+[node name="Ressources" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer" unique_id=1505460520]
 layout_mode = 2
-theme_override_constants/separation = 0
 
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence" unique_id=857377989]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 36
-bbcode_enabled = true
-text = "Offence"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Offence1" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence" unique_id=1786179528]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence/Offence1" unique_id=1704005104]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Melee Critical Hit Chance"
-fit_content = true
-autowrap_mode = 0
-
-[node name="MeleeCritChance" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence/Offence1" unique_id=1983988842]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0%"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Offence2" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence" unique_id=434840094]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence/Offence2" unique_id=49630696]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Critical Hit Damage"
-fit_content = true
-autowrap_mode = 0
-
-[node name="MeleeCritDamage" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence/Offence2" unique_id=188203422]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0%"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Offence3" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence" unique_id=646550289]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence/Offence3" unique_id=523014161]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Attackspeed"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Attackspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence/Offence3" unique_id=553934591]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0%"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Offence4" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence" unique_id=729260681]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence/Offence4" unique_id=1403091348]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Spell Damage"
-fit_content = true
-autowrap_mode = 0
-
-[node name="SpellDamage" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence/Offence4" unique_id=226596114]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0%"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Offence5" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence" unique_id=981533418]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence/Offence5" unique_id=975819635]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Cast Speed"
-fit_content = true
-autowrap_mode = 0
-
-[node name="CastSpeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offence/Offence5" unique_id=246006467]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0%"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Defence" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer" unique_id=921518252]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence" unique_id=2137903041]
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Ressources" unique_id=333378869]
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 36
 bbcode_enabled = true
-text = "Defence"
+text = "Ressources
+"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Defence1" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence" unique_id=31462018]
+[node name="Resource1" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Ressources" unique_id=31462018]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence1" unique_id=1398172734]
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Ressources/Resource1" unique_id=1398172734]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/normal_font_size = 24
@@ -315,7 +188,7 @@ text = "Life"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Life" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence1" unique_id=2018521637]
+[node name="Life" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Ressources/Resource1" unique_id=2018521637]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 24
@@ -324,11 +197,11 @@ text = "0"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Defence2" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence" unique_id=1866490260]
+[node name="Resource2" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Ressources" unique_id=1866490260]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence2" unique_id=1126674161]
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Ressources/Resource2" unique_id=1126674161]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/normal_font_size = 24
@@ -338,7 +211,7 @@ text = "Liferegeneration"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Liferegeneration" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence2" unique_id=779592074]
+[node name="Liferegeneration" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Ressources/Resource2" unique_id=779592074]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 24
@@ -347,11 +220,196 @@ text = "0"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Defence3" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence" unique_id=1113664262]
+[node name="Resource3" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Ressources" unique_id=1646481753]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence3" unique_id=1076291469]
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Ressources/Resource3" unique_id=1774274066]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Mana"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Mana" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Ressources/Resource3" unique_id=333950080]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Resource4" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Ressources" unique_id=1583138591]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Ressources/Resource4" unique_id=1861062577]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Manaregeneration"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Manaregeneration" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Ressources/Resource4" unique_id=432840971]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Offences" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer" unique_id=89476086]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences" unique_id=857377989]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 36
+bbcode_enabled = true
+text = "Offences"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Offence1" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences" unique_id=1786179528]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences/Offence1" unique_id=1704005104]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Melee Critical Hit Chance"
+fit_content = true
+autowrap_mode = 0
+
+[node name="MeleeCritChance" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences/Offence1" unique_id=1983988842]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Offence2" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences" unique_id=434840094]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences/Offence2" unique_id=49630696]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Critical Hit Damage"
+fit_content = true
+autowrap_mode = 0
+
+[node name="MeleeCritDamage" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences/Offence2" unique_id=188203422]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Offence3" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences" unique_id=646550289]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences/Offence3" unique_id=523014161]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Attackspeed"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Attackspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences/Offence3" unique_id=553934591]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Offence4" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences" unique_id=729260681]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences/Offence4" unique_id=1403091348]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Spell Damage"
+fit_content = true
+autowrap_mode = 0
+
+[node name="SpellDamage" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences/Offence4" unique_id=226596114]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Offence5" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences" unique_id=981533418]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences/Offence5" unique_id=975819635]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Castspeed"
+fit_content = true
+autowrap_mode = 0
+
+[node name="CastSpeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Offences/Offence5" unique_id=246006467]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Defences" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer" unique_id=921518252]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences" unique_id=2137903041]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 36
+bbcode_enabled = true
+text = "Defences"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Defence3" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences" unique_id=1113664262]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/Defence3" unique_id=1076291469]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/normal_font_size = 24
@@ -361,7 +419,7 @@ text = "Armor"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Armor" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence3" unique_id=2049976926]
+[node name="Armor" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/Defence3" unique_id=2049976926]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 24
@@ -370,11 +428,11 @@ text = "0"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Defence4" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence" unique_id=1882239461]
+[node name="Defence4" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences" unique_id=1882239461]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence4" unique_id=1900866606]
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/Defence4" unique_id=1900866606]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/normal_font_size = 24
@@ -384,7 +442,7 @@ text = "Dodge"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Dodge" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence4" unique_id=1407413546]
+[node name="Dodge" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/Defence4" unique_id=1407413546]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 24
@@ -393,11 +451,11 @@ text = "0%"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Defence5" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence" unique_id=850058064]
+[node name="Defence5" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences" unique_id=850058064]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence5" unique_id=271495906]
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/Defence5" unique_id=271495906]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/normal_font_size = 24
@@ -407,7 +465,7 @@ text = "Fire Resistance"
 fit_content = true
 autowrap_mode = 0
 
-[node name="FireResistance" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence5" unique_id=920616756]
+[node name="FireResistance" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/Defence5" unique_id=920616756]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 24
@@ -416,11 +474,11 @@ text = "0%"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Defence6" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence" unique_id=1957106983]
+[node name="Defence6" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences" unique_id=1957106983]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence6" unique_id=700656640]
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/Defence6" unique_id=700656640]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/normal_font_size = 24
@@ -430,7 +488,7 @@ text = "Frost Resistance"
 fit_content = true
 autowrap_mode = 0
 
-[node name="FrostResistance" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence6" unique_id=1161249670]
+[node name="FrostResistance" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/Defence6" unique_id=1161249670]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 24
@@ -439,11 +497,11 @@ text = "0%"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Defence7" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence" unique_id=491877563]
+[node name="Defence7" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences" unique_id=491877563]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence7" unique_id=577419177]
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/Defence7" unique_id=577419177]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/normal_font_size = 24
@@ -453,7 +511,7 @@ text = "Lightning Resistance"
 fit_content = true
 autowrap_mode = 0
 
-[node name="LightningResistance" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defence/Defence7" unique_id=1816471493]
+[node name="LightningResistance" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/Defence7" unique_id=1816471493]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 24
@@ -462,23 +520,24 @@ text = "0%"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Utility" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer" unique_id=499258802]
+[node name="Utilities" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer" unique_id=499258802]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=347983005]
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utilities" unique_id=347983005]
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 36
 bbcode_enabled = true
-text = "Utility"
+text = "Utilities
+"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Utility1" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=1164675431]
+[node name="Utility1" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utilities" unique_id=1164675431]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility1" unique_id=1957162166]
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utilities/Utility1" unique_id=1957162166]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/normal_font_size = 24
@@ -489,330 +548,8 @@ text = "Movementspeed
 fit_content = true
 autowrap_mode = 0
 
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility1" unique_id=1355717858]
+[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utilities/Utility1" unique_id=1355717858]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility2" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=698944306]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility2" unique_id=1748789205]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility2" unique_id=1369434436]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility3" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=1650554866]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility3" unique_id=1699924947]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility3" unique_id=1038437816]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility4" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=965224751]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility4" unique_id=1494485742]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility4" unique_id=1359885234]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility5" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=799024928]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility5" unique_id=1148151109]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility5" unique_id=1287011749]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility6" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=500619619]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility6" unique_id=336615423]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility6" unique_id=744376944]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility7" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=1339934570]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility7" unique_id=985810835]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility7" unique_id=27110211]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility8" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=834292419]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility8" unique_id=2053632427]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility8" unique_id=1944029024]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility9" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=137093152]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility9" unique_id=1550958236]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility9" unique_id=243499603]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility10" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=1457671958]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility10" unique_id=1590102991]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility10" unique_id=302767083]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility11" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=612460125]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility11" unique_id=2048333134]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility11" unique_id=276611609]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility12" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=1648924210]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility12" unique_id=851288932]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility12" unique_id=1020347531]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility13" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=2101559171]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility13" unique_id=738216534]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility13" unique_id=506128477]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility14" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=1320050017]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility14" unique_id=1667611801]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility14" unique_id=1589216928]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "0"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Utility15" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility" unique_id=1576785659]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility15" unique_id=1881069244]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = ExtResource("2_hbpk6")
-bbcode_enabled = true
-text = "Movementspeed
-"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Movementspeed" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utility/Utility15" unique_id=1634477937]
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 24
 bbcode_enabled = true

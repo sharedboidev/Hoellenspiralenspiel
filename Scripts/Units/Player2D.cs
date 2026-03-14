@@ -31,7 +31,7 @@ public partial class Player2D : BaseUnit
     [Export] private ResourceOrb     lifeOrb;
     private          float           manaCurrent;
     [Export] private ResourceOrb     manaOrb;
-    private          float           manaProSekunde = .5f;
+    public          float           manaProSekunde = .5f;
     [Export] public  HBoxContainer   SkillBar;
     private          long            xpTotal;
     private          AnimationTree   AnimationTree { get; set; }
