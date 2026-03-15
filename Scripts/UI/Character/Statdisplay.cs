@@ -63,7 +63,7 @@ public partial class Statdisplay : PanelContainer
     private void RenderDefences(Player2D player)
     {
         armorLabel.Text         = equipmentPanel.GetTotalArmor().ToString("N0");
-        dodgeLabel.Text         = equipmentPanel.GetTotalDodge().ToString("0.##") + "%";
+        dodgeLabel.Text         = player.DodgeFinal.ToString("0.##") + "%";
         fireResiLabel.Text      = player.FireResiFinal.ToString("N0") + "%";
         frostResistance.Text    = player.FrostResiFinal.ToString("N0") + "%";
         lightningResiLabel.Text = player.LightningResiFinal.ToString("N0") + "%";
