@@ -1,4 +1,3 @@
-using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Abilities;
 using Hoellenspiralenspiel.Scripts.Abilities.Spells;
@@ -17,13 +16,13 @@ public partial class CooldownSkill : TextureButton
 	private         PackedScene        visualScene;
 
 	public void Init(BaseSkill s,
-					 string    visualResourceName,
-					 Key shortcut)
+	                 string    visualResourceName,
+	                 Key       shortcut)
 	{
-		Shortcut = new Shortcut();
-		skill    = s;
-		cooldown      = s.RealCooldown;
-		visualScene   = ResourceLoader.Load<PackedScene>(visualResourceName);
+		Shortcut    = new Shortcut();
+		skill       = s;
+		cooldown    = s.RealCooldown;
+		visualScene = ResourceLoader.Load<PackedScene>(visualResourceName);
 
 		var inputKey = new InputEventKey();
 		inputKey.Keycode = shortcut;

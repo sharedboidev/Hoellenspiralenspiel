@@ -1,4 +1,5 @@
 ﻿using System;
+using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Units;
 
@@ -8,6 +9,9 @@ public record HitResult(float RawValue, HitType HitType, LifeModificationMode Li
 {
     public int MitigatedDamage => MitigatedBy is CombatStat.Armor ? GetMitigatenPhysicalDamage() : GetMitigatedElementalDamage();
 
+    public  bool WasDodged => ResolveDodge();
+    private int  dodgeSnapshot = -1;
+
     private int GetMitigatenPhysicalDamage() => GetMitigatedDamage(() =>
     {
         //Armor Formula, In eigenen Typen verschieben
@@ -15,6 +19,16 @@ public record HitResult(float RawValue, HitType HitType, LifeModificationMode Li
 
         return (int)mitigatedDamage;
     });
+
+    private bool ResolveDodge()
+    {
+        GD.Randomize();
+
+        if (dodgeSnapshot < 0)
+            dodgeSnapshot = (int)(GD.Randi() % 101);
+
+        return Target.DodgeFinal >= dodgeSnapshot;
+    }
 
     private int GetMitigatedElementalDamage() => MitigatedBy switch
     {
