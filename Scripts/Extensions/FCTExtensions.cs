@@ -14,9 +14,9 @@ public static class FCTExtensions
     {
         var floatingCombatTextInstance = FCTScene.Instantiate<FloatingCombatText>();
         floatingCombatTextInstance.Display      = floatingCombatTextInstance.GetNode<Label>(nameof(Label));
-        floatingCombatTextInstance.Value        = hitResult.MitigatedDamage;
+        floatingCombatTextInstance.Value        = hitResult.WasDodged ? 0 : hitResult.MitigatedDamage;
         floatingCombatTextInstance.Position     = target.Position + offset;
-        floatingCombatTextInstance.Display.Text = floatingCombatTextInstance.Value.ToString("N0");
+        floatingCombatTextInstance.Display.Text = hitResult.WasDodged ? "Dodge" : floatingCombatTextInstance.Value.ToString("N0");
 
         floatingCombatTextInstance = hitResult.LifeModificationMode switch
         {

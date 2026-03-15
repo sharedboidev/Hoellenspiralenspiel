@@ -25,6 +25,7 @@ public partial class Statdisplay : PanelContainer
     private          RichTextLabel  strengthLabel;
     private          RichTextLabel  manaLabel;
     private          RichTextLabel  manaregenerationLabel;
+    private          RichTextLabel  areaLabel;
 
     public override void _Ready()
     {
@@ -46,7 +47,10 @@ public partial class Statdisplay : PanelContainer
 
 
     private void RenderUtilities(Player2D player)
-        => movementspeedLabel.Text = player.Movementspeed.ToString("N0");
+    {
+        movementspeedLabel.Text = player.Movementspeed.ToString("N0");
+        //areaLabel.Text = player.Area.ToString("N0");
+    }
 
     private void RenderOffences(Player2D player)
     {
@@ -83,7 +87,10 @@ public partial class Statdisplay : PanelContainer
     }
 
     private void FindUtilities()
-        => movementspeedLabel = GetNode<RichTextLabel>("%Movementspeed");
+    {
+        movementspeedLabel = GetNode<RichTextLabel>("%Movementspeed");
+        areaLabel = GetNode<RichTextLabel>("%Area");
+    }
 
     private void FindDefences()
     {

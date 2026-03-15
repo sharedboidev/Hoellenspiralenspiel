@@ -44,9 +44,10 @@ public abstract partial class BaseUnit
     public virtual void ReceiveDamage(HitResult hit)
     {
         var mainScene = GetTree().CurrentScene;
-        this.InstatiateFloatingCombatText(hit, mainScene, new Vector2(0, -75));
 
         LifeCurrent -= hit.MitigatedDamage;
+        
+        this.InstatiateFloatingCombatText(hit, mainScene, new Vector2(0, -75));
     }
 
     protected virtual void ResolveLifeReg(double delta)
@@ -305,7 +306,13 @@ public abstract partial class BaseUnit
     
     public float MeleeParryMoreMultiplierTotal => GetTotalMoreMultiplierOf(CombatStat.MeleeParry);
     public float MeleeBlockMoreMultiplierTotal => GetTotalMoreMultiplierOf(CombatStat.MeleeBlock);
-    public float DodgeMoreMultiplierTotal      => GetTotalMoreMultiplierOf(CombatStat.Dodge);
+
+    [Export]
+    public int DodgeBase { get; set; } = 6;
+    public float DodgeAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Dodge);
+    public float DodgePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Dodge);
+    public float DodgeMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Dodge);
+    public int   DodgeFinal                => (int)((DodgeBase + DodgeAddedFlat) * DodgePercentageMultiplier * DodgeMoreMultiplierTotal);
 
     [Export]
     public int FireResiBase { get; set; }

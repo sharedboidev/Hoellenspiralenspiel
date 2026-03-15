@@ -5,6 +5,7 @@ using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Abilities;
+using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Items.Armors;
 using Hoellenspiralenspiel.Scripts.Items.Weapons;
@@ -204,9 +205,16 @@ public partial class Player2D : BaseUnit
 
             if (collider != null && collider.IsInGroup("monsters"))
             {
-                var damageTaken = new HitResult(10, HitType.Normal, LifeModificationMode.Damage, this, CombatStat.Armor);
+                var hit = new HitResult(10, HitType.Normal, LifeModificationMode.Damage, this, CombatStat.Armor);
 
-                ReceiveDamage(damageTaken);
+                if (hit.WasDodged)
+                {
+                    this.InstatiateFloatingCombatText(hit, GetTree().CurrentScene, new Vector2(0, -75));
+
+                    continue;
+                }
+
+                ReceiveDamage(hit);
 
                 lifeOrb.SetRessource(LifeCurrent);
             }

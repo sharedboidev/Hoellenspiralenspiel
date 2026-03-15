@@ -21,7 +21,7 @@ public static class DerivedStatProvider
     private const float MoreBlockChanceCeiling       = 200f;
     private const float MoreCriticalHitChanceCeiling = 200f;
     private const float FlatLightRadiusCeiling       = 400f;
-    private static Dictionary<float, float> growthParameterMap = new()
+    private static readonly Dictionary<float, float> GrowthParameterMap = new()
     {
         { 100f, 0.0009f },
         { 200f, 0.0005f },
@@ -102,10 +102,11 @@ public static class DerivedStatProvider
 
     private static float GetLogisticGrowthValue(int attributeValue, float modifierCeiling)
     {
-        var k            = growthParameterMap[modifierCeiling];
-        var floorValue   = 2;
+        var modifierFloor = 2;
+        var k             = GrowthParameterMap[modifierCeiling];
+
         var firstFactor  = Math.Exp(-k * modifierCeiling * attributeValue);
-        var secondFactor = modifierCeiling / floorValue - 1;
+        var secondFactor = modifierCeiling / modifierFloor - 1;
 
         var growthValue = modifierCeiling * (1 / (1 + firstFactor * secondFactor));
 

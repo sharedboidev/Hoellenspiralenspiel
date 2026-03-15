@@ -556,3 +556,27 @@ bbcode_enabled = true
 text = "0"
 fit_content = true
 autowrap_mode = 0
+
+[node name="Utility2" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utilities" unique_id=1359979780]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utilities/Utility2" unique_id=1698101790]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Area
+"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Area" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Utilities/Utility2" unique_id=804195607]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
