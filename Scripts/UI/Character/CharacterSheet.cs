@@ -142,7 +142,12 @@ public partial class CharacterSheet : Control
     }
 
     private void ToggleVisibility()
-        => Visible = !Visible;
+    {
+        Visible = !Visible;
+
+        if(Visible)
+            statdisplay.Render(player);
+    }
 
     private void ModifyVisibilityThroughSelfModulate(Control control)
     {

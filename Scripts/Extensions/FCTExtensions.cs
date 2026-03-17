@@ -10,22 +10,22 @@ public static class FCTExtensions
 {
     private static readonly PackedScene FCTScene = ResourceLoader.Load<PackedScene>("res://Scenes/UI/floating_combat_text.tscn");
 
-    public static void InstatiateFloatingCombatText(this BaseUnit target, HitResult hitResult, Node mainScene, Vector2 offset = default)
+    public static void InstatiateFloatingCombatText(this BaseUnit target, HitResult hit, Node mainScene, Vector2 offset = default)
     {
         var floatingCombatTextInstance = FCTScene.Instantiate<FloatingCombatText>();
         floatingCombatTextInstance.Display      = floatingCombatTextInstance.GetNode<Label>(nameof(Label));
-        floatingCombatTextInstance.Value        = hitResult.WasDodged ? 0 : hitResult.MitigatedDamage;
+        floatingCombatTextInstance.Value        = hit.WasDodged ? 0 : hit.MitigatedDamage;
         floatingCombatTextInstance.Position     = target.Position + offset;
-        floatingCombatTextInstance.Display.Text = hitResult.WasDodged ? "Dodge" : floatingCombatTextInstance.Value.ToString("N0");
+        floatingCombatTextInstance.Display.Text = hit.WasDodged ? "Dodge" : floatingCombatTextInstance.Value.ToString("N0");
 
-        floatingCombatTextInstance = hitResult.LifeModificationMode switch
+        floatingCombatTextInstance = hit.LifeModificationMode switch
         {
-            LifeModificationMode.Damage when target is Player2D && hitResult.HitType is HitType.Critical => floatingCombatTextInstance.AsDamageReceivedCritical(),
+            LifeModificationMode.Damage when target is Player2D && hit.HitType is HitType.Critical => floatingCombatTextInstance.AsDamageReceivedCritical(),
             LifeModificationMode.Damage when target is Player2D => floatingCombatTextInstance.AsDamageReceived(),
-            LifeModificationMode.Damage when hitResult.HitType is HitType.Normal => floatingCombatTextInstance.AsDamageDealt(),
-            LifeModificationMode.Damage when hitResult.HitType is HitType.Critical => floatingCombatTextInstance.AsDamageDealtCritical(),
-            LifeModificationMode.Heal when hitResult.HitType is HitType.Normal => floatingCombatTextInstance.AsHeal(),
-            LifeModificationMode.Heal when hitResult.HitType is HitType.Critical => floatingCombatTextInstance.AsHealCritical(),
+            LifeModificationMode.Damage when hit.HitType is HitType.Normal => floatingCombatTextInstance.AsDamageDealt(),
+            LifeModificationMode.Damage when hit.HitType is HitType.Critical => floatingCombatTextInstance.AsDamageDealtCritical(),
+            LifeModificationMode.Heal when hit.HitType is HitType.Normal => floatingCombatTextInstance.AsHeal(),
+            LifeModificationMode.Heal when hit.HitType is HitType.Critical => floatingCombatTextInstance.AsHealCritical(),
             _ => floatingCombatTextInstance
         };
 

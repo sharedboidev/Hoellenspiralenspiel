@@ -33,6 +33,7 @@ amount = 128
 texture = ExtResource("1_y1e3a")
 lifetime = 1.2
 one_shot = true
+speed_scale = 1.5
 explosiveness = 0.85
 local_coords = true
 process_material = SubResource("ParticleProcessMaterial_q8mvb")
