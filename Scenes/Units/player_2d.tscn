@@ -321,7 +321,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MeleeAttackSprite:frame")
+tracks/0/path = NodePath("AttackSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -333,11 +333,12 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_a3thm"]
 resource_name = "attack_e"
+length = 1.1
 step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MeleeAttackSprite:frame")
+tracks/0/path = NodePath("AttackSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -349,11 +350,12 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_ti32k"]
 resource_name = "attack_n"
+length = 1.1
 step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MeleeAttackSprite:frame")
+tracks/0/path = NodePath("AttackSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -365,11 +367,12 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_7ixg1"]
 resource_name = "attack_ne"
+length = 1.1
 step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MeleeAttackSprite:frame")
+tracks/0/path = NodePath("AttackSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -381,11 +384,12 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_3r4g6"]
 resource_name = "attack_nw"
+length = 1.1
 step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MeleeAttackSprite:frame")
+tracks/0/path = NodePath("AttackSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -397,11 +401,12 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_0oda6"]
 resource_name = "attack_s"
+length = 1.1
 step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MeleeAttackSprite:frame")
+tracks/0/path = NodePath("AttackSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -413,11 +418,12 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_qc03d"]
 resource_name = "attack_se"
+length = 1.1
 step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MeleeAttackSprite:frame")
+tracks/0/path = NodePath("AttackSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -429,11 +435,12 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_dplsl"]
 resource_name = "attack_sw"
+length = 1.1
 step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MeleeAttackSprite:frame")
+tracks/0/path = NodePath("AttackSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -445,11 +452,12 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_s6d1q"]
 resource_name = "attack_w"
+length = 1.1
 step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MeleeAttackSprite:frame")
+tracks/0/path = NodePath("AttackSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -833,7 +841,6 @@ texture = ExtResource("3_e2uij")
 height = 512.0
 
 [node name="RunSprite" type="Sprite2D" parent="." unique_id=1968664450]
-visible = false
 y_sort_enabled = true
 position = Vector2(0, -213)
 texture = ExtResource("2_rl3bg")
@@ -856,7 +863,8 @@ range_item_cull_mask = 2
 texture = ExtResource("3_e2uij")
 height = 512.0
 
-[node name="MeleeAttackSprite" type="Sprite2D" parent="." unique_id=12502762]
+[node name="AttackSprite" type="Sprite2D" parent="." unique_id=12502762]
+visible = false
 position = Vector2(2, -71)
 scale = Vector2(0.7, 0.7)
 texture = ExtResource("4_2lps2")

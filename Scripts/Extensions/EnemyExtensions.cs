@@ -10,6 +10,7 @@ public static class EnemyExtensions
         enemy.StrengthBase  += 25;
         enemy.Scale         *= 1.3f;
         enemy.XpGranted     =  (int)(enemy.XpGranted * 1.3f);
+        enemy.LifeCurrent   =  enemy.LifeMaximum;
     }
 
     public static void MakeElite(this BaseEnemy enemy)
@@ -18,5 +19,6 @@ public static class EnemyExtensions
         enemy.StrengthBase  += 25;
         enemy.Scale         *= 1.5f;
         enemy.XpGranted     =  (int)(enemy.XpGranted * 1.5f);
+        enemy.LifeCurrent   =  enemy.LifeMaximum;
     }
 }

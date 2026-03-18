@@ -228,7 +228,6 @@ public partial class Player2D : BaseUnit
 
         if (MovementDirection != Vector2.Zero)
         {
-            //AnimationTree.Set("parameters/blend_position", MovementDirection * new Vector2(1, -1));
             AnimationTree.Set("parameters/StateMachine/MoveState/RunState/blend_position", MovementDirection * new Vector2(1, -1));
             AnimationTree.Set("parameters/StateMachine/MoveState/IdleState/blend_position", MovementDirection * new Vector2(1, -1));
         }

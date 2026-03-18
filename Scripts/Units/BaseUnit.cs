@@ -20,7 +20,11 @@ public abstract partial class BaseUnit
 
     public delegate void DiedEventHandler(BaseUnit unit);
 
-    private Vector2 movementDirection = Vector2.Zero;
+    protected Sprite2D AttackSprite;
+    protected Sprite2D DeathSprite;
+    protected Sprite2D IdleSprite;
+    private   Vector2  movementDirection = Vector2.Zero;
+    protected Sprite2D RunSprite;
 
     [Export]
     public Vector2 MovementDirection
@@ -46,7 +50,7 @@ public abstract partial class BaseUnit
         var mainScene = GetTree().CurrentScene;
 
         LifeCurrent -= hit.MitigatedDamage;
-        
+
         this.InstatiateFloatingCombatText(hit, mainScene, new Vector2(0, -75));
     }
 
@@ -80,7 +84,16 @@ public abstract partial class BaseUnit
     {
         LifeCurrent = LifeMaximum;
 
+        LoadSpriteNodes();
         SubscribeAndInitAttributeDerivedStats();
+    }
+
+    protected void LoadSpriteNodes()
+    {
+        IdleSprite   = GetNodeOrNull<Sprite2D>("IdleSprite");
+        RunSprite    = GetNodeOrNull<Sprite2D>("RunSprite");
+        AttackSprite = GetNodeOrNull<Sprite2D>("AttackSprite");
+        DeathSprite  = GetNodeOrNull<Sprite2D>("DeathSprite");
     }
 
     private void SubscribeAndInitAttributeDerivedStats()
@@ -288,8 +301,7 @@ public abstract partial class BaseUnit
         set => SetField(ref lifeCurrent, Math.Min(value, LifeMaximum));
     }
 
-    public int LiferegenerationBase => (int)(StrengthFinal / 5f + ConstitutionFinal / 3f);
-
+    public int   LiferegenerationBase                 => (int)(StrengthFinal / 5f + ConstitutionFinal / 3f);
     public float LiferegenerationAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Liferegeneration);
     public float LiferegenerationPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Liferegeneration);
     public float LiferegenerationMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Liferegeneration);
@@ -302,13 +314,12 @@ public abstract partial class BaseUnit
     public float ArmorPercentageMultiplier     => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Armor);
     public float ArmorMoreMultiplierTotal      => GetTotalMoreMultiplierOf(CombatStat.Armor);
     public int   ArmorFinal                    => (int)((ArmorBase + ArmorAddedFlat) * ArmorPercentageMultiplier * ArmorMoreMultiplierTotal);
-    
-    
     public float MeleeParryMoreMultiplierTotal => GetTotalMoreMultiplierOf(CombatStat.MeleeParry);
     public float MeleeBlockMoreMultiplierTotal => GetTotalMoreMultiplierOf(CombatStat.MeleeBlock);
 
     [Export]
     public int DodgeBase { get; set; } = 6;
+
     public float DodgeAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Dodge);
     public float DodgePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Dodge);
     public float DodgeMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Dodge);
