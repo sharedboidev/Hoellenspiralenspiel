@@ -108,7 +108,8 @@ public partial class EnemyController : Node
     {
         if(unit is not BaseEnemy enemy)
             return;
-        
+
+        AggroMyGroup(enemy);
         player.GainExperience(enemy.XpGranted);
     }
 
@@ -117,14 +118,10 @@ public partial class EnemyController : Node
         if (e.PropertyName != nameof(BaseEnemy.LifeCurrent) || sender is not BaseEnemy enemy)
             return;
 
+        if (enemy.IsAggressive)
+            AggroMyGroup(enemy);
         if (enemy.LifeCurrent <= 0)
             SpawnLootbag(enemy);
-        else
-        {
-            //if (enemy.LifeCurrent < enemy.LifeMaximum)
-            if (enemy.IsAggressive)
-                AggroMyGroup(enemy);
-        }
     }
 
     private void AggroMyGroup(BaseEnemy hitEnemy)

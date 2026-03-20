@@ -6,14 +6,10 @@ namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 public abstract partial class BaseEnemy : BaseUnit
 {
-    private            Sprite2D       attackSprite;
     protected          Player2D       ChasedPlayer;
     protected          Node           CurrentScene;
-    private            Sprite2D       deathSprite;
     private            ProgressBar    healthbar;
     private            ShaderMaterial hiddenInFogShaderMaterial;
-    private            Sprite2D       idleSprite;
-    private            Sprite2D       runSprite;
     protected abstract PackedScene    AttackScene { get; }
     public             string         SpawnGroup  { get; set; }
 
@@ -63,20 +59,20 @@ public abstract partial class BaseEnemy : BaseUnit
         {
             case Animation.DieLeft or Animation.DieRight or Animation.DieTop or Animation.DieDown:
                 healthbar.Visible = false;
-                SetAsOnlyVisibleSprite(deathSprite);
+                SetAsOnlyVisibleSprite(DeathSprite);
                 DieProperly();
 
                 break;
             case Animation.RunLeft or Animation.RunRight or Animation.RunTop or Animation.RunDown:
-                SetAsOnlyVisibleSprite(runSprite);
+                SetAsOnlyVisibleSprite(RunSprite);
 
                 break;
             case Animation.AttackLeft or Animation.AttackRight or Animation.AttackTop or Animation.AttackDown:
-                SetAsOnlyVisibleSprite(attackSprite);
+                SetAsOnlyVisibleSprite(AttackSprite);
 
                 break;
             case Animation.IdleLeft or Animation.IdleRight or Animation.IdleTop or Animation.IdleDown:
-                SetAsOnlyVisibleSprite(idleSprite);
+                SetAsOnlyVisibleSprite(IdleSprite);
 
                 break;
         }
@@ -85,27 +81,19 @@ public abstract partial class BaseEnemy : BaseUnit
     public void SetHighlight(bool active)
         => MovementSprite.SelfModulate = active ? new Color(3f, 1f, 2.0f) : new Color(1, 1, 1);
 
-    private void LoadSpriteNodes()
-    {
-        idleSprite   = GetNodeOrNull<Sprite2D>("IdleSprite");
-        runSprite    = GetNodeOrNull<Sprite2D>("RunSprite");
-        attackSprite = GetNodeOrNull<Sprite2D>("AttackSprite");
-        deathSprite  = GetNodeOrNull<Sprite2D>("DeathSprite");
-    }
-
     private void SetAsOnlyVisibleSprite(Sprite2D sprite)
     {
-        if (idleSprite is not null)
-            idleSprite.Visible = idleSprite == sprite;
+        if (IdleSprite is not null)
+            IdleSprite.Visible = IdleSprite == sprite;
 
-        if (runSprite is not null)
-            runSprite.Visible = runSprite == sprite;
+        if (RunSprite is not null)
+            RunSprite.Visible = RunSprite == sprite;
 
-        if (attackSprite is not null)
-            attackSprite.Visible = attackSprite == sprite;
+        if (AttackSprite is not null)
+            AttackSprite.Visible = AttackSprite == sprite;
 
-        if (deathSprite is not null)
-            deathSprite.Visible = deathSprite == sprite;
+        if (DeathSprite is not null)
+            DeathSprite.Visible = DeathSprite == sprite;
     }
 
     public override void _PhysicsProcess(double delta)
@@ -128,7 +116,7 @@ public abstract partial class BaseEnemy : BaseUnit
         {
             healthbar.Value = LifeCurrent;
 
-            if (!IsDead && !healthbar.Visible && LifeCurrent < LifeMaximum)
+            if (!healthbar.Visible && LifeCurrent < LifeMaximum)
             {
                 healthbar.Visible = true;
                 IsAggressive      = true;
@@ -137,7 +125,7 @@ public abstract partial class BaseEnemy : BaseUnit
         else
         {
             if (e.PropertyName == nameof(MovementDirection) && MovementDirection.Length() > 0.0f)
-                SetAsOnlyVisibleSprite(runSprite); //Hack, die Statemachine im Animationtree Startet die Animation nicht mehr
+                SetAsOnlyVisibleSprite(RunSprite); //Hack, die Statemachine im Animationtree Startet die Animation nicht mehr
         }
     }
 
