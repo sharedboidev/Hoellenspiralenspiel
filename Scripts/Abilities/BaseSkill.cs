@@ -21,7 +21,7 @@ public abstract class BaseSkill
                      double     baseCooldown,
                      CombatStat mitigatedBy,
                      BaseUnit   owner)
-    {
+    {   
         this.baseDamageMin = baseDamageMin;
         this.baseDamageMax = baseDamageMax;
         this.baseCritRate  = baseCritRate;

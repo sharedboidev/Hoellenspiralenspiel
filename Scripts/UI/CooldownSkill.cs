@@ -47,7 +47,6 @@ public partial class CooldownSkill : TextureButton
 	{
 		if (skill.Owner is not Player2D player)
 			return;
-
 		
 		var manaCost = 2;
 
@@ -58,6 +57,7 @@ public partial class CooldownSkill : TextureButton
 		}
 
 		player.ReduceMana(manaCost);
+		
 		var someSkill = visualScene.Instantiate<Area2D>();
 		
 		if (someSkill is ISpell spellSkill)
