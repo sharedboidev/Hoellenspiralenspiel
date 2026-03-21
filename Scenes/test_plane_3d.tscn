@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://ylvksvt4qcy8"]
+[gd_scene format=3 uid="uid://ylvksvt4qcy8"]
 
 [ext_resource type="Texture2D" uid="uid://bytep2ho1fiem" path="res://Textures/13187503_1601.m10.i307.n008.F.c05.205439527 Vector grid marking for user HUD interface.jpg" id="1_lb8tj"]
 [ext_resource type="PackedScene" uid="uid://d3hf0eo12ulp1" path="res://Scenes/Units/player.tscn" id="2_gmfi0"]
@@ -22,34 +22,34 @@ albedo_texture = ExtResource("1_lb8tj")
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lb8tj"]
 albedo_texture = ExtResource("1_lb8tj")
 
-[node name="Test Plane 3D" type="Node"]
+[node name="Test Plane 3D" type="Node" unique_id=275358049]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1314921843]
 environment = SubResource("Environment_ia7k3")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=975673342]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
 shadow_enabled = true
 
-[node name="Node3D" type="Node3D" parent="."]
+[node name="Node3D" type="Node3D" parent="." unique_id=555566792]
 
-[node name="CSGBox3D" type="CSGBox3D" parent="Node3D"]
+[node name="CSGBox3D" type="CSGBox3D" parent="Node3D" unique_id=1033684508]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0)
 material_override = SubResource("StandardMaterial3D_gmfi0")
 use_collision = true
 size = Vector3(1020.73706, 1, 1026.4316)
 
-[node name="CSGBox3D2" type="CSGBox3D" parent="Node3D"]
+[node name="CSGBox3D2" type="CSGBox3D" parent="Node3D" unique_id=1099051748]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.42871, 0, 162.7218)
 material_override = SubResource("StandardMaterial3D_lb8tj")
 use_collision = true
 size = Vector3(223.19781, 100, 140.59106)
 
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=435348882]
 transform = Transform3D(0.7071068, 0.5, -0.5, 0, 0.7071068, 0.70710677, 0.7071068, -0.5, 0.5, 34.576447, 102.61725, 263.8593)
 projection = 1
 size = 184.18071
 near = 0.013
 
-[node name="Player" parent="." instance=ExtResource("2_gmfi0")]
-transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 49.838, 133.60025, 286.4297)
+[node name="Player" parent="." unique_id=1148828959 instance=ExtResource("2_gmfi0")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 100.98007, 2.1731262, 238.69965)
