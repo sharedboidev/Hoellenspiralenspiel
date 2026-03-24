@@ -15,6 +15,7 @@ public partial class Player : CharacterBody3D
     public override void _Process(double delta)
     {
         base._Process(delta);
+
         HandleMovementInputs();
         ResolveInvincibility(delta);
     }
@@ -30,10 +31,11 @@ public partial class Player : CharacterBody3D
 
         MovementDirection = new Vector3(kek.X, 0, kek.Y);
 
-        Velocity          = MovementDirection * Movementspeed;
+        Velocity = MovementDirection * Movementspeed;
 
         MoveAndSlide();
     }
+
     private void ResolveInvincibility(double delta)
     {
         if (millisecondsSinceLastHit > InvicibilityTimeMilliseconds)
