@@ -15,10 +15,8 @@ public static class FCTExtensions
 
     private static readonly PackedScene FCTScene = ResourceLoader.Load<PackedScene>("res://Scenes/UI/floating_combat_text.tscn");
 
-    //Der Name eines Statuseffekts steht über der Schadenszahl, die gleichzeitig erscheint
     private static readonly Vector2 StatusNameLift = new(0, -45);
 
-    //Zeigt das Ergebnis eines Treffers über der getroffenen Einheit
     public static void ShowHit(this BaseUnit target, HitResult hit)
     {
         var isPlayer = target.Faction == Faction.Player;
@@ -46,11 +44,9 @@ public static class FCTExtensions
         target.ShowCombatText(text, color, fontSize, hit.FinalDamage);
     }
 
-    //Zeigt den Schaden eines Statuseffekts in der Farbe des Effekts
     public static void ShowStatusTick(this BaseUnit target, StatusTick tick)
         => target.ShowCombatText(tick.Damage.ToString("N0"), GetColorOf(tick.Kind), StatusFontSize, tick.Damage);
 
-    //Zeigt an, dass ein Statuseffekt begonnen hat
     public static void ShowStatusStarted(this BaseUnit target, StatusEffectKind kind)
         => target.ShowCombatText(GetNameOf(kind), GetColorOf(kind), StatusFontSize, offset: target.CombatTextOffset + StatusNameLift);
 

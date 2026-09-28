@@ -3,8 +3,7 @@ using Hoellenspiralenspiel.Scripts.Core.Combat;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Skills;
 
-//Ein Skill als reine Daten: was er kostet, wie er trifft und wie er ins Ziel kommt.
-//Genau eines von Attack und Spell ist gesetzt und bestimmt die Art des Skills
+//Genau eines von Attack und Spell ist gesetzt
 public sealed record SkillDefinition
 {
     private SkillDefinition(string id, string name)
@@ -28,10 +27,8 @@ public sealed record SkillDefinition
     public double        CooldownSec { get; init; }
     public SkillDelivery Delivery    { get; init; }
 
-    //Nur für Delivery Projectile
     public ProjectileSettings Projectile { get; init; }
 
-    //Nur für Delivery AreaAroundCaster und AreaAtPoint
     public AreaSettings Area { get; init; }
 
     public bool IsArea => Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint;

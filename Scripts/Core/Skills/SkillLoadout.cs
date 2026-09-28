@@ -2,8 +2,6 @@ using System;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Skills;
 
-//Welcher Skill auf welchem Platz der Leiste liegt. Gespeichert wird die Id des Skills, ein leerer Platz ist null.
-//Derselbe Skill darf auf mehreren Plätzen liegen
 public sealed class SkillLoadout
 {
     private readonly string[] slots;
@@ -17,7 +15,6 @@ public sealed class SkillLoadout
 
     public int SlotCount => slots.Length;
 
-    //Feuert mit der Nummer des Platzes, dessen Belegung sich geändert hat
     public event Action<int> SlotChanged;
 
     public string GetSkillId(int slot)
@@ -44,7 +41,6 @@ public sealed class SkillLoadout
     public void Clear(int slot)
         => Assign(slot, null);
 
-    //Der erste Platz, auf dem der Skill liegt, oder -1
     public int FindSlotOf(string skillId)
     {
         if (string.IsNullOrWhiteSpace(skillId))

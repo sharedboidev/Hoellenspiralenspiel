@@ -7,7 +7,6 @@ namespace Hoellenspiralenspiel.Tests.Skills;
 [TestFixture]
 public class NearestPickerTests
 {
-    //Kandidaten sind Punkte auf einer Linie, der Abstand ist ihr Wert
     private static List<float> Pick(float[] candidates, float maxDistance, int count)
     {
         var result = new List<float>();

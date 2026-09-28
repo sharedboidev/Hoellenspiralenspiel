@@ -4,10 +4,8 @@ namespace Hoellenspiralenspiel.Scripts.Core.Progression;
 
 public static class DeathPenalty
 {
-    //Anteil der XP-Spanne des aktuellen Levels, der beim Tod verloren geht
     public const float XpLossFraction = 0.1f;
 
-    //Der Verlust bemisst sich an der Spanne des aktuellen Levels und kann kein Level kosten
     public static long GetXpLoss(long xpTotal, long levelFloor, long nextLevelThreshold, float fraction = XpLossFraction)
     {
         var levelSpan = Math.Max(0, nextLevelThreshold - levelFloor);

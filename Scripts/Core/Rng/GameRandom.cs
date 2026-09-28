@@ -1,6 +1,6 @@
 namespace Hoellenspiralenspiel.Scripts.Core.Rng;
 
-//Die gemeinsame Zufallsquelle des Spiels. Wer würfelt, holt sie hier ab und legt keine eigene an
+//Wer würfelt, holt die Zufallsquelle hier ab und legt keine eigene an, sonst bestimmt der Seed den Ablauf nicht mehr
 public static class GameRandom
 {
     public static SeededRandom Shared { get; private set; } = new(System.Environment.TickCount);

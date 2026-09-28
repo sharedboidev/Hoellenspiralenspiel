@@ -7,8 +7,6 @@ using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.Skills;
 
-//Bringt die Wirkung eines Skills in die Welt. Kosten, Abklingzeit und Takt regelt, wer den Skill einsetzt.
-//Der Ablauf ist für jede Einheit derselbe, über Freund und Feind entscheidet allein die Fraktion
 public static class SkillExecutor
 {
     public static void Execute(BaseUnit caster, SkillResource skill, SkillAim aim)
@@ -63,7 +61,6 @@ public static class SkillExecutor
 
         projectile.Launch(cast, settings, scene, aim.CurrentPoint - origin);
 
-        //Die Wirkung hängt neben dem Wirkenden, ohne festen Pfad durch die Szene
         caster.GetParent().AddChild(projectile);
 
         projectile.GlobalPosition = origin;

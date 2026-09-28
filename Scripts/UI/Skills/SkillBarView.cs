@@ -7,7 +7,6 @@ using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Skills;
 
-//Die Skill-Leiste: ein Platz je Eingabeaktion. Sie zeigt die Belegung des Spielers und ändert sie über die Auswahlliste
 public partial class SkillBarView : HBoxContainer
 {
     private const int SlotGapPx = 8;
@@ -51,7 +50,7 @@ public partial class SkillBarView : HBoxContainer
 
         AddChild(slotView);
 
-        slotView.Init(slot, InputActions.GetKeyLabel(InputActions.SkillSlots[slot]), player.SkillCooldowns);
+        slotView.Init(slot, InputActions.GetKeyLabel(InputActions.SkillSlots[slot]), player);
         slotView.ShowSkill(SkillLibrary.Find(player.Loadout.GetSkillId(slot)));
 
         slotView.PickerRequested += OpenPicker;
@@ -60,7 +59,7 @@ public partial class SkillBarView : HBoxContainer
     }
 
     private void OpenPicker(SkillSlotView slotView)
-        => picker.Open(slotView.Slot, player.KnownSkills, slotView.GetGlobalRect());
+        => picker.Open(slotView.Slot, player.KnownSkills, slotView.GetGlobalRect(), player);
 
     private void OnSkillChosen(int slot, SkillResource skill)
         => player.Loadout.Assign(slot, skill?.Id);
@@ -68,7 +67,6 @@ public partial class SkillBarView : HBoxContainer
     private void OnSlotChanged(int slot)
         => slots[slot].ShowSkill(SkillLibrary.Find(player.Loadout.GetSkillId(slot)));
 
-    //Derselbe Skill kann auf mehreren Plätzen liegen, die Abklingzeit gilt dann für alle
     private void OnCooldownStarted(string skillId)
     {
         foreach (var slotView in slots)

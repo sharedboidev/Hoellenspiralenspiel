@@ -11,11 +11,9 @@ public static class CollisionLayers
     public const uint Spells  = 4;
     public const uint Walls   = 8;
 
-    //Die Ebene, auf der die Körper einer Fraktion liegen
     public static uint GetBodyLayer(Faction faction)
         => faction == Faction.Player ? Player : Monster;
 
-    //Womit ein Skill dieser Fraktion zusammenstößt: mit den Körpern aller anderen Fraktionen und mit Wänden
     public static uint GetSkillMask(Faction faction)
     {
         var mask = Walls;

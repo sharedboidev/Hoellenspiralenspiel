@@ -52,7 +52,6 @@ public enum CombatStat
     [Description("Hit Chance")]
     HitChance,
 
-    //Anteil des Schadens in Prozent, den ein Block abfängt
     [Description("Blocked Damage")]
     BlockReduction
 }

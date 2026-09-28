@@ -28,27 +28,21 @@ public partial class Player2D : BaseUnit
 
     public delegate void RespawnedEventHandler();
 
-    //Anteil des Schwungs, nach dem der Treffer fällt
     private const float ImpactFraction = 0.5f;
 
     //Skills ohne eigene Reichweite setzt der Held ein, sobald das Ziel in diesem Anteil ihrer Reichweite steht
     private const float EngageFraction = 0.9f;
 
-    //Ein Zauber wirkt sofort. Auch ohne eigene Abklingzeit ist er deshalb erst nach dieser Zeit wieder bereit
-    private const double MinSpellCooldownSec = 0.1;
-
-    private const int    NoSlot              = -1;
-    private const float  SkillBarMarginPx    = 60f;
-    private const float  MinAttacksPerSecond = 0.1f;
-    private const double StuckTimeoutSec     = 0.4;
-    private const float  StuckSpeedFraction  = 0.1f;
+    private const int    NoSlot             = -1;
+    private const float  SkillBarMarginPx   = 60f;
+    private const double StuckTimeoutSec    = 0.4;
+    private const float  StuckSpeedFraction = 0.1f;
 
     private static readonly string[] CompassSuffixes = ["e", "se", "s", "sw", "w", "nw", "n", "ne"];
     private static readonly Color    DeathTint       = new(0.6f, 0.1f, 0.1f, 0.7f);
 
     private readonly AttackCycle attackCycle = new();
 
-    //Lichter des Spielers mit der Größe, die in der Szene eingestellt ist
     private readonly Dictionary<PointLight2D, float> lightBaseScales = new();
     private          AnimationPlayer                 animationPlayer;
     private          double                          approachStuckSec;
@@ -87,23 +81,19 @@ public partial class Player2D : BaseUnit
 
     public override Faction Faction => Faction.Player;
 
-    //Der Spieler ist größer als die Gegner, seine Zahlen erscheinen über dem Kopf
     public override Vector2 CombatTextOffset => new(0, -170);
 
-    //Die Werte, mit denen der Spieler angreift. Ohne angelegte Waffe kämpft er mit bloßen Händen
     public override WeaponProfile Weapon => weapon;
 
     public override PackedScene WeaponProjectileScene => equippedWeapon?.ProjectileScene;
 
     public override float AvailableMana => ManaCurrent;
 
-    //Welcher Skill auf welchem Platz der Leiste liegt
     public SkillLoadout Loadout { get; } = new(InputActions.SkillSlots.Length);
 
     //Bis entschieden ist, wie der Held Skills bekommt, kennt er alle
     public IReadOnlyList<SkillResource> KnownSkills => SkillLibrary.PlayerSkills;
 
-    //XP, die der letzte Tod gekostet hat
     public long LastXpLoss { get; private set; }
 
     private AnimationTree AnimationTree { get; set; }
@@ -111,11 +101,9 @@ public partial class Player2D : BaseUnit
     [Export]
     public AudioStreamPlayer2D NoManaSound { get; set; }
 
-    //Zeit nach dem Respawn, in der der Spieler keinen Schaden nimmt
     [Export]
     public float RespawnInvulnerabilitySec { get; set; } = 2f;
 
-    //Mana pro Sekunde
     [Export]
     public float ManaregenerationBase
     {
@@ -123,7 +111,6 @@ public partial class Player2D : BaseUnit
         set => SetBaseStat(ref manaregenerationBase, value, CombatStat.Manaregeneration);
     }
 
-    //Lichtradius in Prozent. 100 entspricht der Größe, die in der Szene eingestellt ist
     [Export]
     public int LightRadiusBase
     {
@@ -201,7 +188,6 @@ public partial class Player2D : BaseUnit
         ApplyLightRadius();
     }
 
-    //Der Lichtradius skaliert die Lichter relativ zu ihrer Größe aus der Szene
     private void ApplyLightRadius()
     {
         var factor = LightRadiusFinal / 100f;
@@ -283,7 +269,6 @@ public partial class Player2D : BaseUnit
             Loadout.Assign(slot, startingSlots[slot]?.Id);
     }
 
-    //Die Leiste sitzt unten in der Mitte über dem XP-Balken und wächst von dort nach beiden Seiten
     private void AnchorSkillbar()
     {
         SkillBar.SetAnchorsPreset(Control.LayoutPreset.CenterBottom);
@@ -321,7 +306,6 @@ public partial class Player2D : BaseUnit
         Move(GetWantedDirection(), delta);
     }
 
-    //Die Orbs hören auf die Änderung von ManaCurrent und LifeCurrent und müssen nicht eigens angestoßen werden
     private void ResolveManareg(double delta)
     {
         if (ManaCurrent < ManaMaximum)
@@ -342,7 +326,6 @@ public partial class Player2D : BaseUnit
 
     #region Skills
 
-    //Jeder Platz der Leiste hat seine eigene Eingabeaktion. Klicks auf die Oberfläche kommen hier nicht an
     public override void _UnhandledInput(InputEvent @event)
     {
         if (IsDead)
@@ -364,7 +347,6 @@ public partial class Player2D : BaseUnit
         }
     }
 
-    //Setzt den Skill des Platzes ein und zielt dabei auf den Mauszeiger
     public bool UseSlot(int slot, bool isRepeat = false)
     {
         var skill = SkillLibrary.Find(Loadout.GetSkillId(slot));
@@ -377,7 +359,6 @@ public partial class Player2D : BaseUnit
         return UseSkill(skill, new SkillAim(aimPoint, FindHostileUnitAt(aimPoint)), isRepeat);
     }
 
-    //Eine ATTACK läuft über den Takt der Waffe: hinlaufen, ausholen, treffen. Ein SPELL wirkt sofort
     public bool UseSkill(SkillResource skill, SkillAim aim, bool isRepeat = false)
     {
         if (IsDead || skill is null)
@@ -388,10 +369,9 @@ public partial class Player2D : BaseUnit
 
     private bool CastSpell(SkillResource skill, SkillAim aim, bool isRepeat)
     {
-        if (!Report(TryPayFor(skill, MinSpellCooldownSec), isRepeat))
+        if (!Report(TryPayFor(skill, CombatRules.MinSpellCooldownSec), isRepeat))
             return false;
 
-        //Ein fehlgeschlagener Zauber kostet Mana und Abklingzeit, wirkt aber nicht
         if (RollActionFailure())
         {
             this.ShowCombatText("Failed", Colors.Yellow, 28);
@@ -404,8 +384,6 @@ public partial class Player2D : BaseUnit
         return true;
     }
 
-    //Der Spieler läuft zum Ziel und greift an, sobald es in Reichweite ist. Eine neue Anweisung ersetzt die alte.
-    //Im Nahkampf braucht es einen Gegner unter dem Mauszeiger, im Fernkampf genügt die Richtung
     private bool OrderAttack(SkillResource skill, SkillAim aim, bool isRepeat)
     {
         if (!aim.HasTarget && IsMelee(skill))
@@ -440,7 +418,6 @@ public partial class Player2D : BaseUnit
         return check == SkillUseCheck.Ready;
     }
 
-    //Solange die Taste eines Platzes gehalten wird, setzt der Spieler dessen Skill immer wieder ein
     private void RepeatHeldSkill()
     {
         if (heldSlot == NoSlot)
@@ -453,7 +430,6 @@ public partial class Player2D : BaseUnit
             return;
         }
 
-        //Eine laufende ATTACK wird erst nach dem Schwung fortgesetzt
         if (orderedSkill is not null || !attackCycle.IsReady)
             return;
 
@@ -485,12 +461,10 @@ public partial class Player2D : BaseUnit
             FinishSwing();
     }
 
-    //Liefert die Richtung, in die sich der Spieler bewegen will, und beginnt den Schwung, sobald das Ziel in Reichweite ist
     private Vector2 GetWantedDirection()
     {
         var inputDirection = Input.GetVector(InputActions.MoveLeft, InputActions.MoveRight, InputActions.MoveUp, InputActions.MoveDown);
 
-        //Bewegung per Tastatur übersteuert Hinlaufen und Ausholen
         if (inputDirection != Vector2.Zero)
         {
             CancelAttack();
@@ -525,7 +499,6 @@ public partial class Player2D : BaseUnit
         return Vector2.Zero;
     }
 
-    //Der Abstand, ab dem der Spieler stehen bleibt und den Skill einsetzt
     private float GetEngageRange(SkillDefinition skill)
         => skill.Delivery switch
         {
@@ -548,7 +521,6 @@ public partial class Player2D : BaseUnit
         GiveUpTargetWhenStuck(direction, delta);
     }
 
-    //Ohne Wegfindung bleibt der Spieler an Wänden hängen. Kommt er nicht voran, gibt er das Ziel auf
     private void GiveUpTargetWhenStuck(Vector2 direction, double delta)
     {
         var isApproaching = attackTarget is not null && direction != Vector2.Zero;
@@ -590,7 +562,7 @@ public partial class Player2D : BaseUnit
         }
 
         var direction = toTarget == Vector2.Zero ? Vector2.Down : toTarget.Normalized();
-        var swingSec  = 1.0 / Math.Max(MinAttacksPerSecond, AttacksPerSecondFinal);
+        var swingSec  = 1.0 / Math.Max(CombatRules.MinAttacksPerSecond, AttacksPerSecondFinal);
 
         swingSkill  = orderedSkill;
         swingFailed = RollActionFailure();
@@ -601,7 +573,6 @@ public partial class Player2D : BaseUnit
         PlaySwingAnimation(direction, swingSec);
     }
 
-    //Der Treffer fällt. Wie er ins Ziel kommt, bestimmt der Skill
     private void Strike()
     {
         if (swingFailed)
@@ -629,8 +600,6 @@ public partial class Player2D : BaseUnit
             ContinueHeldAttack(previousTarget);
     }
 
-    //Bei gehaltener Taste geht es mit dem Gegner unter dem Mauszeiger weiter.
-    //Liegt die Maus auf keinem Gegner, bleibt der Nahkampf beim bisherigen Ziel und der Fernkampf folgt der Maus
     private void ContinueHeldAttack(BaseUnit previousTarget)
     {
         var skill = SkillLibrary.Find(Loadout.GetSkillId(heldSlot));
@@ -738,7 +707,6 @@ public partial class Player2D : BaseUnit
         RaiseDied();
     }
 
-    //Zurück an den Startpunkt des Levels, mit vollem Leben und Mana
     public void Respawn()
     {
         if (!hasDied)
@@ -759,7 +727,6 @@ public partial class Player2D : BaseUnit
 
     #region Ausrüstung
 
-    //Alle Modifier eines Items tragen dessen Herkunft, damit sie beim Ablegen gemeinsam entfernt werden
     public void EquipItem(BaseItem item)
     {
         Stats.Update(sheet =>
@@ -790,7 +757,6 @@ public partial class Player2D : BaseUnit
         EquipmentChanged?.Invoke();
     }
 
-    //Angriffstempo und Krit-Chance der Waffe werden zu Grundwerten im Stat-Blatt
     private void WieldWeapon(BaseWeapon newWeapon)
     {
         equippedWeapon = newWeapon;

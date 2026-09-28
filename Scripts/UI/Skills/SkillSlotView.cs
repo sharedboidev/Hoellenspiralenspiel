@@ -1,10 +1,10 @@
 using Godot;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
+using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Skills;
 
-//Ein Platz der Skill-Leiste. Zeigt Icon, Taste und Abklingzeit. Eingesetzt wird der Skill vom Spieler, nicht von hier
 public partial class SkillSlotView : Control
 {
     public delegate void PickerRequestedEventHandler(SkillSlotView slot);
@@ -13,16 +13,16 @@ public partial class SkillSlotView : Control
     private SkillCooldowns     cooldowns;
     private TextureRect        icon;
     private Label              keyLabel;
+    private BaseUnit           owner;
     private SkillResource      skill;
     private Label              timeLabel;
 
     public int Slot { get; private set; }
 
-    //Der Spieler will diesem Platz einen anderen Skill geben
     public event PickerRequestedEventHandler PickerRequested;
 
     //Die Leiste entsteht, während die Szene noch lädt. _Ready läuft dann erst später, deshalb holt Init die Knoten selbst
-    public void Init(int slot, string keyText, SkillCooldowns unitCooldowns)
+    public void Init(int slot, string keyText, BaseUnit skillOwner)
     {
         icon            = GetNode<TextureRect>("%Icon");
         cooldownOverlay = GetNode<TextureProgressBar>("%CooldownOverlay");
@@ -30,7 +30,8 @@ public partial class SkillSlotView : Control
         timeLabel       = GetNode<Label>("%TimeLabel");
 
         Slot          = slot;
-        cooldowns     = unitCooldowns;
+        owner         = skillOwner;
+        cooldowns     = skillOwner.SkillCooldowns;
         keyLabel.Text = keyText;
 
         SetProcess(false);
@@ -40,7 +41,6 @@ public partial class SkillSlotView : Control
     {
         skill        = newSkill;
         icon.Texture = skill?.Icon;
-        TooltipText  = skill is null ? "Empty\n\nRight click to assign a skill" : $"{skill.GetTooltip()}\n\nRight click to change";
 
         RefreshCooldown();
     }
@@ -48,7 +48,6 @@ public partial class SkillSlotView : Control
     public bool Shows(string skillId)
         => skill is not null && skill.Id == skillId;
 
-    //Die Anzeige läuft nur mit, solange eine Abklingzeit läuft
     public void RefreshCooldown()
     {
         var isRunning = skill is not null && cooldowns is not null && !cooldowns.IsReady(skill.Id);
@@ -81,6 +80,20 @@ public partial class SkillSlotView : Control
         PickerRequested?.Invoke(this);
 
         AcceptEvent();
+    }
+
+    public override string _GetTooltip(Vector2 atPosition)
+        => BuildTooltip();
+
+    public override Control _MakeCustomTooltip(string forText)
+        => SkillTooltip.CreateContent(forText);
+
+    public string BuildTooltip()
+    {
+        if (skill is null || owner is null)
+            return SkillTooltip.BuildNote("Empty", "Right click to assign a skill");
+
+        return SkillTooltip.Build(skill, owner);
     }
 
     private void ShowRemainingTime()

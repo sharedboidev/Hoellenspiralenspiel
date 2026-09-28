@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-235_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-271_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -137,6 +137,7 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 | Freie Belegung | Rechtsklick auf einen Platz öffnet die Liste aller Skills |
 | Gehaltene Taste | Wiederholt den Skill, sobald er wieder bereit ist |
 | Kosten | Mana und Abklingzeit pro Skill, Ton bei leerem Mana |
+| Tooltip mit DPS | Schaden pro Sekunde, mittlerer Treffer, Krit-Chance, Einsätze pro Sekunde und Abklingzeit, gerechnet mit den Werten des Helden |
 
 <details>
 <summary>Die Skills im Überblick</summary>
@@ -150,6 +151,31 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 | Thunderbolt | SPELL | 50 bis 350 Lightning | 4 | 1 s | Einschlag am Mauszeiger nach 0,5 Sekunden |
 
 Alle Werte sind vorläufig und stehen in `Resources/Skills`.
+
+</details>
+
+<details>
+<summary>So rechnet der Tooltip</summary>
+
+Alle Zahlen gelten für ein einzelnes Ziel ohne Verteidigung.
+
+```
+Mittlerer Treffer = (Min + Max) / 2 × (1 + Krit-Chance × Krit-Schaden)
+Einsätze pro Sekunde = ATTACK: Angriffstempo, SPELL: 1 / Abklingzeit
+DPS = Mittlerer Treffer × Einsätze pro Sekunde × Trefferchance + Schaden des Statuseffekts
+```
+
+| Eingerechnet | Wirkung |
+|---|---|
+| Schaden des Helden | Waffenschaden, Prozentsatz des Skills, Zauberschaden, physischer und elementarer Schaden |
+| Krit-Chance und Krit-Schaden | Erhöhen den mittleren Treffer |
+| Angriffstempo und Abklingzeit | Bestimmen die Einsätze pro Sekunde, das langsamere von beiden zählt |
+| Trefferchance | Pierce trifft nur halb so oft |
+| Schadensart | Crush verursacht 20 % mehr Schaden |
+| Bleed und Burn | Ihr Schaden über Zeit zählt zur DPS, begrenzt durch die Regeln fürs Stapeln |
+| Chill und Shock auf dem Helden | Chill senkt das Angriffstempo, unter Shock schlagen Einsätze fehl |
+
+Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
 
 </details>
 
@@ -343,6 +369,7 @@ Hoellenspiralenspiel
 | Logik getrennt von Darstellung | Hält die Entscheidung für 2D oder 3D offen und macht Logik testbar |
 | Inhalte als Daten | Neue Gegner, Skills und Items ohne Änderung am Code |
 | Ein Zufallsgenerator mit Seed | Gleicher Seed ergibt gleiches Level, Voraussetzung für Koop |
+| Sparsame Kommentare | Namen sprechen für sich, Aufbau und Regeln erklärt die Roadmap |
 
 Alles unter `Scripts/Core` kommt ohne Godot aus.
 Das Testprojekt bindet diesen Ordner als Quelltext ein.

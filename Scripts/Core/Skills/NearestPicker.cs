@@ -3,11 +3,9 @@ using System.Collections.Generic;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Skills;
 
-//Sucht die nächsten Kandidaten in einem Durchlauf, ohne alle nach Entfernung zu sortieren
 public static class NearestPicker
 {
-    //Füllt result mit höchstens count Kandidaten innerhalb von maxDistance, der nächste zuerst.
-    //getDistanceSquared liefert das Quadrat des Abstands. Ein negativer Wert schließt den Kandidaten aus
+    //Ein negativer Abstand schließt den Kandidaten aus
     public static void Pick<T>(IReadOnlyList<T> candidates,
                                Func<T, float>   getDistanceSquared,
                                float            maxDistance,

@@ -2,7 +2,6 @@ using System;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Rng;
 
-//Gleicher Seed ergibt dieselbe Folge von Würfen
 public sealed class SeededRandom : IRandomSource
 {
     private readonly Random random;

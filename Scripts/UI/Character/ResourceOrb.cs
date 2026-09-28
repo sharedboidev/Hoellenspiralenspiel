@@ -43,7 +43,6 @@ public partial class ResourceOrb : Control
 		Refresh();
 	}
 
-	//Liest Maximum und aktuellen Wert neu vom Spieler
 	private void Refresh()
 	{
 		MaxRessource = type == ResourceType.Life ? player.LifeMaximum : player.ManaMaximum;
@@ -110,7 +109,6 @@ public partial class ResourceOrb : Control
 		orbShader?.SetShaderParameter("liquid_color", c);
 	}
 
-	//Text und Shader werden nur angefasst, wenn sich das Angezeigte wirklich ändert
 	public void SetRessource(float newValue)
 	{
 		current = Mathf.Clamp(newValue, 0f, MaxRessource);

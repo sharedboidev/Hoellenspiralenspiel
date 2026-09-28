@@ -5,10 +5,8 @@ using Hoellenspiralenspiel.Scripts.Core.Stats;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Combat;
 
-//Baut aus den Stats des Angreifers den Treffer, den die Trefferauflösung würfelt
 public static class HitRequests
 {
-    //ATTACK: Waffenschaden mal Prozentsatz des Skills, verstärkt durch physischen oder elementaren Schaden des Angreifers
     public static HitRequest ForAttack(StatSheet attacker, WeaponProfile weapon, AttackDefinition attack)
     {
         ArgumentNullException.ThrowIfNull(attacker);
@@ -30,7 +28,6 @@ public static class HitRequests
                               attacker.GetFinal(CombatStat.CriticalDamage));
     }
 
-    //SPELL: eigener Grundschaden, verstärkt durch Zauberschaden und den Schaden der Schadensart
     public static HitRequest ForSpell(StatSheet attacker, SpellDefinition spell)
     {
         ArgumentNullException.ThrowIfNull(attacker);
@@ -48,7 +45,6 @@ public static class HitRequests
                               attacker.GetFinal(CombatStat.CriticalDamage));
     }
 
-    //Ein Skill ist entweder ATTACK oder SPELL. Die Waffe zählt nur für ATTACK
     public static HitRequest ForSkill(StatSheet attacker, WeaponProfile weapon, SkillDefinition skill)
     {
         ArgumentNullException.ThrowIfNull(skill);
@@ -58,7 +54,6 @@ public static class HitRequests
                 : ForAttack(attacker, weapon, skill.Attack);
     }
 
-    //Die Grundchance kommt von Waffe oder Zauber, die Modifier vom Angreifer
     private static float GetCriticalHitChance(StatSheet attacker, float baseChance)
         => (baseChance + attacker.GetAddedFlat(CombatStat.CriticalHitChance)) * attacker.GetTotalMultiplier(CombatStat.CriticalHitChance);
 }

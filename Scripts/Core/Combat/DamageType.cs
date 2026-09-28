@@ -21,7 +21,6 @@ public static class DamageTypeExtensions
     public static bool IsElemental(this DamageType damageType)
         => !damageType.IsPhysical();
 
-    //Der Stat des Verteidigers, der Schaden dieser Art mindert
     public static CombatStat GetMitigatingStat(this DamageType damageType)
         => damageType switch
         {
@@ -31,7 +30,12 @@ public static class DamageTypeExtensions
             _                    => CombatStat.Armor
         };
 
-    //Der Stat des Angreifers, der Schaden dieser Art verstärkt
     public static CombatStat GetScalingStat(this DamageType damageType)
         => damageType.IsPhysical() ? CombatStat.PhysicalDamage : CombatStat.ElementalDamage;
+
+    public static float GetDamageFactor(this DamageType damageType)
+        => damageType == DamageType.Crush ? 1f + CombatRules.CrushMoreDamage : 1f;
+
+    public static float GetHitChanceFactor(this DamageType damageType)
+        => damageType == DamageType.Pierce ? 1f - CombatRules.PierceLessHitChance : 1f;
 }

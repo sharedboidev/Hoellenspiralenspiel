@@ -43,7 +43,6 @@ public abstract partial class BaseUnit
         StatusEffects.Started += OnStatusEffectStarted;
     }
 
-    //Alle Stats der Einheit. Gerechnet wird im Kern, diese Klasse hält nur die Grundwerte für den Inspector
     public StatSheet Stats { get; } = new();
 
     public StatusEffectTracker StatusEffects { get; }
@@ -52,13 +51,10 @@ public abstract partial class BaseUnit
 
     public abstract Faction Faction { get; }
 
-    //Die Werte, mit denen die Einheit bei einer ATTACK zuschlägt
     public virtual WeaponProfile Weapon => WeaponProfile.Unarmed;
 
-    //Das Projektil, das eine Fernkampfwaffe verschießt
     public virtual PackedScene WeaponProjectileScene => null;
 
-    //Mana, das für Skills bereitsteht. Einheiten ohne Mana zahlen nichts
     public virtual float AvailableMana => SkillGate.UnlimitedMana;
 
     [Export]
@@ -70,22 +66,17 @@ public abstract partial class BaseUnit
 
     public bool IsDead => LifeCurrent <= 0;
 
-    //Tote und sterbende Einheiten können weder angeklickt noch getroffen werden
     public virtual bool IsTargetable => !IsDead;
 
-    //Die Mitte des Körpers. Abstände im Kampf werden zwischen diesen Punkten gemessen
     public Vector2 BodyCenter => bodyShape?.GlobalPosition ?? GlobalPosition;
 
-    //Radius um die Körpermitte, in dem ein Mausklick die Einheit trifft
     public float PickRadius => Math.Max(MinPickRadiusPx, PickRadiusPerScalePx * Scale.X);
 
-    //Versatz von der Position der Einheit, an dem Schadenszahlen erscheinen
     public virtual Vector2 CombatTextOffset => new(0, -75);
 
     public event PropertyChangedEventHandler PropertyChanged;
     public event DiedEventHandler            Died;
 
-    //Feuert, nachdem alle Stats neu berechnet sind. Anzeigen hören hierauf
     public event StatsChangedEventHandler StatsChanged;
 
     public override void _PhysicsProcess(double delta)
@@ -99,7 +90,6 @@ public abstract partial class BaseUnit
 
     public virtual void SpendMana(float amount) { }
 
-    //Prüft Abklingzeit und Mana. Zahlt bei Erfolg die Kosten und startet die Abklingzeit, die mindestens minCooldownSec dauert
     public SkillUseCheck TryPayFor(SkillResource skill, double minCooldownSec = 0)
     {
         var definition = skill.Definition;
@@ -120,7 +110,6 @@ public abstract partial class BaseUnit
     public float DistanceTo(BaseUnit other)
         => BodyCenter.DistanceTo(other.BodyCenter);
 
-    //Wendet einen gewürfelten Treffer an: Leben abziehen, Statuseffekt auflegen, Ergebnis anzeigen
     public virtual void ReceiveDamage(HitResult hit)
     {
         if (!IsTargetable)
@@ -137,7 +126,6 @@ public abstract partial class BaseUnit
         this.ShowHit(hit);
     }
 
-    //Würfelt, ob die nächste Aktion der Einheit fehlschlägt, z.B. unter Shock
     public bool RollActionFailure()
     {
         var chance = StatusEffects.ActionFailureChance;
@@ -145,7 +133,6 @@ public abstract partial class BaseUnit
         return chance > 0 && GameRandom.Shared.NextFloat() < chance;
     }
 
-    //Die feindliche Einheit, deren Klickfläche den Punkt enthält. Bei mehreren gewinnt die nächste
     public BaseUnit FindHostileUnitAt(Vector2 globalPoint)
     {
         BaseUnit nearestUnit     = null;
@@ -227,7 +214,6 @@ public abstract partial class BaseUnit
         LifeCurrent = LifeMaximum;
     }
 
-    //Hebt die Einheit hervor, solange der Mauszeiger auf ihr liegt
     public virtual void SetHighlight(bool active) { }
 
     protected void LoadSpriteNodes()
@@ -250,7 +236,6 @@ public abstract partial class BaseUnit
         StatsChanged?.Invoke();
     }
 
-    //Für abgeleitete Klassen, die auf neue Stats reagieren müssen, bevor die Anzeigen informiert werden
     protected virtual void OnStatsRecalculated() { }
 
     protected void RaiseDied()
@@ -275,7 +260,6 @@ public abstract partial class BaseUnit
         OnPropertyChanged(propertyName);
     }
 
-    //Setzt einen Grundwert und gibt ihn an den Kern weiter
     protected void SetBaseStat(ref int field, int value, CombatStat stat, [CallerMemberName] string propertyName = null)
     {
         if (field == value)
@@ -377,7 +361,6 @@ public abstract partial class BaseUnit
     private int attackspeedBase;
     private int spellDamageBase;
 
-    //Angriffe pro Sekunde. Beim Spieler kommt der Grundwert von der Waffe
     public float AttacksPerSecondFinal => Stats.GetFinal(CombatStat.Attackspeed);
     public int   SpellDamageFinal      => Stats.GetFinalWhole(CombatStat.SpellDamage);
 
@@ -424,7 +407,6 @@ public abstract partial class BaseUnit
         set => SetBaseStat(ref lifeBaseBonus, value, CombatStat.Life);
     }
 
-    //Das Leben bleibt zwischen 0 und dem Maximum
     [Export]
     public float LifeCurrent
     {
@@ -475,7 +457,6 @@ public abstract partial class BaseUnit
 
     public float MovementspeedFinal => Stats.GetFinal(CombatStat.Movementspeed);
 
-    //Grundwert der Bewegungsgeschwindigkeit. Für die Bewegung zählt MovementspeedFinal
     [Export]
     public float Movementspeed
     {

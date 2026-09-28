@@ -6,8 +6,6 @@ using Hoellenspiralenspiel.Scripts.Core.Stats;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Combat;
 
-//Die zentrale Trefferauflösung. Reihenfolge: Treffen, Ausweichen, Parry, Block, Krit, Minderung.
-//Angewendet wird das Ergebnis von der Einheit, die getroffen wurde
 public static class HitResolver
 {
     public static HitResult Resolve(HitRequest request, StatSheet defender, IRandomSource random)
@@ -16,8 +14,7 @@ public static class HitResolver
         ArgumentNullException.ThrowIfNull(defender);
         ArgumentNullException.ThrowIfNull(random);
 
-        //Alle Würfe fallen vorab und in fester Reihenfolge. So verbraucht jeder Treffer gleich viele Würfe,
-        //und derselbe Seed ergibt denselben Kampf, egal wie die einzelnen Treffer ausgehen
+        //Alle Würfe fallen vorab in fester Reihenfolge, damit derselbe Seed denselben Kampf ergibt, egal wie die Treffer ausgehen
         var hitRoll    = random.NextPercent();
         var dodgeRoll  = random.NextPercent();
         var parryRoll  = random.NextPercent();
@@ -44,10 +41,9 @@ public static class HitResolver
         var damage     = rolledDamage;
 
         if (isCritical)
-            damage *= 1f + Math.Max(0f, request.CriticalDamageBonus) / 100f;
+            damage *= CombatFormulas.GetCriticalFactor(request.CriticalDamageBonus);
 
-        if (request.DamageType == DamageType.Crush)
-            damage *= 1f + CombatRules.CrushMoreDamage;
+        damage *= request.DamageType.GetDamageFactor();
 
         if (wasBlocked)
             damage *= 1f - CombatFormulas.ClampChance(defender.GetFinal(CombatStat.BlockReduction)) / 100f;
@@ -74,12 +70,7 @@ public static class HitResolver
                                              float      dodgeRoll,
                                              float      parryRoll)
     {
-        var hitChance = request.HitChance;
-
-        if (request.DamageType == DamageType.Pierce)
-            hitChance *= 1f - CombatRules.PierceLessHitChance;
-
-        if (hitRoll >= CombatFormulas.ClampChance(hitChance))
+        if (hitRoll >= CombatFormulas.GetHitChance(request))
             return HitAvoidance.Missed;
 
         if (dodgeRoll < CombatFormulas.ClampChance(defender.GetFinal(CombatStat.Dodge)))
@@ -93,7 +84,6 @@ public static class HitResolver
 
     private static float Mitigate(float damage, DamageType damageType, StatSheet defender)
     {
-        //Pierce ignoriert die Rüstung
         if (damageType == DamageType.Pierce)
             return Math.Max(0f, damage);
 

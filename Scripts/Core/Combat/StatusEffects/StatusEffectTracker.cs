@@ -4,8 +4,6 @@ using Hoellenspiralenspiel.Scripts.Core.Stats;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 
-//Hält die Statuseffekte einer Einheit, lässt sie ablaufen und meldet ihren Schaden.
-//Effekte, die Stats verändern, legen ihre Modifier selbst auf das Stat-Blatt und nehmen sie wieder herunter
 public sealed class StatusEffectTracker
 {
     private const double Epsilon = 0.00001;
@@ -31,10 +29,8 @@ public sealed class StatusEffectTracker
 
     public bool HasAny => activeKinds > 0;
 
-    //Chance von 0 bis 1, dass eine Aktion der Einheit fehlschlägt
     public float ActionFailureChance => Math.Clamp(GetMagnitude(StatusEffectKind.Shock), 0f, 1f);
 
-    //Feuert, wenn ein Effekt beginnt, der vorher nicht aktiv war
     public event Action<StatusEffectKind> Started;
 
     public event Action<StatusEffectKind> Ended;
@@ -45,7 +41,6 @@ public sealed class StatusEffectTracker
     public int GetInstanceCount(StatusEffectKind kind)
         => instances[(int)kind].Count;
 
-    //Die wirksame Stärke: bei stapelnden Effekten die Summe, sonst die stärkste Instanz
     public float GetMagnitude(StatusEffectKind kind)
     {
         var list = instances[(int)kind];
@@ -92,7 +87,6 @@ public sealed class StatusEffectTracker
             Started?.Invoke(application.Kind);
     }
 
-    //Lässt die Zeit vergehen und hängt den fälligen Schaden an die übergebene Liste an
     public void Advance(double deltaSec, List<StatusTick> ticks)
     {
         ArgumentNullException.ThrowIfNull(ticks);
@@ -161,7 +155,6 @@ public sealed class StatusEffectTracker
             RefreshModifiers(kind);
     }
 
-    //Schaden wird in ganzen Zahlen gemeldet, der Rest bleibt für den nächsten Takt stehen
     private void CollectTicks(StatusEffectKind kind, double deltaSec, bool hasEnded, List<StatusTick> ticks)
     {
         var index = (int)kind;
@@ -205,7 +198,6 @@ public sealed class StatusEffectTracker
         Ended?.Invoke(kind);
     }
 
-    //Das Stat-Blatt wird nur angefasst, wenn sich die wirksame Stärke ändert
     private void RefreshModifiers(StatusEffectKind kind)
     {
         var index     = (int)kind;
@@ -225,7 +217,6 @@ public sealed class StatusEffectTracker
         });
     }
 
-    //Eine Instanz ist überflüssig, wenn eine andere mindestens so stark ist und mindestens so lange läuft
     private static void AddUnlessDominated(List<Instance> list, StatusEffectApplication application)
     {
         foreach (var instance in list)
@@ -238,7 +229,6 @@ public sealed class StatusEffectTracker
         list.Add(new Instance(application.Magnitude, application.DurationSec));
     }
 
-    //Ist der Stapel voll, weicht die Instanz, die am wenigsten Wirkung übrig hat
     private static void AddToStack(List<Instance> list, StatusEffectApplication application, int maxInstances)
     {
         list.Add(new Instance(application.Magnitude, application.DurationSec));

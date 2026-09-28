@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using Godot;
 using Hoellenspiralenspiel.Resources.Skills;
+using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Skills;
 
-//Die Liste aller bekannten Skills. Ein Klick legt den Skill auf den Platz, für den die Liste geöffnet wurde
 public partial class SkillPicker : PopupPanel
 {
     public delegate void SkillChosenEventHandler(int slot, SkillResource skill);
@@ -17,11 +17,9 @@ public partial class SkillPicker : PopupPanel
     private VBoxContainer entries;
     private int           slot;
 
-    //Ohne Skill soll der Platz geleert werden
     public event SkillChosenEventHandler SkillChosen;
 
-    //Öffnet die Liste über dem Platz der Leiste
-    public void Open(int forSlot, IReadOnlyList<SkillResource> skills, Rect2 slotRect)
+    public void Open(int forSlot, IReadOnlyList<SkillResource> skills, Rect2 slotRect, BaseUnit caster)
     {
         slot = forSlot;
 
@@ -38,10 +36,10 @@ public partial class SkillPicker : PopupPanel
             oldEntry.QueueFree();
         }
 
-        AddEntry("Empty", null, "Clears the slot", null);
+        AddEntry(null, caster);
 
         foreach (var skill in skills)
-            AddEntry(skill.NameOrId, skill.Icon, skill.GetTooltip(), skill);
+            AddEntry(skill, caster);
 
         var size     = (Vector2I)GetContentsMinimumSize();
         var position = new Vector2I((int)slotRect.Position.X, (int)slotRect.Position.Y - size.Y - GapToSlotPx);
@@ -49,18 +47,16 @@ public partial class SkillPicker : PopupPanel
         Popup(new Rect2I(position.Max(Vector2I.Zero), size));
     }
 
-    private void AddEntry(string text, Texture2D icon, string tooltip, SkillResource skill)
+    private void AddEntry(SkillResource skill, BaseUnit caster)
     {
-        var entry = new Button
+        var entry = new SkillPickerEntry
         {
-            Text              = text,
-            Icon              = icon,
             ExpandIcon        = true,
             Alignment         = HorizontalAlignment.Left,
-            TooltipText       = tooltip,
             CustomMinimumSize = new Vector2(EntryWidth, EntryHeight)
         };
 
+        entry.Init(skill, caster);
         entry.AddThemeFontSizeOverride("font_size", EntryFontSize);
 
         entry.Pressed += () => Choose(skill);

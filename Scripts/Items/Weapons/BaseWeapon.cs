@@ -42,15 +42,12 @@ public abstract partial class BaseWeapon : BaseItem
     private float  CriticalHitChanceMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.CriticalHitChance);
     public  double CriticalHitChanceFinal                => Math.Round((CriticalHitChanceBase + CriticalHitChanceAddedFlat) * CriticalHitChancePercentageMultiplier * CriticalHitChanceMoreMultiplierTotal, 2);
 
-    //Reichweite in Pixeln, gemessen zwischen den Positionen von Angreifer und Ziel
     [Export]
     public float Range { get; set; } = WeaponProfile.DefaultMeleeRange;
 
-    //Fernkampfwaffen verschießen diese Szene. Ohne Projektil ist die Waffe eine Nahkampfwaffe
     [Export]
     public PackedScene ProjectileScene { get; set; }
 
-    //Geschwindigkeit des Projektils in Pixeln pro Sekunde
     [Export]
     public float ProjectileSpeed { get; set; } = 1400f;
 
@@ -72,7 +69,6 @@ public abstract partial class BaseWeapon : BaseItem
 
     public override bool IsStackable => false;
 
-    //Die Werte der Waffe samt ihrer lokalen Modifier, so wie der Kampf sie braucht
     public WeaponProfile ToProfile()
         => new(MinDamageFinal, MaxDamageFinal, (float)AttacksPerSecondFinal, (float)CriticalHitChanceFinal, DamageType, Range, IsRanged, ProjectileSpeed);
 

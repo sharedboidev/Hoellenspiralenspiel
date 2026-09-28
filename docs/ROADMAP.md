@@ -1,6 +1,6 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
-Stand: 28.09.2026. M0 bis M3 liegen auf `master`.
+Stand: 28.09.2026. M0 bis M3 liegen auf `master`, dazu die beiden Nachträge zu M3: Schadenswerte im Tooltip und ausgedünnte Kommentare.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code (rund 5.500 Zeilen) plus Szenen.
 Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 und M3 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
@@ -29,7 +29,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF, aber fertig nutzbar |
 | Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF |
 | Leveling | XP-Tabelle bis Level 100, Level-up-Effekt, Attributspunkte, XP-Balken | Nicht im PDF, funktioniert |
-| Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
+| Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen, Tooltip mit DPS | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
 | Kampf | Zentrale Trefferauflösung, Nahkampf, Schadensarten mit Effekten, Statuseffekte, Tod und Respawn | Seit M2. Frost-Effekt war im PDF leer und ist jetzt Verlangsamung. |
 | Schadensminderung | Rüstungsformel, Resistenzen, Dodge, Parry und Block für alle Einheiten | Parry und Block haben noch keine Quelle, weil Schilde fehlen |
 | Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Rare/Elite, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler | Nur Blobs und ein Testgegner |
@@ -144,6 +144,7 @@ Leitlinien, die aus den Richtungsentscheidungen folgen:
 - **Logik getrennt von Darstellung.** Stats, Kampf, Items und Levelaufbau werden reines C# ohne Godot-Knoten. Die 2D- oder 3D-Schicht zeigt nur an.
 - **Inhalte als Daten.** Gegner, Skills, Items und Räume sind Resources, keine Klassen.
 - **Ein Zufallsgenerator mit Seed.** Gleicher Seed ergibt gleiches Level und gleichen Loot. Das ist die Voraussetzung für Koop.
+- **Sparsame Kommentare.** Namen sollen für sich sprechen. Ein Kommentar steht nur dort, wo der Code etwas nicht zeigt: eine Falle, ein Warum, eine Eigenheit der Engine. Aufbau und Regeln erklärt dieses Dokument.
 
 Größen: S bedeutet wenige Abende, M ein bis zwei Wochen Hobbyzeit, L mehrere Wochen.
 
@@ -241,6 +242,11 @@ So funktioniert die Pipeline:
 - `AttackCycle` ist der Takt aus Ausholen, Treffer und Erholen. Spieler und Gegner benutzen denselben.
 - Die Waffe legt Angriffstempo und Krit-Chance als Grundwerte ins Stat-Blatt. Ohne Waffe gilt `WeaponProfile.Unarmed`.
 - Abstände im Kampf werden zwischen den Körpermitten gemessen, also zwischen den Kollisionsformen.
+- `HitResult` kennt drei Stufen des Schadens. `RolledDamage` ist der gewürfelte Wert. `UnmitigatedDamage` ist der Wert nach Krit, Faktor der Schadensart und Block. `FinalDamage` ist der Wert nach Rüstung oder Resistenz und wird vom Leben abgezogen.
+- Einheiten: Chancen, Krit-Schaden und Resistenzen sind Prozent. Die Anteile in `CombatRules` sind Brüche, 0,5 bedeutet 50 %. Nur die drei Werte mit `Base` im Namen sind dort Prozent.
+- Die Stärke eines Statuseffekts ist bei Bleed und Burn der Schaden pro Sekunde, bei Shock und Chill ein Anteil von 0 bis 1.
+- Ab 100 % Resistenz ist ein Ziel immun. Negative Resistenz erhöht den Schaden.
+- Pierce ignoriert die Rüstung. Auch ein abgewehrter Treffer macht einen Gegner aggressiv.
 
 Stellschrauben, alle in [CombatRules.cs](../Scripts/Core/Combat/CombatRules.cs):
 
@@ -256,6 +262,8 @@ Stellschrauben, alle in [CombatRules.cs](../Scripts/Core/Combat/CombatRules.cs):
 | Trefferchance | 100 % |
 | Abgefangener Anteil beim Block | 50 % |
 | Takt der Schadenszahlen | 0,5 s |
+| Langsamster Angriff | 0,1 Angriffe pro Sekunde, egal wie stark das Angriffstempo gesenkt ist |
+| Kürzeste Abklingzeit eines Zaubers | 0,1 s, auch wenn der Zauber selbst keine hat |
 | Unbewaffnet | 1 bis 3 Crush, 1,2 Angriffe pro Sekunde, 5 % Krit, Reichweite 100 |
 | XP-Verlust beim Tod | 10 %, in [DeathPenalty.cs](../Scripts/Core/Progression/DeathPenalty.cs) |
 
@@ -291,7 +299,7 @@ Ziel: neue Skills ohne Codeänderung am Spieler.
 
 Fertig, wenn ein neuer Zauber nur aus einer Resource und einer Szene besteht und derselbe Zauber von Spieler und Gegner gewirkt werden kann.
 
-Stand des Fertig-Kriteriums: erfüllt. 55 neue Unit-Tests decken den Kern ab, insgesamt sind es 235. Eine Laufzeitprüfung mit 109 Schritten im Testlevel lief achtmal hintereinander fehlerfrei, zusätzlich gab es eine Sichtprüfung mit Bildschirmfotos. In der Prüfung wirkt der Testgegner den Feuerball des Helden und trifft damit den Helden, aber kein Monster.
+Stand des Fertig-Kriteriums: erfüllt. 55 neue Unit-Tests decken den Kern ab, insgesamt waren es damit 235. Eine Laufzeitprüfung mit 109 Schritten im Testlevel lief achtmal hintereinander fehlerfrei, zusätzlich gab es eine Sichtprüfung mit Bildschirmfotos. In der Prüfung wirkt der Testgegner den Feuerball des Helden und trifft damit den Helden, aber kein Monster.
 
 Getroffene Designentscheidungen vom 28.09.2026:
 
@@ -326,6 +334,10 @@ So funktionieren Skills:
 - Eine ATTACK läuft über den Takt der Waffe und zahlt beim Ausholen. Ein SPELL wirkt sofort.
 - Die Belegung der Leiste ist ein `SkillLoadout` im Kern und speichert nur die Ids der Skills. Die Startbelegung steht in `Resources/Skills/starting_loadout.tres`.
 - Jeder Platz hat eine Eingabeaktion `skill_slot_1` bis `skill_slot_10` in den Projekteinstellungen.
+- Die Abklingzeit gehört zum Skill, nicht zum Platz. Liegt derselbe Skill auf mehreren Plätzen, zeigen alle dieselbe Abklingzeit.
+- Eine Skill-Resource baut ihre Definition beim ersten Zugriff und behält sie. Wer Werte der Resource im laufenden Spiel ändert, sieht davon nichts.
+- `CollisionLayers` spiegelt die Kollisionsebenen aus den Projekteinstellungen. Ändert sich dort eine Ebene, muss die Klasse folgen.
+- Gegner zahlen für Skills weder Mana noch Abklingzeit, ihr `AvailableMana` ist unbegrenzt.
 
 Ein neuer Skill in drei Schritten:
 
@@ -356,6 +368,66 @@ Bewusst offen gelassen:
 - Der Bogen ist ein Platzhalter mit gezeichnetem Icon und fällt bei Blue Blobs. Die Angriffsanimation bleibt die Einhand-Animation.
 - Die Leiste wird weiter per Code platziert. Das gehört zu A6.
 - Icons der Skills stammen aus dem vorhandenen Archiv unter `Textures/Spells/Archive/icons`.
+
+#### Nachtrag vom 28.09.2026: Schadenswerte im Tooltip
+
+Umgesetzt auf dem Branch `master_SkillTooltipDps`. Der Tooltip eines Skills zeigt fünf Werte:
+
+| Zeile | Inhalt |
+|---|---|
+| DPS | Schaden pro Sekunde gegen ein Ziel |
+| Average Hit | Mittlerer Treffer, Krit eingerechnet |
+| Crit Chance | Krit-Chance des Skills in der Hand des Helden |
+| Attacks oder Casts per Second | Einsätze pro Sekunde. Bei einer ATTACK ist das Angriffstempo die indirekte Abklingzeit, eine längere Abklingzeit des Skills bremst zusätzlich. |
+| Cooldown | Nur, wenn der Skill eine Abklingzeit hat |
+
+Die erste Fassung zeigte mehr, unter anderem kleinsten und größten Treffer, Trefferchance, Mana und DPS auf Dauer. Das war zu voll. Der Kern rechnet diese Werte weiter aus, angezeigt werden sie nicht.
+
+- `SkillDamageEstimator` im Kern rechnet mit Erwartungswerten statt zu würfeln und benutzt dieselben Regeln wie die Trefferauflösung.
+- Die gemeinsamen Regeln stehen jetzt an einer Stelle: `GetDamageFactor` und `GetHitChanceFactor` an der Schadensart, `GetCriticalFactor` und `GetHitChance` in `CombatFormulas`.
+- Der Tooltip entsteht erst beim Anzeigen. Er zeigt deshalb immer die Werte der aktuellen Ausrüstung und der laufenden Statuseffekte.
+- Alle Zahlen gelten für ein einzelnes Ziel ohne Verteidigung. Die Anzeige beschreibt den Helden, nicht einen bestimmten Gegner.
+
+Die Formel:
+
+```
+Mittlerer Treffer    = (Min + Max) / 2 × (1 + Krit-Chance × Krit-Schaden)
+Einsätze pro Sekunde = ATTACK: 1 / max(1 / Angriffstempo, Abklingzeit)
+                       SPELL:  1 / max(Abklingzeit, 0,1 s)
+Treffer pro Sekunde  = Einsätze pro Sekunde × (1 − Fehlschläge) × Trefferchance
+DPS                  = Mittlerer Treffer × Treffer pro Sekunde + Schaden des Statuseffekts
+```
+
+Was außer den verlangten Werten in die DPS eingerechnet ist:
+
+| Wert | Wirkung |
+|---|---|
+| Trefferchance | Stat des Helden, bei Pierce halbiert |
+| Faktor der Schadensart | Crush verursacht 20 % mehr Schaden |
+| Bleed | 50 % des mittleren Treffers über 4 Sekunden. Nur die stärkste Blutung wirkt, schnellere Treffer erhöhen den Wert also nicht. |
+| Burn | 25 % des mittleren Treffers über 4 Sekunden pro Treffer, höchstens 10 Brände gleichzeitig |
+| Fehlschläge | Steht der Held unter Shock, schlagen 25 % der Einsätze fehl |
+| Chill auf dem Helden | Senkt das Angriffstempo und damit die Einsätze pro Sekunde |
+
+Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
+
+Geprüft: 36 neue Unit-Tests, insgesamt 271. Ein Test würfelt je Schadensart 200.000 Treffer und vergleicht den Mittelwert mit der Schätzung. Im laufenden Spiel ergab eine Minute Nahkampf mit dem Schwert 10,73 DPS, der Tooltip zeigte 10,6.
+
+Bewusst vereinfacht:
+
+- Bei Bleed rechnet die Schätzung mit dem mittleren Treffer. Im Spiel wirkt die stärkste Blutung, der echte Wert liegt deshalb leicht darüber.
+- Treffer werden im Spiel auf ganze Zahlen gerundet, die Schätzung rechnet ohne Rundung.
+- Forks und mehrere Ziele in einer Fläche zählen nicht, gerechnet wird ein Ziel.
+- Die Zeit fürs Hinlaufen und die Flugzeit von Projektilen zählen nicht.
+
+#### Nachtrag vom 28.09.2026: Kommentare im Code
+
+Der Code aus M1 bis M3 war zu dicht kommentiert, oft stand über einer Methode nur ihr Name in anderen Worten.
+
+- Von 311 Kommentarzeilen, die seit M1 dazugekommen waren, sind 47 geblieben.
+- Geblieben sind Fallen ("Neue Werte nur am Ende anhängen"), Begründungen, Eigenheiten von Godot und Reihenfolgen, die eingehalten werden müssen.
+- Erklärungen zu Aufbau, Einheiten und Regeln stehen jetzt hier: unter M1 "So funktioniert der Kern", unter M2 "So funktioniert die Pipeline" und unter M3 "So funktionieren Skills".
+- Kommentare aus der Zeit vor M1 sind unverändert.
 
 ### M4: Items als Daten und Speichern (M)
 

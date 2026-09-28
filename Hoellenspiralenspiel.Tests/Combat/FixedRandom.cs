@@ -3,7 +3,6 @@ using Hoellenspiralenspiel.Scripts.Core.Rng;
 
 namespace Hoellenspiralenspiel.Tests.Combat;
 
-//Liefert vorgegebene Würfe der Reihe nach, danach immer den Ersatzwert
 internal sealed class FixedRandom : IRandomSource
 {
     private readonly float        fallback;
@@ -29,8 +28,6 @@ internal static class Rolls
 {
     private const float Never = 0.999f;
 
-    //Reihenfolge der Würfe in der Trefferauflösung: Treffen, Ausweichen, Parry, Block, Krit, Schaden.
-    //Werte von 0 bis unter 1. Ohne Angabe trifft der Angriff, und keine Chance unter 100 % greift
     public static FixedRandom Create(float hit    = 0f,
                                      float dodge  = Never,
                                      float parry  = Never,

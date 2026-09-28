@@ -7,7 +7,6 @@ namespace Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 
 public sealed record StatusEffectRule(StatusEffectKind Kind, StackingRule Stacking, int MaxInstances, bool DealsDamage);
 
-//Legt fest, wie sich jeder Statuseffekt verhält und welche Schadensart ihn auslöst
 public static class StatusEffectRules
 {
     private static readonly StatusEffectRule[] Rules =
@@ -24,7 +23,6 @@ public static class StatusEffectRules
     public static string GetOriginId(StatusEffectKind kind)
         => $"Status:{kind}";
 
-    //Der Effekt, den ein gelandeter Treffer auslöst. Ohne Schaden gibt es keinen Effekt
     public static StatusEffectApplication GetEffectOfHit(DamageType damageType, float unmitigatedDamage, int finalDamage)
     {
         if (finalDamage <= 0)
@@ -44,7 +42,6 @@ public static class StatusEffectRules
         };
     }
 
-    //Modifier, die ein Effekt mit dieser Stärke auf das Stat-Blatt legt
     public static IReadOnlyList<CombatStatModifier> GetModifiers(StatusEffectKind kind, float magnitude)
     {
         if (kind != StatusEffectKind.Chill || magnitude <= 0)

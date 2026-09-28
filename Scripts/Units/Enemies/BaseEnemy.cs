@@ -14,10 +14,8 @@ public abstract partial class BaseEnemy : BaseUnit
 {
     private const float MinAttackspeedRate = 0.1f;
 
-    //Färbt den Gegner, solange er ausholt, damit der Angriff zu sehen ist
     private static readonly Color WindupTint = new(1.6f, 0.7f, 0.7f);
 
-    //Gilt für Gegner, denen kein Skill zugewiesen ist
     private static readonly AttackSkillResource StandardAttack = new() { Id = "attack", DisplayName = AttackDefinition.Standard.Name };
 
     private readonly AttackCycle     attackCycle = new();
@@ -34,10 +32,8 @@ public abstract partial class BaseEnemy : BaseUnit
     public override Faction Faction      => Faction.Monster;
     public override bool    IsTargetable => !IsDead && !IsDying;
 
-    //Die Angriffswerte aus dem Inspector sind die Waffe des Gegners. Eine ATTACK skaliert damit
     public override WeaponProfile Weapon => new(AttackDamageMin, AttackDamageMax, 1f, AttackCriticalHitChance, AttackDamageType, AttackRange);
 
-    //Der Skill, mit dem der Gegner angreift. Ohne Angabe ist es der Standardangriff im Nahkampf
     [Export]
     public SkillResource AttackSkill { get; set; }
 
@@ -50,7 +46,6 @@ public abstract partial class BaseEnemy : BaseUnit
     [Export]
     public float AggroRange { get; set; } = 500f;
 
-    //Abstand in Pixeln zwischen den Körpermitten, ab dem der Gegner angreift
     [Export]
     public float AttackRange { get; set; } = 150f;
 
@@ -96,7 +91,6 @@ public abstract partial class BaseEnemy : BaseUnit
         AnimationTree.AnimationStarted += AnimationTreeOnAnimationStarted;
     }
 
-    //Ändert sich das maximale Leben, muss der Balken das neue Maximum kennen
     private void OnStatsChanged()
     {
         healthbar.MaxValue = LifeMaximum;
@@ -194,7 +188,6 @@ public abstract partial class BaseEnemy : BaseUnit
 
     public override void ReceiveDamage(HitResult hit)
     {
-        //Auch ein abgewehrter Treffer macht den Gegner aggressiv
         if (IsTargetable)
             IsAggressive = true;
 
@@ -241,7 +234,6 @@ public abstract partial class BaseEnemy : BaseUnit
             QueueFree();
     }
 
-    //Gegner setzen Skills auf demselben Weg ein wie der Spieler. Mana und Abklingzeit zählen für sie noch nicht
     protected virtual void ExecuteAttack()
         => SkillExecutor.Execute(this, AttackSkill ?? StandardAttack, new SkillAim(ChasedPlayer.BodyCenter, ChasedPlayer));
 
@@ -268,7 +260,6 @@ public abstract partial class BaseEnemy : BaseUnit
     {
         var toPlayer = ChasedPlayer.BodyCenter - BodyCenter;
 
-        //Chill und andere Modifier auf das Angriffstempo strecken oder stauchen den Takt
         var attackspeedRate = Math.Max(MinAttackspeedRate, Stats.GetTotalMultiplier(CombatStat.Attackspeed));
 
         Velocity          = Vector2.Zero;

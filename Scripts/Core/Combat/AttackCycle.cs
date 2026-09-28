@@ -9,7 +9,6 @@ public enum AttackPhase
     Recovery
 }
 
-//Der Takt eines Angriffs: Ausholen, Treffer, Erholen. Spieler und Gegner benutzen denselben Ablauf
 public sealed class AttackCycle
 {
     private double recoverySec;
@@ -18,7 +17,6 @@ public sealed class AttackCycle
     public double      TimeLeftSec { get; private set; }
     public bool        IsReady     => Phase == AttackPhase.Ready;
 
-    //Liefert false, wenn noch ein Angriff läuft
     public bool Start(double windupSec, double recoverySec)
     {
         if (!IsReady)
@@ -31,7 +29,6 @@ public sealed class AttackCycle
         return true;
     }
 
-    //Liefert true genau in dem Schritt, in dem das Ausholen endet und der Treffer fällt
     public bool Advance(double deltaSec)
     {
         var hasImpact = false;
@@ -63,8 +60,7 @@ public sealed class AttackCycle
         return hasImpact;
     }
 
-    //Bricht das Ausholen ab, es fällt kein Treffer. Nach dem Treffer läuft das Erholen weiter,
-    //damit ein Abbruch den nächsten Angriff nicht beschleunigt
+    //Nach dem Treffer läuft das Erholen weiter, damit ein Abbruch den nächsten Angriff nicht beschleunigt
     public void CancelWindup()
     {
         if (Phase != AttackPhase.Windup)

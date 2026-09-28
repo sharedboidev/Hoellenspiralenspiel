@@ -47,8 +47,6 @@ public partial class Statdisplay : PanelContainer
         RenderUtilities(player);
     }
 
-
-    //Zeigt Increased und More eines Stats zusammen als Zuwachs in Prozent
     private static string AsBonusPercent(Player2D player, CombatStat stat)
         => "+" + ((player.Stats.GetTotalMultiplier(stat) - 1) * 100).ToString("0.##") + "%";
 
@@ -59,7 +57,6 @@ public partial class Statdisplay : PanelContainer
         lightRadiusLabel.Text   = player.LightRadiusFinal.ToString("N0") + "%";
     }
 
-    //Die Waffe liefert die Grundwerte für Krit-Chance und Angriffstempo, gerechnet wird im Stat-Blatt
     private void RenderOffences(Player2D player)
     {
         meleeCritChanceLabel.Text = player.Stats.GetFinal(CombatStat.CriticalHitChance).ToString("0.##") + "%";

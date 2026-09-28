@@ -6,7 +6,6 @@ using Hoellenspiralenspiel.Scripts.Core.Combat;
 
 namespace Hoellenspiralenspiel.Scripts.Skills;
 
-//Alle Skills, die der Held kennen kann. Jede Skill-Resource im Ordner gehört dazu, ein neuer Skill braucht hier keinen Eintrag
 public static class SkillLibrary
 {
     public const string PlayerSkillsPath    = "res://Resources/Skills/Player";
@@ -16,7 +15,6 @@ public static class SkillLibrary
     private static readonly List<SkillResource>               Skills     = new();
     private static          bool                              isLoaded;
 
-    //Attacks zuerst, danach Spells, jeweils nach Namen sortiert
     public static IReadOnlyList<SkillResource> PlayerSkills
     {
         get

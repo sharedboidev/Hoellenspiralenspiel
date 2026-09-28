@@ -13,7 +13,6 @@ public class DerivedStatProviderTests
                               .Single(modifier => modifier.AffectedStat == derivedStat)
                               .Value;
 
-    //Obergrenzen aus dem Designdokument, in Prozent. Flache Rüstung ist ein absoluter Wert
     private static readonly object[] Ceilings =
     [
         new object[] { CombatStat.Strength, CombatStat.PhysicalDamage, ModificationType.More, 1.00f },
@@ -58,7 +57,6 @@ public class DerivedStatProviderTests
             previous = current;
         }
 
-        //Danach flacht die Kurve ab und erreicht die Obergrenze, fallen darf sie nie
         for (var attributeValue = 101; attributeValue <= 1000; attributeValue++)
         {
             var current = ValueOf(attribute, attributeValue, derivedStat);

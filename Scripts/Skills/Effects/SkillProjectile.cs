@@ -6,8 +6,7 @@ using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.Skills.Effects;
 
-//Ein Projektil für jeden Skill und jeden Wirkenden. Die Szene zeigt nach rechts und bringt Aussehen und Kollisionsform mit,
-//Flugverhalten und Treffer kommen aus dem Skill
+//Die Szene muss nach rechts zeigen
 public partial class SkillProjectile : Area2D
 {
     private readonly List<BaseUnit>     forkTargets = new();
@@ -79,7 +78,6 @@ public partial class SkillProjectile : Area2D
         Spend();
     }
 
-    //Vom getroffenen Ziel aus fliegen neue Projektile zu den nächsten Feinden, die dieser Wurf noch nicht getroffen hat
     private void Fork(BaseUnit hitUnit)
     {
         if (!settings.CanFork || generation >= settings.ForkGenerations)

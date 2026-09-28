@@ -17,7 +17,6 @@ public class StatFormulasTests
     [Test]
     public void Combine_IncreasedUndMore_WerdenMiteinanderMultipliziert()
     {
-        //Das Beispiel aus dem Spiel: 14 % und 22 % increased, dazu 2,97 % more
         var multiplier = StatFormulas.Combine(1, 0, 0.14f + 0.22f, 1.0297f);
 
         Assert.That(multiplier, Is.EqualTo(1.4004f).Within(0.0001f));

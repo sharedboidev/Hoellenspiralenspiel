@@ -6,7 +6,6 @@ namespace Hoellenspiralenspiel.Tests.Progression;
 [TestFixture]
 public class DeathPenaltyTests
 {
-    //Level 3 beginnt bei 1760 XP, Level 4 bei 3781 XP
     private const long LevelFloor = 1760;
     private const long NextLevel  = 3781;
 

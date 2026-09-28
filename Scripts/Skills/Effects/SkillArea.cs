@@ -4,8 +4,6 @@ using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.Skills.Effects;
 
-//Eine Fläche auf dem Boden für jeden Skill und jeden Wirkenden. Die Szene bringt das Aussehen mit,
-//Radius, Verzögerung und Ausbreitung kommen aus dem Skill. Getroffen wird, wer feindlich ist und in der Fläche steht
 public partial class SkillArea : Node2D
 {
     private double       activeSec;
@@ -17,7 +15,6 @@ public partial class SkillArea : Node2D
     private AreaSettings settings;
     private Vector2      visualBaseScale = Vector2.One;
 
-    //Wächst mit dem Radius der Fläche
     [Export]
     public Node2D Visual { get; set; }
 
@@ -25,18 +22,15 @@ public partial class SkillArea : Node2D
     [Export]
     public float VisualRadius { get; set; } = 100f;
 
-    //Läuft während der Verzögerung genau einmal durch
     [Export]
     public AnimatedSprite2D Indicator { get; set; }
 
-    //Erscheint in dem Augenblick, in dem die Fläche zu wirken beginnt
     [Export]
     public PackedScene ImpactScene { get; set; }
 
     [Export]
     public Vector2 ImpactScale { get; set; } = Vector2.One;
 
-    //Zeit nach dem Ende der Wirkung, bis die Szene verschwindet
     [Export]
     public float LingerSec { get; set; }
 

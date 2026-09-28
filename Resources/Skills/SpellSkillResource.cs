@@ -4,7 +4,6 @@ using Hoellenspiralenspiel.Scripts.Core.Skills;
 
 namespace Hoellenspiralenspiel.Resources.Skills;
 
-//Ein SPELL: bringt seinen eigenen Grundschaden mit und skaliert nicht mit der Waffe
 [GlobalClass]
 public partial class SpellSkillResource : SkillResource
 {
@@ -22,8 +21,6 @@ public partial class SpellSkillResource : SkillResource
     public float CriticalHitChance { get; set; } = 5f;
 
     public override SkillKind Kind => SkillKind.Spell;
-
-    public override string DamageSummary => $"{MinDamage:0.##} to {MaxDamage:0.##} {DamageType} damage";
 
     protected override SkillDefinition CreateBaseDefinition()
         => SkillDefinition.ForSpell(Id, new SpellDefinition(NameOrId, MinDamage, MaxDamage, DamageType, CriticalHitChance));

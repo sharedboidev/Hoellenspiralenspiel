@@ -2,10 +2,8 @@ using System;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Combat;
 
-//Alle Rechenregeln der Schadensminderung an einer Stelle
 public static class CombatFormulas
 {
-    //Ab diesem Wert ist ein Ziel immun. Negative Resistenz erhöht den Schaden
     public const float MaxResistance = 100f;
 
     //Rüstung wirkt gegen kleine Treffer stark und gegen große schwach
@@ -30,4 +28,10 @@ public static class CombatFormulas
 
     public static float ClampChance(float chancePercent)
         => Math.Clamp(chancePercent, 0f, 100f);
+
+    public static float GetCriticalFactor(float criticalDamageBonusPercent)
+        => 1f + Math.Max(0f, criticalDamageBonusPercent) / 100f;
+
+    public static float GetHitChance(HitRequest request)
+        => ClampChance(request.HitChance * request.DamageType.GetHitChanceFactor());
 }

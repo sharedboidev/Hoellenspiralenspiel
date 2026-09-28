@@ -2,8 +2,6 @@ using System.Collections.Generic;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
-//Alle Einheiten, die gerade im Szenenbaum hängen. Wer Ziele sucht, fragt hier und filtert nach Fraktion,
-//statt den Szenenbaum zu durchsuchen
 public static class UnitRegistry
 {
     private static readonly List<BaseUnit> RegisteredUnits = new();

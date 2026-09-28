@@ -9,10 +9,8 @@ public enum SkillUseCheck
     NotEnoughMana
 }
 
-//Prüft, ob eine Einheit einen Skill gerade einsetzen kann
 public static class SkillGate
 {
-    //Für Einheiten ohne Mana, sie zahlen nichts
     public const float UnlimitedMana = float.PositiveInfinity;
 
     public static SkillUseCheck Check(SkillDefinition skill, SkillCooldowns cooldowns, float availableMana)

@@ -2,7 +2,6 @@ using Godot;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
-//Erscheint beim Tod des Spielers und meldet, wenn er wiederbelebt werden will
 public partial class DeathScreen : Control
 {
     public delegate void RespawnRequestedEventHandler();

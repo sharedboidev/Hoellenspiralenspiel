@@ -26,7 +26,6 @@ public class StatusEffectTrackerTests
         return sheet;
     }
 
-    //Lässt die Zeit in Frames vergehen und sammelt den Schaden ein
     private static List<StatusTick> Run(StatusEffectTracker tracker, double seconds)
     {
         var ticks = new List<StatusTick>();

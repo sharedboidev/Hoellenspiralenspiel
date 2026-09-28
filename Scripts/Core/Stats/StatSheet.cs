@@ -5,8 +5,6 @@ using Hoellenspiralenspiel.Enums;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Stats;
 
-//Hält alle Stats einer Einheit. Gerechnet wird nur, wenn sich etwas ändert, gelesen wird aus einem Zwischenspeicher.
-//Die Klasse ist reines C# ohne Godot, damit sie ohne Engine testbar ist und für 2D und 3D gleich funktioniert.
 public sealed class StatSheet
 {
     public static readonly IReadOnlyList<CombatStat> Attributes =
@@ -35,26 +33,21 @@ public sealed class StatSheet
     public StatSheet()
         => Recalculate();
 
-    //Modifier von außen, z.B. von Ausrüstung
     public IReadOnlyList<CombatStatModifier> Modifiers => modifiers;
 
-    //Modifier, die das Blatt selbst aus den Attributen ableitet
     public IReadOnlyList<CombatStatModifier> DerivedModifiers => derivedModifiers;
 
-    //Zählt die Neuberechnungen, für Tests und zur Diagnose
     public int RecalculationCount { get; private set; }
 
-    //Feuert nach jeder Neuberechnung, also erst wenn alle Werte aktuell sind
     public event Action Changed;
 
     public static bool IsAttribute(CombatStat stat)
         => stat is CombatStat.Strength or CombatStat.Dexterity or CombatStat.Intelligence or CombatStat.Constitution or CombatStat.Awareness;
 
-    //Der gesetzte Grundwert. Bei Leben, Mana und Lebensregeneration ist das der Zuschlag auf die Formel aus den Attributen
+    //Bei Leben, Mana und Lebensregeneration ist der Grundwert ein Zuschlag auf die Formel aus den Attributen
     public float GetBase(CombatStat stat)
         => baseValues[(int)stat];
 
-    //Der Grundwert, mit dem gerechnet wird, inklusive der Formel aus den Attributen
     public float GetEffectiveBase(CombatStat stat)
         => effectiveBase[(int)stat];
 
@@ -67,14 +60,12 @@ public sealed class StatSheet
     public float GetMoreMultiplier(CombatStat stat)
         => more[(int)stat];
 
-    //Increased und More zusammen, z.B. 1,4 für "+40 %"
     public float GetTotalMultiplier(CombatStat stat)
         => GetIncreasedMultiplier(stat) * GetMoreMultiplier(stat);
 
     public float GetFinal(CombatStat stat)
         => finalValues[(int)stat];
 
-    //Endwert ohne Nachkommastellen, so wie ihn Kampf und Anzeige bisher benutzen
     public int GetFinalWhole(CombatStat stat)
         => (int)finalValues[(int)stat];
 
@@ -114,7 +105,6 @@ public sealed class StatSheet
             NotifyChanged();
     }
 
-    //Entfernt alle Modifier einer Herkunft, z.B. eines abgelegten Items. Liefert die Anzahl der entfernten Modifier
     public int RemoveModifiersOf(string originId)
     {
         var removed = modifiers.RemoveAll(modifier => modifier.OriginId == originId);
@@ -125,7 +115,6 @@ public sealed class StatSheet
         return removed;
     }
 
-    //Fasst mehrere Änderungen zusammen. Gerechnet und gemeldet wird einmal am Ende
     public void Update(Action<StatSheet> changes)
     {
         ArgumentNullException.ThrowIfNull(changes);
@@ -179,14 +168,13 @@ public sealed class StatSheet
         foreach (var modifier in modifiers)
             Accumulate(modifier);
 
-        //Schritt 1: Attribute. Sie hängen nur von Grundwert und äußeren Modifiern ab
+        //Die Reihenfolge zählt: erst Attribute, dann die daraus abgeleiteten Modifier, dann alle übrigen Stats
         foreach (var attribute in Attributes)
         {
             effectiveBase[(int)attribute] = baseValues[(int)attribute];
             finalValues[(int)attribute]   = StatFormulas.TruncateAttribute(CombineFor(attribute));
         }
 
-        //Schritt 2: Aus den Endwerten der Attribute leiten sich weitere Modifier ab
         derivedModifiers.Clear();
 
         foreach (var attribute in Attributes)
@@ -199,7 +187,6 @@ public sealed class StatSheet
                 Accumulate(modifier);
         }
 
-        //Schritt 3: Alle übrigen Stats
         foreach (var stat in AllStats)
         {
             if (IsAttribute(stat))

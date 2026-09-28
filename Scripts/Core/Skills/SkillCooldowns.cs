@@ -3,17 +3,14 @@ using System.Collections.Generic;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Skills;
 
-//Die laufenden Abklingzeiten einer Einheit. Die Abklingzeit gehört zum Skill, nicht zum Platz auf der Leiste
 public sealed class SkillCooldowns
 {
     private readonly List<Entry> running = new();
 
     public bool HasAny => running.Count > 0;
 
-    //Feuert, wenn die Abklingzeit eines Skills beginnt
     public event Action<string> Started;
 
-    //Feuert, wenn ein Skill wieder bereit ist
     public event Action<string> Finished;
 
     public bool IsReady(string skillId)
@@ -22,7 +19,6 @@ public sealed class SkillCooldowns
     public double GetRemainingSec(string skillId)
         => Find(skillId)?.RemainingSec ?? 0;
 
-    //Volle Dauer der laufenden Abklingzeit, für die Anzeige des Fortschritts
     public double GetTotalSec(string skillId)
         => Find(skillId)?.TotalSec ?? 0;
 

@@ -14,7 +14,6 @@ public static class InputActions
     public static readonly StringName ToggleCharacterSheet = "toggle_character_sheet";
     public static readonly StringName ToggleOverlayMap     = "toggle_overlay_map";
 
-    //Eine Aktion je Platz der Skill-Leiste, in der Reihenfolge der Plätze
     public static readonly StringName[] SkillSlots =
     [
         "skill_slot_1",
@@ -29,7 +28,6 @@ public static class InputActions
         "skill_slot_10"
     ];
 
-    //Kurze Beschriftung der ersten Taste, die auf der Aktion liegt, z.B. "LMB" oder "Q"
     public static string GetKeyLabel(StringName action)
     {
         if (!InputMap.HasAction(action))
