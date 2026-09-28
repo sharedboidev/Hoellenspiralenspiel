@@ -129,14 +129,14 @@ Leitlinien, die aus den Richtungsentscheidungen folgen:
 
 Größen: S bedeutet wenige Abende, M ein bis zwei Wochen Hobbyzeit, L mehrere Wochen.
 
-### M0: Aufräumen und Fehler beheben (S)
+### M0: Aufräumen und Fehler beheben (S, abgeschlossen)
 
 Ziel: stabile Basis, bevor umgebaut wird.
 
 - Erledigt am 28.09.2026: alle bekannten Fehler F1 bis F22.
 - Erledigt am 28.09.2026: `.gitignore` erweitert, eingecheckte IDE- und Build-Dateien aus dem Repo entfernt, Wurzelordner aufgeräumt, tote Klassen gelöscht.
 - Erledigt am 28.09.2026: Eingabeaktionen nach Funktion benannt, ungenutzte Aktionen `F` und `+` entfernt.
-- Offen: Branch `master_MeleeCombat` nach `master` zusammenführen.
+- Erledigt am 28.09.2026: Branch `master_MeleeCombat` per Fast-Forward nach `master` zusammengeführt.
 
 Bewusst nicht angefasst:
 
