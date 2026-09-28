@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Skills/Effects/SkillArea.cs" id="1_area"]
+[ext_resource type="Shader" path="res://Scenes/Spells/cool.tres" id="2_shader"]
+[ext_resource type="SpriteFrames" path="res://Resources/SpriteFrames/target_circle.tres" id="3_frames"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/fire_burst.tscn" id="4_burst"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_circle"]
+shader = ExtResource("2_shader")
+shader_parameter/Glow_Color2 = Color(0.95, 0.12, 0.05, 1)
+
+[node name="DeathBlast" type="Node2D" node_paths=PackedStringArray("Visual", "Indicator")]
+script = ExtResource("1_area")
+Visual = NodePath("Circle")
+VisualRadius = 243.0
+Indicator = NodePath("Circle")
+ImpactScene = ExtResource("4_burst")
+ImpactScale = Vector2(1.12, 1.12)
+LingerSec = 0.35
+
+[node name="Circle" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_circle")
+scale = Vector2(1, 0.5)
+sprite_frames = ExtResource("3_frames")
+animation = &"Cool"

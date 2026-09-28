@@ -1,8 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Godot;
+using Hoellenspiralenspiel.Resources.Enemies;
+using Hoellenspiralenspiel.Resources.MonsterMods;
+using Hoellenspiralenspiel.Scripts.Core.Enemies;
+using Hoellenspiralenspiel.Scripts.Core.Rng;
+using Hoellenspiralenspiel.Scripts.Enemies;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.UI;
@@ -13,120 +16,166 @@ namespace Hoellenspiralenspiel.Scripts.Controllers;
 
 public partial class EnemyController : Node
 {
-    private readonly int                   calculationMaxTries = 20;
-    private readonly Random                isEliteRng          = new();
-    private readonly Random                isRareRng           = new();
-    private readonly RandomNumberGenerator rng                 = new();
-    private          Node2D                container;
-    private          Node                  currentScene;
-    private          Player2D              player;
-    private          Timer                 spawnTimer;
-
-    [Export]
-    public PackedScene[] EnemiesToSpawn { get; set; }
+    private readonly List<Enemy> enemies = new();
+    private          Node2D      container;
+    private          Player2D    player;
 
     [Export]
     public Lootsystem Lootsystem { get; set; }
 
+    //Jedes Monster der Karte hat dieses Level, plus die Anpassungen an Monster und Spawn-Marker
     [Export]
-    public float SpawnIntervallSec { get; set; } = 1.5f;
+    public int AreaLevel { get; set; } = 1;
+
+    //Ruhende Monster außerhalb dieses Abstands zum Helden denken und bewegen sich nicht
+    [Export]
+    public float SimulationRadius { get; set; } = 2500f;
+
+    [ExportGroup("Elite")]
+    [Export(PropertyHint.Range, "0,100,0.1")]
+    public float EliteChancePercent { get; set; } = 10f;
 
     [Export]
-    public float MinDistanceToPlayer { get; set; } = 220f;
+    public float EliteScale { get; set; } = 1.25f;
 
-    public  List<BaseEnemy> SpawnedEnemies   { get; set; } = new();
-    private bool            NextSpawnIsRare  => isRareRng.Next(1, 11) == 1;
-    private bool            NextSpawnIsElite => isEliteRng.Next(1, 16) == 1;
+    [Export]
+    public float EliteXpFactor { get; set; } = 1.5f;
+
+    [Export]
+    public int EliteLootRolls { get; set; } = 2;
+
+    [Export]
+    public Color EliteNameColor { get; set; } = new(0.45f, 0.68f, 1f);
+
+    [ExportGroup("Rare Elite")]
+    [Export(PropertyHint.Range, "0,100,0.1")]
+    public float RareEliteChancePercent { get; set; } = 4f;
+
+    [Export]
+    public float RareEliteScale { get; set; } = 1.5f;
+
+    [Export]
+    public float RareEliteXpFactor { get; set; } = 3f;
+
+    [Export]
+    public int RareEliteLootRolls { get; set; } = 3;
+
+    [Export]
+    public Color RareEliteNameColor { get; set; } = new(1f, 0.82f, 0.25f);
+
+    public IReadOnlyList<Enemy> Enemies => enemies;
 
     public override void _Ready()
     {
-        base._Ready();
+        var currentScene = GetTree().CurrentScene;
 
-        rng.Randomize();
+        player    = currentScene.GetNode<Player2D>("%Player 2D");
+        container = currentScene.GetNode<Node2D>("%Enemies");
 
-        currentScene = GetTree().CurrentScene;
-        player       = currentScene.GetNode<Player2D>("%Player 2D");
-        container    = currentScene.GetNode<Node2D>("%Enemies");
-
-        //ConfigureSpawntimer();
-
-        var spawnMarkers = GetParent().GetNode<Node2D>(nameof(SpawnMarker)).GetAllChildren<SpawnMarker>();
-
-        foreach (var spawnMarker in spawnMarkers)
-            SpawnEnemies(spawnMarker);
-    }
-
-    private void ConfigureSpawntimer()
-    {
-        spawnTimer = GetNode<Timer>("EnemySpawnTimer");
-
-        spawnTimer.WaitTime =  SpawnIntervallSec;
-        spawnTimer.Timeout  += SpawnTimerOnTimeout;
+        foreach (var spawnMarker in GetParent().GetNode<Node2D>(nameof(SpawnMarker)).GetAllChildren<SpawnMarker>())
+            SpawnGroupAt(spawnMarker);
     }
 
     public override void _PhysicsProcess(double delta)
-        => MakeEnemiesDoTheirThing(delta);
-
-    private void SpawnTimerOnTimeout()
     {
-        if (SpawnedEnemies.Count >= 100)
-            return;
-    }
+        var playerPosition          = player.GlobalPosition;
+        var simulationRadiusSquared = SimulationRadius * SimulationRadius;
 
-    private void SpawnEnemies(SpawnMarker spawnMarker)
-    {
-        for (var i = 0; i < spawnMarker.AmountToSpawn; i++)
+        //Über den Index, weil ein Monster beim Denken weitere beschwören kann
+        for (var i = 0; i < enemies.Count; i++)
         {
-            var spawn = spawnMarker.EnemyToSpawn.Instantiate<BaseEnemy>();
+            var enemy   = enemies[i];
+            var isAwake = !enemy.IsResting || enemy.GlobalPosition.DistanceSquaredTo(playerPosition) <= simulationRadiusSquared;
 
-            if (NextSpawnIsRare)
-                spawn.MakeRare();
+            enemy.SetAwake(isAwake);
 
-            if (NextSpawnIsElite)
-                spawn.MakeElite();
-
-            spawn.Position        =  spawnMarker.GetSpawnlocationFor(i);
-            spawn.SpawnGroup      =  spawnMarker.Name;
-            spawn.PropertyChanged += SpawnOnPropertyChanged;
-            spawn.Died += SpawnOnDied;
-
-            SpawnedEnemies.Add(spawn);
-            container.AddChild(spawn);
+            if (isAwake)
+                enemy.Think(delta);
         }
     }
 
-    private void SpawnOnDied(BaseUnit unit)
+    private void SpawnGroupAt(SpawnMarker spawnMarker)
     {
-        if(unit is not BaseEnemy enemy)
+        if (spawnMarker.Enemy is null)
+        {
+            GD.PushWarning($"Der Spawn-Marker {spawnMarker.Name} hat keinen Gegner.");
+
+            return;
+        }
+
+        var level   = EnemyScaling.GetLevel(AreaLevel, spawnMarker.Enemy.LevelOffset, spawnMarker.LevelOffset);
+        var chances = new EnemyRarityChances(EliteChancePercent, RareEliteChancePercent);
+
+        for (var i = 0; i < spawnMarker.AmountToSpawn; i++)
+        {
+            var modCount = EnemyRarityRules.RollModCount(chances, GameRandom.Shared);
+
+            Spawn(spawnMarker.Enemy, spawnMarker.GetSpawnlocationFor(i), spawnMarker.Name, level, modCount);
+        }
+    }
+
+    public Enemy Spawn(EnemyResource definition, Vector2 position, string spawnGroup, int level, int modCount = 0)
+    {
+        var traits = new MonsterTraits(level, definition.UsesProjectiles);
+        var mods   = MonsterModRoller.Pick(MonsterModLibrary.Pool, modCount, traits, GameRandom.Shared)
+                                     .Select(mod => MonsterModLibrary.Find(mod.Id))
+                                     .ToList();
+
+        return Spawn(definition, position, spawnGroup, level, mods);
+    }
+
+    public Enemy Spawn(EnemyResource definition, Vector2 position, string spawnGroup, int level, IReadOnlyList<MonsterModResource> mods)
+    {
+        var enemy = definition.Scene.Instantiate<Enemy>();
+
+        enemy.Configure(definition, level, mods, GetLookOf(EnemyRarityRules.FromModCount(mods.Count)));
+
+        enemy.Position   = position;
+        enemy.SpawnGroup = spawnGroup;
+        enemy.Controller = this;
+        enemy.Target     = player;
+        enemy.Provoked   += CallGroupToArms;
+        enemy.Died       += OnEnemyDied;
+
+        enemies.Add(enemy);
+        container.AddChild(enemy);
+
+        return enemy;
+    }
+
+    private EnemyRarityLook GetLookOf(EnemyRarity rarity)
+        => rarity switch
+        {
+            EnemyRarity.Elite     => new EnemyRarityLook(EliteScale, EliteXpFactor, EliteLootRolls, EliteNameColor),
+            EnemyRarity.RareElite => new EnemyRarityLook(RareEliteScale, RareEliteXpFactor, RareEliteLootRolls, RareEliteNameColor),
+            _                     => EnemyRarityLook.Normal
+        };
+
+    private void OnEnemyDied(BaseUnit unit)
+    {
+        if (unit is not Enemy enemy)
             return;
 
-        AggroMyGroup(enemy);
+        enemies.Remove(enemy);
+
+        CallGroupToArms(enemy);
+
         player.GainExperience(enemy.XpGranted);
 
         //Died feuert genau einmal pro Gegner, daher entsteht der Loot hier und nicht bei jeder Lebensänderung
         SpawnLootbags(enemy);
     }
 
-    private void SpawnOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void CallGroupToArms(Enemy caller)
     {
-        if (e.PropertyName != nameof(BaseEnemy.LifeCurrent) || sender is not BaseEnemy enemy)
-            return;
-
-        if (enemy.IsAggressive)
-            AggroMyGroup(enemy);
+        foreach (var enemy in enemies)
+        {
+            if (enemy != caller && !enemy.IsInCombat && enemy.SpawnGroup == caller.SpawnGroup)
+                enemy.Provoke();
+        }
     }
 
-    private void AggroMyGroup(BaseEnemy hitEnemy)
-    {
-        var notAggressiveFriends = SpawnedEnemies.Except([hitEnemy])
-                                                 .Where(friends => !friends.IsAggressive &&
-                                                                   friends.SpawnGroup == hitEnemy.SpawnGroup);
-
-        foreach (var groupMember in notAggressiveFriends)
-            groupMember.IsAggressive = true;
-    }
-
-    private void SpawnLootbags(BaseEnemy enemy)
+    private void SpawnLootbags(Enemy enemy)
     {
         var loot = Lootsystem.GenerateLoot(enemy);
 
@@ -143,42 +192,5 @@ public partial class EnemyController : Node
             return Vector2.Zero;
 
         return Vector2.Right.Rotated(Mathf.Tau * index / totalAmount) * spreadRadiusPx;
-    }
-
-    private void MakeEnemiesDoTheirThing(double delta)
-    {
-        foreach (var enemy in SpawnedEnemies)
-        {
-            if (player.IsInAggroRangeOf(enemy))
-                enemy.IsAggressive = true;
-
-            enemy.ChasePlayer();
-        }
-    }
-
-    private Vector2 GetRandomVisiblePointNotNearPlayer()
-    {
-        var rect    = GetViewport().GetVisibleRect();
-        var padding = 64f;
-        rect.Position += new Vector2(padding, padding);
-        rect.Size     -= new Vector2(padding * 2f, padding * 2f);
-
-        if (rect.Size.X <= 0 || rect.Size.Y <= 0)
-            return Vector2.Zero;
-
-        var minDistSq = MinDistanceToPlayer * MinDistanceToPlayer;
-        var playerPos = player.GlobalPosition;
-
-        for (var i = 0; i < calculationMaxTries; i++)
-        {
-            var x = rng.RandfRange(rect.Position.X, rect.End.X);
-            var y = rng.RandfRange(rect.Position.Y, rect.End.Y);
-            var p = new Vector2(x, y);
-
-            if (p.DistanceSquaredTo(playerPos) >= minDistSq)
-                return p;
-        }
-
-        return Vector2.Zero;
     }
 }

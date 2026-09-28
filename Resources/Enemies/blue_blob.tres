@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Enemies/EnemyResource.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://cnxyy07a3er8q" path="res://Scenes/Units/Enemies/blue_blob.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "blue_blob"
+DisplayName = "Blue Blob"
+Scene = ExtResource("2_scene")
+LootTableId = "blue_blob_loot"
+StrengthPerLevel = 1.0
+ConstitutionPerLevel = 1.0
+Movementspeed = 25.0
+FrostResistance = 75
+DamageType = 4
+AttackRange = 80.0
+AttackWindupSec = 0.5
+AttackRecoverySec = 0.7

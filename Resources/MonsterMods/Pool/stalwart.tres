@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MonsterModResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/MonsterMods/MonsterModResource.cs" id="1_mod"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/StatModifierResource.cs" id="2_stat"]
+
+[sub_resource type="Resource" id="Resource_life"]
+script = ExtResource("2_stat")
+Modification = 2
+Value = 0.6
+
+[resource]
+script = ExtResource("1_mod")
+Id = "stalwart"
+DisplayName = "Stalwart"
+Description = "60% more Life"
+Modifiers = Array[ExtResource("2_stat")]([SubResource("Resource_life")])

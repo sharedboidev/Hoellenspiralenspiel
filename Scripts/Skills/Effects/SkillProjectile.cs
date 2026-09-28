@@ -9,7 +9,8 @@ namespace Hoellenspiralenspiel.Scripts.Skills.Effects;
 //Die Szene muss nach rechts zeigen
 public partial class SkillProjectile : Area2D
 {
-    private readonly List<BaseUnit>     forkTargets = new();
+    private readonly List<BaseUnit>     forkTargets  = new();
+    private readonly List<BaseUnit>     unitsInRange = new();
     private          double             ageSec;
     private          SkillCast          cast;
     private          Vector2            direction = Vector2.Right;
@@ -86,7 +87,9 @@ public partial class SkillProjectile : Area2D
         var origin = hitUnit.BodyCenter;
         var parent = GetParent();
 
-        NearestPicker.Pick(UnitRegistry.Units,
+        UnitRegistry.FindNear(origin, settings.ForkRange, unitsInRange);
+
+        NearestPicker.Pick(unitsInRange,
                            unit => cast.CanHit(unit) ? origin.DistanceSquaredTo(unit.BodyCenter) : -1f,
                            settings.ForkRange,
                            settings.ForkCount,

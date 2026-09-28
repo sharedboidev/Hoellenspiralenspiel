@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="MonsterModResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/MonsterMods/MonsterModResource.cs" id="1_mod"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/MonsterModEffect.cs" id="2_effect"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/ModAction.cs" id="3_action"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/Triggers/LifeBelowTrigger.cs" id="4_life"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/Actions/AddModifiersAction.cs" id="5_buff"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/StatModifierResource.cs" id="6_stat"]
+
+[sub_resource type="Resource" id="Resource_trigger"]
+script = ExtResource("4_life")
+Percent = 35.0
+
+[sub_resource type="Resource" id="Resource_attackspeed"]
+script = ExtResource("6_stat")
+Stat = 9
+Modification = 2
+Value = 0.5
+
+[sub_resource type="Resource" id="Resource_movementspeed"]
+script = ExtResource("6_stat")
+Stat = 29
+Modification = 2
+Value = 0.5
+
+[sub_resource type="Resource" id="Resource_action"]
+script = ExtResource("5_buff")
+Modifiers = Array[ExtResource("6_stat")]([SubResource("Resource_attackspeed"), SubResource("Resource_movementspeed")])
+
+[sub_resource type="Resource" id="Resource_effect"]
+script = ExtResource("2_effect")
+Trigger = SubResource("Resource_trigger")
+Actions = Array[ExtResource("3_action")]([SubResource("Resource_action")])
+Announcement = "Berserk!"
+
+[resource]
+script = ExtResource("1_mod")
+Id = "berserk"
+DisplayName = "Berserk"
+Description = "50% more Attack and Movement Speed below 35% Life"
+Effects = Array[ExtResource("2_effect")]([SubResource("Resource_effect")])

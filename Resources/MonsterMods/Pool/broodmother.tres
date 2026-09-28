@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="MonsterModResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/MonsterMods/MonsterModResource.cs" id="1_mod"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/MonsterModEffect.cs" id="2_effect"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/ModAction.cs" id="3_action"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/Triggers/LifeBelowTrigger.cs" id="4_life"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/Actions/SummonAction.cs" id="5_summon"]
+[ext_resource type="Resource" path="res://Resources/Enemies/blue_blob.tres" id="6_blob"]
+
+[sub_resource type="Resource" id="Resource_trigger"]
+script = ExtResource("4_life")
+Percent = 50.0
+
+[sub_resource type="Resource" id="Resource_action"]
+script = ExtResource("5_summon")
+Enemy = ExtResource("6_blob")
+Count = 3
+Radius = 120.0
+
+[sub_resource type="Resource" id="Resource_effect"]
+script = ExtResource("2_effect")
+Trigger = SubResource("Resource_trigger")
+Actions = Array[ExtResource("3_action")]([SubResource("Resource_action")])
+Announcement = "Brood!"
+
+[resource]
+script = ExtResource("1_mod")
+Id = "broodmother"
+DisplayName = "Broodmother"
+Description = "Summons three Blue Blobs at half Life"
+Effects = Array[ExtResource("2_effect")]([SubResource("Resource_effect")])

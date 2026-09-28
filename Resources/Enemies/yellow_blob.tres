@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Enemies/EnemyResource.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://v011gi31s48p" path="res://Scenes/Units/Enemies/yellow_blob.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "yellow_blob"
+DisplayName = "Yellow Blob"
+Scene = ExtResource("2_scene")
+LootTableId = "blue_blob_loot"
+StrengthPerLevel = 1.0
+DexterityPerLevel = 0.5
+ConstitutionPerLevel = 1.0
+LifeBonus = 66
+Movementspeed = 100.0
+LightningResistance = 75
+DamageMin = 2.0
+DamageMax = 4.0
+DamageType = 5
+AttackRange = 80.0
+AttackWindupSec = 0.5
+AttackRecoverySec = 0.7

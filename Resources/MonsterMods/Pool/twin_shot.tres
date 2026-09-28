@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="MonsterModResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/MonsterMods/MonsterModResource.cs" id="1_mod"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/StatModifierResource.cs" id="2_stat"]
+
+[sub_resource type="Resource" id="Resource_projectiles"]
+script = ExtResource("2_stat")
+Stat = 32
+Modification = 2
+Value = 1.0
+
+[resource]
+script = ExtResource("1_mod")
+Id = "twin_shot"
+DisplayName = "Twin Shot"
+Description = "Fires double Projectiles"
+Fit = 1
+Modifiers = Array[ExtResource("2_stat")]([SubResource("Resource_projectiles")])

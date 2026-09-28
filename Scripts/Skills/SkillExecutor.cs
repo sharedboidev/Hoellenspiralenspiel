@@ -1,4 +1,6 @@
+using System;
 using Godot;
+using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
@@ -12,7 +14,7 @@ public static class SkillExecutor
     public static void Execute(BaseUnit caster, SkillResource skill, SkillAim aim)
     {
         var definition = skill.Definition;
-        var cast       = new SkillCast(caster.Faction, HitRequests.ForSkill(caster.Stats, caster.Weapon, definition));
+        var cast       = new SkillCast(caster, HitRequests.ForSkill(caster.Stats, caster.Weapon, definition));
 
         switch (definition.Delivery)
         {
@@ -56,14 +58,21 @@ public static class SkillExecutor
             return;
         }
 
-        var origin     = caster.BodyCenter;
-        var projectile = scene.Instantiate<SkillProjectile>();
+        var origin    = caster.BodyCenter;
+        var direction = aim.CurrentPoint - origin;
+        var count     = Math.Max(1, caster.Stats.GetFinalWhole(CombatStat.ProjectileCount));
 
-        projectile.Launch(cast, settings, scene, aim.CurrentPoint - origin);
+        //Alle Projektile eines Wurfs teilen sich den Treffer, jede Einheit wird also höchstens einmal getroffen
+        for (var i = 0; i < count; i++)
+        {
+            var projectile = scene.Instantiate<SkillProjectile>();
 
-        caster.GetParent().AddChild(projectile);
+            projectile.Launch(cast, settings, scene, direction.Rotated(Mathf.DegToRad(ProjectileSpread.GetOffsetDegrees(i, count))));
 
-        projectile.GlobalPosition = origin;
+            caster.GetParent().AddChild(projectile);
+
+            projectile.GlobalPosition = origin;
+        }
     }
 
     private static void LaunchArea(BaseUnit caster, SkillCast cast, PackedScene scene, AreaSettings settings, Vector2 center)

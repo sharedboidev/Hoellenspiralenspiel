@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://bimy6yugt0oad" path="res://Textures/Spells/frost nova.png" id="1_nova"]
+
+[node name="FireBurst" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(2.4, 0.75, 0.2, 1)
+scale = Vector2(1, 0.5)
+texture = ExtResource("1_nova")

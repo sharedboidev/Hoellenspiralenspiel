@@ -1,0 +1,161 @@
+using System.Linq;
+using Godot;
+using Godot.Collections;
+using Hoellenspiralenspiel.Resources.Items;
+using Hoellenspiralenspiel.Resources.Skills;
+using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Enemies;
+using Hoellenspiralenspiel.Scripts.Core.Skills;
+
+namespace Hoellenspiralenspiel.Resources.Enemies;
+
+[GlobalClass]
+public partial class EnemyResource : Resource
+{
+    [Export]
+    public string Id { get; set; } = string.Empty;
+
+    [Export]
+    public string DisplayName { get; set; } = string.Empty;
+
+    //Die Szene bringt nur Aussehen, Animationen und Kollisionsform mit
+    [Export]
+    public PackedScene Scene { get; set; }
+
+    //Wird auf das Bereichslevel der Karte addiert
+    [Export]
+    public int LevelOffset { get; set; }
+
+    [Export]
+    public int Xp { get; set; } = 100;
+
+    [Export]
+    public string LootTableId { get; set; } = string.Empty;
+
+    [ExportGroup("Attributes")]
+    [Export]
+    public int Strength { get; set; } = 1;
+
+    [Export]
+    public int Dexterity { get; set; } = 1;
+
+    [Export]
+    public int Intelligence { get; set; } = 1;
+
+    [Export]
+    public int Constitution { get; set; } = 1;
+
+    [Export]
+    public int Awareness { get; set; } = 1;
+
+    [ExportSubgroup("Growth per Level")]
+    [Export]
+    public float StrengthPerLevel { get; set; }
+
+    [Export]
+    public float DexterityPerLevel { get; set; }
+
+    [Export]
+    public float IntelligencePerLevel { get; set; }
+
+    [Export]
+    public float ConstitutionPerLevel { get; set; }
+
+    [Export]
+    public float AwarenessPerLevel { get; set; }
+
+    [ExportGroup("Base Values")]
+    [Export]
+    public int LifeBonus { get; set; }
+
+    [Export]
+    public float Movementspeed { get; set; } = 50f;
+
+    [Export]
+    public int Armor { get; set; }
+
+    [Export]
+    public int Dodge { get; set; } = 6;
+
+    [Export]
+    public int FireResistance { get; set; }
+
+    [Export]
+    public int FrostResistance { get; set; }
+
+    [Export]
+    public int LightningResistance { get; set; }
+
+    //Die erste Waffe in der Liste führt das Monster, sie ersetzt die natürliche Waffe
+    [ExportGroup("Equipment")]
+    [Export]
+    public Array<EquippableBaseResource> Equipment { get; set; } = new();
+
+    [ExportGroup("Natural Weapon")]
+    [Export]
+    public float DamageMin { get; set; } = 1f;
+
+    [Export]
+    public float DamageMax { get; set; } = 3f;
+
+    [Export]
+    public DamageType DamageType { get; set; } = DamageType.Crush;
+
+    [Export(PropertyHint.Range, "0,100,0.1")]
+    public float CriticalHitChance { get; set; } = 5f;
+
+    //Das Monster nimmt den ersten Skill der Liste, der nicht abklingt. Ohne Eintrag bleibt der Standardangriff
+    [ExportGroup("Attack")]
+    [Export]
+    public Array<SkillResource> Skills { get; set; } = new();
+
+    [Export]
+    public float AttackRange { get; set; } = 150f;
+
+    [Export]
+    public float AttackWindupSec { get; set; } = 0.3f;
+
+    [Export]
+    public float AttackRecoverySec { get; set; } = 0.2f;
+
+    [ExportGroup("Behaviour")]
+    [Export]
+    public float AggroRange { get; set; } = 500f;
+
+    //So lange folgt das Monster einem Ziel, das außerhalb von AggroRange bleibt
+    [Export]
+    public double ChaseTimeSec { get; set; } = 6;
+
+    [Export(PropertyHint.Range, "0.1,1,0.05")]
+    public float ReturnSpeedFactor { get; set; } = 0.5f;
+
+    //Der Rückweg endet an einem zufälligen Punkt in diesem Abstand um den Startort
+    [Export]
+    public float HomeRadius { get; set; } = 150f;
+
+    public string NameOrId => string.IsNullOrWhiteSpace(DisplayName) ? Id : DisplayName;
+
+    public WeaponBaseResource WieldedWeapon => Equipment.OfType<WeaponBaseResource>().FirstOrDefault();
+
+    public bool UsesProjectiles
+    {
+        get
+        {
+            var hasRangedWeapon = WieldedWeapon?.ProjectileScene is not null;
+
+            return Skills.Any(skill => skill is not null &&
+                                       (skill.Delivery == SkillDelivery.Projectile ||
+                                        (skill.Delivery == SkillDelivery.Weapon && hasRangedWeapon))) ||
+                   (Skills.Count == 0 && hasRangedWeapon);
+        }
+    }
+
+    public WeaponProfile NaturalWeapon => new(DamageMin, DamageMax, 1f, CriticalHitChance, DamageType, AttackRange);
+
+    public EnemyBehaviour ToBehaviour()
+        => new()
+        {
+            AggroRange   = AggroRange,
+            ChaseTimeSec = ChaseTimeSec
+        };
+}

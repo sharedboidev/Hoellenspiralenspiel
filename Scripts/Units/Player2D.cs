@@ -15,7 +15,6 @@ using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.Skills;
 using Hoellenspiralenspiel.Scripts.UI.Character;
 using Hoellenspiralenspiel.Scripts.UI.Skills;
-using Hoellenspiralenspiel.Scripts.Units.Enemies;
 using Hoellenspiralenspiel.Scripts.Utils;
 using ResourceOrb = Hoellenspiralenspiel.Scripts.UI.Character.ResourceOrb;
 
@@ -52,6 +51,7 @@ public partial class Player2D : BaseUnit
 
     private readonly Dictionary<PointLight2D, float> lightBaseScales = new();
     private          AnimationPlayer                 animationPlayer;
+    private          PathFollower                    approachPath;
     private          double                          approachStuckSec;
     private          Vector2                         attackAimPoint;
     private          BaseUnit                        attackTarget;
@@ -174,6 +174,7 @@ public partial class Player2D : BaseUnit
 
         ManaCurrent   = ManaMaximum;
         spawnPosition = GlobalPosition;
+        approachPath  = new PathFollower(this);
 
         LoadLights();
         ConfigureSkillbar();
@@ -298,13 +299,6 @@ public partial class Player2D : BaseUnit
         SkillBar.OffsetBottom   = -SkillBarMarginPx;
     }
 
-    public bool IsInAggroRangeOf(BaseEnemy enemy)
-    {
-        var distanceToEnemy = Math.Sqrt(GlobalPosition.DistanceSquaredTo(enemy.GlobalPosition));
-
-        return distanceToEnemy <= enemy.AggroRange;
-    }
-
     public override void _Process(double delta)
         => UpdateHoveredUnit();
 
@@ -320,7 +314,7 @@ public partial class Player2D : BaseUnit
         ResolveManareg(delta);
         RepeatHeldSkill();
         AdvanceAttack(delta);
-        Move(GetWantedDirection(), delta);
+        Move(GetWantedDirection(delta), delta);
     }
 
     private void ResolveManareg(double delta)
@@ -412,10 +406,15 @@ public partial class Player2D : BaseUnit
         if (!CanPayFor(skill, isRepeat))
             return false;
 
+        var previousTarget = attackTarget;
+
         orderedSkill     = skill;
         attackTarget     = aim.HasTarget ? aim.Target : null;
         attackAimPoint   = aim.Point;
         approachStuckSec = 0;
+
+        if (attackTarget != previousTarget)
+            approachPath.Reset();
 
         return true;
     }
@@ -478,7 +477,7 @@ public partial class Player2D : BaseUnit
             FinishSwing();
     }
 
-    private Vector2 GetWantedDirection()
+    private Vector2 GetWantedDirection(double delta)
     {
         var inputDirection = Input.GetVector(InputActions.MoveLeft, InputActions.MoveRight, InputActions.MoveUp, InputActions.MoveDown);
 
@@ -509,7 +508,7 @@ public partial class Player2D : BaseUnit
         var toTarget = attackTarget.BodyCenter - BodyCenter;
 
         if (toTarget.Length() > GetEngageRange(orderedSkill.Definition))
-            return toTarget.Normalized();
+            return approachPath.GetDirectionTo(attackTarget.BodyCenter, delta);
 
         StartSwing(toTarget);
 
@@ -695,12 +694,12 @@ public partial class Player2D : BaseUnit
 
     #region Tod und Respawn
 
-    public override void ReceiveDamage(HitResult hit)
+    public override void ReceiveDamage(HitResult hit, BaseUnit attacker = null)
     {
         if (invulnerableTimeLeftSec > 0)
             return;
 
-        base.ReceiveDamage(hit);
+        base.ReceiveDamage(hit, attacker);
     }
 
     private void Die()

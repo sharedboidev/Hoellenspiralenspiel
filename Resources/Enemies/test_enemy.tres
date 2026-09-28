@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Enemies/EnemyResource.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://cycesnf53lc51" path="res://Scenes/Units/test_enemy.tscn" id="2_scene"]
+[ext_resource type="Script" path="res://Resources/Skills/SkillResource.cs" id="3_skill"]
+[ext_resource type="Resource" path="res://Resources/Skills/Monsters/fire_spit.tres" id="4_spit"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "test_enemy"
+DisplayName = "Test Enemy"
+Scene = ExtResource("2_scene")
+LootTableId = "test_loot"
+IntelligencePerLevel = 1.0
+ConstitutionPerLevel = 1.0
+LifeBonus = 249
+DamageMin = 3.0
+DamageMax = 6.0
+DamageType = 3
+Skills = Array[ExtResource("3_skill")]([ExtResource("4_spit")])
+AttackRange = 350.0
+AttackWindupSec = 0.6
+AttackRecoverySec = 1.0

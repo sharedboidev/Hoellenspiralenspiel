@@ -4,9 +4,3 @@
 
 [node name="EnemyController" type="Node" unique_id=1289861331]
 script = ExtResource("1_lfrkg")
-EnemiesToSpawn = Array[PackedScene]([])
-SpawnIntervallSec = 0.75
-
-[node name="EnemySpawnTimer" type="Timer" parent="." unique_id=624589109]
-wait_time = 0.5
-autostart = true

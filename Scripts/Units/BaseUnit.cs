@@ -18,12 +18,19 @@ public abstract partial class BaseUnit
         : CharacterBody2D,
           INotifyPropertyChanged
 {
+    public delegate void DamageTakenEventHandler(BaseUnit victim, HitResult hit, BaseUnit attacker);
+
     public delegate void DiedEventHandler(BaseUnit unit);
+
+    public delegate void HitDealtEventHandler(BaseUnit attacker, HitResult hit, BaseUnit victim);
 
     public delegate void StatsChangedEventHandler();
 
     private const float MinPickRadiusPx      = 40f;
     private const float PickRadiusPerScalePx = 22f;
+    private const float MaxPickRadiusPx      = 200f;
+
+    private static readonly List<BaseUnit> UnitsNearPoint = new();
 
     private readonly List<StatusTick> statusTicks = new();
     protected        Sprite2D         AttackSprite;
@@ -70,12 +77,14 @@ public abstract partial class BaseUnit
 
     public Vector2 BodyCenter => bodyShape?.GlobalPosition ?? GlobalPosition;
 
-    public float PickRadius => Math.Max(MinPickRadiusPx, PickRadiusPerScalePx * Scale.X);
+    public float PickRadius => Math.Clamp(PickRadiusPerScalePx * Scale.X, MinPickRadiusPx, MaxPickRadiusPx);
 
     public virtual Vector2 CombatTextOffset => new(0, -75);
 
     public event PropertyChangedEventHandler PropertyChanged;
     public event DiedEventHandler            Died;
+    public event DamageTakenEventHandler     DamageTaken;
+    public event HitDealtEventHandler        HitDealt;
 
     public event StatsChangedEventHandler StatsChanged;
 
@@ -86,6 +95,8 @@ public abstract partial class BaseUnit
 
         if (SkillCooldowns.HasAny)
             SkillCooldowns.Advance(delta);
+
+        UnitRegistry.Track(this);
     }
 
     public virtual void SpendMana(float amount) { }
@@ -110,7 +121,7 @@ public abstract partial class BaseUnit
     public float DistanceTo(BaseUnit other)
         => BodyCenter.DistanceTo(other.BodyCenter);
 
-    public virtual void ReceiveDamage(HitResult hit)
+    public virtual void ReceiveDamage(HitResult hit, BaseUnit attacker = null)
     {
         if (!IsTargetable)
             return;
@@ -124,7 +135,12 @@ public abstract partial class BaseUnit
         }
 
         this.ShowHit(hit);
+
+        DamageTaken?.Invoke(this, hit, attacker);
     }
+
+    public void NotifyHitDealt(HitResult hit, BaseUnit victim)
+        => HitDealt?.Invoke(this, hit, victim);
 
     public bool RollActionFailure()
     {
@@ -138,7 +154,9 @@ public abstract partial class BaseUnit
         BaseUnit nearestUnit     = null;
         var      nearestDistance = float.MaxValue;
 
-        foreach (var unit in UnitRegistry.Units)
+        UnitRegistry.FindNear(globalPoint, MaxPickRadiusPx, UnitsNearPoint);
+
+        foreach (var unit in UnitsNearPoint)
         {
             if (!IsHostileTo(unit) || !unit.IsTargetable)
                 continue;
@@ -303,6 +321,7 @@ public abstract partial class BaseUnit
             sheet.SetBase(CombatStat.HitChance, CombatRules.BaseHitChance);
             sheet.SetBase(CombatStat.CriticalDamage, CombatRules.BaseCriticalDamage);
             sheet.SetBase(CombatStat.BlockReduction, CombatRules.BaseBlockReduction);
+            sheet.SetBase(CombatStat.ProjectileCount, 1);
         });
 
     #region Attributes

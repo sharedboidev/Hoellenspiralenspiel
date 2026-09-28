@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-425_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-547_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -184,12 +184,38 @@ Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
 | Feature | Beschreibung |
 |---|---|
 | Drei Gegnertypen | Blue Blob mit Frost, Yellow Blob mit Blitz und ein Testgegner, der Feuer spuckt |
+| Gegner als Daten | Jeder Gegner ist eine Resource mit Attributen, Ausrüstung, Skills, Beute und Verhalten. Ein neuer Gegner braucht keinen Code |
+| Level | Jede Karte hat ein Bereichslevel. Attribute wachsen mit dem Level, die Beute trägt das Level des Monsters |
 | Spawn-Marker | Gegner erscheinen in Gruppen an festgelegten Orten |
 | Aggro | Reichweite pro Gegner, die ganze Gruppe reagiert auf einen Treffer |
-| Rare und Elite | Stärkere Varianten mit mehr Leben, Tempo und Erfahrung |
+| Wegfindung | Gegner laufen um Wände herum. Schützen greifen nur mit freier Sicht an |
+| Aufgeben | Entkommt der Held, gibt der Gegner nach einigen Sekunden auf und geht langsam in die Nähe seines Startorts zurück |
+| Elite und Rare Elite | Elite mit 1 bis 2 Mods, Rare Elite mit 3 bis 5. Beide sind größer, bringen mehr Erfahrung und mehr Beute |
+| Monster-Mods | Zehn Mods von einfach bis verrückt, zusammengesteckt aus Werten, Auslösern und Aktionen |
 | Angriffe | Ausholen, Treffer, Erholen. Beim Ausholen färbt sich der Gegner |
-| Skills | Jeder Gegner bekommt seinen Skill in der Szene zugewiesen, ohne Angabe schlägt er im Nahkampf zu |
+| Skills | Mehrere Skills pro Gegner mit Abklingzeiten, ohne Angabe schlägt er im Nahkampf zu |
 | Tod | Erfahrung und Beute sofort, danach läuft die Todesanimation |
+
+<details>
+<summary>Die Mods im Überblick</summary>
+
+| Mod | Wirkung |
+|---|---|
+| Hasted | 33 % mehr Angriffstempo |
+| Swift | 40 % mehr Bewegungstempo |
+| Stalwart | 60 % mehr Leben |
+| Twin Shot | Doppelte Projektile, nur für Schützen |
+| Meteor Caller | Lässt im Kampf Meteore um sich herum regnen |
+| Volatile | Explodiert kurz nach dem Tod |
+| Freezing Skin | Antwortet auf Treffer mit einem Frostpuls |
+| Broodmother | Ruft bei halbem Leben drei Blue Blobs |
+| Blinking | Springt alle 4 Sekunden neben sein Ziel, nur für Nahkämpfer |
+| Berserk | Wird unter 35 % Leben deutlich schneller |
+
+Ein Mod ist eine Resource unter `Resources/MonsterMods/Pool`.
+Auslöser und Aktionen lassen sich im Inspector frei kombinieren, zum Beispiel "beim Tod" mit "Skill wirken".
+
+</details>
 
 ### 🎒 Items und Beute
 
@@ -252,6 +278,7 @@ Der Held startet am Startpunkt mit vollem Leben und Mana.
 | Feature | Beschreibung |
 |---|---|
 | Isometrisches Testlevel | Boden, Wände und Objekte auf getrennten Ebenen |
+| Navigationsnetz | Entsteht beim Start des Levels aus den Wänden, für Gegner und Held |
 | Licht und Schatten | Punktlichter mit Schattenwurf in abgedunkelter Umgebung |
 | Lebens- und Mana-Orb | Mit Flüssigkeits-Shader |
 | Erfahrungsbalken | Unterteilt, mit Anzeige beim Überfahren |
@@ -260,7 +287,7 @@ Der Held startet am Startpunkt mit vollem Leben und Mana.
 ### 🚧 Noch nicht enthalten
 
 - Hub, Levelwechsel und Menüs, damit auch mehrere Charaktere
-- Prozedurale Level und Wegfindung
+- Prozedurale Level
 - Item-Basen für die übrigen zwölf Ausrüstungsplätze
 - Tasten im Spiel umbelegen
 - Klassen und Erwerb von Skills, der Held kennt vorerst alle
@@ -296,7 +323,7 @@ flowchart LR
     M0(["M0 Aufräumen"]):::done --> M1(["M1 Stat-Kern"]):::done --> M2(["M2 Kampf"]):::done
     M2 --> M3(["M3 Skills"]):::done
     M2 --> M4(["M4 Items und Speichern"]):::done
-    M4 --> M5(["M5 Gegner-KI"]):::next --> D{"2D oder 3D"}:::decision
+    M4 --> M5(["M5 Gegner-KI"]):::done --> D{"2D oder 3D"}:::decision
     D --> M6(["M6 Level"]):::open --> M7(["M7 Hub"]):::open --> M8(["M8 Höllenkreis"]):::open
     M8 --> M9(["M9 Inhalt"]):::open --> M10(["M10 Koop"]):::optional
 
@@ -314,15 +341,15 @@ flowchart LR
 | ✅ | **M2** Kampf | Trefferauflösung, Tod des Spielers, Nahkampf, Statuseffekte | mittel |
 | ✅ | **M3** Skills | Attacks und Spells als Daten, frei belegbare Leiste, Skills unabhängig vom Wirkenden | mittel |
 | ✅ | **M4** Items und Speichern | Items als Daten, Inventar-Modell, Schild mit Block, Speichern und Laden | mittel |
-| ⏭️ | **M5** Gegner-KI | Zustandsmaschine, Wegfindung, Skalierung nach Level | mittel |
-| 🔀 | **Entscheidung** | 2D oder 3D, per kurzem Vergleichsprototyp | klein |
+| ✅ | **M5** Gegner-KI | Gegner als Daten, Zustandsmaschine, Wegfindung, Level, Elite mit Mods | mittel |
+| ⏭️ | **Entscheidung** | 2D oder 3D, per kurzem Vergleichsprototyp | klein |
 | ⬜ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
 | ⬜ | **M7** Hub | Stadt, Abstieg, Menüs, Truhe, Händler, Einstellungen | mittel |
 | ⬜ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
 | 💤 | **M10** Koop | Optional, baut auf Kern und Seeds auf | groß |
 
-✅ fertig · ⏭️ als Nächstes · ⬜ offen · 🔀 Entscheidung · 💤 optional
+✅ fertig · ⏭️ als Nächstes · ⬜ offen · 💤 optional
 
 Aufgaben, Fertig-Kriterien und alle Befunde stehen in der [Roadmap](docs/ROADMAP.md).
 
@@ -378,17 +405,22 @@ Hoellenspiralenspiel
 │   │   ├── Combat      Trefferauflösung, Schadensarten, Statuseffekte, Angriffstakt
 │   │   ├── Skills      Skill-Definition, Abklingzeiten, Kosten, Belegung der Leiste
 │   │   ├── Items       Item-Basis und Instanz, Inventar-Raster, Ausrüstung, Affixe, Beute
+│   │   ├── Enemies     Zustandsmaschine, Seltenheit, Wahl der Mods, Wachstum mit dem Level
+│   │   ├── Navigation  Takt für die Pfadsuche
+│   │   ├── Spatial     Raster für die Suche nach Einheiten in der Nähe
 │   │   ├── Saving      Format des Spielstands, Lesen und Schreiben als JSON
 │   │   ├── Rng         Zufallsquelle mit Seed
 │   │   └── Progression XP-Verlust beim Tod
-│   ├── Units           Spieler und Gegner
+│   ├── Units           Spieler, Gegner, Pfadfolger
 │   ├── Skills          Ausführung der Skills, Projektil und Fläche
 │   ├── Items           Bibliothek aller Item-Basen
+│   ├── Enemies         Bibliothek aller Monster-Mods
+│   ├── World           Navigationsnetz des Levels
 │   ├── Saving          Datei des Spielstands
 │   ├── Controllers     Gegnersteuerung, Beute, Spielablauf, Speichern
 │   └── UI              Charakterbogen, Inventar, Orbs, Tooltips
 ├── Scenes              Szenen für Level, Einheiten, Zauber, Oberfläche
-├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Themes
+├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Gegner, Monster-Mods, Themes
 ├── Enums               Gemeinsame Aufzählungen
 ├── Hoellenspiralenspiel.Tests   Unit-Tests mit NUnit
 └── docs                Roadmap und Analyse

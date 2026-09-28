@@ -9,11 +9,14 @@ namespace Hoellenspiralenspiel.Scripts.Skills;
 //Fraktion und Treffer stehen beim Auslösen fest, damit der Skill weiterwirkt, wenn der Wirkende inzwischen tot ist
 public sealed class SkillCast
 {
+    private readonly BaseUnit       caster;
     private readonly HashSet<ulong> hitUnits = new();
 
-    public SkillCast(Faction faction, HitRequest hit)
+    public SkillCast(BaseUnit caster, HitRequest hit)
     {
-        Faction = faction;
+        this.caster = caster;
+
+        Faction = caster.Faction;
         Hit     = hit;
     }
 
@@ -33,6 +36,11 @@ public sealed class SkillCast
     {
         hitUnits.Add(unit.GetInstanceId());
 
-        unit.ReceiveDamage(HitResolver.Resolve(Hit, unit.Stats, GameRandom.Shared));
+        var result   = HitResolver.Resolve(Hit, unit.Stats, GameRandom.Shared);
+        var attacker = GodotObject.IsInstanceValid(caster) ? caster : null;
+
+        unit.ReceiveDamage(result, attacker);
+
+        attacker?.NotifyHitDealt(result, unit);
     }
 }
