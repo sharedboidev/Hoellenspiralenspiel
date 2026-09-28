@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterModResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/MonsterMods/MonsterModResource.cs" id="1_mod"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/MonsterModEffect.cs" id="2_effect"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/ModAction.cs" id="3_action"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/Triggers/OnDamageTakenTrigger.cs" id="4_damage"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/Actions/CastSkillAction.cs" id="5_cast"]
+[ext_resource type="Resource" path="res://Resources/Skills/Monsters/frost_pulse.tres" id="6_pulse"]
+
+[sub_resource type="Resource" id="Resource_trigger"]
+script = ExtResource("4_damage")
+
+[sub_resource type="Resource" id="Resource_action"]
+script = ExtResource("5_cast")
+Skill = ExtResource("6_pulse")
+Aim = 0
+
+[sub_resource type="Resource" id="Resource_effect"]
+script = ExtResource("2_effect")
+Trigger = SubResource("Resource_trigger")
+Actions = Array[ExtResource("3_action")]([SubResource("Resource_action")])
+ChancePercent = 35.0
+CooldownSec = 2.0
+
+[resource]
+script = ExtResource("1_mod")
+Id = "freezing_skin"
+DisplayName = "Freezing Skin"
+Description = "35% chance to release a Frost Pulse when hit"
+Effects = Array[ExtResource("2_effect")]([SubResource("Resource_effect")])

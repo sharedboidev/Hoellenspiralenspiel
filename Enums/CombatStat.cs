@@ -53,5 +53,8 @@ public enum CombatStat
     HitChance,
 
     [Description("Blocked Damage")]
-    BlockReduction
+    BlockReduction,
+
+    [Description("Projectiles")]
+    ProjectileCount
 }

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellSkillResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Skills/SpellSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cpfbboa73j0j4" path="res://Textures/Spells/Archive/icons/ice.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/frost_nova.tscn" id="3_scene"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "frost_pulse"
+DisplayName = "Frost Pulse"
+Description = "A small ring of frost. Uses the same scene as Frost Nova, only the numbers differ."
+Icon = ExtResource("2_icon")
+Delivery = 2
+EffectScene = ExtResource("3_scene")
+AreaRadius = 220.0
+AreaExpansionSec = 0.2
+MinDamage = 3.0
+MaxDamage = 6.0
+DamageType = 4
+CriticalHitChance = 5.0

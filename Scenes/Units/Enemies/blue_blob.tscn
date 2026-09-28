@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cnxyy07a3er8q"]
 
-[ext_resource type="Script" uid="uid://bw5x32awb8efw" path="res://Scripts/Units/Enemies/BlueBlob.cs" id="1_e1ef1"]
+[ext_resource type="Script" uid="uid://5i64ewjlr7ac" path="res://Scripts/Units/Enemies/Enemy.cs" id="1_e1ef1"]
 [ext_resource type="Texture2D" uid="uid://32vlmynx8of0" path="res://Textures/Units/Enemies/BlueBlob/Slime1_Run_with_shadow.png" id="1_e786n"]
 [ext_resource type="Texture2D" uid="uid://doiubwajh6a34" path="res://Textures/Units/Enemies/BlueBlob/Slime1_Death_with_shadow.png" id="3_in1bd"]
 
@@ -266,13 +266,7 @@ scale = Vector2(2, 2)
 collision_layer = 2
 collision_mask = 13
 script = ExtResource("1_e1ef1")
-LootTableId = "blue_blob_loot"
-AttackRange = 80.0
-AttackWindeupTimeSec = 0.5
-AttackRecoveryTimeSec = 0.7
-AttackDamageType = 4
-FrostResiBase = 75
-Movementspeed = 25.0
+RandomizeAnimationStart = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=174800444]
 position = Vector2(0, -0.5)

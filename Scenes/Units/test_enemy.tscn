@@ -1,8 +1,7 @@
 [gd_scene format=3 uid="uid://cycesnf53lc51"]
 
-[ext_resource type="Script" uid="uid://dvrmqxff8wdo0" path="res://Scripts/Units/Enemies/TestEnemy.cs" id="1_x3aji"]
+[ext_resource type="Script" uid="uid://5i64ewjlr7ac" path="res://Scripts/Units/Enemies/Enemy.cs" id="1_x3aji"]
 [ext_resource type="Texture2D" uid="uid://bdxqtrxpgx6to" path="res://Textures/Units/Enemies/TestEnemy.png" id="2_ysuca"]
-[ext_resource type="Resource" path="res://Resources/Skills/Monsters/fire_spit.tres" id="3_spit"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x3aji"]
 size = Vector2(38, 28)
@@ -154,16 +153,6 @@ collision_mask = 15
 platform_on_leave = 2
 platform_floor_layers = 0
 script = ExtResource("1_x3aji")
-AttackSkill = ExtResource("3_spit")
-LootTableId = "test_loot"
-AttackRange = 350.0
-AttackWindeupTimeSec = 0.6
-AttackRecoveryTimeSec = 1.0
-AttackDamageMin = 3
-AttackDamageMax = 6
-AttackDamageType = 3
-LifeBaseBonus = 249
-Movementspeed = 50.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=495005380]
 position = Vector2(0, -14)

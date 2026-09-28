@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Units;
@@ -6,6 +7,8 @@ namespace Hoellenspiralenspiel.Scripts.Skills.Effects;
 
 public partial class SkillArea : Node2D
 {
+    private readonly List<BaseUnit> unitsInRange = new();
+
     private double       activeSec;
     private SkillCast    cast;
     private double       delayLeftSec;
@@ -99,12 +102,11 @@ public partial class SkillArea : Node2D
     private void HitUnitsWithin(float radius)
     {
         var center = GlobalPosition;
-        var units  = UnitRegistry.Units;
 
-        for (var i = units.Count - 1; i >= 0; i--)
+        UnitRegistry.FindNear(center, radius, unitsInRange);
+
+        foreach (var unit in unitsInRange)
         {
-            var unit = units[i];
-
             if (!cast.CanHit(unit))
                 continue;
 

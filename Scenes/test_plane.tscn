@@ -6,10 +6,10 @@
 [ext_resource type="TileSet" uid="uid://bjrvhfwxc86rt" path="res://Resources/Desert.tres" id="1_vglo3"]
 [ext_resource type="Script" uid="uid://rq55bipqlvcq" path="res://Scripts/Controllers/GameController.cs" id="2_4iyv1"]
 [ext_resource type="PackedScene" uid="uid://c8hx5eg0q1vct" path="res://Scenes/Units/player_2d.tscn" id="3_35xgq"]
-[ext_resource type="PackedScene" uid="uid://cnxyy07a3er8q" path="res://Scenes/Units/Enemies/blue_blob.tscn" id="4_db61r"]
+[ext_resource type="Script" path="res://Scripts/World/LevelNavigation.cs" id="4_nav"]
 [ext_resource type="PackedScene" uid="uid://bg8s6qmxf15f8" path="res://Scripts/Controllers/enemy_controller.tscn" id="5_vglo3"]
-[ext_resource type="PackedScene" uid="uid://cycesnf53lc51" path="res://Scenes/Units/test_enemy.tscn" id="6_0j3ep"]
-[ext_resource type="PackedScene" uid="uid://v011gi31s48p" path="res://Scenes/Units/Enemies/yellow_blob.tscn" id="6_2sot3"]
+[ext_resource type="Resource" path="res://Resources/Enemies/test_enemy.tres" id="6_0j3ep"]
+[ext_resource type="Resource" path="res://Resources/Enemies/yellow_blob.tres" id="6_2sot3"]
 [ext_resource type="PackedScene" uid="uid://dpai8eumf00w0" path="res://Scenes/UI/spawn_marker.tscn" id="6_7imrf"]
 [ext_resource type="PackedScene" uid="uid://b8q3plajba8gb" path="res://Scenes/UI/character_sheet.tscn" id="9_2sot3"]
 [ext_resource type="Script" uid="uid://v5paruy0b76n" path="res://Scripts/UI/OverlayMapViewport.cs" id="9_db61r"]
@@ -79,6 +79,10 @@ y_sort_enabled = true
 [node name="CanvasModulate" type="CanvasModulate" parent="Environment" unique_id=2038441828]
 color = Color(0.39841205, 0.39841217, 0.39841193, 1)
 
+[node name="LevelNavigation" type="NavigationRegion2D" parent="Environment" node_paths=PackedStringArray("Ground")]
+script = ExtResource("4_nav")
+Ground = NodePath("../Ground")
+
 [node name="SpawnMarker" type="Node2D" parent="." unique_id=1148664553]
 
 [node name="SpawnMarker" parent="SpawnMarker" unique_id=1519096458 instance=ExtResource("6_7imrf")]
@@ -86,7 +90,7 @@ offset_left = 2387.0
 offset_top = 1619.0
 offset_right = 2453.9724
 offset_bottom = 1659.0
-EnemyToSpawn = ExtResource("6_0j3ep")
+Enemy = ExtResource("6_0j3ep")
 AmountToSpawn = 25
 
 [node name="SpawnMarker2" parent="SpawnMarker" unique_id=334759122 instance=ExtResource("6_7imrf")]
@@ -101,7 +105,7 @@ offset_left = -3.0
 offset_top = 486.0
 offset_right = 63.972473
 offset_bottom = 526.0
-EnemyToSpawn = ExtResource("6_2sot3")
+Enemy = ExtResource("6_2sot3")
 
 [node name="SpawnMarker4" parent="SpawnMarker" unique_id=1766736446 instance=ExtResource("6_7imrf")]
 offset_left = 1846.0
@@ -115,10 +119,7 @@ unique_name_in_owner = true
 
 [node name="EnemyController" parent="." unique_id=722604080 node_paths=PackedStringArray("Lootsystem") instance=ExtResource("5_vglo3")]
 unique_name_in_owner = true
-EnemiesToSpawn = Array[PackedScene]([ExtResource("4_db61r")])
 Lootsystem = NodePath("../Lootsystem")
-SpawnIntervallSec = 0.5
-MinDistanceToPlayer = 300.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1293480226]
 

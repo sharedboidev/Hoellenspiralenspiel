@@ -24,10 +24,6 @@ public partial class Lootsystem : Node
     [Export]
     public string AffixesPath { get; set; } = "res://Resources/Affixes";
 
-    //Bis Gegner ein Level haben, fällt alles mit diesem Itemlevel
-    [Export]
-    public int ItemLevel { get; set; } = 1;
-
     public override void _Ready()
     {
         LoadTables();
@@ -35,15 +31,20 @@ public partial class Lootsystem : Node
         roller = new LootRoller(ItemLibrary.Catalog, new AffixRoller(LoadAffixes(), MaximumAffixesPerItem));
     }
 
-    public IReadOnlyList<ItemInstance> GenerateLoot(BaseEnemy enemy)
-        => GenerateLoot(enemy.LootTableId);
+    public IReadOnlyList<ItemInstance> GenerateLoot(Enemy enemy)
+        => GenerateLoot(enemy.LootTableId, enemy.Level, enemy.LootRolls);
 
-    public IReadOnlyList<ItemInstance> GenerateLoot(string tableId)
+    public IReadOnlyList<ItemInstance> GenerateLoot(string tableId, int itemLevel = 1, int timesRolled = 1)
     {
         if (string.IsNullOrEmpty(tableId) || !tables.TryGetValue(tableId, out var table))
             return [];
 
-        return roller.Roll(table, GameRandom.Shared, ItemLevel);
+        var loot = new List<ItemInstance>();
+
+        for (var i = 0; i < timesRolled; i++)
+            loot.AddRange(roller.Roll(table, GameRandom.Shared, itemLevel));
+
+        return loot;
     }
 
     private void LoadTables()

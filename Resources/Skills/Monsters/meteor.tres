@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellSkillResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Skills/SpellSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://c7udd6aj0mrqh" path="res://Textures/Spells/Icons_Fire Spell.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/meteor.tscn" id="3_scene"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "meteor"
+DisplayName = "Meteor"
+Description = "Marks the ground. A moment later a meteor strikes everything inside the circle."
+Icon = ExtResource("2_icon")
+Delivery = 3
+EffectScene = ExtResource("3_scene")
+AreaRadius = 150.0
+AreaDelaySec = 1.2
+MinDamage = 6.0
+MaxDamage = 12.0
+DamageType = 3
+CriticalHitChance = 5.0

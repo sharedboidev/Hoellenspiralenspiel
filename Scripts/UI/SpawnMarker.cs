@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using Godot.Collections;
+using Hoellenspiralenspiel.Resources.Enemies;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
@@ -9,10 +10,14 @@ public partial class SpawnMarker : PanelContainer
     private Dictionary<int, Vector2> spawnLocations = new();
 
     [Export]
-    public PackedScene EnemyToSpawn { get; set; }
+    public EnemyResource Enemy { get; set; }
 
     [Export]
     public int AmountToSpawn { get; set; }
+
+    //Wird auf das Level der Monster dieses Markers addiert
+    [Export]
+    public int LevelOffset { get; set; }
 
     public Vector2 GetSpawnlocationFor(int i) => spawnLocations[i];
 

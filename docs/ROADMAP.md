@@ -1,10 +1,10 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
-Stand: 28.09.2026. M0 bis M3 liegen auf `master`, dazu die beiden Nachträge zu M3: Schadenswerte im Tooltip und ausgedünnte Kommentare.
-M4 ist auf dem Branch `master_ItemsAndSaving` umgesetzt, dazu der Nachtrag zu M2: Bleed stapelt.
+Stand: 28.09.2026. M0 bis M4 liegen auf `master`, dazu die Nachträge zu M2 und M3: Bleed stapelt, Schadenswerte im Tooltip und ausgedünnte Kommentare.
+M5 ist auf dem Branch `master_EnemyAiAndScaling` umgesetzt.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code (rund 5.500 Zeilen) plus Szenen.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 bis M4 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 bis M5 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -26,7 +26,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Waffen | Schadensspanne, Angriffe pro Sekunde, Swingtimer, Typ, Schadensart, Krit, Anforderungen | Seit M2 bestimmen die Werte den Nahkampf, seit M3 gibt es Fernkampfwaffen mit Projektil. Seit M4 sind Waffen Resources und bringen Parry oder Block mit. Klassen-Anforderung fehlt. |
 | Rüstung | Helm, Torso, Handschuhe und Schild mit Rüstungswert | 4 von 16 Slots haben Item-Basen |
 | Affixe | 17 Affixe mit Tiers, Gewichten, Itemlevel-Grenze, Prefix/Suffix, lokale und globale Mods | Slot-Tabelle aus dem PDF nur teilweise abgedeckt |
-| Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle |
+| Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle. Seit M5 bestimmt das Monsterlevel das Itemlevel. |
 | Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. |
 | Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. |
 | Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch | Nicht im PDF |
@@ -34,7 +34,8 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen, Tooltip mit DPS | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
 | Kampf | Zentrale Trefferauflösung, Nahkampf, Schadensarten mit Effekten, Statuseffekte, Tod und Respawn | Seit M2. Frost-Effekt war im PDF leer und ist jetzt Verlangsamung. |
 | Schadensminderung | Rüstungsformel, Resistenzen, Dodge, Parry und Block für alle Einheiten | Seit M4 bringen Schild, Stab und Schwert Block und Parry mit |
-| Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Rare/Elite, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler | Nur Blobs und ein Testgegner |
+| Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler. Seit M5 sind sie Resources mit Level, Ausrüstung und Verhalten, dazu Elite und Rare Elite mit Mods aus Bausteinen | Nur Blobs und ein Testgegner |
+| Wegfindung | Seit M5: Navigationsnetz pro Level, zur Laufzeit gebacken. Gegner und Held laufen um Wände herum | Nicht im PDF |
 | Atmosphäre | Punktlichter mit Schatten, abgedunkelte Szene, Overlay-Karte | Passt zum düsteren Vibe |
 | 3D | Ein Prototyp, der nur Bewegung kann | Offene Frage aus dem PDF |
 
@@ -48,11 +49,11 @@ Ohne diese Systeme gibt es kein spielbares Spiel, nur eine Testszene.
 4. **Speichern und Laden.** Erledigt in M4. Vorher gab es keine Persistenz für Charakter, Inventar oder Fortschritt.
 5. **Spielstruktur.** Hub, Levelwechsel, Hauptmenü, Pausenmenü und Freischaltung fehlen. Die Kellertür schreibt nur eine Logzeile.
 6. **Levelgenerierung.** Es gibt nur ein handgebautes Testlevel.
-7. **Wegfindung.** Gegner laufen in gerader Linie und bleiben an Wänden hängen.
+7. **Wegfindung.** Erledigt in M5. Vorher liefen Gegner in gerader Linie und blieben an Wänden hängen.
 8. **Statuseffekte.** Erledigt in M2: Bleed, Burn, Shock und Chill. Bleed und Burn stapeln. Die leeren Schadensart-Klassen sind durch eine Aufzählung im Kern ersetzt.
 9. **Parry, Block, Krit aus Stats.** Erledigt in M2. Die Trefferauflösung wertet alle drei aus.
 10. **Skill-Erwerb.** Seit M3 sind Skills Daten und die Leiste ist frei belegbar. Der Held kennt vorerst alle Skills. Klassen und Skill-Fortschritt fehlen.
-11. **Skalierung.** Itemlevel ist immer 1. Monsterlevel und Bereichslevel existieren nicht.
+11. **Skalierung.** Seit M5 hat jede Karte ein Bereichslevel, jedes Monster ein Level, und das Monsterlevel bestimmt das Itemlevel. Das Testlevel hat Bereichslevel 1. Ein Bereichslevel, das mit der Tiefe steigt, kommt mit M6 und M7.
 12. **Inhalt.** Kein einziger Höllenkreis, kein Boss, kein Intro.
 13. **Einstellungen.** Auflösung, Tastenbelegung und Lautstärke sind nicht einstellbar.
 14. **Tests.** Vom Testprojekt existiert nur ein `obj`-Ordner ohne Quellcode.
@@ -70,7 +71,7 @@ Status vom 28.09.2026. Die Zeilennummern beziehen sich auf den Stand vor den Kor
 | F3 | Behoben | Zauberschaden ignoriert den More-Multiplikator. Intelligenz erhöht den Schaden dadurch nicht. | [BaseSkill.cs:42](../Scripts/Abilities/BaseSkill.cs) |
 | F4 | Behoben | Treffer auf Gegner zeigen manchmal "Dodge" an, ziehen aber trotzdem Leben ab. Heilung konnte ebenfalls "Dodge" anzeigen. | [BaseUnit.cs:48](../Scripts/Units/BaseUnit.cs), [FCTExtensions.cs:17](../Scripts/Extensions/FCTExtensions.cs) |
 | F5 | Behoben | Kontaktschaden trifft in jedem Physik-Frame ohne Abklingzeit | [Player2D.cs:199](../Scripts/Units/Player2D.cs) |
-| F6 | Behoben | Gegner greifen ohne Cooldown an. Der Testgegner erzeugt pro Frame einen Feuerball. Windup und Recovery werden nicht benutzt. | [BaseEnemy.cs:145](../Scripts/Units/Enemies/BaseEnemy.cs), [TestEnemy.cs:21](../Scripts/Units/Enemies/TestEnemy.cs) |
+| F6 | Behoben | Gegner greifen ohne Cooldown an. Der Testgegner erzeugt pro Frame einen Feuerball. Windup und Recovery werden nicht benutzt. | BaseEnemy.cs:145, heute [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs). TestEnemy.cs:21, seit M5 entfallen |
 | F7 | Behoben | Ein Gegner kann mehrere Lootbags fallen lassen, wenn er nach dem Tod noch getroffen wird. Von mehreren gewürfelten Items fällt nur das erste. | [EnemyController.cs:116](../Scripts/Controllers/EnemyController.cs) |
 | F8 | Behoben | Einen Trank zu trinken gibt den Slot frei, obwohl der Stapel noch Tränke enthält. Das nächste Item landet darüber. | [Inventory.cs:192](../Scripts/UI/Character/Inventory.cs) |
 | F9 | Behoben | Ein fallengelassenes Item geht verloren, wenn man es bei vollem Inventar wieder aufhebt | [MouseObject.cs:72](../Scripts/UI/MouseObject.cs) |
@@ -79,7 +80,7 @@ Status vom 28.09.2026. Die Zeilennummern beziehen sich auf den Stand vor den Kor
 | F12 | Behoben | Der Affix-Wurf kann `null` liefern, wenn ein Slot keine passenden Affixe hat. Das führt zum Absturz. | [Lootsystem.cs:181](../Scripts/Controllers/Lootsystem.cs) |
 | F13 | Behoben | Verschachtelte Loot-Tabellen sind als Typ angelegt, aber nicht umgesetzt | [LootTable.cs:42](../Resources/LootTable.cs) |
 | F14 | Behoben | Derselbe Affix kann mehrfach auf einem Item landen | [Lootsystem.cs:57](../Scripts/Controllers/Lootsystem.cs) |
-| F15 | Behoben | Die Todesanimation ist nie zu sehen, weil der Gegner beim Start der Animation entfernt wird | [BaseEnemy.cs:60](../Scripts/Units/Enemies/BaseEnemy.cs) |
+| F15 | Behoben | Die Todesanimation ist nie zu sehen, weil der Gegner beim Start der Animation entfernt wird | BaseEnemy.cs:60, heute [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs) |
 | F16 | Behoben | Auf Level 100 ist die nächste XP-Schwelle 0. Jeder XP-Gewinn löst dann ein Level-up aus und das Level danach wirft eine Ausnahme. | [XpTable.cs:109](../Scripts/Utils/XpTable.cs) |
 | F17 | Behoben | `LifeBase = 75` in den Gegner-Szenen wird ignoriert. Alle Gegner haben 9 Leben, der Feuerball macht 50 bis 75 Schaden. | [yellow_blob.tscn](../Scenes/Units/Enemies/yellow_blob.tscn) |
 | F18 | Behoben | Schadenszahlen driften pro Frame statt pro Sekunde und sind damit abhängig von der Bildrate | [FloatingCombatText.cs:58](../Scripts/UI/FloatingCombatText.cs) |
@@ -92,7 +93,7 @@ Hinweise zu den Korrekturen:
 
 - F2 war pragmatisch behoben und ist seit M1 durch den Stat-Kern ersetzt.
 - F4, F5 und F6 waren pragmatisch behoben und sind seit M2 durch die Kampf-Pipeline ersetzt. Der Kontaktschaden aus F5 ist entfallen, Gegner greifen jetzt selbst an.
-- F17 führt den exportierten Wert `LifeBaseBonus` ein. Er wird auf das Basisleben aus den Attributen addiert.
+- F17 führt den exportierten Wert `LifeBaseBonus` ein. Er wird auf das Basisleben aus den Attributen addiert. Seit M5 steht er als `LifeBonus` in der Gegner-Resource.
 - F18 ändert die Einheit von `DriftVelocity` auf Pixel pro Sekunde.
 
 ### 3.2 Performance
@@ -101,19 +102,19 @@ Hinweise zu den Korrekturen:
 |---|---|---|
 | P1 | Behoben in M1. Jeder Stat-Zugriff durchsuchte die Modifikator-Liste mehrfach mit LINQ. Das passierte pro Einheit und pro Frame mehrfach und erzeugte laufend Müll für den Garbage Collector. | [StatSheet.cs](../Scripts/Core/Stats/StatSheet.cs) |
 | P2 | Behoben in M1. Die Orbs bauten jeden Frame Text neu und setzten Shader-Parameter, auch wenn sich nichts änderte. | [ResourceOrb.cs](../Scripts/UI/Character/ResourceOrb.cs) |
-| P3 | Alle Gegner der Karte werden jeden Frame simuliert, egal wie weit sie entfernt sind | [EnemyController.cs:170](../Scripts/Controllers/EnemyController.cs) |
+| P3 | Behoben in M5. Alle Gegner der Karte wurden jeden Frame simuliert, egal wie weit sie entfernt waren. Jetzt ruhen Denken, Bewegung und Animation fern vom Helden. Die Messung unter M5 zeigt: Bei 200 Gegnern war das kein Engpass. | [EnemyController.cs](../Scripts/Controllers/EnemyController.cs) |
 | P4 | Behoben in M3. Ein Feuerball konnte sich auf bis zu 63 Projektile aufspalten, und jeder Treffer sortierte alle Gegner der Karte nach Entfernung. Jetzt sind es höchstens 7, die Zielsuche läuft in einem Durchlauf ohne Sortieren. | [SkillProjectile.cs](../Scripts/Skills/Effects/SkillProjectile.cs), [NearestPicker.cs](../Scripts/Core/Skills/NearestPicker.cs) |
 | P5 | Behoben in M4. Das Inventar nutzte Godot-Dictionaries mit Float-Vektoren als Schlüssel. Jeder Zugriff wurde zwischen C# und Engine konvertiert. Jetzt rechnet ein Raster im Kern mit ganzen Feldern. | [InventoryGrid.cs](../Scripts/Core/Items/InventoryGrid.cs) |
 | P6 | Behoben in M4. Knoten wurden in Property-Gettern bei jedem Zugriff neu gesucht. Inventar und Ausrüstung holen ihre Knoten jetzt einmal. | [Inventory.cs](../Scripts/UI/Character/Inventory.cs), [EquipmentPanel.cs](../Scripts/UI/Character/EquipmentPanel.cs) |
-| P7 | Für den Kampf behoben in M2, für Loot in M4: Alle Würfe laufen über eine Zufallsquelle mit Seed. Offen bleiben die eigenen Zufallsquellen der Spawns (M5). | [GameRandom.cs](../Scripts/Core/Rng/GameRandom.cs), [LootRoller.cs](../Scripts/Core/Items/LootRoller.cs), [EnemyController.cs](../Scripts/Controllers/EnemyController.cs) |
+| P7 | Behoben: für den Kampf in M2, für Loot in M4, für Spawns und Seltenheit in M5. Alle Würfe laufen über eine Zufallsquelle mit Seed. | [GameRandom.cs](../Scripts/Core/Rng/GameRandom.cs), [LootRoller.cs](../Scripts/Core/Items/LootRoller.cs), [EnemyController.cs](../Scripts/Controllers/EnemyController.cs) |
 | P8 | Neu seit M2: Jede Schadenszahl ist ein eigener Knoten. Brennen viele Gegner gleichzeitig, entstehen pro Sekunde zwei Zahlen je Gegner. Bisher ohne messbare Folgen, Pooling steht in M9. | [FCTExtensions.cs](../Scripts/Extensions/FCTExtensions.cs) |
-| P9 | Neu seit M3: Flächen und die Suche nach dem Gegner unter dem Mauszeiger gehen alle Einheiten der Karte durch. Bei rund 100 Gegnern ohne messbare Folgen. Eine räumliche Aufteilung gehört zu M5, zusammen mit P3. | [SkillArea.cs](../Scripts/Skills/Effects/SkillArea.cs), [BaseUnit.cs](../Scripts/Units/BaseUnit.cs) |
+| P9 | Behoben in M5. Flächen, Forks und die Suche nach dem Gegner unter dem Mauszeiger gingen alle Einheiten der Karte durch. Jetzt fragen sie ein Raster und sehen nur die Einheiten in der Nähe. | [SpatialHash.cs](../Scripts/Core/Spatial/SpatialHash.cs), [UnitRegistry.cs](../Scripts/Units/UnitRegistry.cs) |
 
 ### 3.3 Architektur
 
 | Nr. | Problem | Folge |
 |---|---|---|
-| A1 | Rund 15 Stellen suchen Spieler, Controller oder Tooltip über feste Namen in der aktuellen Szene. Skills gehören seit M3 nicht mehr dazu, Items und Lootbags seit M4. | Jedes neue Level muss exakt wie das Testlevel aufgebaut sein |
+| A1 | Rund 15 Stellen suchen Spieler, Controller oder Tooltip über feste Namen in der aktuellen Szene. Skills gehören seit M3 nicht mehr dazu, Items und Lootbags seit M4, Gegner seit M5. Der `EnemyController` selbst sucht Held und Gegner-Container weiter über feste Namen. | Jedes neue Level muss exakt wie das Testlevel aufgebaut sein |
 | A2 | Behoben in M1. Alle Stats steckten in einer 2D-Physik-Klasse. Die Rechnung liegt jetzt in `Scripts/Core/Stats` ohne Godot. | Blockierte die 2D/3D-Entscheidung, Tests und Koop |
 | A3 | Für Skills behoben in M3, für das Inventar in M4. Der Skillbar-Button zauberte und zog Mana ab, das Inventar rechnete in seinen Knoten. Jetzt zeigen Leiste und Inventar nur noch an. | Logik ist ohne UI nicht nutzbar und nicht testbar |
 | A4 | Behoben in M4. Items waren Szenen-Knoten, die nie im Baum hingen. Jetzt sind sie reine Daten. | Speicherleck und nicht serialisierbar |
@@ -128,11 +129,11 @@ Hinweis zu A10: Die alten Testzauber Fireball, Frost Nova und Lightning Strike s
 
 ### 3.4 Balance
 
-Beobachtungen aus den Laufzeitprüfungen von M2 bis M4. Der Balance-Durchgang steht in M8.
+Beobachtungen aus den Laufzeitprüfungen von M2 bis M5. Der Balance-Durchgang steht in M8.
 
 | Nr. | Beobachtung | Stelle |
 |---|---|---|
-| B1 | Rare und Elite bekommen 25 Stärke und regenerieren dadurch 5 Leben pro Sekunde. Ein unbewaffneter Spieler macht weniger Schaden und kann sie nicht töten. | [EnemyExtensions.cs](../Scripts/Extensions/EnemyExtensions.cs), [StatFormulas.cs](../Scripts/Core/Stats/StatFormulas.cs) |
+| B1 | Erledigt in M5. Rare und Elite bekamen 25 Stärke und regenerierten dadurch 5 Leben pro Sekunde. Seit M5 kommt die Stärke von Elite und Rare Elite allein aus ihren Mods. | [Resources/MonsterMods/Pool](../Resources/MonsterMods/Pool) |
 | B2 | Der Spieler startet mit 9 Leben. Im Testlevel hat er 50 Bonusleben bekommen, damit ein Kampf länger als zwei Treffer dauert. | [test_plane.tscn](../Scenes/test_plane.tscn) |
 | B3 | Jeder Treffer mit Fire, Frost, Lightning oder Slash löst seinen Effekt sicher aus. Eine Chance statt Gewissheit wäre eine Stellschraube. | [StatusEffectRules.cs](../Scripts/Core/Combat/StatusEffects/StatusEffectRules.cs) |
 | B4 | Der Held startet mit 9 Mana und regeneriert 0,5 pro Sekunde. Das reicht für vier Feuerbälle oder zwei Thunderbolts. | [Resources/Skills/Player](../Resources/Skills/Player) |
@@ -140,6 +141,10 @@ Beobachtungen aus den Laufzeitprüfungen von M2 bis M4. Der Balance-Durchgang st
 | B6 | Pierce trifft nur halb so oft. Mit dem Bogen geht deshalb jeder zweite Pfeil daneben, obwohl er sichtbar durch den Gegner fliegt. | [CombatRules.cs](../Scripts/Core/Combat/CombatRules.cs) |
 | B7 | Neu seit M4: Die Werte für Parry und Block der ersten Items sind geschätzt. Awareness verstärkt Block und Parry gegen Attacks, nicht gegen Spells. | [Resources/Items](../Resources/Items), [DerivedStatProvider.cs](../Scripts/Core/Stats/DerivedStatProvider.cs) |
 | B8 | Neu seit dem 28.09.2026: Bleed stapelt ohne Obergrenze und legt auf Dauer 50 % des Trefferschadens obendrauf. Burn bringt 25 % und endet bei 10 Stapeln. Eine Obergrenze für Bleed ist die Stellschraube. | [StatusEffectRules.cs](../Scripts/Core/Combat/StatusEffects/StatusEffectRules.cs) |
+| B9 | Neu seit M5: Attribute wirken bei kleinen Werten kaum. Ein Blob auf Level 10 hat Stärke 10 statt 1 und schlägt damit nur 2,5 % härter zu. Sein Leben steigt dagegen von 9 auf rund 45, und er regeneriert 5 Leben pro Sekunde. Den Schaden hoher Level müssen Ausrüstung und Mods tragen. | [DerivedStatProvider.cs](../Scripts/Core/Stats/DerivedStatProvider.cs), [Resources/Enemies](../Resources/Enemies) |
+| B10 | Neu seit M5: Natürliche Waffen mit Frost, Fire oder Lightning wachsen mit keinem Attribut. Stärke verstärkt nur physischen Schaden, Intelligenz nur Spells. | [HitRequests.cs](../Scripts/Core/Combat/HitRequests.cs) |
+| B11 | Neu seit M5: Chancen für Elite und Rare Elite, alle Werte der Mods und der Schaden von Meteor, Death Blast und Frost Pulse sind geschätzt. Der Schaden der drei Skills wächst nicht mit dem Level. | [EnemyController.cs](../Scripts/Controllers/EnemyController.cs), [Resources/MonsterMods/Pool](../Resources/MonsterMods/Pool) |
+| B12 | Neu seit M5: Ein Blue Blob läuft 25 Pixel pro Sekunde und gibt auf, sobald der Held 6 Sekunden lang außerhalb des Aggroradius bleibt. Aus der Ferne getroffen, kommt er deshalb nur 150 Pixel weit. | [blue_blob.tres](../Resources/Enemies/blue_blob.tres) |
 
 ## 4. Meilensteinplan
 
@@ -275,10 +280,10 @@ Bewusst offen gelassen:
 
 - Parry und Block haben die Grundchance 0. Seit M4 bringen Schild, Stab und Schwert die ersten Werte mit, weitere folgen in M8.
 - Parry und Block unterscheiden nur ATTACK und SPELL. Fernkampf-Attacks benutzen die Werte des Nahkampfs. Das gilt auch nach M3.
-- Der Held läuft in gerader Linie zum Ziel. Bleibt er hängen, gibt er das Ziel nach 0,4 Sekunden auf. Wegfindung kommt in M5.
+- Der Held lief in gerader Linie zum Ziel. Seit M5 folgt er dem Pfad um Wände herum. Bleibt er trotzdem hängen, gibt er das Ziel nach 0,4 Sekunden auf.
 - Die Angriffsanimation des Spielers benutzt das vorhandene graue Platzhalter-Sprite und spielt für alle Waffen die Einhand-Animation.
 - Ein fehlgeschlagener Zauber wurde im Skillbar-Button behandelt. Seit M3 regelt das der Spieler.
-- Gegner finden den Spieler weiter über den festen Namen in der Szene. Das gehört zu A1.
+- Gegner fanden den Spieler über den festen Namen in der Szene. Seit M5 bekommen sie ihr Ziel vom `EnemyController`.
 
 #### Nachtrag vom 28.09.2026: Bleed stapelt
 
@@ -359,7 +364,7 @@ So funktionieren Skills:
 - Die Abklingzeit gehört zum Skill, nicht zum Platz. Liegt derselbe Skill auf mehreren Plätzen, zeigen alle dieselbe Abklingzeit.
 - Eine Skill-Resource baut ihre Definition beim ersten Zugriff und behält sie. Wer Werte der Resource im laufenden Spiel ändert, sieht davon nichts.
 - `CollisionLayers` spiegelt die Kollisionsebenen aus den Projekteinstellungen. Ändert sich dort eine Ebene, muss die Klasse folgen.
-- Gegner zahlen für Skills weder Mana noch Abklingzeit, ihr `AvailableMana` ist unbegrenzt.
+- Gegner zahlen für Skills kein Mana, ihr `AvailableMana` ist unbegrenzt. Seit M5 gilt für sie die Abklingzeit des Skills.
 
 Ein neuer Skill in drei Schritten:
 
@@ -384,8 +389,8 @@ Bewusst offen gelassen:
 - Klassen und Skill-Erwerb. Die Frage muss vor dem Meilenstein beantwortet sein, der Skills freischaltet.
 - Die Tasten lassen sich nur in den Projekteinstellungen ändern. Eine Einstellung im Spiel kommt in M7.
 - Die Belegung der Leiste wurde nicht gespeichert. Seit M4 steht sie im Spielstand.
-- Gegner zahlen für Skills weder Mana noch Abklingzeit. Ihr Takt kommt weiter aus Windup und Recovery. Das gehört zu M5.
-- Gegner finden den Spieler weiter über den festen Namen in der Szene. Das gehört zu A1.
+- Gegner zahlten für Skills weder Mana noch Abklingzeit. Seit M5 gilt die Abklingzeit, Mana bleibt frei. Ihr Takt kommt weiter aus Windup und Recovery.
+- Gegner fanden den Spieler über den festen Namen in der Szene. Seit M5 bekommen sie ihr Ziel vom `EnemyController`.
 - Zauber haben keine Zauberzeit und keine Animation am Helden.
 - Der Bogen ist ein Platzhalter mit gezeichnetem Icon und fällt bei Blue Blobs. Die Angriffsanimation bleibt die Einhand-Animation.
 - Die Leiste wird weiter per Code platziert. Das gehört zu A6.
@@ -564,26 +569,201 @@ Bewusst offen gelassen:
 
 - Der abgefangene Anteil beim Block steht nicht im Charakterbogen. Den Grundwert von 50 % nennt die Roadmap, den Affix der Tooltip des Schilds.
 - Die Werteliste im Charakterbogen ist voll. Eine weitere Zeile braucht mehr Höhe oder eine kleinere Schrift.
-- Itemlevel ist weiter 1. Das Monsterlevel bestimmt es ab M5. `Lootsystem.ItemLevel` ist bis dahin die Stellschraube.
-- Rare und Elite würfeln weiter mit eigenen Zufallsquellen. Das gehört zu M5.
+- Itemlevel war immer 1. Seit M5 bestimmt es das Monsterlevel, `Lootsystem.ItemLevel` ist entfallen.
+- Rare und Elite würfelten mit eigenen Zufallsquellen. Seit M5 laufen Spawns und Seltenheit über die gemeinsame Zufallsquelle.
 - Ringe haben vier einzelne Plätze, aber noch keine Item-Basen. Welcher Ring in welchen Platz geht, ist offen.
 - Waffen für die Nebenhand gibt es nicht. Die Wield-Strategien `OffHand` und `OneHand` stehen nur im Tooltip.
 - Es gibt einen Charakter. Mehrere Charaktere und ein neues Spiel kommen mit dem Hauptmenü in M7.
 - Der Tooltip sucht weiter über einen festen Namen in der Szene. Das gehört zu A1.
 - Das Item in der Hand ist wie bisher nur blass zu sehen.
 
-### M5: Gegner-KI und Skalierung (M)
+### M5: Gegner-KI und Skalierung (M, umgesetzt am 28.09.2026 auf `master_EnemyAiAndScaling`)
 
 Ziel: Gegner, die sich durch Level bewegen und mit der Tiefe stärker werden.
 
-- Gegner-Definition als Resource: Attribute, Level, Loot-Tabelle, XP, Angriffe. Behebt F17.
-- Zustandsmaschine: Idle, Verfolgen, Windup, Angriff, Recovery, Tod. Todesanimation läuft zu Ende. Behebt F15.
-- Wegfindung auf einem logischen Gitter, das für 2D und 3D gleich funktioniert. Auch der Held benutzt sie, wenn er zu einem angeklickten Gegner läuft.
-- Spawns und Rare/Elite würfeln über die gemeinsame Zufallsquelle mit Seed. Behebt den Spawn-Anteil von P7.
-- Nur Gegner in Spielernähe werden simuliert. Behebt P3.
-- Monsterlevel bestimmt Itemlevel. Rare und Elite bekommen eigene Modifikatoren.
+- Erledigt: Gegner-Definition als Resource mit Attributen, Wachstum pro Level, Ausrüstung, natürlicher Waffe, Skills, Beute, XP und Verhalten. Die Klassen pro Gegner sind entfallen, die Szene bringt nur noch Aussehen und Kollisionsform mit. F17 bleibt behoben.
+- Erledigt: Zustandsmaschine im Kern: Ruhe, Verfolgen, Ausholen, Erholen, Rückweg, Tod. F15 bleibt behoben.
+- Erledigt: Wegfindung über Godots Navigation. Auch der Held benutzt sie, wenn er zu einem angeklickten Gegner läuft.
+- Erledigt: Gegner geben die Verfolgung auf und gehen langsam in die Nähe ihres Startorts zurück.
+- Erledigt: Bereichslevel pro Karte, Anpassung pro Gegner und pro Spawn-Marker. Das Monsterlevel bestimmt das Itemlevel.
+- Erledigt: Elite und Rare Elite mit 1 bis 5 Mods. Ein Mod besteht aus Werten, Auslösern und Aktionen, die sich im Inspector frei kombinieren lassen.
+- Erledigt: Skills von Gegnern haben Abklingzeiten. Ein Gegner kann mehrere Skills haben.
+- Erledigt: Spawns und Seltenheit würfeln über die gemeinsame Zufallsquelle mit Seed. Behebt den Rest von P7.
+- Erledigt: Ruhende Gegner fern vom Helden denken und bewegen sich nicht. Behebt P3.
+- Erledigt: Flächen, Forks und die Suche unter dem Mauszeiger fragen ein Raster statt alle Einheiten der Karte. Behebt P9.
+- Zusätzlich: Stat `ProjectileCount`. Wer ihn erhöht, schießt mehrere Projektile als Fächer. Er gilt für jede Einheit, auch für den Helden.
+- Zusätzlich: Jede Einheit meldet erlittene und ausgeteilte Treffer über `DamageTaken` und `HitDealt`, mit Angreifer und Opfer.
+- Zusätzlich: Schützen greifen nur an, wenn keine Wand zwischen ihnen und dem Ziel steht.
+- Zusätzlich: Namensschild über Elite und Rare Elite mit Namen und Mods.
+- Zusätzlich: Der Lebensbalken eines Gegners verschwindet wieder, wenn sein Leben voll ist.
 
 Fertig, wenn Gegner um Wände herum laufen und 200 Gegner auf der Karte die Bildrate nicht senken.
+
+Stand des Fertig-Kriteriums: erfüllt. 122 neue Unit-Tests decken den Kern ab, insgesamt sind es 547. Eine Laufzeitprüfung mit 105 Schritten im Testlevel lief sechsmal hintereinander fehlerfrei. In ihr läuft ein Gegner aus dem ummauerten Hof um die Wand herum zum Helden, und der Held findet denselben Weg zu einem Gegner im Hof. Eine zweite Prüfung mit 5 Schritten deckt die Sichtlinie der Schützen ab. Zusätzlich gab es eine Sichtprüfung mit Bildschirmfotos und eine Messung mit 200 Gegnern, siehe unten.
+
+Getroffene Designentscheidungen vom 28.09.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| Monsterlevel | Bereichslevel pro Karte. Monster bekommen eine Property für individuelle Anpassungen. |
+| Skalierung | Alles über Attribute, Ausrüstung und Monster-Mods. Keine eigene Kurve für Leben oder Schaden. |
+| Mods | Sollen einfach und verrückt sein können. Beispiele: 33 % increased Attack Speed, doppelte Projektile, Meteore im Umkreis des Monsters. |
+| Anzahl der Mods | 1 bis 5. Mit 1 bis 2 Mods heißt das Monster Elite, mit 3 bis 5 Mods Rare Elite. |
+| Kosten für Gegner | Skills haben Abklingzeiten, kosten aber vorerst kein Mana. |
+| Verfolgen | Gegner geben nach einer Zeit auf und gehen langsam zurück, nicht genau zum Startort, nur in die Nähe. Verfolgungszeit und Aggroradius sind im Inspector einstellbar. |
+| Entfernte Gegner | Statuseffekte und Regeneration laufen normal weiter. |
+| Wegfindung | Über Godots Navigation statt über ein eigenes Gitter im Kern. |
+
+Von mir festgelegt, weil es sich aus dem Umbau ergab. Alles lässt sich in den Resources oder im Inspector ändern:
+
+| Punkt | Festlegung |
+|---|---|
+| Chancen | Elite 10 %, Rare Elite 4 %. Innerhalb der Stufe ist jede Anzahl von Mods gleich wahrscheinlich. |
+| Größe, XP und Beute | Elite: 1,25-fache Größe, 1,5-fache XP, Beute zweimal gewürfelt. Rare Elite: 1,5-fache Größe, 3-fache XP, Beute dreimal gewürfelt. |
+| Namensschild | Name in Blau für Elite und in Gold für Rare Elite, darunter die Mods. |
+| Verfolgungszeit | 6 Sekunden. Sie läuft nur, solange das Ziel außerhalb des Aggroradius ist. Jeder Treffer auf den Gegner setzt sie zurück. |
+| Rückweg | Halbes Tempo, Ziel ist ein zufälliger Punkt bis 150 Pixel um den Startort. Der Gegner heilt dabei nicht von selbst. |
+| Wecken auf dem Rückweg | Ein Treffer oder ein Ziel im Aggroradius lässt ihn wieder angreifen. |
+| Tod des Helden | Gegner geben auf und gehen zurück. |
+| Gruppe | Treffer und Tod rufen die Gruppe, bloße Nähe nicht. So war es vor M5 auch. |
+| Wachstum der Attribute | Steht pro Attribut in der Gegner-Resource. Die Blobs bekommen pro Level 1 Stärke und 1 Konstitution, der Testgegner 1 Intelligenz und 1 Konstitution. |
+| Ausrüstung | Item-Basen ohne Affixe. Die erste Waffe der Liste ersetzt die natürliche Waffe. Den Takt bestimmen weiter Windup und Recovery, nicht das Angriffstempo der Waffe. |
+| Wahl des Skills | Der erste Skill der Liste, der nicht abklingt. Die Abklingzeit beginnt beim Ausholen. |
+| Reichweite | Der Gegner greift an, sobald das Ziel in `AttackRange` und in der Reichweite des Skills steht. |
+| Mehrere Projektile | Teilen sich den Treffer, jede Einheit wird pro Wurf höchstens einmal getroffen. Der Fächer öffnet sich um 12 Grad pro Projektil, höchstens 60 Grad. |
+| Passende Mods | Twin Shot bekommen nur Schützen, Blinking nur Nahkämpfer. Die Auswahl steht als `Fit` am Mod. |
+| Beschworene Monster | Sind Normal, haben das Level und die Gruppe des Beschwörers und greifen sofort mit an. |
+| Simulation | Ruhende Gegner schlafen ab 2500 Pixel Abstand zum Helden. |
+| Begehbare Fläche | Das Rechteck um den Boden des Levels, abzüglich aller Wände. |
+| Abstand zu Wänden | 40 Pixel für die Mitte jeder Einheit. |
+
+So funktionieren Gegner:
+
+- Eine Gegner-Resource liegt unter `Resources/Enemies`. Ein Spawn-Marker verweist auf die Resource, nicht mehr auf eine Szene.
+- Alle Gegner benutzen dasselbe Skript `Enemy`. Die Szene eines Gegners enthält Sprites, Animationen, Kollisionsform und Lebensbalken.
+- `EnemyController.Spawn` baut einen Gegner: Szene instanziieren, Definition, Level und Mods übergeben, Ziel setzen, in den Baum hängen.
+- Das Level ist `AreaLevel` am `EnemyController` plus `LevelOffset` am Gegner plus `LevelOffset` am Spawn-Marker, begrenzt auf 1 bis 100.
+- Ein Attribut ist der Wert aus der Resource plus Wachstum mal gewonnene Level, abgerundet.
+- Ausrüstung und Mods legen ihre Modifier ins Stat-Blatt, genau wie beim Helden.
+- `EnemyBrain` im Kern entscheidet. Es bekommt pro Schritt eine Wahrnehmung (Abstand zum Ziel, Reichweite, Skill bereit, zu Hause angekommen) und liefert eine Entscheidung (Bewegung, Angriff beginnt, Treffer fällt, aufgeben).
+- `Enemy` führt die Entscheidung aus: bewegen, Skill bezahlen, Animation spielen, Skill über `SkillExecutor` auslösen.
+- Der `EnemyController` lässt nur wache Gegner denken. Wach ist, wer nicht ruht oder näher als `SimulationRadius` am Helden steht.
+- Ein schlafender Gegner hält Animation und Bewegung an. Leben, Statuseffekte, Abklingzeiten und die Auslöser seiner Mods laufen weiter.
+- Ein Treffer weckt auch einen schlafenden Gegner, egal wie weit der Angreifer entfernt ist.
+- Neue Werte in den Enums `MonsterModFit` und `ModAim` nur am Ende anhängen, weil Resources sie als Zahl speichern.
+
+So funktioniert die Wegfindung:
+
+- Jedes Level bekommt einen Knoten `LevelNavigation`. Er hängt neben den Tile-Ebenen und bekommt die Boden-Ebene zugewiesen.
+- Beim Start des Levels liest er alle Kollisionsformen der Ebene "Walls" unterhalb seines Elternknotens und backt daraus das Netz, auf einem eigenen Thread. Im Testlevel dauert das rund 30 Millisekunden und ergibt 48 Polygone.
+- Nach dem Erzeugen eines Levels zur Laufzeit genügt ein Aufruf von `Rebuild`.
+- `PathFollower` kapselt den `NavigationAgent2D`. Gegner und Held fragen ihn nur nach der Richtung zum Ziel.
+- Der Agent hängt an der Kollisionsform. Der Pfad gilt damit für die Mitte des Körpers, nicht für die Füße.
+- Einen neuen Pfad gibt es höchstens alle 0,4 Sekunden und nur, wenn sich das Ziel um mehr als 48 Pixel bewegt hat. Der Takt ist pro Einheit versetzt. Die Regel steht als `RepathTimer` im Kern.
+- Das Ausweichen der Agents untereinander ist aus. Es ist teuer und kennt keine Wände.
+- Ohne `LevelNavigation` im Level läuft jede Einheit wie früher in gerader Linie.
+- Die Navigation in den Tiles des TileSets bleibt ungenutzt. Die Godot-Doku rät davon ab, weil Einheiten damit an Ecken hängen bleiben.
+
+So funktionieren Monster-Mods:
+
+- Ein Mod ist eine Resource unter `Resources/MonsterMods/Pool`. `MonsterModLibrary` lädt alle Resources aus diesem Ordner, ein neuer Mod braucht dort keinen Eintrag.
+- Ein Mod hat Werte und Effekte. Werte sind Modifier fürs Stat-Blatt. Ein Effekt verbindet einen Auslöser mit beliebig vielen Aktionen, dazu Chance, Abklingzeit und eine Schrift über dem Monster.
+- `MonsterModRoller` im Kern wählt die Mods: nach Gewicht, keinen doppelt, aus jeder `ExclusiveGroup` höchstens einen, nur passende für Level und Art des Monsters.
+- Die Seltenheit folgt aus der Zahl der Mods, die das Monster wirklich bekommen hat. Reicht der Vorrat nicht, sinkt sie.
+- Eine Resource gehört allen Monstern mit diesem Mod gemeinsam. Was pro Monster läuft, etwa ein Takt, steht in der Bindung, die der Auslöser pro Monster anlegt.
+- Aktionen laufen erst nach dem laufenden Physikschritt. Ein Treffer durch ein Projektil darf so ein Monster beschwören oder ein Projektil zurückschießen.
+- "Skill wirken" nimmt jede Skill-Resource. Der Skill kostet dabei weder Mana noch Abklingzeit, den Takt bestimmt der Auslöser.
+
+| Auslöser | Löst aus |
+|---|---|
+| `OnDeathTrigger` | Beim Tod |
+| `OnDamageTakenTrigger` | Bei erlittenem Treffer, wahlweise auch bei abgewehrtem |
+| `OnHitDealtTrigger` | Bei eigenem Treffer |
+| `IntervalTrigger` | Alle X Sekunden, wahlweise nur im Kampf |
+| `LifeBelowTrigger` | Sobald das Leben unter X % fällt, einmal oder bei jedem Unterschreiten |
+| `OnEngageTrigger` | Wenn der Kampf beginnt |
+
+| Aktion | Wirkung |
+|---|---|
+| `CastSkillAction` | Wirkt einen Skill: auf sich, auf das Ziel, auf den Angreifer oder auf einen zufälligen Punkt im Umkreis |
+| `SummonAction` | Beschwört Monster neben sich |
+| `HealAction` | Heilt einen Anteil des Lebens |
+| `TeleportAction` | Springt neben das Ziel |
+| `AddModifiersAction` | Legt Modifier ins Stat-Blatt, befristet oder bis zum Tod |
+
+Die ersten zehn Mods, alle in [Resources/MonsterMods/Pool](../Resources/MonsterMods/Pool):
+
+| Mod | Wirkung | Passt zu |
+|---|---|---|
+| Hasted | 33 % increased Angriffstempo | allen |
+| Swift | 40 % increased Bewegungstempo | allen |
+| Stalwart | 60 % more Leben | allen |
+| Twin Shot | 100 % more Projektile, also doppelte | Schützen |
+| Meteor Caller | Im Kampf alle 1,5 Sekunden ein Meteor auf einen zufälligen Punkt bis 400 Pixel um das Monster | allen |
+| Volatile | Beim Tod eine Explosion um die Leiche, angekündigt durch einen Kreis | allen |
+| Freezing Skin | Bei erlittenem Treffer 35 % Chance auf einen Frost Pulse, höchstens alle 2 Sekunden | allen |
+| Broodmother | Unter 50 % Leben einmal drei Blue Blobs | allen |
+| Blinking | Im Kampf alle 4 Sekunden ein Sprung neben das Ziel | Nahkämpfern |
+| Berserk | Unter 35 % Leben 50 % more Angriffs- und Bewegungstempo bis zum Tod | allen |
+
+Die Skills dazu, alle in [Resources/Skills/Monsters](../Resources/Skills/Monsters):
+
+| Skill | Schaden | Wirkung |
+|---|---|---|
+| Meteor | 6 bis 12 Fire | Fläche am Zielpunkt, Radius 150, schlägt nach 1,2 Sekunden ein |
+| Death Blast | 10 bis 16 Fire | Fläche um den Wirkenden, Radius 200, zündet nach 1 Sekunde |
+| Frost Pulse | 3 bis 6 Frost | Fläche um den Wirkenden, Radius 220, wächst in 0,2 Sekunden. Dieselbe Szene wie Frost Nova |
+
+Ein neuer Gegner in drei Schritten:
+
+1. Szene anlegen, Wurzelknoten `CharacterBody2D` mit dem Skript `Enemy`. Sie braucht `CollisionShape2D`, `AnimationPlayer`, `AnimationTree` und einen Lebensbalken mit dem eindeutigen Namen `Healthbar`. Am einfachsten erbt sie von `base_enemy.tscn`.
+2. Resource vom Typ `EnemyResource` unter `Resources/Enemies` anlegen und die Szene eintragen.
+3. Die Resource an einem Spawn-Marker eintragen.
+
+Ein neuer Mod in zwei Schritten:
+
+1. Resource vom Typ `MonsterModResource` unter `Resources/MonsterMods/Pool` anlegen, Id und Namen vergeben.
+2. Werte und Effekte im Inspector zusammenstecken.
+
+Fehlt ein Baustein, ist er eine kleine Klasse: ein Auslöser erbt von `ModTrigger`, eine Aktion von `ModAction`. Danach steht er in jedem Mod zur Auswahl.
+
+Die Werte der Gegner, alle in [Resources/Enemies](../Resources/Enemies):
+
+| Gegner | Leben auf Level 1 | Tempo | Natürliche Waffe | Reichweite | Ausholen und Erholen | Besonderes |
+|---|---|---|---|---|---|---|
+| Blue Blob | 9 | 25 | 1 bis 3 Frost | 80 | 0,5 s und 0,7 s | 75 % Frostresistenz |
+| Yellow Blob | 76 | 100 | 2 bis 4 Lightning | 80 | 0,5 s und 0,7 s | 75 % Blitzresistenz |
+| Test Enemy | 263 | 50 | 3 bis 6 Fire | 350 | 0,6 s und 1,0 s | Skill Fire Spit |
+
+Alle drei haben Aggroradius 500, Verfolgungszeit 6 Sekunden und 100 XP. Die Werte sind dieselben wie vor M5.
+
+Messung mit 200 Gegnern im Testlevel, headless und damit ohne Zeichnen. Bei 60 Bildern pro Sekunde hat ein Physik-Frame 16,7 Millisekunden Zeit:
+
+| Lage | Vor M5 | Nach M5 |
+|---|---|---|
+| Alle ruhen, der Held ist weit weg | 0,7 bis 0,8 ms | 0,8 bis 0,9 ms |
+| Alle ruhen, der Held steht im Level, 114 Gegner sind wach | 0,6 bis 0,8 ms | 0,8 bis 0,9 ms |
+| Alle 200 verfolgen den Helden und kämpfen | 2,3 ms | 2,0 bis 2,5 ms |
+
+- 200 kämpfende Gegner brauchen ein Siebtel der verfügbaren Zeit. Wegfindung, Zustandsmaschine und Mods kosten gegenüber dem alten Stand nichts Messbares.
+- Das Schlafen spart bei 200 Gegnern kaum etwas. P3 war in dieser Größe kein Engpass, der Befund stammte aus der Code-Lektüre.
+- Der Code der Gegner macht rund die Hälfte der Zeit aus. Der Rest ist Arbeit der Engine.
+- Gemessen wird unter Volllast: Die Engine soll 6000 Physik-Frames pro Sekunde rechnen und schafft nur einen Teil. Aus der Uhr ergibt sich die Dauer pro Frame.
+- Der Monitor `TimePhysicsProcess` der Engine taugt dafür nicht. Er meldet den langsamsten Frame der letzten Sekunde, nicht den Mittelwert.
+
+Bewusst offen gelassen:
+
+- Das Bereichslevel ist ein fester Wert am `EnemyController`. Ein Level, das mit der Tiefe steigt, kommt mit M6 und M7.
+- Ausrüstung von Gegnern bekommt keine Affixe. Gewürfelte Affixe nach Monsterlevel wären ein Weg, den Schaden mit dem Level wachsen zu lassen, siehe B9.
+- XP und der Schaden der Mod-Skills wachsen nicht mit dem Level.
+- Gegner weichen einander nicht aus und stehen beim Helden übereinander. Das war vor M5 auch so.
+- Ein Radius gilt für alle Einheiten. Rare Elite sind größer und streifen an Ecken entlang.
+- Begehbar ist das ganze Rechteck um den Boden. Löcher im Boden ohne Kollisionsform gelten als begehbar, so wie für die Physik auch. Räume mit eigenen Umrissen kommen mit M6.
+- Der Wechsel auf 3D tauscht `NavigationAgent2D` und `NavigationRegion2D` gegen ihre 3D-Geschwister. Betroffen sind `PathFollower` und `LevelNavigation`, der Kern nicht.
+- Die Mods stehen nur auf dem Namensschild. Eine Beschreibung beim Überfahren mit der Maus fehlt.
+- Das Namensschild ist nur zu sehen, solange der Gegner wach ist.
+- Der `EnemyController` sucht Held und Gegner-Container weiter über feste Namen in der Szene. Das gehört zu A1.
+- Die Szenen `lightning_strike.tscn` und `thunderbolt.tscn` verweisen auf veraltete UIDs und melden beim Laden je eine Warnung. Das war vor M5 auch so.
 
 ### Entscheidungspunkt: 2D oder 3D
 
