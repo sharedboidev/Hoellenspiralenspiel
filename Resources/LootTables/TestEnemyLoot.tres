@@ -1,25 +1,25 @@
 [gd_resource type="Resource" script_class="LootTable" format=3 uid="uid://bxcn40lenvjbt"]
 
-[ext_resource type="Script" uid="uid://bg22hx7k8vipe" path="res://Resources/LootEntry.cs" id="1_oa5wn"]
-[ext_resource type="Script" uid="uid://bmef8b2b0wodq" path="res://Resources/LootTable.cs" id="2_7xqkj"]
-[ext_resource type="PackedScene" uid="uid://cphtaoh2o6ddc" path="res://Scenes/Items/Consumables/health_potion.tscn" id="2_qbgce"]
-[ext_resource type="PackedScene" uid="uid://bafd40n3y6xtn" path="res://Scenes/Items/Weapons/Staffs/staff.tscn" id="3_qxger"]
+[ext_resource type="Script" uid="uid://bg22hx7k8vipe" path="res://Resources/LootEntry.cs" id="1_entry"]
+[ext_resource type="Script" uid="uid://bmef8b2b0wodq" path="res://Resources/LootTable.cs" id="2_table"]
+[ext_resource type="Resource" path="res://Resources/Items/Consumables/health_potion.tres" id="3_item"]
+[ext_resource type="Resource" path="res://Resources/Items/Weapons/wooden_staff.tres" id="4_item"]
 
-[sub_resource type="Resource" id="Resource_oa5wn"]
-script = ExtResource("1_oa5wn")
-ItemScene = ExtResource("2_qbgce")
+[sub_resource type="Resource" id="Resource_entry1"]
+script = ExtResource("1_entry")
+Item = ExtResource("3_item")
 Weight = 7.0
 QuantityMax = 5
 
-[sub_resource type="Resource" id="Resource_7xqkj"]
-script = ExtResource("1_oa5wn")
+[sub_resource type="Resource" id="Resource_entry2"]
+script = ExtResource("1_entry")
 Type = 2
 
-[sub_resource type="Resource" id="Resource_qbgce"]
-script = ExtResource("1_oa5wn")
-ItemScene = ExtResource("3_qxger")
+[sub_resource type="Resource" id="Resource_entry3"]
+script = ExtResource("1_entry")
+Item = ExtResource("4_item")
 
 [resource]
-script = ExtResource("2_7xqkj")
+script = ExtResource("2_table")
 TableId = "test_loot"
-Entries = Array[ExtResource("1_oa5wn")]([SubResource("Resource_oa5wn"), SubResource("Resource_7xqkj"), SubResource("Resource_qbgce")])
+Entries = Array[ExtResource("1_entry")]([SubResource("Resource_entry1"), SubResource("Resource_entry2"), SubResource("Resource_entry3")])

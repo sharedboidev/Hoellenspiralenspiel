@@ -80,42 +80,56 @@ public class StatusEffectTrackerTests
     }
 
     [Test]
-    public void Bleed_NurDerStaerksteWirkt()
+    public void Bleed_Stapelt()
     {
         var tracker = new StatusEffectTracker(CreateSheet());
 
         tracker.Apply(new StatusEffectApplication(StatusEffectKind.Bleed, 5f, 4f));
         tracker.Apply(new StatusEffectApplication(StatusEffectKind.Bleed, 2f, 4f));
 
-        Assert.That(tracker.GetMagnitude(StatusEffectKind.Bleed), Is.EqualTo(5f));
-        Assert.That(TotalDamage(Run(tracker, 4.1), StatusEffectKind.Bleed), Is.EqualTo(20));
+        Assert.Multiple(() =>
+        {
+            Assert.That(tracker.GetInstanceCount(StatusEffectKind.Bleed), Is.EqualTo(2));
+            Assert.That(tracker.GetMagnitude(StatusEffectKind.Bleed), Is.EqualTo(7f));
+        });
+
+        Assert.That(TotalDamage(Run(tracker, 4.1), StatusEffectKind.Bleed), Is.EqualTo(28));
     }
 
     [Test]
-    public void Bleed_SchwaechererLaeuftWeiterWennDerStaerkereEndet()
+    public void Bleed_StapelEndenUnabhaengigVoneinander()
     {
         var tracker = new StatusEffectTracker(CreateSheet());
 
         tracker.Apply(new StatusEffectApplication(StatusEffectKind.Bleed, 8f, 1f));
         tracker.Apply(new StatusEffectApplication(StatusEffectKind.Bleed, 2f, 4f));
 
-        var ticks = Run(tracker, 4.1);
+        var ticks = Run(tracker, 1.1);
 
-        Assert.That(TotalDamage(ticks, StatusEffectKind.Bleed), Is.EqualTo(8 * 1 + 2 * 3));
-    }
+        Assert.That(tracker.GetInstanceCount(StatusEffectKind.Bleed), Is.EqualTo(1), "die kurze Blutung ist abgelaufen");
 
-    [Test]
-    public void Bleed_StaerkererErsetztSchwaecheren()
-    {
-        var tracker = new StatusEffectTracker(CreateSheet());
-
-        tracker.Apply(new StatusEffectApplication(StatusEffectKind.Bleed, 2f, 4f));
-        tracker.Apply(new StatusEffectApplication(StatusEffectKind.Bleed, 5f, 4f));
+        ticks.AddRange(Run(tracker, 3));
 
         Assert.Multiple(() =>
         {
-            Assert.That(tracker.GetInstanceCount(StatusEffectKind.Bleed), Is.EqualTo(1));
-            Assert.That(tracker.GetMagnitude(StatusEffectKind.Bleed), Is.EqualTo(5f));
+            Assert.That(tracker.IsActive(StatusEffectKind.Bleed), Is.False);
+            Assert.That(TotalDamage(ticks, StatusEffectKind.Bleed), Is.EqualTo(8 * 1 + 2 * 4));
+        });
+    }
+
+    [Test]
+    public void Bleed_HatKeineObergrenze()
+    {
+        var tracker = new StatusEffectTracker(CreateSheet());
+        var stacks  = CombatRules.BurnMaxStacks * 3;
+
+        for (var i = 0; i < stacks; i++)
+            tracker.Apply(new StatusEffectApplication(StatusEffectKind.Bleed, 2f, 4f));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(tracker.GetInstanceCount(StatusEffectKind.Bleed), Is.EqualTo(stacks));
+            Assert.That(tracker.GetMagnitude(StatusEffectKind.Bleed), Is.EqualTo(2f * stacks));
         });
     }
 
@@ -249,6 +263,61 @@ public class StatusEffectTrackerTests
         Run(tracker, 1.1);
 
         Assert.That(tracker.IsActive(StatusEffectKind.Chill), Is.False);
+    }
+
+    [Test]
+    public void Chill_NurDerStaerksteWirkt()
+    {
+        var sheet   = CreateSheet();
+        var tracker = new StatusEffectTracker(sheet);
+        var speed   = sheet.GetFinal(CombatStat.Movementspeed);
+
+        tracker.Apply(new StatusEffectApplication(StatusEffectKind.Chill, 0.5f, 3f));
+        tracker.Apply(new StatusEffectApplication(StatusEffectKind.Chill, 0.3f, 3f));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(tracker.GetMagnitude(StatusEffectKind.Chill), Is.EqualTo(0.5f));
+            Assert.That(sheet.GetFinal(CombatStat.Movementspeed), Is.EqualTo(speed * 0.5f).Within(0.001f));
+        });
+    }
+
+    [Test]
+    public void Chill_SchwaechererLaeuftWeiterWennDerStaerkereEndet()
+    {
+        var sheet   = CreateSheet();
+        var tracker = new StatusEffectTracker(sheet);
+        var speed   = sheet.GetFinal(CombatStat.Movementspeed);
+
+        tracker.Apply(new StatusEffectApplication(StatusEffectKind.Chill, 0.5f, 1f));
+        tracker.Apply(new StatusEffectApplication(StatusEffectKind.Chill, 0.3f, 3f));
+
+        Run(tracker, 1.1);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(tracker.GetInstanceCount(StatusEffectKind.Chill), Is.EqualTo(1));
+            Assert.That(sheet.GetFinal(CombatStat.Movementspeed), Is.EqualTo(speed * 0.7f).Within(0.001f));
+        });
+
+        Run(tracker, 2);
+
+        Assert.That(tracker.IsActive(StatusEffectKind.Chill), Is.False);
+    }
+
+    [Test]
+    public void Shock_StaerkererErsetztSchwaecheren()
+    {
+        var tracker = new StatusEffectTracker(CreateSheet());
+
+        tracker.Apply(new StatusEffectApplication(StatusEffectKind.Shock, 0.1f, 4f));
+        tracker.Apply(new StatusEffectApplication(StatusEffectKind.Shock, 0.25f, 4f));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(tracker.GetInstanceCount(StatusEffectKind.Shock), Is.EqualTo(1));
+            Assert.That(tracker.ActionFailureChance, Is.EqualTo(0.25f));
+        });
     }
 
     [Test]

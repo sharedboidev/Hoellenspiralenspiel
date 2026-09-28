@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ConsumableBaseResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Items/ConsumableBaseResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cq2vnovnsqqbf" path="res://Textures/Items/Consumables/ManaPotion.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "mana_potion"
+DisplayName = "Mana Potion"
+Icon = ExtResource("2_icon")
+SlotSize = Vector2i(1, 1)
+Effect = 1

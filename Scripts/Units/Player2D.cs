@@ -5,12 +5,13 @@ using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Core.Progression;
+using Hoellenspiralenspiel.Scripts.Core.Saving;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Items;
-using Hoellenspiralenspiel.Scripts.Items.Armors;
-using Hoellenspiralenspiel.Scripts.Items.Weapons;
+using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.Skills;
 using Hoellenspiralenspiel.Scripts.UI.Character;
 using Hoellenspiralenspiel.Scripts.UI.Skills;
@@ -26,7 +27,12 @@ public partial class Player2D : BaseUnit
 
     public delegate void LeveledUpEventHandler(Player2D player);
 
+    public delegate void ProgressRestoredEventHandler();
+
     public delegate void RespawnedEventHandler();
+
+    public const int InventoryWidth  = 14;
+    public const int InventoryHeight = 5;
 
     private const float ImpactFraction = 0.5f;
 
@@ -35,6 +41,7 @@ public partial class Player2D : BaseUnit
 
     private const int    NoSlot             = -1;
     private const float  SkillBarMarginPx   = 60f;
+    private const float  DropDistancePx     = 30f;
     private const double StuckTimeoutSec    = 0.4;
     private const float  StuckSpeedFraction = 0.1f;
 
@@ -48,11 +55,12 @@ public partial class Player2D : BaseUnit
     private          double                          approachStuckSec;
     private          Vector2                         attackAimPoint;
     private          BaseUnit                        attackTarget;
-    private          BaseWeapon                      equippedWeapon;
+    private          ItemInstance                    equippedWeapon;
     private          bool                            hasDied;
     private          int                             heldSlot = NoSlot;
     private          BaseUnit                        hoveredUnit;
     private          double                          invulnerableTimeLeftSec;
+    private          bool                            isRestoringProgress;
     private          bool                            isSwingAnimationRunning;
     private          LevelUpEffect                   levelUpEffect;
     [Export] private ResourceOrb                     lifeOrb;
@@ -77,7 +85,15 @@ public partial class Player2D : BaseUnit
         });
 
         weapon.ApplyTo(Stats);
+
+        Items = new CharacterItems(InventoryWidth, InventoryHeight, GetRequiredAttributevalue);
+
+        Items.Equipment.Equipped   += OnItemEquipped;
+        Items.Equipment.Unequipped += OnItemUnequipped;
+        Items.Dropped              += OnItemDropped;
     }
+
+    public CharacterItems Items { get; }
 
     public override Faction Faction => Faction.Player;
 
@@ -85,7 +101,7 @@ public partial class Player2D : BaseUnit
 
     public override WeaponProfile Weapon => weapon;
 
-    public override PackedScene WeaponProjectileScene => equippedWeapon?.ProjectileScene;
+    public override PackedScene WeaponProjectileScene => ItemLibrary.GetProjectileScene(equippedWeapon);
 
     public override float AvailableMana => ManaCurrent;
 
@@ -144,6 +160,7 @@ public partial class Player2D : BaseUnit
 
     public event EquipmentChangedEventHandler EquipmentChanged;
     public event LeveledUpEventHandler        LeveledUp;
+    public event ProgressRestoredEventHandler ProgressRestored;
     public event RespawnedEventHandler        Respawned;
 
     public override void _Ready()
@@ -200,7 +217,7 @@ public partial class Player2D : BaseUnit
     {
         switch (e.PropertyName)
         {
-            case nameof(XpTotal) when Level < XpTable.MaxLevel && XpTotal >= XpForNextLevel:
+            case nameof(XpTotal) when !isRestoringProgress && Level < XpTable.MaxLevel && XpTotal >= XpForNextLevel:
                 LevelUp();
 
                 break;
@@ -725,30 +742,50 @@ public partial class Player2D : BaseUnit
 
     #endregion
 
-    #region Ausrüstung
+    #region Items
 
-    public void EquipItem(BaseItem item)
+    public void Consume(ItemInstance item)
+    {
+        if (IsDead)
+            return;
+
+        var effect = Items.Consume(item);
+
+        switch (effect?.Kind)
+        {
+            case ConsumableEffectKind.RestoreLife:
+                var healedAmount = LifeMaximum * effect.Percent / 100f;
+
+                LifeCurrent += (int)healedAmount;
+
+                this.ShowHeal(healedAmount, new Vector2(0, -128));
+
+                break;
+            case ConsumableEffectKind.RestoreMana:
+                ManaCurrent += ManaMaximum * effect.Percent / 100f;
+
+                break;
+        }
+    }
+
+    private void OnItemEquipped(ItemInstance item)
     {
         Stats.Update(sheet =>
         {
-            if (item is BaseArmor armor)
-                sheet.AddModifier(item.CreateCombatStatModifier(CombatStat.Armor, ModificationType.Flat, armor.ArmorvalueFinal));
+            sheet.AddModifiers(item.GetEquipModifiers());
 
-            foreach (var modifier in item.GetExtrinsicModifiers())
-                sheet.AddModifier(item.CreateCombatStatModifier(modifier));
-
-            if (item is BaseWeapon weapon)
-                WieldWeapon(weapon);
+            if (item.Definition.Kind == ItemKind.Weapon)
+                WieldWeapon(item);
         });
 
         EquipmentChanged?.Invoke();
     }
 
-    public void UnequipItem(BaseItem item)
+    private void OnItemUnequipped(ItemInstance item)
     {
         Stats.Update(sheet =>
         {
-            sheet.RemoveModifiersOf(item.ToString());
+            sheet.RemoveModifiersOf(item.InstanceId);
 
             if (item == equippedWeapon)
                 WieldWeapon(null);
@@ -757,12 +794,68 @@ public partial class Player2D : BaseUnit
         EquipmentChanged?.Invoke();
     }
 
-    private void WieldWeapon(BaseWeapon newWeapon)
+    private void WieldWeapon(ItemInstance newWeapon)
     {
         equippedWeapon = newWeapon;
-        weapon         = newWeapon?.ToProfile() ?? WeaponProfile.Unarmed;
+        weapon         = newWeapon?.ToWeaponProfile() ?? WeaponProfile.Unarmed;
 
         weapon.ApplyTo(Stats);
+    }
+
+    private void OnItemDropped(ItemInstance item)
+    {
+        if (!IsInsideTree())
+            return;
+
+        var towardsMouse = (GetGlobalMousePosition() - GlobalPosition).Normalized();
+
+        Lootbag.Drop(GetParent(), GlobalPosition + towardsMouse * DropDistancePx, item, Items);
+    }
+
+    #endregion
+
+    #region Speichern
+
+    public CharacterSave CaptureProgress()
+        => new()
+        {
+            Level           = Level,
+            XpTotal         = XpTotal,
+            AttributePoints = AttributePointsAllowedToSpend,
+            Strength        = StrengthBase,
+            Dexterity       = DexterityBase,
+            Intelligence    = IntelligenceBase,
+            Constitution    = ConstitutionBase,
+            Awareness       = AwarenessBase
+        };
+
+    public void RestoreProgress(CharacterSave progress)
+    {
+        Level                         = Math.Clamp(progress.Level, 1, XpTable.MaxLevel);
+        XpForNextLevel                = XpTable.GetTotalXpNeededForLevel(Level + 1);
+        AttributePointsAllowedToSpend = Math.Max(0, progress.AttributePoints);
+
+        Stats.Update(_ =>
+        {
+            StrengthBase     = Math.Max(1, progress.Strength);
+            DexterityBase    = Math.Max(1, progress.Dexterity);
+            IntelligenceBase = Math.Max(1, progress.Intelligence);
+            ConstitutionBase = Math.Max(1, progress.Constitution);
+            AwarenessBase    = Math.Max(1, progress.Awareness);
+        });
+
+        //Ein Spielstand kann mehr XP enthalten, als das Level verlangt. Der Aufstieg folgt wie im Spiel erst mit dem nächsten Gewinn
+        isRestoringProgress = true;
+        XpTotal             = Math.Max(progress.XpTotal, XpFloorCurrentLevel);
+        isRestoringProgress = false;
+
+        ProgressRestored?.Invoke();
+    }
+
+    public void RefillResources()
+    {
+        LifeCurrent = LifeMaximum;
+        ManaCurrent = ManaMaximum;
     }
 
     #endregion

@@ -4,13 +4,10 @@ using System.ComponentModel;
 using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Extensions;
-using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
-using CharacterSheet = Hoellenspiralenspiel.Scripts.UI.Character.CharacterSheet;
-using Inventory = Hoellenspiralenspiel.Scripts.UI.Character.Inventory;
 
 namespace Hoellenspiralenspiel.Scripts.Controllers;
 
@@ -32,11 +29,6 @@ public partial class EnemyController : Node
     public Lootsystem Lootsystem { get; set; }
 
     [Export]
-    public CharacterSheet CharacterSheet { get; set; }
-
-    private PackedScene LootbagScene { get; set; }
-
-    [Export]
     public float SpawnIntervallSec { get; set; } = 1.5f;
 
     [Export]
@@ -52,7 +44,6 @@ public partial class EnemyController : Node
 
         rng.Randomize();
 
-        LootbagScene = ResourceLoader.Load<PackedScene>("res://Scenes/Objects/lootbag.tscn");
         currentScene = GetTree().CurrentScene;
         player       = currentScene.GetNode<Player2D>("%Player 2D");
         container    = currentScene.GetNode<Node2D>("%Enemies");
@@ -139,11 +130,8 @@ public partial class EnemyController : Node
     {
         var loot = Lootsystem.GenerateLoot(enemy);
 
-        if (loot is null || loot.Length == 0)
-            return;
-
-        for (var i = 0; i < loot.Length; i++)
-            InstantiateLootbag(enemy, loot[i], GetLootbagOffset(i, loot.Length));
+        for (var i = 0; i < loot.Count; i++)
+            Lootbag.Drop(player.GetParent(), enemy.GlobalPosition + GetLootbagOffset(i, loot.Count), loot[i], player.Items);
     }
 
     //Mehrere Beutel werden im Kreis um den Gegner verteilt, damit sie sich nicht überdecken
@@ -155,29 +143,6 @@ public partial class EnemyController : Node
             return Vector2.Zero;
 
         return Vector2.Right.Rotated(Mathf.Tau * index / totalAmount) * spreadRadiusPx;
-    }
-
-    private void InstantiateLootbag(BaseEnemy enemy, BaseItem loot, Vector2 offset)
-    {
-        var lootbagInstance = LootbagScene.Instantiate<Lootbag>();
-        lootbagInstance.GlobalPosition =  enemy.GlobalPosition + offset;
-        lootbagInstance.ContainedItem  =  loot;
-        lootbagInstance.LootClicked    += LootbagInstanceOnLootClicked;
-
-        GetParent().GetNode<Node2D>("Environment").AddChild(lootbagInstance);
-    }
-
-    private void LootbagInstanceOnLootClicked(Lootbag sender, BaseItem lootedItem)
-    {
-        GD.Print($"{lootedItem?.Name ?? "Nothing"} looted.");
-
-        var inventory     = CharacterSheet.GetNode<Inventory>("%" + nameof(Inventory));
-        var couldLootItem = inventory.SetItem(lootedItem);
-
-        if (couldLootItem)
-            sender?.QueueFree();
-        else
-            sender.BounceAndFlip();
     }
 
     private void MakeEnemiesDoTheirThing(double delta)

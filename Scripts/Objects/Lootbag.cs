@@ -1,26 +1,49 @@
 using Godot;
-using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Core.Items;
 
 namespace Hoellenspiralenspiel.Scripts.Objects;
 
 public partial class Lootbag : PanelContainer
 {
-    public delegate void LootClickedEventHandler(Lootbag sender, BaseItem lootedItem);
+    private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Objects/lootbag.tscn");
 
-    public BaseItem                      ContainedItem { get; set; }
-    public event LootClickedEventHandler LootClicked;
+    private CharacterItems collector;
+
+    public ItemInstance ContainedItem { get; private set; }
+
+    public static Lootbag Drop(Node parent, Vector2 globalPosition, ItemInstance item, CharacterItems collector)
+    {
+        var lootbag = Scene.Instantiate<Lootbag>();
+
+        lootbag.ContainedItem  = item;
+        lootbag.collector      = collector;
+        lootbag.GlobalPosition = globalPosition;
+
+        parent.AddChild(lootbag);
+
+        return lootbag;
+    }
 
     public void _on_gui_input(InputEvent inputEvent)
     {
         if (inputEvent is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
-            LootClicked?.Invoke(this, ContainedItem);
+            Collect();
+    }
+
+    public void Collect()
+    {
+        if (collector.PickUp(ContainedItem))
+            QueueFree();
+        else
+            BounceAndFlip();
     }
 
     public void BounceAndFlip()
     {
         var startPos = GlobalPosition;
         var startRot = Rotation;
-        var tween    = GetTree().CreateTween();
+        //Der Tween hängt am Beutel und endet mit ihm, sonst liefe er nach dem Aufheben ins Leere
+        var tween = CreateTween();
 
         tween.SetParallel();
         tween.TweenProperty(this, "position", startPos + Vector2.Up * 50, 0.1f);

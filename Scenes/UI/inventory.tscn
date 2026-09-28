@@ -30,7 +30,6 @@ offset_bottom = 40.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_dt15g")
 script = ExtResource("1_dt15g")
 SlotScene = ExtResource("2_osrsm")
-AmountSlots = 70
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=365297740]
 layout_mode = 2

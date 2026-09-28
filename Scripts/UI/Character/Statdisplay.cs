@@ -1,5 +1,6 @@
 using Godot;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
@@ -20,9 +21,13 @@ public partial class Statdisplay : PanelContainer
     private          RichTextLabel  lifeLabel;
     private          RichTextLabel  liferegenerationLabel;
     private          RichTextLabel  lightningResiLabel;
+    private          RichTextLabel  meleeBlockLabel;
     private          RichTextLabel  meleeCritChanceLabel;
+    private          RichTextLabel  meleeParryLabel;
     private          RichTextLabel  movementspeedLabel;
+    private          RichTextLabel  spellBlockLabel;
     private          RichTextLabel  spellDamageLabel;
+    private          RichTextLabel  spellParryLabel;
     private          RichTextLabel  strengthLabel;
     private          RichTextLabel  manaLabel;
     private          RichTextLabel  manaregenerationLabel;
@@ -50,6 +55,9 @@ public partial class Statdisplay : PanelContainer
     private static string AsBonusPercent(Player2D player, CombatStat stat)
         => "+" + ((player.Stats.GetTotalMultiplier(stat) - 1) * 100).ToString("0.##") + "%";
 
+    private static string AsChance(Player2D player, CombatStat stat)
+        => CombatFormulas.ClampChance(player.Stats.GetFinal(stat)).ToString("0.##") + "%";
+
     private void RenderUtilities(Player2D player)
     {
         movementspeedLabel.Text = player.MovementspeedFinal.ToString("N0");
@@ -69,6 +77,10 @@ public partial class Statdisplay : PanelContainer
     {
         armorLabel.Text         = player.ArmorFinal.ToString("N0");
         dodgeLabel.Text         = player.DodgeFinal.ToString("0.##") + "%";
+        meleeBlockLabel.Text    = AsChance(player, CombatStat.MeleeBlock);
+        spellBlockLabel.Text    = AsChance(player, CombatStat.SpellBlock);
+        meleeParryLabel.Text    = AsChance(player, CombatStat.MeleeParry);
+        spellParryLabel.Text    = AsChance(player, CombatStat.SpellParry);
         fireResiLabel.Text      = player.FireResiFinal.ToString("N0") + "%";
         frostResistance.Text    = player.FrostResiFinal.ToString("N0") + "%";
         lightningResiLabel.Text = player.LightningResiFinal.ToString("N0") + "%";
@@ -102,6 +114,10 @@ public partial class Statdisplay : PanelContainer
     {
         armorLabel         = GetNode<RichTextLabel>("%Armor");
         dodgeLabel         = GetNode<RichTextLabel>("%Dodge");
+        meleeBlockLabel    = GetNode<RichTextLabel>("%MeleeBlock");
+        spellBlockLabel    = GetNode<RichTextLabel>("%SpellBlock");
+        meleeParryLabel    = GetNode<RichTextLabel>("%MeleeParry");
+        spellParryLabel    = GetNode<RichTextLabel>("%SpellParry");
         fireResiLabel      = GetNode<RichTextLabel>("%FireResistance");
         frostResistance    = GetNode<RichTextLabel>("%FrostResistance");
         lightningResiLabel = GetNode<RichTextLabel>("%LightningResistance");

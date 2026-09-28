@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-271_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-425_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -49,7 +49,7 @@ Das ist der Stand, der heute im Spiel steckt. Gespielt wird in einem Testlevel.
 | Leben und Mana | Leben: `5 + S + 3*C`, Mana: `3 + A + 5*I`, beide mit Regeneration |
 | Leveling | Level 1 bis 100, pro Level ein Attributpunkt, mit Dialog und Effekt |
 | Lichtradius | Wächst mit Awareness und vergrößert das Licht um den Spieler |
-| Charakterbogen | Alle Werte auf einen Blick, aktualisiert sich sofort |
+| Charakterbogen | Alle Werte auf einen Blick, auch Block und Parry, aktualisiert sich sofort |
 
 <details>
 <summary>Was jedes Attribut bewirkt</summary>
@@ -101,9 +101,9 @@ Beispiel: 14 % und 22 % increased von der Ausrüstung, dazu 2,97 % more aus Inte
 | Fernkampf | Mit einem Bogen läuft der Held in Reichweite und schießt. Ohne Gegner unter der Maus schießt er in ihre Richtung |
 | ATTACK und SPELL | Attacks skalieren mit dem Waffenschaden, Spells bringen eigenen Grundschaden mit |
 | Sechs Schadensarten | Crush, Pierce, Slash, Fire, Frost, Lightning, jede mit eigenem Effekt |
-| Statuseffekte | Bleed, stapelnder Burn, Shock mit Fehlschlägen, Chill mit Verlangsamung |
+| Statuseffekte | Stapelnder Bleed und Burn, Shock mit Fehlschlägen, Chill mit Verlangsamung |
 | Schadensminderung | Rüstung gegen physischen Schaden, Resistenzen gegen Feuer, Frost und Blitz |
-| Parry und Block | Parry wehrt ganz ab, Block fängt 50 % ab. Der Anteil ist ein eigener Wert für Items und Skills |
+| Parry und Block | Parry wehrt ganz ab, Block fängt 50 % ab. Schilde und Stäbe blocken, Schwerter parieren |
 | Kritische Treffer | Chance von Waffe oder Zauber, verstärkt durch Awareness |
 | Tod und Respawn | Todesanzeige, Verlust von 10 % der XP des Levels, Rückkehr zum Startpunkt |
 | Schadenszahlen | Schweben über dem Ziel, mit eigenen Farben für Krit, Heilung und jeden Statuseffekt |
@@ -115,7 +115,7 @@ Beispiel: 14 % und 22 % increased von der Ausrüstung, dazu 2,97 % more aus Inte
 |---|---|---|
 | Crush | Physisch | 20 % mehr Schaden |
 | Pierce | Physisch | Trifft nur halb so oft, ignoriert dafür die Rüstung |
-| Slash | Physisch | Bleed: 50 % des ungeminderten Treffers über 4 Sekunden, nur der stärkste wirkt |
+| Slash | Physisch | Bleed: 50 % des ungeminderten Treffers über 4 Sekunden, stapelt ohne Obergrenze |
 | Fire | Elementar | Burn: 25 % des erlittenen Schadens über 4 Sekunden, stapelt bis 10 Mal |
 | Frost | Elementar | Chill: Bewegung und Angriffe 30 % langsamer für 3 Sekunden |
 | Lightning | Elementar | Shock: Aktionen schlagen 4 Sekunden lang mit 25 % Chance fehl |
@@ -172,7 +172,7 @@ DPS = Mittlerer Treffer × Einsätze pro Sekunde × Trefferchance + Schaden des 
 | Angriffstempo und Abklingzeit | Bestimmen die Einsätze pro Sekunde, das langsamere von beiden zählt |
 | Trefferchance | Pierce trifft nur halb so oft |
 | Schadensart | Crush verursacht 20 % mehr Schaden |
-| Bleed und Burn | Ihr Schaden über Zeit zählt zur DPS, begrenzt durch die Regeln fürs Stapeln |
+| Bleed und Burn | Ihr Schaden über Zeit zählt zur DPS. Burn endet bei 10 Stapeln, Bleed hat keine Obergrenze |
 | Chill und Shock auf dem Helden | Chill senkt das Angriffstempo, unter Shock schlagen Einsätze fehl |
 
 Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
@@ -195,12 +195,15 @@ Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
 
 | Feature | Beschreibung |
 |---|---|
-| Item-Basen | Schwert, Stab, Bogen, Helm, Torso, Handschuhe, Heil- und Manatrank |
-| Affixe | 16 Affixe mit Stufen, Gewichten und Mindest-Itemlevel |
+| Item-Basen | Schwert, Stab, Bogen, Schild, Helm, Torso, Handschuhe, Heil- und Manatrank |
+| Items als Daten | Jede Item-Basis ist eine Resource mit Werten, Größe, Anforderungen und Icon. Ein neues Item braucht keinen Code |
+| Parry und Block | Jede Basis kann beides mitbringen, einstellbar im Inspector |
+| Affixe | 17 Affixe mit Stufen, Gewichten und Mindest-Itemlevel |
 | Prefix und Suffix | Bis zu 8 Affixe pro Item, keiner doppelt |
 | Lokal und global | Manche Affixe verbessern das Item selbst, andere den Charakter |
 | Seltenheit | Normal, Magic in Blau, Rare in Gelb mit erzeugtem Namen |
 | Loot-Tabellen | Gewichtete Einträge, Mengen, verschachtelte Tabellen |
+| Beute mit Seed | Derselbe Seed ergibt dieselbe Beute |
 | Anforderungen | Level und Attribute, unerfüllte Anforderungen erscheinen rot |
 
 ### 🧰 Inventar und Ausrüstung
@@ -213,9 +216,36 @@ Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
 |---|---|
 | Raster-Inventar | 70 Felder, Items belegen je nach Größe mehrere Felder |
 | Drag-and-drop | Aufnehmen, ablegen, tauschen, auf den Boden werfen |
-| Stapel | Tränke stapeln sich bis 5 |
+| Stapel | Tränke stapeln sich bis 5, aufgehobene Tränke füllen vorhandene Stapel |
 | 16 Ausrüstungsplätze | Inklusive vier Ringe |
+| Zweihandwaffen | Bogen und Stab sperren den Schildplatz, der Schild wandert ins Inventar |
 | Tooltips | Werte, Affixe und Anforderungen, farbig nach Seltenheit |
+
+### 💾 Speichern
+
+| Feature | Beschreibung |
+|---|---|
+| Automatisch | Das Spiel speichert beim Beenden und kurz nach jeder Änderung am Charakter |
+| Laden beim Start | Der Charakter ist nach dem Neustart derselbe, mit Inventar, Ausrüstung und Skill-Leiste |
+| Inhalt | Level, XP, Attribute, offene Punkte, jedes Item mit Affixen, Namen und Platz |
+| Sicher | Ein Absturz beim Schreiben zerstört den alten Spielstand nicht |
+
+<details>
+<summary>Wo der Spielstand liegt</summary>
+
+Die Datei heißt `character.json` und liegt im Benutzerordner von Godot.
+Unter Windows ist das `%APPDATA%\Godot\app_userdata\Hoellenspiralenspiel\saves`.
+
+| Wunsch | Weg |
+|---|---|
+| Neu anfangen | Die Datei löschen |
+| Mit einem zweiten Charakter spielen | Godot mit `-- --save-file=user://saves/zweiter.json` starten |
+| Ohne Spielstand testen | Im Inspector am `GameController` den Schalter `SavingEnabled` ausschalten |
+
+Leben, Mana, Position und die Welt stehen nicht im Spielstand.
+Der Held startet am Startpunkt mit vollem Leben und Mana.
+
+</details>
 
 ### 🖥️ Oberfläche und Welt
 
@@ -229,10 +259,9 @@ Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
 
 ### 🚧 Noch nicht enthalten
 
-- Speichern und Laden
-- Hub, Levelwechsel und Menüs
+- Hub, Levelwechsel und Menüs, damit auch mehrere Charaktere
 - Prozedurale Level und Wegfindung
-- Schilde und Waffen, die Parry oder Block mitbringen
+- Item-Basen für die übrigen zwölf Ausrüstungsplätze
 - Tasten im Spiel umbelegen
 - Klassen und Erwerb von Skills, der Held kennt vorerst alle
 
@@ -266,8 +295,8 @@ Die Skills liegen zu Beginn wie unten auf den Tasten. Jeder Platz der Leiste lä
 flowchart LR
     M0(["M0 Aufräumen"]):::done --> M1(["M1 Stat-Kern"]):::done --> M2(["M2 Kampf"]):::done
     M2 --> M3(["M3 Skills"]):::done
-    M2 --> M4(["M4 Items und Speichern"]):::next
-    M4 --> M5(["M5 Gegner-KI"]):::open --> D{"2D oder 3D"}:::decision
+    M2 --> M4(["M4 Items und Speichern"]):::done
+    M4 --> M5(["M5 Gegner-KI"]):::next --> D{"2D oder 3D"}:::decision
     D --> M6(["M6 Level"]):::open --> M7(["M7 Hub"]):::open --> M8(["M8 Höllenkreis"]):::open
     M8 --> M9(["M9 Inhalt"]):::open --> M10(["M10 Koop"]):::optional
 
@@ -284,8 +313,8 @@ flowchart LR
 | ✅ | **M1** Stat-Kern | Stats als reines C#, Tests, Lichtradius | mittel |
 | ✅ | **M2** Kampf | Trefferauflösung, Tod des Spielers, Nahkampf, Statuseffekte | mittel |
 | ✅ | **M3** Skills | Attacks und Spells als Daten, frei belegbare Leiste, Skills unabhängig vom Wirkenden | mittel |
-| ⏭️ | **M4** Items und Speichern | Items als Daten, Inventar-Modell, Speichern und Laden | mittel |
-| ⬜ | **M5** Gegner-KI | Zustandsmaschine, Wegfindung, Skalierung nach Level | mittel |
+| ✅ | **M4** Items und Speichern | Items als Daten, Inventar-Modell, Schild mit Block, Speichern und Laden | mittel |
+| ⏭️ | **M5** Gegner-KI | Zustandsmaschine, Wegfindung, Skalierung nach Level | mittel |
 | 🔀 | **Entscheidung** | 2D oder 3D, per kurzem Vergleichsprototyp | klein |
 | ⬜ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
 | ⬜ | **M7** Hub | Stadt, Abstieg, Menüs, Truhe, Händler, Einstellungen | mittel |
@@ -348,15 +377,18 @@ Hoellenspiralenspiel
 │   │   ├── Stats       Stat-Blatt, Rechenregeln, abgeleitete Werte
 │   │   ├── Combat      Trefferauflösung, Schadensarten, Statuseffekte, Angriffstakt
 │   │   ├── Skills      Skill-Definition, Abklingzeiten, Kosten, Belegung der Leiste
+│   │   ├── Items       Item-Basis und Instanz, Inventar-Raster, Ausrüstung, Affixe, Beute
+│   │   ├── Saving      Format des Spielstands, Lesen und Schreiben als JSON
 │   │   ├── Rng         Zufallsquelle mit Seed
 │   │   └── Progression XP-Verlust beim Tod
 │   ├── Units           Spieler und Gegner
 │   ├── Skills          Ausführung der Skills, Projektil und Fläche
-│   ├── Items           Waffen, Rüstung, Verbrauchsgüter
-│   ├── Controllers     Gegnersteuerung, Beute, Spielablauf
+│   ├── Items           Bibliothek aller Item-Basen
+│   ├── Saving          Datei des Spielstands
+│   ├── Controllers     Gegnersteuerung, Beute, Spielablauf, Speichern
 │   └── UI              Charakterbogen, Inventar, Orbs, Tooltips
-├── Scenes              Szenen für Level, Einheiten, Items, Zauber, Oberfläche
-├── Resources           Affixe, Loot-Tabellen, Skills, Themes
+├── Scenes              Szenen für Level, Einheiten, Zauber, Oberfläche
+├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Themes
 ├── Enums               Gemeinsame Aufzählungen
 ├── Hoellenspiralenspiel.Tests   Unit-Tests mit NUnit
 └── docs                Roadmap und Analyse

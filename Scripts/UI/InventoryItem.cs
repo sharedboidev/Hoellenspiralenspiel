@@ -1,204 +1,88 @@
 using Godot;
-using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
+using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Items;
-using Hoellenspiralenspiel.Scripts.Items.Consumables;
-using Hoellenspiralenspiel.Scripts.UI.Character;
-using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
+
 public partial class InventoryItem
         : PanelContainer,
           ITooltipObjectContainer
 {
-    public delegate void ItemConsumedEventHandler(InventorySlot fromRootSlot);
+    public delegate void ClickedEventHandler(InventoryItem view, MouseButton button, Vector2 localPosition);
 
-    public delegate void MergingItemEventHandler(InventorySlot fromRootSlot);
+    public delegate void HoverChangedEventHandler(InventoryItem view, bool isHovered);
 
-    public delegate void MouseMovementEventHandler(MousemovementDirection mousemovementDirection, InventoryItem inventoryItem);
+    private static readonly Color AllowedColor   = new(0, 0.25f, 0, .9f);
+    private static readonly Color ForbiddenColor = new(0.25f, 0, 0, .9f);
 
-    public delegate void SwappingItemEventHandler(InventorySlot fromRootSlot);
+    private StyleBoxFlat   allowedStylebox;
+    private Vector2        cellSize;
+    private StyleBoxFlat   defaultStylebox;
+    private StyleBoxFlat   forbiddenStylebox;
+    private CharacterItems items;
+    private Label          stackLabel;
 
-    public delegate void WasRightClickedEventHandler(InventorySlot fromRootSlot);
+    public ItemInstance Item { get; private set; }
 
-    public delegate void WithdrawingItemEventHandler(InventorySlot intoSlot);
+    public ITooltipObject ContainedItem      => new ItemTooltipContent(Item, items.GetUnmetRequirements(Item));
+    public Vector2        TooltipAnchorPoint => GlobalPosition;
 
-    private          StyleBoxFlat actionAlldowdStylebox;
-    private          StyleBoxFlat actionForbiddenStylebox;
-    private          StyleBoxFlat defaultStyleBox;
-    private          Texture2D    defaultTexture;
-    private          TextureRect  icon;
-    private          Player2D     player;
-    [Export] private int          pxDimension = 64;
-    private          int          slotHeight  = 1;
-    private          int          slotWidth   = 1;
-
-    [Export]
-    public Texture2D DefaultTexture
-    {
-        get => defaultTexture;
-        set
-        {
-            defaultTexture = value;
-            SetDefaultTexture();
-        }
-    }
-
-    [Export]
-    public int SlotWidth
-    {
-        get => slotWidth;
-        set
-        {
-            slotWidth = value;
-            SetScaledSize();
-        }
-    }
-
-    [Export]
-    public int SlotHeight
-    {
-        get => slotHeight;
-        set
-        {
-            slotHeight = value;
-            SetScaledSize();
-        }
-    }
-
-    public InventorySlot                     RootSlot           { get; set; }
-    public ITooltipObject                    ContainedItem      { get; set; }
-    public Vector2                           TooltipAnchorPoint => GlobalPosition;
-    public event WasRightClickedEventHandler WasRightClicked;
-    public event MouseMovementEventHandler   MouseMoving;
-    public event ItemConsumedEventHandler    ItemConsumed;
-    public event WithdrawingItemEventHandler WithdrawingItem;
-    public event SwappingItemEventHandler    SwappingItem;
-    public event MergingItemEventHandler     MergingItem;
+    public event ClickedEventHandler      Clicked;
+    public event HoverChangedEventHandler HoverChanged;
 
     public override void _Ready()
     {
-        player = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D");
+        defaultStylebox   = (StyleBoxFlat)GetThemeStylebox("panel").Duplicate();
+        allowedStylebox   = (StyleBoxFlat)defaultStylebox.Duplicate();
+        forbiddenStylebox = (StyleBoxFlat)defaultStylebox.Duplicate();
 
-        ConfigureBackgroundColors();
-        SetScaledSize();
+        allowedStylebox.BgColor   = AllowedColor;
+        forbiddenStylebox.BgColor = ForbiddenColor;
     }
 
-    private void ConfigureBackgroundColors()
+    public void Init(ItemInstance item, CharacterItems owner, Vector2 slotSize)
     {
-        var styleboxName = "panel";
+        Item       = item;
+        items      = owner;
+        cellSize   = slotSize;
+        stackLabel = GetNode<Label>("%StackLabel");
 
-        defaultStyleBox         = (StyleBoxFlat)GetThemeStylebox(styleboxName).Duplicate();
-        actionAlldowdStylebox   = (StyleBoxFlat)defaultStyleBox.Duplicate();
-        actionForbiddenStylebox = (StyleBoxFlat)defaultStyleBox.Duplicate();
+        GetNode<TextureRect>("%Icon").Texture = ItemLibrary.GetIcon(item);
 
-        actionAlldowdStylebox.BgColor   = new Color(0, 0.25f, 0, .9f); // green
-        actionForbiddenStylebox.BgColor = new Color(0.25f, 0, 0, .9f); // red
+        CustomMinimumSize = new Vector2(item.Definition.Width, item.Definition.Height) * cellSize;
     }
 
-    public void Init(BaseItem item, Vector2 inventorySlotSize)
+    public void ShowAt(GridCell cell)
     {
-        icon          = GetNode<TextureRect>("%Icon");
-        icon.Texture  = item.Icon.Texture;
-        ContainedItem = item;
-        pxDimension   = (int)(inventorySlotSize.X + inventorySlotSize.Y) / 2;
-        SlotWidth     = (int)item.SlotSize.X;
-        SlotHeight    = (int)item.SlotSize.Y;
+        Position = new Vector2(cell.X, cell.Y) * cellSize;
 
-        SetScaledSize();
+        stackLabel.Visible = Item.Definition.IsStackable;
+        stackLabel.Text    = $"x{Item.StackSize:N0}";
     }
 
-    private void SetScaledSize()
-    {
-        var minSizeX = SlotWidth * pxDimension;
-        var minSizeY = SlotHeight * pxDimension;
-        var newSize  = new Vector2(minSizeX, minSizeY);
-
-        CustomMinimumSize = newSize;
-    }
-
-    private void SetDefaultTexture()
-    {
-        var textureNode = GetNode<TextureRect>("%Icon");
-        var texture     = DefaultTexture ?? GD.Load<Texture2D>("res://icon.svg");
-
-        textureNode.Texture = texture;
-    }
-
-    private bool HasSpaceFor(BaseItem item)
-    {
-        if (item is ConsumableItem newConsumable && ContainedItem is ConsumableItem containedConsumable)
-            return containedConsumable.CanFit(newConsumable);
-
-        return ContainedItem is null;
-    }
+    public GridCell GetCellAt(GridCell rootCell, Vector2 localPosition)
+        => new(rootCell.X + Mathf.FloorToInt(localPosition.X / cellSize.X), rootCell.Y + Mathf.FloorToInt(localPosition.Y / cellSize.Y));
 
     public void _on_gui_input(InputEvent inputEvent)
     {
-        var mouseObject = RootSlot.Inventory.GetNode<MouseObject>(nameof(MouseObject));
-
-        switch (inputEvent)
-        {
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is not null && !mouseObject.HasItem:
-                WithdrawItem();
-
-                break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && !HasSpaceFor((BaseItem)mouseObject.ContainedItem):
-                SwapItems();
-
-                break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && HasSpaceFor((BaseItem)mouseObject.ContainedItem):
-                MergeItems();
-
-                break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } when ContainedItem is ConsumableItem consumable:
-                ConsumeItem(consumable);
-
-                break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } when ContainedItem is not null:
-                EquipItem();
-
-                break;
-        }
-    }
-
-    private void MergeItems() => MergingItem?.Invoke(RootSlot);
-
-    private void SwapItems() => SwappingItem?.Invoke(RootSlot);
-
-    private void WithdrawItem() => WithdrawingItem?.Invoke(RootSlot);
-
-    private void ConsumeItem(ConsumableItem consumable)
-    {
-        consumable.GetConsumedBy(player);
-
-        ItemConsumed?.Invoke(RootSlot);
-    }
-
-    private void EquipItem()
-    {
-        WasRightClicked?.Invoke(RootSlot);
-        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
+        if (inputEvent is InputEventMouseButton { Pressed: true } click)
+            Clicked?.Invoke(this, click.ButtonIndex, click.Position);
     }
 
     public void _on_mouse_entered()
     {
-        if (ContainedItem is not BaseItem item || item is ConsumableItem)
-        {
-            MouseMoving?.Invoke(MousemovementDirection.Entered, this);
-            return;
-        }
+        HoverChanged?.Invoke(this, true);
 
-        var stylebox = item.CanBeEquipedBy(player) ? actionAlldowdStylebox : actionForbiddenStylebox;
-        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
-
-        AddThemeStyleboxOverride("panel", stylebox);
+        if (Item.Definition.IsEquippable)
+            AddThemeStyleboxOverride("panel", items.CanEquip(Item) ? allowedStylebox : forbiddenStylebox);
     }
 
     public void _on_mouse_exited()
     {
-        MouseMoving?.Invoke(MousemovementDirection.Left, this);
+        HoverChanged?.Invoke(this, false);
 
-        AddThemeStyleboxOverride("panel", defaultStyleBox);
+        AddThemeStyleboxOverride("panel", defaultStylebox);
     }
 }

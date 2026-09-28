@@ -31,7 +31,7 @@ theme_override_constants/margin_bottom = 5
 [node name="GroupContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer" unique_id=1920418893]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 7
 
 [node name="Attributes" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer" unique_id=1575597368]
 layout_mode = 2
@@ -443,6 +443,98 @@ fit_content = true
 autowrap_mode = 0
 
 [node name="Dodge" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/Defence4" unique_id=1407413546]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="DefenceBlock" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/DefenceBlock"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Block"
+fit_content = true
+autowrap_mode = 0
+
+[node name="MeleeBlock" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/DefenceBlock"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="DefenceSpellBlock" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/DefenceSpellBlock"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Spell Block"
+fit_content = true
+autowrap_mode = 0
+
+[node name="SpellBlock" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/DefenceSpellBlock"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="DefenceParry" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/DefenceParry"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Parry"
+fit_content = true
+autowrap_mode = 0
+
+[node name="MeleeParry" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/DefenceParry"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "0%"
+fit_content = true
+autowrap_mode = 0
+
+[node name="DefenceSpellParry" type="HBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/DefenceSpellParry"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = ExtResource("2_hbpk6")
+bbcode_enabled = true
+text = "Spell Parry"
+fit_content = true
+autowrap_mode = 0
+
+[node name="SpellParry" type="RichTextLabel" parent="MarginContainer/ScrollContainer/MarginContainer/GroupContainer/Defences/DefenceSpellParry"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 24

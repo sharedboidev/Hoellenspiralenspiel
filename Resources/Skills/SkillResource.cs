@@ -2,7 +2,7 @@ using Godot;
 using Godot.Collections;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
-using Hoellenspiralenspiel.Scripts.Items.Weapons;
+using Hoellenspiralenspiel.Scripts.Core.Items;
 
 namespace Hoellenspiralenspiel.Resources.Skills;
 

@@ -1,66 +1,70 @@
 [gd_resource type="Resource" script_class="LootTable" format=3 uid="uid://b3jr0cbor0v5q"]
 
-[ext_resource type="Script" uid="uid://bg22hx7k8vipe" path="res://Resources/LootEntry.cs" id="1_lvq8t"]
-[ext_resource type="Script" uid="uid://bmef8b2b0wodq" path="res://Resources/LootTable.cs" id="2_5w23i"]
-[ext_resource type="PackedScene" uid="uid://bafd40n3y6xtn" path="res://Scenes/Items/Weapons/Staffs/staff.tscn" id="2_e2jip"]
-[ext_resource type="PackedScene" uid="uid://cphtaoh2o6ddc" path="res://Scenes/Items/Consumables/health_potion.tscn" id="3_e2jip"]
-[ext_resource type="PackedScene" uid="uid://chsic7gu1dtji" path="res://Scenes/Items/Consumables/mana_potion.tscn" id="4_g3b5r"]
-[ext_resource type="PackedScene" uid="uid://bmnr4uijb76uv" path="res://Scenes/Items/Weapons/Swords/wooden_sword.tscn" id="5_x3xyj"]
-[ext_resource type="PackedScene" uid="uid://ce6vr0pknckbm" path="res://Scenes/Items/Armors/Helmets/gugel.tscn" id="6_pcy66"]
-[ext_resource type="PackedScene" uid="uid://dhbbe7mkkfcdl" path="res://Scenes/Items/Armors/Torsos/peasant_tunic.tscn" id="7_dgrxi"]
-[ext_resource type="PackedScene" uid="uid://u05e4wlngiwk" path="res://Scenes/Items/Armors/Gloves/wool_gloves.tscn" id="8_b62sa"]
-[ext_resource type="PackedScene" path="res://Scenes/Items/Weapons/Bows/short_bow.tscn" id="9_bow"]
+[ext_resource type="Script" uid="uid://bg22hx7k8vipe" path="res://Resources/LootEntry.cs" id="1_entry"]
+[ext_resource type="Script" uid="uid://bmef8b2b0wodq" path="res://Resources/LootTable.cs" id="2_table"]
+[ext_resource type="Resource" path="res://Resources/Items/Weapons/wooden_staff.tres" id="3_item"]
+[ext_resource type="Resource" path="res://Resources/Items/Consumables/health_potion.tres" id="4_item"]
+[ext_resource type="Resource" path="res://Resources/Items/Consumables/mana_potion.tres" id="5_item"]
+[ext_resource type="Resource" path="res://Resources/Items/Weapons/training_sword.tres" id="6_item"]
+[ext_resource type="Resource" path="res://Resources/Items/Armors/gugel.tres" id="7_item"]
+[ext_resource type="Resource" path="res://Resources/Items/Armors/peasant_tunic.tres" id="8_item"]
+[ext_resource type="Resource" path="res://Resources/Items/Armors/wool_gloves.tres" id="9_item"]
+[ext_resource type="Resource" path="res://Resources/Items/Weapons/short_bow.tres" id="10_item"]
+[ext_resource type="Resource" path="res://Resources/Items/Armors/wooden_shield.tres" id="11_item"]
 
-[sub_resource type="Resource" id="Resource_lvq8t"]
-script = ExtResource("1_lvq8t")
+[sub_resource type="Resource" id="Resource_entry1"]
+script = ExtResource("1_entry")
 Type = 2
 Weight = 1000.0
 
-[sub_resource type="Resource" id="Resource_5w23i"]
-script = ExtResource("1_lvq8t")
-ItemScene = ExtResource("2_e2jip")
+[sub_resource type="Resource" id="Resource_entry2"]
+script = ExtResource("1_entry")
+Item = ExtResource("3_item")
 Weight = 1000.0
 
-[sub_resource type="Resource" id="Resource_g3b5r"]
-script = ExtResource("1_lvq8t")
-ItemScene = ExtResource("3_e2jip")
+[sub_resource type="Resource" id="Resource_entry3"]
+script = ExtResource("1_entry")
+Item = ExtResource("4_item")
 Weight = 250.0
 QuantityMax = 5
 
-[sub_resource type="Resource" id="Resource_x3xyj"]
-script = ExtResource("1_lvq8t")
-ItemScene = ExtResource("4_g3b5r")
+[sub_resource type="Resource" id="Resource_entry4"]
+script = ExtResource("1_entry")
+Item = ExtResource("5_item")
 Weight = 250.0
 QuantityMax = 5
 
-[sub_resource type="Resource" id="Resource_pcy66"]
-script = ExtResource("1_lvq8t")
-ItemScene = ExtResource("5_x3xyj")
+[sub_resource type="Resource" id="Resource_entry5"]
+script = ExtResource("1_entry")
+Item = ExtResource("6_item")
 Weight = 1000.0
 
-[sub_resource type="Resource" id="Resource_dgrxi"]
-script = ExtResource("1_lvq8t")
-ItemScene = ExtResource("6_pcy66")
+[sub_resource type="Resource" id="Resource_entry6"]
+script = ExtResource("1_entry")
+Item = ExtResource("7_item")
 Weight = 1000.0
 
-[sub_resource type="Resource" id="Resource_b62sa"]
-script = ExtResource("1_lvq8t")
-ItemScene = ExtResource("7_dgrxi")
+[sub_resource type="Resource" id="Resource_entry7"]
+script = ExtResource("1_entry")
+Item = ExtResource("8_item")
 Weight = 1000.0
-metadata/_custom_type_script = "uid://bg22hx7k8vipe"
 
-[sub_resource type="Resource" id="Resource_7ois7"]
-script = ExtResource("1_lvq8t")
-ItemScene = ExtResource("8_b62sa")
+[sub_resource type="Resource" id="Resource_entry8"]
+script = ExtResource("1_entry")
+Item = ExtResource("9_item")
 Weight = 1000.0
-metadata/_custom_type_script = "uid://bg22hx7k8vipe"
 
-[sub_resource type="Resource" id="Resource_bow"]
-script = ExtResource("1_lvq8t")
-ItemScene = ExtResource("9_bow")
+[sub_resource type="Resource" id="Resource_entry9"]
+script = ExtResource("1_entry")
+Item = ExtResource("10_item")
+Weight = 1000.0
+
+[sub_resource type="Resource" id="Resource_entry10"]
+script = ExtResource("1_entry")
+Item = ExtResource("11_item")
 Weight = 1000.0
 
 [resource]
-script = ExtResource("2_5w23i")
+script = ExtResource("2_table")
 TableId = "blue_blob_loot"
-Entries = Array[ExtResource("1_lvq8t")]([SubResource("Resource_lvq8t"), SubResource("Resource_5w23i"), SubResource("Resource_g3b5r"), SubResource("Resource_x3xyj"), SubResource("Resource_pcy66"), SubResource("Resource_dgrxi"), SubResource("Resource_b62sa"), SubResource("Resource_7ois7"), SubResource("Resource_bow")])
+Entries = Array[ExtResource("1_entry")]([SubResource("Resource_entry1"), SubResource("Resource_entry2"), SubResource("Resource_entry3"), SubResource("Resource_entry4"), SubResource("Resource_entry5"), SubResource("Resource_entry6"), SubResource("Resource_entry7"), SubResource("Resource_entry8"), SubResource("Resource_entry9"), SubResource("Resource_entry10")])

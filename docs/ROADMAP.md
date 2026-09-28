@@ -1,9 +1,10 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
 Stand: 28.09.2026. M0 bis M3 liegen auf `master`, dazu die beiden Nachträge zu M3: Schadenswerte im Tooltip und ausgedünnte Kommentare.
+M4 ist auf dem Branch `master_ItemsAndSaving` umgesetzt, dazu der Nachtrag zu M2: Bleed stapelt.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code (rund 5.500 Zeilen) plus Szenen.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 und M3 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 bis M4 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -22,16 +23,17 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Attribute | Alle fünf Attribute mit abgeleiteten Werten und Obergrenzen | Obergrenzen stimmen exakt. Wachstum ist logistisch statt beschränkt. Lichtradius fehlt. |
 | Leben und Mana | Basisformeln, Regeneration, Orbs mit Shader | Formeln stimmen exakt |
 | Modifier-System | Flat, Percentage (increased) und More, sauber getrennt | Trägt das ganze Stat-Konzept |
-| Waffen | Schadensspanne, Angriffe pro Sekunde, Swingtimer, Typ, Schadensart, Krit, Anforderungen | Seit M2 bestimmen die Werte den Nahkampf, seit M3 gibt es Fernkampfwaffen mit Projektil. Klassen-Anforderung fehlt. |
-| Rüstung | Helm, Torso, Handschuhe mit Rüstungswert | 3 von 16 Slots haben Item-Basen |
-| Affixe | 16 Affixe mit Tiers, Gewichten, Itemlevel-Grenze, Prefix/Suffix, lokale und globale Mods | Slot-Tabelle aus dem PDF nur teilweise abgedeckt |
-| Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen | Funktioniert im Testlevel |
-| Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF, aber fertig nutzbar |
-| Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF |
+| Waffen | Schadensspanne, Angriffe pro Sekunde, Swingtimer, Typ, Schadensart, Krit, Anforderungen | Seit M2 bestimmen die Werte den Nahkampf, seit M3 gibt es Fernkampfwaffen mit Projektil. Seit M4 sind Waffen Resources und bringen Parry oder Block mit. Klassen-Anforderung fehlt. |
+| Rüstung | Helm, Torso, Handschuhe und Schild mit Rüstungswert | 4 von 16 Slots haben Item-Basen |
+| Affixe | 17 Affixe mit Tiers, Gewichten, Itemlevel-Grenze, Prefix/Suffix, lokale und globale Mods | Slot-Tabelle aus dem PDF nur teilweise abgedeckt |
+| Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle |
+| Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. |
+| Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. |
+| Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch | Nicht im PDF |
 | Leveling | XP-Tabelle bis Level 100, Level-up-Effekt, Attributspunkte, XP-Balken | Nicht im PDF, funktioniert |
 | Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen, Tooltip mit DPS | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
 | Kampf | Zentrale Trefferauflösung, Nahkampf, Schadensarten mit Effekten, Statuseffekte, Tod und Respawn | Seit M2. Frost-Effekt war im PDF leer und ist jetzt Verlangsamung. |
-| Schadensminderung | Rüstungsformel, Resistenzen, Dodge, Parry und Block für alle Einheiten | Parry und Block haben noch keine Quelle, weil Schilde fehlen |
+| Schadensminderung | Rüstungsformel, Resistenzen, Dodge, Parry und Block für alle Einheiten | Seit M4 bringen Schild, Stab und Schwert Block und Parry mit |
 | Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Rare/Elite, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler | Nur Blobs und ein Testgegner |
 | Atmosphäre | Punktlichter mit Schatten, abgedunkelte Szene, Overlay-Karte | Passt zum düsteren Vibe |
 | 3D | Ein Prototyp, der nur Bewegung kann | Offene Frage aus dem PDF |
@@ -43,11 +45,11 @@ Ohne diese Systeme gibt es kein spielbares Spiel, nur eine Testszene.
 1. **Spielertod.** Erledigt in M2. Vorher konnte das Leben unter null fallen, ohne dass etwas passierte.
 2. **Nahkampf.** Erledigt in M2. Vorher existierten Waffenwerte nur im Tooltip.
 3. **Gegnerangriffe.** Erledigt in M2. Vorher schadeten die Blobs nur durch Berührung.
-4. **Speichern und Laden.** Es gibt keine Persistenz für Charakter, Inventar oder Fortschritt.
+4. **Speichern und Laden.** Erledigt in M4. Vorher gab es keine Persistenz für Charakter, Inventar oder Fortschritt.
 5. **Spielstruktur.** Hub, Levelwechsel, Hauptmenü, Pausenmenü und Freischaltung fehlen. Die Kellertür schreibt nur eine Logzeile.
 6. **Levelgenerierung.** Es gibt nur ein handgebautes Testlevel.
 7. **Wegfindung.** Gegner laufen in gerader Linie und bleiben an Wänden hängen.
-8. **Statuseffekte.** Erledigt in M2: Bleed, stapelnder Burn, Shock und Chill. Die leeren Schadensart-Klassen sind durch eine Aufzählung im Kern ersetzt.
+8. **Statuseffekte.** Erledigt in M2: Bleed, Burn, Shock und Chill. Bleed und Burn stapeln. Die leeren Schadensart-Klassen sind durch eine Aufzählung im Kern ersetzt.
 9. **Parry, Block, Krit aus Stats.** Erledigt in M2. Die Trefferauflösung wertet alle drei aus.
 10. **Skill-Erwerb.** Seit M3 sind Skills Daten und die Leiste ist frei belegbar. Der Held kennt vorerst alle Skills. Klassen und Skill-Fortschritt fehlen.
 11. **Skalierung.** Itemlevel ist immer 1. Monsterlevel und Bereichslevel existieren nicht.
@@ -101,9 +103,9 @@ Hinweise zu den Korrekturen:
 | P2 | Behoben in M1. Die Orbs bauten jeden Frame Text neu und setzten Shader-Parameter, auch wenn sich nichts änderte. | [ResourceOrb.cs](../Scripts/UI/Character/ResourceOrb.cs) |
 | P3 | Alle Gegner der Karte werden jeden Frame simuliert, egal wie weit sie entfernt sind | [EnemyController.cs:170](../Scripts/Controllers/EnemyController.cs) |
 | P4 | Behoben in M3. Ein Feuerball konnte sich auf bis zu 63 Projektile aufspalten, und jeder Treffer sortierte alle Gegner der Karte nach Entfernung. Jetzt sind es höchstens 7, die Zielsuche läuft in einem Durchlauf ohne Sortieren. | [SkillProjectile.cs](../Scripts/Skills/Effects/SkillProjectile.cs), [NearestPicker.cs](../Scripts/Core/Skills/NearestPicker.cs) |
-| P5 | Das Inventar nutzt Godot-Dictionaries mit Float-Vektoren als Schlüssel. Jeder Zugriff wird zwischen C# und Engine konvertiert. | [Inventory.cs:17](../Scripts/UI/Character/Inventory.cs) |
-| P6 | Knoten werden in Property-Gettern bei jedem Zugriff neu gesucht | [Inventory.cs:21](../Scripts/UI/Character/Inventory.cs), [EquipmentPanel.cs:26](../Scripts/UI/Character/EquipmentPanel.cs) |
-| P7 | Für den Kampf behoben in M2: Alle Würfe laufen über eine Zufallsquelle mit Seed. Offen bleiben die eigenen Zufallsquellen von Loot (M4) und Spawns (M5). | [GameRandom.cs](../Scripts/Core/Rng/GameRandom.cs), [Lootsystem.cs](../Scripts/Controllers/Lootsystem.cs), [EnemyController.cs](../Scripts/Controllers/EnemyController.cs) |
+| P5 | Behoben in M4. Das Inventar nutzte Godot-Dictionaries mit Float-Vektoren als Schlüssel. Jeder Zugriff wurde zwischen C# und Engine konvertiert. Jetzt rechnet ein Raster im Kern mit ganzen Feldern. | [InventoryGrid.cs](../Scripts/Core/Items/InventoryGrid.cs) |
+| P6 | Behoben in M4. Knoten wurden in Property-Gettern bei jedem Zugriff neu gesucht. Inventar und Ausrüstung holen ihre Knoten jetzt einmal. | [Inventory.cs](../Scripts/UI/Character/Inventory.cs), [EquipmentPanel.cs](../Scripts/UI/Character/EquipmentPanel.cs) |
+| P7 | Für den Kampf behoben in M2, für Loot in M4: Alle Würfe laufen über eine Zufallsquelle mit Seed. Offen bleiben die eigenen Zufallsquellen der Spawns (M5). | [GameRandom.cs](../Scripts/Core/Rng/GameRandom.cs), [LootRoller.cs](../Scripts/Core/Items/LootRoller.cs), [EnemyController.cs](../Scripts/Controllers/EnemyController.cs) |
 | P8 | Neu seit M2: Jede Schadenszahl ist ein eigener Knoten. Brennen viele Gegner gleichzeitig, entstehen pro Sekunde zwei Zahlen je Gegner. Bisher ohne messbare Folgen, Pooling steht in M9. | [FCTExtensions.cs](../Scripts/Extensions/FCTExtensions.cs) |
 | P9 | Neu seit M3: Flächen und die Suche nach dem Gegner unter dem Mauszeiger gehen alle Einheiten der Karte durch. Bei rund 100 Gegnern ohne messbare Folgen. Eine räumliche Aufteilung gehört zu M5, zusammen mit P3. | [SkillArea.cs](../Scripts/Skills/Effects/SkillArea.cs), [BaseUnit.cs](../Scripts/Units/BaseUnit.cs) |
 
@@ -111,13 +113,13 @@ Hinweise zu den Korrekturen:
 
 | Nr. | Problem | Folge |
 |---|---|---|
-| A1 | Rund 24 Stellen suchen Spieler, Controller oder `Environment` über feste Namen in der aktuellen Szene. Skills gehören seit M3 nicht mehr dazu. | Jedes neue Level muss exakt wie das Testlevel aufgebaut sein |
+| A1 | Rund 15 Stellen suchen Spieler, Controller oder Tooltip über feste Namen in der aktuellen Szene. Skills gehören seit M3 nicht mehr dazu, Items und Lootbags seit M4. | Jedes neue Level muss exakt wie das Testlevel aufgebaut sein |
 | A2 | Behoben in M1. Alle Stats steckten in einer 2D-Physik-Klasse. Die Rechnung liegt jetzt in `Scripts/Core/Stats` ohne Godot. | Blockierte die 2D/3D-Entscheidung, Tests und Koop |
-| A3 | Für Skills behoben in M3. Der Skillbar-Button zauberte und zog Mana ab. Jetzt zeigt die Leiste nur noch an. Offen bleibt das Inventar, das zu M4 gehört. | Logik ist ohne UI nicht nutzbar und nicht testbar |
-| A4 | Items sind Szenen-Knoten, die nie im Baum hängen | Speicherleck und nicht serialisierbar |
+| A3 | Für Skills behoben in M3, für das Inventar in M4. Der Skillbar-Button zauberte und zog Mana ab, das Inventar rechnete in seinen Knoten. Jetzt zeigen Leiste und Inventar nur noch an. | Logik ist ohne UI nicht nutzbar und nicht testbar |
+| A4 | Behoben in M4. Items waren Szenen-Knoten, die nie im Baum hingen. Jetzt sind sie reine Daten. | Speicherleck und nicht serialisierbar |
 | A5 | Behoben in M3. Es gab zwei parallele Skill-Hierarchien, Skills und Manakosten standen fest im Code. Beide Hierarchien sind durch Skill-Resources ersetzt. | Neue Skills brauchen Codeänderungen an mehreren Stellen |
 | A6 | UI wird per Code anhand der Fenstergröße platziert. Das Fenster ist fest 2560x1440 im exklusiven Vollbild. | Bricht bei anderen Auflösungen |
-| A7 | Lootbag-Code existiert dreimal mit unterschiedlichem Verhalten | Quelle von F9 |
+| A7 | Behoben in M4. Lootbag-Code existierte dreimal mit unterschiedlichem Verhalten. Jetzt gibt es einen Aufruf für alle. | Quelle von F9 |
 | A8 | Behoben am 28.09.2026. `.idea`, `*.user` und `obj` waren eingecheckt. Shader und Testszenen lagen im Projektwurzelordner. Leere Klassen wie `SceneDispenser` und `StaticMemory` existierten. | Unübersichtlich |
 | A9 | Behoben am 28.09.2026. Eingabeaktionen hießen wie Tasten (`F`, `B`, `Tab`) statt nach ihrer Funktion. Die Namen stehen jetzt zentral in `InputActions`. Seit M3 hat jeder Platz der Skill-Leiste eine eigene Aktion. | Tastenbelegung lässt sich nicht sauber ändern |
 | A10 | Behoben in M3. Zauber unterschieden Freund und Feind über Typprüfungen auf `Player2D` und `BaseEnemy`, die Gruppe `monsters`, feste Kollisionsebenen und den `EnemyController`. Jetzt entscheidet allein die Fraktion. | Ein Zauber verhält sich nicht gleich für jeden, der ihn wirkt. Begleiter und Koop-Spieler sind nicht abgedeckt. |
@@ -126,7 +128,7 @@ Hinweis zu A10: Die alten Testzauber Fireball, Frost Nova und Lightning Strike s
 
 ### 3.4 Balance
 
-Beobachtungen aus den Laufzeitprüfungen von M2 und M3. Der Balance-Durchgang steht in M8.
+Beobachtungen aus den Laufzeitprüfungen von M2 bis M4. Der Balance-Durchgang steht in M8.
 
 | Nr. | Beobachtung | Stelle |
 |---|---|---|
@@ -136,6 +138,8 @@ Beobachtungen aus den Laufzeitprüfungen von M2 und M3. Der Balance-Durchgang st
 | B4 | Der Held startet mit 9 Mana und regeneriert 0,5 pro Sekunde. Das reicht für vier Feuerbälle oder zwei Thunderbolts. | [Resources/Skills/Player](../Resources/Skills/Player) |
 | B5 | Die Schadenswerte der Zauber stammen von den alten Testzaubern. Ein Thunderbolt mit 50 bis 350 tötet jeden Gegner des Testlevels mit einem Treffer. | [thunderbolt.tres](../Resources/Skills/Player/thunderbolt.tres) |
 | B6 | Pierce trifft nur halb so oft. Mit dem Bogen geht deshalb jeder zweite Pfeil daneben, obwohl er sichtbar durch den Gegner fliegt. | [CombatRules.cs](../Scripts/Core/Combat/CombatRules.cs) |
+| B7 | Neu seit M4: Die Werte für Parry und Block der ersten Items sind geschätzt. Awareness verstärkt Block und Parry gegen Attacks, nicht gegen Spells. | [Resources/Items](../Resources/Items), [DerivedStatProvider.cs](../Scripts/Core/Stats/DerivedStatProvider.cs) |
+| B8 | Neu seit dem 28.09.2026: Bleed stapelt ohne Obergrenze und legt auf Dauer 50 % des Trefferschadens obendrauf. Burn bringt 25 % und endet bei 10 Stapeln. Eine Obergrenze für Bleed ist die Stellschraube. | [StatusEffectRules.cs](../Scripts/Core/Combat/StatusEffects/StatusEffectRules.cs) |
 
 ## 4. Meilensteinplan
 
@@ -213,7 +217,7 @@ Ziel: eine vollständige Kampfschleife. Das ist der erste Meilenstein, der sich 
 - Erledigt: Gegnerangriffe mit Windup und Recovery. Gegnerprojektile treffen den Spieler. Behebt F6.
 - Erledigt: Spielertod mit XP-Verlust und Respawn.
 - Erledigt: Schadensarten aus dem PDF mit ihren Effekten, physisch und elementar.
-- Erledigt: Statuseffekt-System mit Bleed, stapelndem Burn, Shock und Chill.
+- Erledigt: Statuseffekt-System mit Bleed, stapelndem Burn, Shock und Chill. Seit dem Nachtrag unten stapelt auch Bleed.
 - Zusätzlich: Krit-Chance, Krit-Schaden und Angriffstempo im Charakterbogen kommen aus dem Kern.
 - Zusätzlich: Fraktionen und `UnitRegistry` als Vorarbeit für A10.
 
@@ -254,7 +258,7 @@ Stellschrauben, alle in [CombatRules.cs](../Scripts/Core/Combat/CombatRules.cs):
 |---|---|
 | Crush, mehr Schaden | 20 % |
 | Pierce, weniger Trefferchance | 50 % |
-| Bleed | 50 % des ungeminderten Treffers über 4 s, nur der stärkste wirkt |
+| Bleed | 50 % des ungeminderten Treffers über 4 s, stapelt ohne Obergrenze |
 | Burn | 25 % des erlittenen Schadens über 4 s, höchstens 10 Stapel |
 | Shock | 25 % Fehlschlag für 4 s |
 | Chill | 30 % langsamer für 3 s |
@@ -269,12 +273,30 @@ Stellschrauben, alle in [CombatRules.cs](../Scripts/Core/Combat/CombatRules.cs):
 
 Bewusst offen gelassen:
 
-- Parry und Block haben die Grundchance 0. Eine Quelle kommt erst mit Schilden und passenden Waffen in M4 und M8.
+- Parry und Block haben die Grundchance 0. Seit M4 bringen Schild, Stab und Schwert die ersten Werte mit, weitere folgen in M8.
 - Parry und Block unterscheiden nur ATTACK und SPELL. Fernkampf-Attacks benutzen die Werte des Nahkampfs. Das gilt auch nach M3.
 - Der Held läuft in gerader Linie zum Ziel. Bleibt er hängen, gibt er das Ziel nach 0,4 Sekunden auf. Wegfindung kommt in M5.
 - Die Angriffsanimation des Spielers benutzt das vorhandene graue Platzhalter-Sprite und spielt für alle Waffen die Einhand-Animation.
 - Ein fehlgeschlagener Zauber wurde im Skillbar-Button behandelt. Seit M3 regelt das der Spieler.
 - Gegner finden den Spieler weiter über den festen Namen in der Szene. Das gehört zu A1.
+
+#### Nachtrag vom 28.09.2026: Bleed stapelt
+
+Entscheidung vom 28.09.2026: Bleed stapelt wie Burn, aber ohne Obergrenze. Vorher wirkte nur die stärkste Blutung.
+
+| Punkt | Vorher | Jetzt |
+|---|---|---|
+| Mehrere Blutungen | Nur die stärkste wirkt | Alle wirken, ihr Schaden addiert sich |
+| Obergrenze | Nicht nötig | Keine |
+| Ende | Eine stärkere Blutung ersetzt die schwächere | Jede Blutung läuft ihre 4 Sekunden und endet für sich |
+| Schaden auf Dauer | Höchstens 12,5 % eines Treffers pro Sekunde | 50 % des Schadens aller Treffer |
+
+- Die Regel ist eine Zeile in [StatusEffectRules.cs](../Scripts/Core/Combat/StatusEffects/StatusEffectRules.cs).
+- Der Tooltip folgt der Regel von selbst. `SkillDamageEstimator` liest Stapelregel und Obergrenze aus `StatusEffectRules`. Eine spätere Obergrenze für Bleed braucht dort keine Änderung.
+- Slash legt damit auf Dauer die Hälfte des Trefferschadens obendrauf. Zum Vergleich: Crush bringt 20 %, Burn 25 %.
+- Shock und Chill bleiben bei der Regel, dass nur der stärkste Effekt wirkt.
+
+Geprüft: 11 neue Unit-Tests, insgesamt 425. Sechs davon lassen die Effekte 60 Sekunden lang ablaufen und vergleichen ihren Schaden mit der Schätzung, für Bleed und Burn bei langsamem, mittlerem und schnellem Angriffstempo. Im laufenden Spiel ergaben zwei Minuten Nahkampf mit dem Schwert 14,75 DPS, der Tooltip zeigte 14,6. Auf dem Ziel lagen im Mittel 5,7 Blutungen.
 
 ### M3: Skills als Daten (M, umgesetzt am 28.09.2026 auf `master_SkillsAsData`)
 
@@ -361,7 +383,7 @@ Bewusst offen gelassen:
 
 - Klassen und Skill-Erwerb. Die Frage muss vor dem Meilenstein beantwortet sein, der Skills freischaltet.
 - Die Tasten lassen sich nur in den Projekteinstellungen ändern. Eine Einstellung im Spiel kommt in M7.
-- Die Belegung der Leiste wird nicht gespeichert. Das gehört zum Speichern in M4.
+- Die Belegung der Leiste wurde nicht gespeichert. Seit M4 steht sie im Spielstand.
 - Gegner zahlen für Skills weder Mana noch Abklingzeit. Ihr Takt kommt weiter aus Windup und Recovery. Das gehört zu M5.
 - Gegner finden den Spieler weiter über den festen Namen in der Szene. Das gehört zu A1.
 - Zauber haben keine Zauberzeit und keine Animation am Helden.
@@ -404,18 +426,17 @@ Was außer den verlangten Werten in die DPS eingerechnet ist:
 |---|---|
 | Trefferchance | Stat des Helden, bei Pierce halbiert |
 | Faktor der Schadensart | Crush verursacht 20 % mehr Schaden |
-| Bleed | 50 % des mittleren Treffers über 4 Sekunden. Nur die stärkste Blutung wirkt, schnellere Treffer erhöhen den Wert also nicht. |
+| Bleed | 50 % des mittleren Treffers über 4 Sekunden pro Treffer, ohne Obergrenze. Bis zum Nachtrag zu M2 wirkte nur die stärkste Blutung. |
 | Burn | 25 % des mittleren Treffers über 4 Sekunden pro Treffer, höchstens 10 Brände gleichzeitig |
 | Fehlschläge | Steht der Held unter Shock, schlagen 25 % der Einsätze fehl |
 | Chill auf dem Helden | Senkt das Angriffstempo und damit die Einsätze pro Sekunde |
 
 Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
 
-Geprüft: 36 neue Unit-Tests, insgesamt 271. Ein Test würfelt je Schadensart 200.000 Treffer und vergleicht den Mittelwert mit der Schätzung. Im laufenden Spiel ergab eine Minute Nahkampf mit dem Schwert 10,73 DPS, der Tooltip zeigte 10,6.
+Geprüft: 36 neue Unit-Tests, insgesamt 271. Ein Test würfelt je Schadensart 200.000 Treffer und vergleicht den Mittelwert mit der Schätzung. Im laufenden Spiel ergab eine Minute Nahkampf mit dem Schwert 10,73 DPS, der Tooltip zeigte 10,6. Beide Zahlen stammen aus der Zeit, als nur die stärkste Blutung wirkte. Die Messung mit stapelndem Bleed steht im Nachtrag zu M2.
 
 Bewusst vereinfacht:
 
-- Bei Bleed rechnet die Schätzung mit dem mittleren Treffer. Im Spiel wirkt die stärkste Blutung, der echte Wert liegt deshalb leicht darüber.
 - Treffer werden im Spiel auf ganze Zahlen gerundet, die Schätzung rechnet ohne Rundung.
 - Forks und mehrere Ziele in einer Fläche zählen nicht, gerechnet wird ein Ziel.
 - Die Zeit fürs Hinlaufen und die Flugzeit von Projektilen zählen nicht.
@@ -429,20 +450,127 @@ Der Code aus M1 bis M3 war zu dicht kommentiert, oft stand über einer Methode n
 - Erklärungen zu Aufbau, Einheiten und Regeln stehen jetzt hier: unter M1 "So funktioniert der Kern", unter M2 "So funktioniert die Pipeline" und unter M3 "So funktionieren Skills".
 - Kommentare aus der Zeit vor M1 sind unverändert.
 
-### M4: Items als Daten und Speichern (M)
+### M4: Items als Daten und Speichern (M, umgesetzt am 28.09.2026 auf `master_ItemsAndSaving`)
 
 Ziel: Charakter und Fortschritt überleben einen Neustart.
 
-- Item-Basen als Resource, Item-Instanzen als reine Daten. Behebt A4.
-- Inventar-Modell getrennt von der Inventar-Oberfläche, mit Ganzzahl-Koordinaten. Behebt F8, P5, P6.
-- Aufgehobene Tränke landen automatisch auf vorhandenen Stapeln.
-- Eine einzige Lootbag-Logik. Alle gewürfelten Items fallen. Behebt F7, F9, A7.
-- Keine doppelten Affixe, verschachtelte Loot-Tabellen. Behebt F13, F14.
-- Schilde und Waffen als Quelle für Parry und Block. Affix für den abgefangenen Anteil beim Block (`BlockReduction`).
-- Loot würfelt über die gemeinsame Zufallsquelle mit Seed. Behebt den Loot-Anteil von P7.
-- Speichern und Laden von Charakter, Inventar, Ausrüstung und Fortschritt.
+- Erledigt: Item-Basen als Resource, Item-Instanzen als reine Daten. Die Klassen und Szenen pro Item sind entfallen. Behebt A4.
+- Erledigt: Inventar-Modell getrennt von der Inventar-Oberfläche, mit Ganzzahl-Koordinaten. Behebt P5, P6 und A3 für das Inventar. F8 bleibt behoben.
+- Erledigt: Aufgehobene Tränke landen automatisch auf vorhandenen Stapeln.
+- Erledigt: Eine einzige Lootbag-Logik. Alle gewürfelten Items fallen. Behebt A7, F7 und F9 bleiben behoben.
+- Erledigt: Keine doppelten Affixe, verschachtelte Loot-Tabellen. Beides liegt jetzt im Kern und ist getestet, F13 und F14 bleiben behoben.
+- Erledigt: Schilde und Waffen als Quelle für Parry und Block. Affix für den abgefangenen Anteil beim Block (`BlockReduction`).
+- Erledigt: Loot würfelt über die gemeinsame Zufallsquelle mit Seed. Behebt den Loot-Anteil von P7.
+- Erledigt: Speichern und Laden von Charakter, Inventar, Ausrüstung und Fortschritt, dazu die Belegung der Skill-Leiste.
+- Zusätzlich: Regel für Zweihandwaffen und Schild, mit Schalter für ein späteres Talent.
+- Zusätzlich: Holzschild als erste Item-Basis für den Schildplatz, mit gezeichnetem Platzhalter-Icon.
+- Zusätzlich: Der Charakterbogen zeigt Block und Parry, je gegen Attacks und gegen Spells.
 
 Fertig, wenn ein Charakter mit Ausrüstung nach Neustart identisch geladen wird.
+
+Stand des Fertig-Kriteriums: erfüllt. 143 neue Unit-Tests decken den Kern ab, insgesamt sind es 414. Eine Laufzeitprüfung mit 187 Schritten im Testlevel lief fünfmal hintereinander fehlerfrei. Sie spielt, speichert, beendet das Spiel, startet neu und vergleicht den geladenen Charakter mit dem gespeicherten, Wert für Wert. Eine zweite Prüfung mit 17 Schritten deckt die neuen Zeilen im Charakterbogen ab. Zusätzlich gab es eine Sichtprüfung mit Bildschirmfotos.
+
+Getroffene Designentscheidungen vom 28.09.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| Wann wird gespeichert | Automatisch: beim Beenden und nach jeder Änderung an Items, Ausrüstung, Skill-Leiste, Attributen und XP, außerdem nach Level-up und Tod. Beim Start lädt der Charakter von selbst. |
+| Block | Jeder Schild blockt. Zweihand-Stäbe blocken ebenfalls. |
+| Parry | Einige Nahkampfwaffen parieren, unter anderem Schwerter und Dolche. Später kommen Schilde dazu, die auch parieren, zum Beispiel Buckler. |
+| Konfiguration | Parry und Block sind Felder jeder Item-Basis und im Inspector einstellbar. Kein Item-Typ blockt oder pariert per Code. |
+| Zweihandwaffen | Sperren den Schildplatz. Beim Anlegen wandert der Schild ins Inventar, ohne Platz dafür schlägt das Anlegen fehl. |
+| Späteres Talent | Soll erlauben, Zweihandwaffen einhändig zu führen und dazu einen Schild zu tragen. Der Schalter dafür ist `CharacterItems.AllowsOffhandWithTwoHander`. |
+| Anzeige | Der Charakterbogen zeigt Parry und Block. |
+
+Von mir festgelegt, weil es sich aus dem Umbau ergab. Die Werte lassen sich in den Resources ändern:
+
+| Punkt | Festlegung |
+|---|---|
+| Speicherort | Eine Datei `user://saves/character.json`, unter Windows `%APPDATA%\Godot\app_userdata\Hoellenspiralenspiel\saves`. Die Auswahl zwischen mehreren Charakteren kommt mit dem Hauptmenü in M7. |
+| Was gespeichert wird | Level, XP, offene Attributpunkte, die fünf Attribute, Belegung der Leiste, Inventar mit Positionen, Ausrüstung. |
+| Was nicht gespeichert wird | Leben, Mana, Position, Gegner und Beutel am Boden. Der Held startet am Startpunkt mit vollem Leben und Mana. |
+| Item in der Hand | Steht als Item ohne Platz im Spielstand und landet beim Laden im Inventar. Passt es nicht, fällt es zu Boden. |
+| Takt des Speicherns | Eine Sekunde nach der ersten Änderung. Mehrere Änderungen in dieser Zeit ergeben einen Schreibvorgang. |
+| Kaputter Spielstand | Wird als `character.json.broken` zur Seite gelegt, das Spiel beginnt mit einem neuen Charakter. |
+| Ablegen auf belegte Felder | Das Item in der Hand landet mit seiner linken oberen Ecke auf dem angeklickten Feld. Liegt dort genau ein Item, tauschen beide. Am Rand rückt das Item ins Raster. |
+| Tauschen beim Anlegen | Das alte Item nimmt den Platz des neuen im Inventar ein, wenn es dort passt. |
+| Trank bei vollem Inventar | Vorhandene Stapel füllen sich, der Rest bleibt im Beutel. |
+| Werte für Parry und Block | Siehe Tabelle unten, alle geschätzt. |
+| Affixe für Schilde | Der neue Affix für `BlockReduction`, dazu die beiden vorhandenen Rüstungs-Affixe. |
+| Dolch | Neuer Waffentyp `Dagger` mit Schadensart Pierce. Eine Item-Basis dazu gibt es noch nicht. |
+| Zeilen im Charakterbogen | Vier Zeilen unter Dodge: Block, Spell Block, Parry, Spell Parry. Die Werte sind wie in der Trefferauflösung auf 0 bis 100 % begrenzt. |
+| Abstand im Charakterbogen | Der Abstand zwischen den Gruppen ist von 12 auf 7 Pixel gesunken. So passen die vier Zeilen ohne Rollbalken, und die Werteliste schließt weiter bündig mit dem Inventar ab. |
+
+So funktionieren Items:
+
+- Eine Item-Basis ist eine Resource unter `Resources/Items`. `ItemLibrary` lädt alle Resources aus diesem Ordner samt Unterordnern, eine neue Basis braucht dort keinen Eintrag.
+- Es gibt drei Arten: `WeaponBaseResource`, `ArmorBaseResource` und `ConsumableBaseResource`. Ein Schild ist eine Rüstung im Platz `Offhand`.
+- Der Kern kennt eine Basis als `ItemDefinition` und ein einzelnes Item als `ItemInstance`. Die Instanz hält Basis, Itemlevel, Affixe, Namen und Stapelgröße.
+- Ein lokaler Affix verändert die Werte des Items selbst, zum Beispiel Schaden oder Rüstung. Ein globaler Affix geht beim Anlegen ins Stat-Blatt. Im Inspector heißt das Feld weiter `IsInherentMod`.
+- `ItemInstance.GetEquipModifiers` liefert alles, was ein angelegtes Item dem Helden gibt: Rüstung, Parry, Block und die globalen Affixe.
+- `CharacterItems` ist das Modell für alles, was der Held bei sich trägt: Inventar, Ausrüstung und das Item in der Hand. Jeder Klick in der Oberfläche ruft dort genau eine Methode auf.
+- `InventoryGrid` rechnet mit ganzen Feldern. Gesucht wird Zeile für Zeile von links oben.
+- Die Oberfläche hört auf `CharacterItems.Changed` und gleicht ihre Ansichten mit dem Modell ab. Sie enthält keine Regeln mehr.
+- Der Held hört auf `Equipment.Equipped` und `Unequipped` und legt die Modifier ins Stat-Blatt oder nimmt sie heraus.
+- `Lootbag.Drop` legt einen Beutel in die Welt. Gegner, Held und das Laden benutzen denselben Aufruf. Der Beutel hängt am Elternknoten des Helden.
+- `LootRoller` und `AffixRoller` würfeln im Kern mit `GameRandom.Shared`. Derselbe Seed ergibt dieselbe Beute.
+- Eine Item-Resource baut ihre Definition beim ersten Zugriff und behält sie. Wer Werte der Resource im laufenden Spiel ändert, sieht davon nichts.
+- Die Herkunft der Modifier im Stat-Blatt ist die `InstanceId` des Items. Sie gilt nur für die laufende Sitzung und steht nicht im Spielstand.
+- Neue Werte in den Enums `Requirement`, `WeaponType`, `ConsumableEffectKind` und `ItemSlot` nur am Ende anhängen, weil Resources sie als Zahl speichern.
+
+So funktioniert das Speichern:
+
+- `SaveGame` ist das Format, `SaveGameSerializer` schreibt und liest es als JSON, `SaveGameMapper` übersetzt zwischen Spiel und Format. Alle drei liegen im Kern und sind getestet.
+- Enums stehen als Namen in der Datei. Ein Spielstand übersteht deshalb neue Enum-Werte.
+- Items stehen mit der Id ihrer Basis im Spielstand. Gibt es die Basis nicht mehr, fehlt das Item nach dem Laden, und das Spiel meldet eine Warnung.
+- `SaveGameStore` schreibt erst in eine zweite Datei und benennt sie dann um. Ein Absturz mitten im Schreiben zerstört den alten Spielstand nicht.
+- `GameController` lädt nach dem Aufbau der Szene und beobachtet danach den Helden. Der Schalter `SavingEnabled` im Inspector schaltet Laden und Speichern ab.
+- Ein Spielstand kann mehr XP enthalten, als das Level verlangt. Der Aufstieg folgt wie im Spiel erst mit dem nächsten XP-Gewinn.
+- Die Datei trägt eine Versionsnummer. Spielstände einer neueren Version lehnt das Spiel ab.
+- Mit einem anderen Spielstand starten: Godot mit `-- --save-file=user://saves/test.json` aufrufen.
+- Neu anfangen: die Datei `character.json` löschen.
+
+Eine neue Item-Basis in zwei Schritten:
+
+1. Resource vom Typ `WeaponBaseResource`, `ArmorBaseResource` oder `ConsumableBaseResource` unter `Resources/Items` anlegen. Id, Name, Icon, Größe und Anforderungen eintragen, bei Bedarf Parry und Block.
+2. Die Resource in eine Loot-Tabelle unter `Resources/LootTables` eintragen.
+
+Vorläufige Werte der Item-Basen, alle in [Resources/Items](../Resources/Items):
+
+| Item | Art | Größe | Werte | Parry und Block | Anforderung |
+|---|---|---|---|---|---|
+| Training Sword | Einhand, Slash | 1x3 | 4 bis 9, 1,4 Angriffe pro Sekunde, 5 % Krit | 5 % Parry | Stärke 2 |
+| Wooden Staff | Zweihand, Crush | 1x4 | 10 bis 14, 0,33 Angriffe pro Sekunde, 3 % Krit | 10 % Block, 5 % Block gegen Spells | Intelligenz 1 |
+| Short Bow | Zweihand, Pierce | 1x3 | 5 bis 11, 1,2 Angriffe pro Sekunde, 6 % Krit, Reichweite 700 | keine | Geschick 2 |
+| Wooden Shield | Schild | 2x2 | 8 Rüstung | 15 % Block, 8 % Block gegen Spells | Stärke 2 |
+| Gugel | Helm | 2x2 | 10 Rüstung | keine | Stärke 1 |
+| Peasant Tunic | Torso | 2x3 | 25 Rüstung | keine | keine |
+| Wool Gloves | Handschuhe | 2x2 | 10 Rüstung | keine | keine |
+| Health Potion | Trank | 1x1 | 20 % Leben, Stapel bis 5 | | |
+| Mana Potion | Trank | 1x1 | 20 % Mana, Stapel bis 5 | | |
+
+Der neue Affix für Schilde:
+
+| Stufe | Ab Itemlevel | Wert | Name |
+|---|---|---|---|
+| 4 | 1 | 3 bis 5 | of Bracing |
+| 3 | 20 | 6 bis 9 | of Deflection |
+| 2 | 45 | 10 bis 13 | of the Bulwark |
+| 1 | 70 | 14 bis 18 | of the Bastion |
+
+Der Wert erhöht den abgefangenen Anteil beim Block, der Grundwert ist 50 %.
+
+Bewusst offen gelassen:
+
+- Der abgefangene Anteil beim Block steht nicht im Charakterbogen. Den Grundwert von 50 % nennt die Roadmap, den Affix der Tooltip des Schilds.
+- Die Werteliste im Charakterbogen ist voll. Eine weitere Zeile braucht mehr Höhe oder eine kleinere Schrift.
+- Itemlevel ist weiter 1. Das Monsterlevel bestimmt es ab M5. `Lootsystem.ItemLevel` ist bis dahin die Stellschraube.
+- Rare und Elite würfeln weiter mit eigenen Zufallsquellen. Das gehört zu M5.
+- Ringe haben vier einzelne Plätze, aber noch keine Item-Basen. Welcher Ring in welchen Platz geht, ist offen.
+- Waffen für die Nebenhand gibt es nicht. Die Wield-Strategien `OffHand` und `OneHand` stehen nur im Tooltip.
+- Es gibt einen Charakter. Mehrere Charaktere und ein neues Spiel kommen mit dem Hauptmenü in M7.
+- Der Tooltip sucht weiter über einen festen Namen in der Szene. Das gehört zu A1.
+- Das Item in der Hand ist wie bisher nur blass zu sehen.
 
 ### M5: Gegner-KI und Skalierung (M)
 
@@ -495,7 +623,7 @@ Ziel: ein Kreis in Endqualität als Vorlage für alle weiteren.
 - Vorschlag ist der zweite Kreis aus dem PDF: Wollust, ewiger Sturm. Wind als Levelmechanik.
 - Vier bis fünf Gegnertypen, ein Boss, zwei Event-Räume.
 - Item-Basen für alle 16 Slots und Affixe nach der Slot-Tabelle des PDF.
-- Balance-Durchgang für Leben, Schaden, XP und Loot. Dazu gehören B1 bis B3 und die Stellschrauben aus M2.
+- Balance-Durchgang für Leben, Schaden, XP und Loot. Dazu gehören B1 bis B8 und die Stellschrauben aus M2.
 - Ton und Musik.
 
 Fertig, wenn ein Durchlauf des Kreises 30 bis 60 Minuten dauert und Spaß macht.

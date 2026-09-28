@@ -1,6 +1,4 @@
 using Godot;
-using Hoellenspiralenspiel.Scripts.Items;
-using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.UI.Buttons;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Utils;
@@ -21,7 +19,7 @@ public partial class CharacterSheet : Control
     {
         SetPositionRelativeToViewport();
         ConfigureStatDisplay();
-        SubscribeEquipmentEvents();
+        BindItems();
         ConfigureLevelDisplay();
 
         SetVisible(false);
@@ -34,6 +32,8 @@ public partial class CharacterSheet : Control
 
         //Hält die Anzeige aktuell, wenn sich Attribute ändern, z.B. beim Verteilen von Punkten nach einem Level-up
         player.StatsChanged += RerenderStatdisplay;
+
+        GetNode<StatdisplayButton>(nameof(StatdisplayButton)).Pressed += OnPressed;
     }
 
     public override void _ExitTree()
@@ -41,23 +41,24 @@ public partial class CharacterSheet : Control
         if (player is null)
             return;
 
-        player.StatsChanged -= RerenderStatdisplay;
-        player.LeveledUp    -= PlayerOnLeveledUp;
+        player.StatsChanged     -= RerenderStatdisplay;
+        player.LeveledUp        -= PlayerOnLeveledUp;
+        player.ProgressRestored -= SetDisplayedLevel;
     }
 
-    private void SubscribeEquipmentEvents()
+    private void BindItems()
     {
-        inventory.EquippingItem += OnEquippingItem;
-
-        GetNode<EquipmentPanel>("%" + nameof(EquipmentPanel)).EquipmentChanged += OnEquipmentChanged;
-        GetNode<StatdisplayButton>(nameof(StatdisplayButton)).Pressed          += OnPressed;
+        inventory.Bind(player);
+        equipmentPanel.Bind(player);
     }
 
     private void ConfigureLevelDisplay()
     {
         levelDisplay = GetNode<LevelDisplay>("%" + nameof(LevelDisplay));
         SetDisplayedLevel();
-        player.LeveledUp += PlayerOnLeveledUp;
+
+        player.LeveledUp        += PlayerOnLeveledUp;
+        player.ProgressRestored += SetDisplayedLevel;
     }
 
     private void SetDisplayedLevel() => levelDisplay.SetDisplayedValue(player.Level);
@@ -70,74 +71,8 @@ public partial class CharacterSheet : Control
         statdisplay.Visible = isToggledOpen;
     }
 
-    private void OnEquipmentChanged(object formerlyEqipped, object newlyEquipped)
-    {
-        if (player is null)
-            return;
-
-        if (formerlyEqipped is BaseItem item)
-            player.UnequipItem(item);
-
-        RerenderStatdisplay();
-    }
-
     private void RerenderStatdisplay()
         => statdisplay.Render(player);
-
-    private void OnEquippingItem(InventorySlot fromslot)
-    {
-        if (fromslot.ContainedInventoryItem?.ContainedItem is not BaseItem item)
-            return;
-
-        if (!item.CanBeEquipedBy(player))
-            return;
-
-        var retrievedItem        = inventory.RetrieveItem(fromslot);
-        var formerlyEquippedItem = equipmentPanel.EquipIntoFittingSlot(retrievedItem);
-
-        if (formerlyEquippedItem is null)
-            return;
-
-        var couldSetItem = inventory.SetItem(formerlyEquippedItem);
-
-        if (!couldSetItem)
-            DropItem(formerlyEquippedItem);
-    }
-
-    public void DropItem(BaseItem item)
-    {
-        if (item is null)
-            return;
-
-        var playerPosition = GetTree().CurrentScene.GetNode<Player2D>("%Player 2D").GlobalPosition;
-        var dropAtPosition = playerPosition;
-
-        InstantiateLootbag(dropAtPosition, item);
-
-        GD.Print($"{item?.Name ?? "Nothing"} dropped by Player.");
-    }
-
-    private void InstantiateLootbag(Vector2 atPosition, BaseItem loot)
-    {
-        var lootbagInstance = GD.Load<PackedScene>("res://Scenes/Objects/lootbag.tscn").Instantiate<Lootbag>();
-        lootbagInstance.GlobalPosition =  atPosition;
-        lootbagInstance.ContainedItem  =  loot;
-        lootbagInstance.LootClicked    += LootbagInstanceOnLootClicked;
-
-        GetTree().CurrentScene.GetNode<Node2D>("Environment").AddChild(lootbagInstance);
-    }
-
-    private void LootbagInstanceOnLootClicked(Lootbag sender, BaseItem lootedItem)
-    {
-        GD.Print($"{lootedItem?.Name ?? "Nothing"} looted.");
-
-        var couldLootItem = inventory.SetItem(lootedItem);
-
-        if (couldLootItem)
-            sender?.QueueFree();
-        else
-            sender.BounceAndFlip();
-    }
 
     private void SetPositionRelativeToViewport()
     {

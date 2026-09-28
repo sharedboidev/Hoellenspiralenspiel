@@ -1,84 +1,73 @@
-using System.Collections.Generic;
-using System.ComponentModel;
 using Godot;
-using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Extensions;
-using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.UI.Tooltips;
 using Hoellenspiralenspiel.Scripts.Units;
-using Hoellenspiralenspiel.Scripts.Utils.EventArgs;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 public partial class EquipmentPanel : PanelContainer
 {
-    public delegate void EquipmentChangedEventHandler(object formerlyEqipped, object newlyEquipped);
+    private EquipmentSlot[] equipmentSlots = [];
+    private EquipmentSlot   hoveredSlot;
+    private CharacterItems  items;
+    private BaseTooltip     tooltip;
 
-    private readonly Dictionary<ItemSlot, EquipmentSlot> slotMap = new();
-    private          EquipmentSlot[]                     equipmentSlots;
+    private BaseTooltip Tooltip => tooltip ??= GetTree().CurrentScene.GetNodeOrNull<ItemTooltip>("%" + nameof(ItemTooltip));
 
-    [Export]
-    public Inventory Inventory { get; set; }
-
-    private Player2D    Player  => GetTree().CurrentScene.GetNodeOrNull<Player2D>("%Player 2D");
-    private BaseTooltip Tooltip => GetTree().CurrentScene.GetNodeOrNull<ItemTooltip>("%" + nameof(ItemTooltip));
-
-    public event EquipmentChangedEventHandler EquipmentChanged;
-
-    public override void _Ready()
+    public void Bind(Player2D owner)
     {
+        items          = owner.Items;
         equipmentSlots = this.GetAllChildren<EquipmentSlot>();
 
         foreach (var equipmentSlot in equipmentSlots)
         {
-            foreach (var fittingItemType in equipmentSlot.FittingItemSlot)
-            {
-                equipmentSlot.Player          =  Player;
-                equipmentSlot.MouseMoving     += EquipmentSlotOnMouseMoving;
-                equipmentSlot.PropertyChanged += EquipmentSlotOnPropertyChanged;
+            equipmentSlot.Bind(items);
 
-                slotMap.Add(fittingItemType, equipmentSlot);
-            }
+            equipmentSlot.HoverChanged += OnHoverChanged;
         }
+
+        items.Changed += Refresh;
+
+        Refresh();
     }
 
-    private void EquipmentSlotOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    public override void _ExitTree()
     {
-        if (e is not CustomPropertyChangedEventArgs customArg)
-            return;
-
-        if (customArg.OldValue != customArg.NewValue)
-            EquipmentChanged?.Invoke(customArg.OldValue, customArg.NewValue);
+        if (items is not null)
+            items.Changed -= Refresh;
     }
 
-    private void EquipmentSlotOnMouseMoving(MousemovementDirection mousemovementdirection, EquipmentSlot equipmentslot)
+    private void Refresh()
     {
-        switch (mousemovementdirection)
+        foreach (var equipmentSlot in equipmentSlots)
+            equipmentSlot.Refresh();
+
+        if (hoveredSlot is not null)
+            ShowTooltipOf(hoveredSlot);
+    }
+
+    private void OnHoverChanged(EquipmentSlot equipmentSlot, bool isHovered)
+    {
+        if (isHovered)
         {
-            case MousemovementDirection.Entered:
-                if (equipmentslot.IsEmpty)
-                    return;
+            hoveredSlot = equipmentSlot;
 
-                Tooltip.Show(equipmentslot);
+            ShowTooltipOf(equipmentSlot);
+        }
+        else if (hoveredSlot == equipmentSlot)
+        {
+            hoveredSlot = null;
 
-                break;
-            case MousemovementDirection.Left:
-                Tooltip.Hide();
-
-                break;
+            Tooltip?.Hide();
         }
     }
 
-    public BaseItem EquipIntoFittingSlot(BaseItem itemToEquip)
+    private void ShowTooltipOf(EquipmentSlot equipmentSlot)
     {
-        if (itemToEquip is null)
-            return null; 
-                    
-        var fittingSlot          = slotMap[itemToEquip.ItemSlot];
-        var formerlyEquippedItem = fittingSlot.RetrieveItem();
-
-        fittingSlot.EquipItem(itemToEquip);
-
-        return formerlyEquippedItem;
+        if (equipmentSlot.IsEmpty)
+            Tooltip?.Hide();
+        else
+            Tooltip?.Show(equipmentSlot);
     }
 }

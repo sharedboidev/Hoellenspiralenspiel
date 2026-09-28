@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ArmorBaseResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Items/ArmorBaseResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cyu3672iep1er" path="res://Textures/Items/Armor/Torsos/peasant_tunic.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "peasant_tunic"
+DisplayName = "Peasant Tunic"
+Icon = ExtResource("2_icon")
+SlotSize = Vector2i(2, 3)
+Requirements = Dictionary[int, int]({
+5: 1
+})
+Armor = 25

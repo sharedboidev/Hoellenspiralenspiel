@@ -1,4 +1,5 @@
-﻿using Godot;
+using Godot;
+using Hoellenspiralenspiel.Scripts.Core.Items;
 
 namespace Hoellenspiralenspiel.Resources.Affixes;
 
@@ -22,4 +23,7 @@ public partial class AffixTier : Resource
 
     [Export]
     public string ItemnameAddition { get; set; }
+
+    public AffixTierDefinition ToDefinition()
+        => new(Tier, MinItemLevelToAppearOn, Weight, MinValue, MaxValue, ItemnameAddition);
 }
