@@ -31,19 +31,4 @@ expand_mode = 1
 layout_mode = 2
 theme_override_constants/margin_right = 3
 
-[node name="StacksizeDisplay" type="Label" parent="MarginContainer/PanelContainer/MarginContainer" unique_id=742847753]
-unique_name_in_owner = true
-visible = false
-z_index = 1
-y_sort_enabled = true
-layout_mode = 2
-size_flags_vertical = 8
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 16
-text = "99x"
-horizontal_alignment = 2
-
 [connection signal="gui_input" from="MarginContainer/PanelContainer/MarginContainer" to="." method="_on_item_image_gui_input"]
-[connection signal="mouse_entered" from="MarginContainer/PanelContainer/MarginContainer" to="." method="_on_mouse_entered"]
-[connection signal="mouse_exited" from="MarginContainer/PanelContainer/MarginContainer" to="." method="_on_mouse_exited"]

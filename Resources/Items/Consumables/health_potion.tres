@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ConsumableBaseResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Items/ConsumableBaseResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dqo82syqyywq2" path="res://Textures/Items/Consumables/HealthPotion.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "health_potion"
+DisplayName = "Health Potion"
+Icon = ExtResource("2_icon")
+SlotSize = Vector2i(1, 1)

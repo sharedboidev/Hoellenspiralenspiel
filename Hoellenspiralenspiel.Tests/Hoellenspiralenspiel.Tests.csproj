@@ -15,6 +15,7 @@
         -->
         <Compile Include="..\Scripts\Core\**\*.cs" LinkBase="Core" />
         <Compile Include="..\Enums\CombatStat.cs" Link="Enums\CombatStat.cs" />
+        <Compile Include="..\Enums\ItemSlot.cs" Link="Enums\ItemSlot.cs" />
         <Compile Include="..\Enums\ModificationType.cs" Link="Enums\ModificationType.cs" />
     </ItemGroup>
 

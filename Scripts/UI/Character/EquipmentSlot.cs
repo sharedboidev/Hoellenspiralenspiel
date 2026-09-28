@@ -1,33 +1,25 @@
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using Godot;
 using Godot.Collections;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
+using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Items;
-using Hoellenspiralenspiel.Scripts.Units;
-using Hoellenspiralenspiel.Scripts.Utils.EventArgs;
+using Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 [Tool]
 public partial class EquipmentSlot
         : PanelContainer,
-          ITooltipObjectContainer,
-          INotifyPropertyChanged
+          ITooltipObjectContainer
 {
-    public delegate void MouseMovementEventHandler(MousemovementDirection mousemovementDirection, EquipmentSlot equipmentSlot);
+    public delegate void HoverChangedEventHandler(EquipmentSlot slot, bool isHovered);
 
-    private ITooltipObject containedItem;
-
-    private          Texture2D defaultTexture;
-    [Export] private int       pxDimension = 64;
-    private          int       slotHeight  = 1;
-    private          int       slotWidth   = 1;
-    public           bool      IsEmpty => ContainedItem is null;
-    public           Player2D         Player      { get; set; }
+    private          Texture2D      defaultTexture;
+    private          CharacterItems items;
+    [Export] private int            pxDimension = 64;
+    private          int            slotHeight  = 1;
+    private          int            slotWidth   = 1;
 
     [Export]
     public Array<ItemSlot> FittingItemSlot { get; private set; }
@@ -65,48 +57,33 @@ public partial class EquipmentSlot
         }
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public ItemSlot Place => FittingItemSlot is { Count: > 0 } ? Equipment.GetPlaceFor(FittingItemSlot[0]) : ItemSlot.Undefined;
 
-    public ITooltipObject ContainedItem
-    {
-        get => containedItem;
-        set => SetField(ref containedItem, value);
-    }
+    public ItemInstance Item => items?.Equipment.Get(Place);
 
-    public Vector2 TooltipAnchorPoint => GlobalPosition;
+    public bool IsEmpty => Item is null;
 
-    public event MouseMovementEventHandler MouseMoving;
+    public ITooltipObject ContainedItem      => IsEmpty ? null : new ItemTooltipContent(Item, items.GetUnmetRequirements(Item));
+    public Vector2        TooltipAnchorPoint => GlobalPosition;
+
+    public event HoverChangedEventHandler HoverChanged;
 
     public override void _Ready()
         => SetScaledSize();
 
+    public void Bind(CharacterItems owner)
+        => items = owner;
+
+    public void Refresh()
+    {
+        if (IsEmpty)
+            SetDefaultTexture();
+        else
+            GetNode<TextureRect>("%Icon").Texture = ItemLibrary.GetIcon(Item);
+    }
+
     private void SetScaledSize()
-    {
-        var minSizeX = SlotWidth * pxDimension;
-        var minSizeY = SlotHeight * pxDimension;
-        var newSize  = new Vector2(minSizeX, minSizeY);
-
-        CustomMinimumSize = newSize;
-    }
-
-    public BaseItem RetrieveItem()
-    {
-        var itemToRetrieve = ContainedItem;
-        ContainedItem = null;
-
-        SetDefaultTexture();
-
-        return (BaseItem)itemToRetrieve;
-    }
-
-    public void EquipItem(BaseItem item)
-    {
-        Player.EquipItem(item);
-        ContainedItem = item;
-        
-        var textureNode = GetNode<TextureRect>("%Icon");
-        textureNode.Texture = ((BaseItem)ContainedItem).Icon.Texture;
-    }
+        => CustomMinimumSize = new Vector2(SlotWidth, SlotHeight) * pxDimension;
 
     private void SetDefaultTexture()
     {
@@ -118,80 +95,18 @@ public partial class EquipmentSlot
 
     public void _on_texture_rect_gui_input(InputEvent inputEvent)
     {
-        var mouseObject = ((EquipmentPanel)Owner).Inventory.GetNode<MouseObject>(nameof(MouseObject));
+        if (items is null || inputEvent is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
+            return;
 
-        switch (inputEvent)
-        {
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is not null && !mouseObject.HasItem:
-                WithdrawItem(mouseObject);
-
-                break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is null && CanEquipItemOf(mouseObject):
-                PutItemIntoSlot(mouseObject);
-
-                break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is not null && CanEquipItemOf(mouseObject):
-                SwapItems(mouseObject);
-
-                break;
-        }
-    }
-
-    private bool CanEquipItemOf(MouseObject mouseObject)
-        => mouseObject.ContainedItem is BaseItem item &&
-           FittingItemSlot.Any(slot => slot == item.ItemSlot) &&
-           item.CanBeEquipedBy(Player);
-
-    private void SwapItems(MouseObject mouseObject)
-    {
-        var mousItem = mouseObject.RetrieveItem();
-        var slotItem = RetrieveItem();
-
-        EquipItem(mousItem);
-
-        mouseObject.Show(slotItem);
-
-        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
-    }
-
-    private void WithdrawItem(MouseObject mouseObject)
-    {
-        var item = RetrieveItem();
-        
-        MouseMoving?.Invoke(MousemovementDirection.Left, this);
-
-        mouseObject.Show(item);
-    }
-
-    private void PutItemIntoSlot(MouseObject mouseObject)
-    {
-        var item = mouseObject.RetrieveItem();
-
-        EquipItem(item);
-
-        MouseMoving?.Invoke(MousemovementDirection.Entered, this);
+        if (items.HeldItem is null)
+            items.TakeFromEquipment(Place);
+        else
+            items.PlaceHeldInEquipment(Place);
     }
 
     public void _on_texture_rect_mouse_exited()
-        => MouseMoving?.Invoke(MousemovementDirection.Left, this);
+        => HoverChanged?.Invoke(this, false);
 
     public void _on_texture_rect_mouse_entered()
-        => MouseMoving?.Invoke(MousemovementDirection.Entered, this);
-
-    protected virtual void OnPropertyChanged<T>(T oldValue, T newValue, [CallerMemberName] string propertyName = null)
-        => PropertyChanged?.Invoke(this, new CustomPropertyChangedEventArgs(oldValue, newValue, propertyName));
-
-    
-    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value))
-            return false;
-
-        var oldValue = field;
-        field = value;
-        
-        OnPropertyChanged(oldValue, value, propertyName);
-
-        return true;
-    }
+        => HoverChanged?.Invoke(this, true);
 }

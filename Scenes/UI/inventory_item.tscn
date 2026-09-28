@@ -18,6 +18,22 @@ layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
+[node name="StackMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_right = 3
+
+[node name="StackLabel" type="Label" parent="StackMargin"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 16
+text = "x99"
+horizontal_alignment = 2
+
 [connection signal="gui_input" from="Icon" to="." method="_on_gui_input"]
 [connection signal="mouse_entered" from="Icon" to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="Icon" to="." method="_on_mouse_exited"]

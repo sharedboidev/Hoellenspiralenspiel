@@ -1,4 +1,5 @@
 using Godot;
+using Hoellenspiralenspiel.Resources.Items;
 
 namespace Hoellenspiralenspiel.Resources;
 
@@ -16,7 +17,7 @@ public partial class LootEntry : Resource
     public EntryType Type { get; set; } = EntryType.Item;
 
     [Export]
-    public PackedScene ItemScene { get; set; }
+    public ItemBaseResource Item { get; set; }
 
     [Export]
     public LootTable NestedTable { get; set; }

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ArmorBaseResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Items/ArmorBaseResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dgsjcn1x6xnn2" path="res://Textures/Items/Armor/Gloves/wool_gloves.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "wool_gloves"
+DisplayName = "Wool Gloves"
+Icon = ExtResource("2_icon")
+SlotSize = Vector2i(2, 2)
+Requirements = Dictionary[int, int]({
+5: 1
+})
+Slot = 12
+Armor = 10

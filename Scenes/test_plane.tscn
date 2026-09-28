@@ -113,11 +113,10 @@ AmountToSpawn = 15
 [node name="Lootsystem" parent="." unique_id=1477031551 instance=ExtResource("1_h4q4d")]
 unique_name_in_owner = true
 
-[node name="EnemyController" parent="." unique_id=722604080 node_paths=PackedStringArray("Lootsystem", "CharacterSheet") instance=ExtResource("5_vglo3")]
+[node name="EnemyController" parent="." unique_id=722604080 node_paths=PackedStringArray("Lootsystem") instance=ExtResource("5_vglo3")]
 unique_name_in_owner = true
 EnemiesToSpawn = Array[PackedScene]([ExtResource("4_db61r")])
 Lootsystem = NodePath("../Lootsystem")
-CharacterSheet = NodePath("../CanvasLayer/CharacterSheet")
 SpawnIntervallSec = 0.5
 MinDistanceToPlayer = 300.0
 

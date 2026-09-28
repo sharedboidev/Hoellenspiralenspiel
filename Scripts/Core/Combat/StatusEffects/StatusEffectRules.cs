@@ -11,7 +11,7 @@ public static class StatusEffectRules
 {
     private static readonly StatusEffectRule[] Rules =
     [
-        new(StatusEffectKind.Bleed, StackingRule.Strongest, int.MaxValue, true),
+        new(StatusEffectKind.Bleed, StackingRule.Sum, int.MaxValue, true),
         new(StatusEffectKind.Burn, StackingRule.Sum, CombatRules.BurnMaxStacks, true),
         new(StatusEffectKind.Shock, StackingRule.Strongest, int.MaxValue, false),
         new(StatusEffectKind.Chill, StackingRule.Strongest, int.MaxValue, false)

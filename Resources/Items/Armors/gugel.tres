@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArmorBaseResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Items/ArmorBaseResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dmh4d2m36bb1c" path="res://Textures/Items/Armor/Helmets/gugel.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "gugel"
+DisplayName = "Gugel"
+Icon = ExtResource("2_icon")
+SlotSize = Vector2i(2, 2)
+Requirements = Dictionary[int, int]({
+0: 1,
+5: 1
+})
+Slot = 4
+Armor = 10

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
@@ -338,21 +340,47 @@ public class SkillDamageEstimatorTests
     }
 
     [Test]
-    public void Bleed_WirktNurEinmal_EgalWieSchnellDieTrefferFolgen()
+    public void Bleed_LegtDieHaelfteDesSchadensObendrauf()
+    {
+        var weapon   = Weapon(DamageType.Slash, 1f);
+        var estimate = SkillDamageEstimator.Estimate(Attacker(weapon), weapon, StandardAttack);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(estimate.DamagingEffect, Is.EqualTo(StatusEffectKind.Bleed));
+            Assert.That(estimate.EffectDps, Is.EqualTo(estimate.HitDps * CombatRules.BleedDamageFraction).Within(Tolerance));
+            Assert.That(estimate.Dps, Is.EqualTo(estimate.HitDps * 1.5f).Within(Tolerance));
+        });
+    }
+
+    [Test]
+    public void Bleed_WaechstMitDemAngriffstempo()
     {
         var slow = Weapon(DamageType.Slash, 1f);
         var fast = Weapon(DamageType.Slash, 4f);
 
         var slowEstimate = SkillDamageEstimator.Estimate(Attacker(slow), slow, StandardAttack);
         var fastEstimate = SkillDamageEstimator.Estimate(Attacker(fast), fast, StandardAttack);
-        var bleedDps     = slowEstimate.AverageHit * CombatRules.BleedDamageFraction / CombatRules.BleedDurationSec;
 
         Assert.Multiple(() =>
         {
-            Assert.That(slowEstimate.DamagingEffect, Is.EqualTo(StatusEffectKind.Bleed));
-            Assert.That(slowEstimate.EffectDps, Is.EqualTo(bleedDps).Within(Tolerance));
-            Assert.That(fastEstimate.EffectDps, Is.EqualTo(bleedDps).Within(Tolerance));
             Assert.That(fastEstimate.HitDps, Is.EqualTo(slowEstimate.HitDps * 4f).Within(Tolerance));
+            Assert.That(fastEstimate.EffectDps, Is.EqualTo(slowEstimate.EffectDps * 4f).Within(Tolerance));
+        });
+    }
+
+    [Test]
+    public void Bleed_HatKeineObergrenze()
+    {
+        var weapon   = Weapon(DamageType.Slash, 5f);
+        var estimate = SkillDamageEstimator.Estimate(Attacker(weapon), weapon, StandardAttack);
+        var perStack = estimate.AverageHit * CombatRules.BleedDamageFraction / CombatRules.BleedDurationSec;
+        var stacks   = estimate.UsesPerSecond * CombatRules.BleedDurationSec;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(stacks, Is.GreaterThan(CombatRules.BurnMaxStacks));
+            Assert.That(estimate.EffectDps, Is.EqualTo(perStack * stacks).Within(Tolerance));
         });
     }
 
@@ -497,6 +525,50 @@ public class SkillDamageEstimatorTests
             Assert.That((double)totalDamage / landed, Is.EqualTo(estimate.AverageHit).Within(estimate.AverageHit * 0.005), "mittlerer Treffer");
             Assert.That(totalDamage / (double)attempts * estimate.UsesPerSecond, Is.EqualTo(estimate.HitDps).Within(estimate.HitDps * 0.01), "Schaden pro Sekunde aus Treffern");
         });
+    }
+
+    [TestCase(DamageType.Slash, 0.2f)]
+    [TestCase(DamageType.Slash, 2f)]
+    [TestCase(DamageType.Slash, 5f)]
+    [TestCase(DamageType.Fire, 0.2f)]
+    [TestCase(DamageType.Fire, 2f)]
+    [TestCase(DamageType.Fire, 5f)]
+    public void SchadenUeberZeit_StimmtMitDemVerlaufDerEffekteUeberein(DamageType damageType, float attacksPerSecond)
+    {
+        const double frameSec    = 1.0 / 60.0;
+        const double warmUpSec   = 10;
+        const double measuredSec = 60;
+
+        var weapon   = Weapon(damageType, attacksPerSecond);
+        var estimate = SkillDamageEstimator.Estimate(Attacker(weapon), weapon, StandardAttack);
+        var effect   = StatusEffectRules.GetEffectOfHit(damageType, estimate.AverageHit, (int)MathF.Round(estimate.AverageHit));
+        var tracker  = new StatusEffectTracker(new StatSheet());
+        var ticks    = new List<StatusTick>();
+
+        var hitIntervalSec = 1.0 / estimate.UsesPerSecond;
+        var nextHitSec     = 0.0;
+        var damage         = 0;
+
+        for (var nowSec = 0.0; nowSec < warmUpSec + measuredSec; nowSec += frameSec)
+        {
+            while (nextHitSec <= nowSec)
+            {
+                tracker.Apply(effect);
+
+                nextHitSec += hitIntervalSec;
+            }
+
+            ticks.Clear();
+            tracker.Advance(frameSec, ticks);
+
+            if (nowSec < warmUpSec)
+                continue;
+
+            foreach (var tick in ticks)
+                damage += tick.Damage;
+        }
+
+        Assert.That(damage / measuredSec, Is.EqualTo(estimate.EffectDps).Within(estimate.EffectDps * 0.02));
     }
 
     #endregion

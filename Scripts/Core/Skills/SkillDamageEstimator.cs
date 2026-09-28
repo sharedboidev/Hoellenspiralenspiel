@@ -87,26 +87,21 @@ public static class SkillDamageEstimator
             _                => null
         };
 
-    //Von Bleed wirkt nur die stärkste Blutung, Burn stapelt bis zur Obergrenze
+    //Wie viele Instanzen zugleich wirken, bestimmt die Stapelregel des Effekts
     private static float GetEffectDps(StatusEffectKind? effect, float averageHit, double landingsPerSecond)
     {
-        switch (effect)
-        {
-            case StatusEffectKind.Bleed:
-            {
-                var damagePerSecond = averageHit * CombatRules.BleedDamageFraction / CombatRules.BleedDurationSec;
-                var uptime          = Math.Min(1.0, landingsPerSecond * CombatRules.BleedDurationSec);
+        if (effect is null)
+            return 0f;
 
-                return (float)(damagePerSecond * uptime);
-            }
-            case StatusEffectKind.Burn:
-            {
-                var damagePerSecond = averageHit * CombatRules.BurnDamageFraction / CombatRules.BurnDurationSec;
-                var stacks          = Math.Min(CombatRules.BurnMaxStacks, landingsPerSecond * CombatRules.BurnDurationSec);
+        var (damageFraction, durationSec) = effect == StatusEffectKind.Bleed
+                ? (CombatRules.BleedDamageFraction, CombatRules.BleedDurationSec)
+                : (CombatRules.BurnDamageFraction, CombatRules.BurnDurationSec);
 
-                return (float)(damagePerSecond * stacks);
-            }
-            default: return 0f;
-        }
+        var rule            = StatusEffectRules.Get(effect.Value);
+        var maxInstances    = rule.Stacking == StackingRule.Sum ? rule.MaxInstances : 1;
+        var instances       = Math.Min(maxInstances, landingsPerSecond * durationSec);
+        var damagePerSecond = averageHit * damageFraction / durationSec;
+
+        return (float)(damagePerSecond * instances);
     }
 }

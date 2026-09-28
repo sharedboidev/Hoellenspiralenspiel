@@ -1,19 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Godot;
 using Godot.Collections;
-using Hoellenspiralenspiel.Scripts.Items;
-using Hoellenspiralenspiel.Scripts.Items.Consumables;
+using Hoellenspiralenspiel.Scripts.Core.Items;
+using TranslatedTables = System.Collections.Generic.Dictionary<Hoellenspiralenspiel.Resources.LootTable, Hoellenspiralenspiel.Scripts.Core.Items.LootTableDefinition>;
 
 namespace Hoellenspiralenspiel.Resources;
 
 [GlobalClass]
 public partial class LootTable : Resource
 {
-    //Schutz gegen Tabellen, die sich direkt oder über Umwege selbst enthalten
-    private const int MaxNestingDepth = 8;
-
     [Export]
     public string TableId { get; set; } = string.Empty;
 
@@ -23,59 +17,44 @@ public partial class LootTable : Resource
     [Export]
     public Array<LootEntry> Entries { get; set; } = new();
 
-    private float TotalLootWeight => Entries.Sum(e => e.Weight);
+    public LootTableDefinition ToDefinition()
+        => ToDefinition(new TranslatedTables());
 
-    public BaseItem[] RollLoot()
-        => RollLoot(new Random(), 0);
-
-    private BaseItem[] RollLoot(Random rng, int nestingDepth)
+    //Bereits übersetzte Tabellen kommen aus dem Zwischenspeicher, sonst liefe eine Tabelle, die sich selbst enthält, endlos
+    private LootTableDefinition ToDefinition(TranslatedTables translated)
     {
-        var drops = new List<BaseItem>();
+        if (translated.TryGetValue(this, out var known))
+            return known;
 
-        for (int i = 0; i < Rolls; i++)
+        var definition = new LootTableDefinition { Id = TableId, Rolls = Rolls };
+
+        translated[this] = definition;
+
+        foreach (var entry in Entries)
         {
-            var randomNumber     = rng.Next(1, (int)TotalLootWeight+1);
-            var cumulativeWeight = 0f;
-
-            foreach (var lootEntry in Entries)
-            {
-                cumulativeWeight += lootEntry.Weight;
-
-                if (!(cumulativeWeight >= randomNumber))
-                    continue;
-
-                drops.AddRange(CreateDropsOf(lootEntry, rng, nestingDepth));
-
-                break;
-            }
+            if (entry is not null)
+                definition.Entries.Add(Translate(entry, translated));
         }
 
-        return drops.ToArray();
+        return definition;
     }
 
-    private static BaseItem[] CreateDropsOf(LootEntry lootEntry, Random rng, int nestingDepth)
-    {
-        switch (lootEntry.Type)
+    private static LootEntryDefinition Translate(LootEntry entry, TranslatedTables translated)
+        => new()
         {
-            case LootEntry.EntryType.Nothing:
-                return [];
+            Kind        = GetKind(entry),
+            ItemId      = entry.Item?.Id,
+            NestedTable = entry.Type == LootEntry.EntryType.NestedTable ? entry.NestedTable?.ToDefinition(translated) : null,
+            Weight      = entry.Weight,
+            QuantityMin = entry.QuantityMin,
+            QuantityMax = entry.QuantityMax
+        };
 
-            case LootEntry.EntryType.NestedTable:
-                if (lootEntry.NestedTable is null || nestingDepth >= MaxNestingDepth)
-                    return [];
-
-                return lootEntry.NestedTable.RollLoot(rng, nestingDepth + 1);
-
-            default:
-                if (lootEntry.ItemScene is null)
-                    return [];
-
-                var itemInstance = lootEntry.ItemScene.Instantiate<BaseItem>();
-
-                if (itemInstance is ConsumableItem consumableItem)
-                    consumableItem.StacksizeCurrent = rng.Next(lootEntry.QuantityMin, lootEntry.QuantityMax + 1);
-
-                return [itemInstance];
-        }
-    }
+    private static LootEntryKind GetKind(LootEntry entry)
+        => entry.Type switch
+        {
+            LootEntry.EntryType.NestedTable => LootEntryKind.NestedTable,
+            LootEntry.EntryType.Nothing     => LootEntryKind.Nothing,
+            _                               => LootEntryKind.Item
+        };
 }
