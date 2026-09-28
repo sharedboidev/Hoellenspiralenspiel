@@ -20,6 +20,8 @@ public abstract partial class BaseUnit
 
     public delegate void DiedEventHandler(BaseUnit unit);
 
+    public delegate void StatsChangedEventHandler();
+
     protected Sprite2D AttackSprite;
     protected Sprite2D DeathSprite;
     protected Sprite2D IdleSprite;
@@ -41,6 +43,9 @@ public abstract partial class BaseUnit
     public event PropertyChangedEventHandler  PropertyChanged;
     public event AttributeChangedEventHandler AttributeChanged;
     public event DiedEventHandler             Died;
+
+    //Feuert, nachdem die abgeleiteten Modifier neu berechnet sind. Anzeigen sollen hierauf hören, nicht auf AttributeChanged
+    public event StatsChangedEventHandler StatsChanged;
 
     public override void _PhysicsProcess(double delta)
         => ResolveLifeReg(delta);
@@ -83,10 +88,11 @@ public abstract partial class BaseUnit
 
     public override void _Ready()
     {
-        LifeCurrent = LifeMaximum;
-
         LoadSpriteNodes();
         SubscribeAndInitAttributeDerivedStats();
+
+        //Erst nach den abgeleiteten Modifiern füllen, sonst startet die Einheit unter ihrem Maximum
+        LifeCurrent = LifeMaximum;
     }
 
     protected void LoadSpriteNodes()
@@ -101,6 +107,12 @@ public abstract partial class BaseUnit
     {
         AttributeChanged += OnAttributeChanged;
 
+        RefreshAttributeDerivedStats();
+    }
+
+    //Muss nach jeder Änderung an Modifiern laufen, die ein Attribut betreffen können, z.B. durch Ausrüstung
+    protected void RefreshAttributeDerivedStats()
+    {
         AttributeChanged?.Invoke(CombatStat.Strength, StrengthFinal);
         AttributeChanged?.Invoke(CombatStat.Dexterity, DexterityFinal);
         AttributeChanged?.Invoke(CombatStat.Intelligence, IntelligenceFinal);
@@ -117,6 +129,8 @@ public abstract partial class BaseUnit
         CombatStatModifiers.AddRange(derivedStats);
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LifeMaximum))); //Hack, weil Racecondition zwischen ResourceOrb und Der Zeile hier drüber, obwohl beide Das selbe Event subscriben
+
+        StatsChanged?.Invoke();
     }
 
     protected void RemoveModifiers(string modId)
@@ -141,9 +155,12 @@ public abstract partial class BaseUnit
         return nearestBois;
     }
 
+    protected void RaiseDied()
+        => Died?.Invoke(this);
+
     protected virtual void DieProperly()
     {
-        Died?.Invoke(this);
+        RaiseDied();
 
         QueueFree();
     }
@@ -287,8 +304,12 @@ public abstract partial class BaseUnit
     public  float LifePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Life);
     public  float LifeMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Life);
     public  float LifeMaximum              => (int)((LifeBase + LifeAddedFlat) * LifePercentageMultiplier * LifeMoreMultiplierTotal);
-    public  int   LifeBase                 => 5 + StrengthFinal + 3 * ConstitutionFinal;
+    public  int   LifeBase                 => 5 + StrengthFinal + 3 * ConstitutionFinal + LifeBaseBonus;
     private float lifeCurrent;
+
+    //Fester Zuschlag auf das Basisleben, z.B. für Gegner, deren Leben nicht nur aus Attributen kommen soll
+    [Export]
+    public int LifeBaseBonus { get; set; }
 
     [Export]
     public float LifeCurrent

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Models;
@@ -7,12 +7,15 @@ namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 public abstract partial class BaseEnemy : BaseUnit
 {
+    private            AttackPhase    attackPhase = AttackPhase.Ready;
+    private            double         attackPhaseTimeLeftSec;
     protected          Player2D       ChasedPlayer;
     protected          Node           CurrentScene;
     private            ProgressBar    healthbar;
     private            ShaderMaterial hiddenInFogShaderMaterial;
     protected abstract PackedScene    AttackScene { get; }
     public             string         SpawnGroup  { get; set; }
+    public             bool           IsDying     { get; private set; }
 
     [Export]
     public int XpGranted { get; set; } = 100;
@@ -59,9 +62,7 @@ public abstract partial class BaseEnemy : BaseUnit
         switch (animname)
         {
             case Animation.DieLeft or Animation.DieRight or Animation.DieTop or Animation.DieDown:
-                healthbar.Visible = false;
                 SetAsOnlyVisibleSprite(DeathSprite);
-                DieProperly();
 
                 break;
             case Animation.RunLeft or Animation.RunRight or Animation.RunTop or Animation.RunDown:
@@ -101,6 +102,11 @@ public abstract partial class BaseEnemy : BaseUnit
     {
         base._PhysicsProcess(delta);
 
+        if (IsDying)
+            return;
+
+        AdvanceAttack(delta);
+
         if (MovementDirection != Vector2.Zero)
         {
             var direction = MovementDirection;
@@ -109,6 +115,13 @@ public abstract partial class BaseEnemy : BaseUnit
             AnimationTree.Set("parameters/StateMachine/MoveState/IdleState/blend_position", direction);
             AnimationTree.Set("parameters/StateMachine/MoveState/DeathState/blend_position", direction);
         }
+    }
+
+    protected override void ResolveLifeReg(double delta)
+    {
+        //Ein sterbender Gegner regeneriert nicht zurück ins Leben
+        if (!IsDying)
+            base.ResolveLifeReg(delta);
     }
 
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -122,6 +135,9 @@ public abstract partial class BaseEnemy : BaseUnit
                 healthbar.Visible = true;
                 IsAggressive      = true;
             }
+
+            if (IsDead)
+                BeginDeath();
         }
         else
         {
@@ -138,15 +154,43 @@ public abstract partial class BaseEnemy : BaseUnit
         base.ReceiveDamage(hit);
     }
 
-    protected override void DieProperly()
+    //Der Tod wird genau einmal ausgelöst: XP und Loot sofort, entfernt wird der Gegner erst nach der Todesanimation
+    private void BeginDeath()
     {
+        if (IsDying)
+            return;
+
+        IsDying           = true;
+        healthbar.Visible = false;
+        Velocity          = Vector2.Zero;
+        attackPhase       = AttackPhase.Ready;
+
+        GetNodeOrNull<CollisionShape2D>(nameof(CollisionShape2D))?.SetDeferred(CollisionShape2D.PropertyName.Disabled, true);
+
         var controller = CurrentScene.GetNode<EnemyController>("%" + nameof(EnemyController));
         controller.SpawnedEnemies.Remove(this);
 
-        PropertyChanged                -= OnPropertyChanged;
-        AnimationTree.AnimationStarted -= AnimationTreeOnAnimationStarted;
+        PropertyChanged -= OnPropertyChanged;
 
-        base.DieProperly();
+        RaiseDied();
+
+        GetTree().CreateTimer(GetDeathAnimationLengthSec()).Timeout += RemoveCorpse;
+    }
+
+    private double GetDeathAnimationLengthSec()
+    {
+        var animationPlayer = GetNodeOrNull<AnimationPlayer>(nameof(AnimationPlayer));
+
+        if (animationPlayer is null || !animationPlayer.HasAnimation(Animation.DieDown))
+            return 0;
+
+        return animationPlayer.GetAnimation(Animation.DieDown).Length;
+    }
+
+    private void RemoveCorpse()
+    {
+        if (IsInstanceValid(this) && !IsQueuedForDeletion())
+            QueueFree();
     }
 
     protected abstract void ExecuteAttack();
@@ -160,13 +204,48 @@ public abstract partial class BaseEnemy : BaseUnit
             return;
         }
 
+        //Während Windup und Recovery bleibt der Gegner stehen
+        if (attackPhase != AttackPhase.Ready)
+            return;
+
         var distance  = ChasedPlayer.Position.DistanceTo(Position);
         var isInRange = distance < AttackRange;
 
         if (isInRange)
-            ExecuteAttack();
+            StartAttack();
         else
             RunAtPlayer();
+    }
+
+    private void StartAttack()
+    {
+        Velocity               = Vector2.Zero;
+        attackPhase            = AttackPhase.Windup;
+        attackPhaseTimeLeftSec = AttackWindeupTimeSec;
+    }
+
+    private void AdvanceAttack(double delta)
+    {
+        if (attackPhase == AttackPhase.Ready)
+            return;
+
+        attackPhaseTimeLeftSec -= delta;
+
+        if (attackPhaseTimeLeftSec > 0)
+            return;
+
+        if (attackPhase == AttackPhase.Recovery)
+        {
+            attackPhase = AttackPhase.Ready;
+
+            return;
+        }
+
+        if (!ChasedPlayer.IsDead)
+            ExecuteAttack();
+
+        attackPhase            = AttackPhase.Recovery;
+        attackPhaseTimeLeftSec = AttackRecoveryTimeSec;
     }
 
     private void RunAtPlayer()
@@ -178,5 +257,12 @@ public abstract partial class BaseEnemy : BaseUnit
         Velocity          = Movementspeed * direction;
 
         MoveAndSlide();
+    }
+
+    private enum AttackPhase
+    {
+        Ready,
+        Windup,
+        Recovery
     }
 }

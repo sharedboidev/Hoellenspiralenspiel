@@ -9,8 +9,9 @@ public partial class FloatingCombatText : Node2D
     private const string FontColor = "font_color";
     private const string FontSize  = "font_size";
 
+    //Pixel pro Sekunde. 18 entspricht dem früheren Wert von 0,3 Pixeln pro Frame bei 60 Bildern pro Sekunde
     [Export]
-    public float DriftVelocity { get; set; } = 0.3f;
+    public float DriftVelocity { get; set; } = 18f;
 
     [Export]
     public float VisibilityTimeSeconds { get; set; } = 2;
@@ -50,12 +51,17 @@ public partial class FloatingCombatText : Node2D
         Elapsed += delta;
 
         if (Elapsed >= FadeDelaySeconds)
-            Modulate = new Color(Modulate, 1 - ((float)Elapsed - 1));
+        {
+            var fadeDurationSeconds = Mathf.Max(VisibilityTimeSeconds - FadeDelaySeconds, 0.001f);
+            var alpha               = 1 - ((float)Elapsed - FadeDelaySeconds) / fadeDurationSeconds;
+
+            Modulate = new Color(Modulate, Mathf.Clamp(alpha, 0f, 1f));
+        }
 
         if (Elapsed >= VisibilityTimeSeconds)
             QueueFree();
 
-        Position += new Vector2(0, -DriftVelocity);
+        Position += new Vector2(0, -DriftVelocity * (float)delta);
     }
 
     public void _freed() => QueueFreed?.Invoke();

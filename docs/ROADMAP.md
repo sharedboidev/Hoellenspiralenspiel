@@ -40,7 +40,7 @@ Ohne diese Systeme gibt es kein spielbares Spiel, nur eine Testszene.
 
 1. **Spielertod.** Das Leben kann unter null fallen, ohne dass etwas passiert. Es gibt kein Game Over und keinen Respawn.
 2. **Nahkampf.** Der Spieler hat keinen Angriff. Waffenwerte existieren nur im Tooltip.
-3. **Gegnerangriffe.** Die Blobs greifen nicht an. Der Feuerball des Testgegners kann den Spieler nicht treffen.
+3. **Gegnerangriffe.** Die Blobs haben keinen eigenen Angriff und schaden nur durch Berührung. Nur der Testgegner greift an, mit Feuerbällen.
 4. **Speichern und Laden.** Es gibt keine Persistenz für Charakter, Inventar oder Fortschritt.
 5. **Spielstruktur.** Hub, Levelwechsel, Hauptmenü, Pausenmenü und Freischaltung fehlen. Die Kellertür schreibt nur eine Logzeile.
 6. **Levelgenerierung.** Es gibt nur ein handgebautes Testlevel.
@@ -62,24 +62,33 @@ Status vom 28.09.2026. Die Zeilennummern beziehen sich auf den Stand vor den Kor
 | Nr. | Status | Problem | Stelle |
 |---|---|---|---|
 | F1 | Behoben | Stärke und Konstitution überschreiben gegenseitig ihren Rüstungsbonus, weil beide dieselbe Herkunfts-ID benutzen | [DerivedStatProvider.cs:65](../Scripts/Utils/DerivedStatProvider.cs), [DerivedStatProvider.cs:98](../Scripts/Utils/DerivedStatProvider.cs) |
-| F2 | Offen | Attribute von Ausrüstung aktualisieren die abgeleiteten Werte nicht. Nur Änderungen am Basiswert lösen die Neuberechnung aus. | [BaseUnit.cs:155](../Scripts/Units/BaseUnit.cs) |
+| F2 | Behoben | Attribute von Ausrüstung aktualisieren die abgeleiteten Werte nicht. Nur Änderungen am Basiswert lösen die Neuberechnung aus. | [BaseUnit.cs:155](../Scripts/Units/BaseUnit.cs) |
 | F3 | Behoben | Zauberschaden ignoriert den More-Multiplikator. Intelligenz erhöht den Schaden dadurch nicht. | [BaseSkill.cs:42](../Scripts/Abilities/BaseSkill.cs) |
 | F4 | Behoben | Treffer auf Gegner zeigen manchmal "Dodge" an, ziehen aber trotzdem Leben ab. Heilung konnte ebenfalls "Dodge" anzeigen. | [BaseUnit.cs:48](../Scripts/Units/BaseUnit.cs), [FCTExtensions.cs:17](../Scripts/Extensions/FCTExtensions.cs) |
-| F5 | Offen | Kontaktschaden trifft in jedem Physik-Frame ohne Abklingzeit | [Player2D.cs:199](../Scripts/Units/Player2D.cs) |
-| F6 | Offen | Gegner greifen ohne Cooldown an. Der Testgegner erzeugt pro Frame einen Feuerball. Windup und Recovery werden nicht benutzt. | [BaseEnemy.cs:145](../Scripts/Units/Enemies/BaseEnemy.cs), [TestEnemy.cs:21](../Scripts/Units/Enemies/TestEnemy.cs) |
-| F7 | Offen | Ein Gegner kann mehrere Lootbags fallen lassen, wenn er nach dem Tod noch getroffen wird. Von mehreren gewürfelten Items fällt nur das erste. | [EnemyController.cs:116](../Scripts/Controllers/EnemyController.cs) |
+| F5 | Behoben | Kontaktschaden trifft in jedem Physik-Frame ohne Abklingzeit | [Player2D.cs:199](../Scripts/Units/Player2D.cs) |
+| F6 | Behoben | Gegner greifen ohne Cooldown an. Der Testgegner erzeugt pro Frame einen Feuerball. Windup und Recovery werden nicht benutzt. | [BaseEnemy.cs:145](../Scripts/Units/Enemies/BaseEnemy.cs), [TestEnemy.cs:21](../Scripts/Units/Enemies/TestEnemy.cs) |
+| F7 | Behoben | Ein Gegner kann mehrere Lootbags fallen lassen, wenn er nach dem Tod noch getroffen wird. Von mehreren gewürfelten Items fällt nur das erste. | [EnemyController.cs:116](../Scripts/Controllers/EnemyController.cs) |
 | F8 | Behoben | Einen Trank zu trinken gibt den Slot frei, obwohl der Stapel noch Tränke enthält. Das nächste Item landet darüber. | [Inventory.cs:192](../Scripts/UI/Character/Inventory.cs) |
 | F9 | Behoben | Ein fallengelassenes Item geht verloren, wenn man es bei vollem Inventar wieder aufhebt | [MouseObject.cs:72](../Scripts/UI/MouseObject.cs) |
 | F10 | Behoben | Ausrüsten per Drag-and-drop umgeht die Anforderungsprüfung | [EquipmentSlot.cs:129](../Scripts/UI/Character/EquipmentSlot.cs) |
 | F11 | Behoben | Das Entfernen von Modifikatoren fasst nebenbei wertgleiche Einträge zusammen. Zwei identische Affixe auf einem Item zählen danach nur noch einmal. | [BaseUnit.cs:123](../Scripts/Units/BaseUnit.cs) |
 | F12 | Behoben | Der Affix-Wurf kann `null` liefern, wenn ein Slot keine passenden Affixe hat. Das führt zum Absturz. | [Lootsystem.cs:181](../Scripts/Controllers/Lootsystem.cs) |
-| F13 | Offen | Verschachtelte Loot-Tabellen sind als Typ angelegt, aber nicht umgesetzt | [LootTable.cs:42](../Resources/LootTable.cs) |
-| F14 | Offen | Derselbe Affix kann mehrfach auf einem Item landen | [Lootsystem.cs:57](../Scripts/Controllers/Lootsystem.cs) |
-| F15 | Offen | Die Todesanimation ist nie zu sehen, weil der Gegner beim Start der Animation entfernt wird | [BaseEnemy.cs:60](../Scripts/Units/Enemies/BaseEnemy.cs) |
+| F13 | Behoben | Verschachtelte Loot-Tabellen sind als Typ angelegt, aber nicht umgesetzt | [LootTable.cs:42](../Resources/LootTable.cs) |
+| F14 | Behoben | Derselbe Affix kann mehrfach auf einem Item landen | [Lootsystem.cs:57](../Scripts/Controllers/Lootsystem.cs) |
+| F15 | Behoben | Die Todesanimation ist nie zu sehen, weil der Gegner beim Start der Animation entfernt wird | [BaseEnemy.cs:60](../Scripts/Units/Enemies/BaseEnemy.cs) |
 | F16 | Behoben | Auf Level 100 ist die nächste XP-Schwelle 0. Jeder XP-Gewinn löst dann ein Level-up aus und das Level danach wirft eine Ausnahme. | [XpTable.cs:109](../Scripts/Utils/XpTable.cs) |
-| F17 | Offen | `LifeBase = 75` in den Gegner-Szenen wird ignoriert. Alle Gegner haben 9 Leben, der Feuerball macht 50 bis 75 Schaden. | [yellow_blob.tscn](../Scenes/Units/Enemies/yellow_blob.tscn) |
-| F18 | Offen | Schadenszahlen driften pro Frame statt pro Sekunde und sind damit abhängig von der Bildrate | [FloatingCombatText.cs:58](../Scripts/UI/FloatingCombatText.cs) |
-| F19 | Offen, neu | Ein Slot meldet sich nie vom Stapel-Ereignis eines Tranks ab. Wird ein verschobener Trankstapel leer getrunken, löscht der alte Slot den fremden Trankstapel, der inzwischen dort liegt. | [InventorySlot.cs:62](../Scripts/UI/Character/InventorySlot.cs) |
+| F17 | Behoben | `LifeBase = 75` in den Gegner-Szenen wird ignoriert. Alle Gegner haben 9 Leben, der Feuerball macht 50 bis 75 Schaden. | [yellow_blob.tscn](../Scenes/Units/Enemies/yellow_blob.tscn) |
+| F18 | Behoben | Schadenszahlen driften pro Frame statt pro Sekunde und sind damit abhängig von der Bildrate | [FloatingCombatText.cs:58](../Scripts/UI/FloatingCombatText.cs) |
+| F19 | Behoben | Ein Slot meldet sich nie vom Stapel-Ereignis eines Tranks ab. Wird ein verschobener Trankstapel leer getrunken, löscht der alte Slot den fremden Trankstapel, der inzwischen dort liegt. | [InventorySlot.cs:62](../Scripts/UI/Character/InventorySlot.cs) |
+| F20 | Behoben | Einheiten füllen Leben und Mana, bevor die abgeleiteten Modifier berechnet sind. Sie starten dadurch knapp unter ihrem Maximum. | [BaseUnit.cs:84](../Scripts/Units/BaseUnit.cs), [Player2D.cs:76](../Scripts/Units/Player2D.cs) |
+| F21 | Behoben | Das Inventar hat einen höheren Z-Index als der Level-up-Dialog und verdeckt ihn | [level_up_dialog.tscn](../Scenes/UI/level_up_dialog.tscn) |
+| F22 | Behoben | Das Statdisplay zeichnet sich nach dem Verteilen eines Attributpunkts nicht neu | [CharacterSheet.cs](../Scripts/UI/Character/CharacterSheet.cs), [BaseUnit.cs](../Scripts/Units/BaseUnit.cs) |
+
+Hinweise zu den Korrekturen:
+
+- F2, F5 und F6 sind pragmatisch behoben. M1 und M2 ersetzen diese Lösungen später durch den Stat-Kern und die Kampf-Pipeline.
+- F17 führt den exportierten Wert `LifeBaseBonus` ein. Er wird auf das Basisleben aus den Attributen addiert.
+- F18 ändert die Einheit von `DriftVelocity` auf Pixel pro Sekunde.
 
 ### 3.2 Performance
 
@@ -106,6 +115,9 @@ Status vom 28.09.2026. Die Zeilennummern beziehen sich auf den Stand vor den Kor
 | A7 | Lootbag-Code existiert dreimal mit unterschiedlichem Verhalten | Quelle von F9 |
 | A8 | `.idea`, `*.user` und `obj` sind eingecheckt. Shader und Testszenen liegen im Projektwurzelordner. Leere Klassen wie `SceneDispenser` und `StaticMemory` existieren. | Unübersichtlich |
 | A9 | Eingabeaktionen heißen wie Tasten (`F`, `B`, `Tab`) statt nach ihrer Funktion | Tastenbelegung lässt sich nicht sauber ändern |
+| A10 | Zauber unterscheiden Freund und Feind über Typprüfungen auf `Player2D` und `BaseEnemy`, die Gruppe `monsters`, feste Kollisionsebenen und den `EnemyController` | Ein Zauber verhält sich nicht gleich für jeden, der ihn wirkt. Begleiter und Koop-Spieler sind nicht abgedeckt. |
+
+Hinweis zu A10: Fireball, Frost Nova und Lightning Strike sind Testzauber und werden in M3 neu gebaut. Sie werden bis dahin nicht umgebaut. Der Feuerball kennt seit F6 zwei Seiten, entscheidet aber weiter über den Typ des Besitzers.
 
 ## 4. Meilensteinplan
 
@@ -121,12 +133,10 @@ Größen: S bedeutet wenige Abende, M ein bis zwei Wochen Hobbyzeit, L mehrere W
 
 Ziel: stabile Basis, bevor umgebaut wird.
 
-- Erledigt am 28.09.2026: F1, F3, F4, F8, F9, F10, F11, F12, F16.
-- Noch offen und klein: F7, F13, F14, F15, F17, F18, F19.
-- F2, F5 und F6 werden durch M1 und M2 ersetzt.
-- `.gitignore` erweitern, eingecheckte IDE- und Build-Dateien entfernen, Wurzelordner aufräumen, tote Klassen löschen.
-- Eingabeaktionen nach Funktion benennen.
-- Branch `master_MeleeCombat` nach `master` zusammenführen.
+- Erledigt am 28.09.2026: alle bekannten Fehler F1 bis F22.
+- Offen: `.gitignore` erweitern, eingecheckte IDE- und Build-Dateien entfernen, Wurzelordner aufräumen, tote Klassen löschen.
+- Offen: Eingabeaktionen nach Funktion benennen.
+- Offen: Branch `master_MeleeCombat` nach `master` zusammenführen.
 
 Fertig, wenn das Testlevel ohne die genannten Fehler läuft und der Wurzelordner nur noch Projektdateien enthält.
 
@@ -165,9 +175,16 @@ Ziel: neue Skills ohne Codeänderung am Spieler.
 - Skill-Definition als Resource: Kosten, Cooldown, Schaden, Schadensart, Szene, Icon.
 - Eine Skill-Hierarchie statt zwei. Zauberlogik raus aus dem Skillbar-Button. Behebt A3, A5.
 - Skillbar frei belegbar.
-- Fork-Verhalten des Feuerballs begrenzen. Behebt P4.
+- Die drei Testzauber werden neu gebaut, nicht umgebaut. Behebt P4.
+- Zauber sind unabhängig davon, wer sie wirkt. Behebt A10.
+  - Jede Einheit bekommt eine Fraktion. Ein Zauber trifft Einheiten, deren Fraktion sich von der des Wirkenden unterscheidet.
+  - Trefferlogik arbeitet nur mit `BaseUnit`, ohne Typprüfung auf Spieler oder Gegner.
+  - Zielsuche für Fork und Flächenzauber fragt "feindliche Einheiten in der Nähe" ab, nicht den `EnemyController`.
+  - Die Kollisionsmaske ergibt sich aus der Fraktion. Wände werden über ihre Kollisionsebene erkannt, nicht über den Knotennamen.
+  - Geschwindigkeit, Lebenszeit und Anzahl der Forks kommen aus der Skill-Definition.
+  - Erzeugte Projektile hängen am Elternknoten des Auslösers, ohne festen Pfad durch die Szene.
 
-Fertig, wenn ein neuer Zauber nur aus einer Resource und einer Szene besteht.
+Fertig, wenn ein neuer Zauber nur aus einer Resource und einer Szene besteht und derselbe Zauber von Spieler und Gegner gewirkt werden kann.
 
 Offene Designfrage: Gibt es Klassen, und wie bekommt man Skills? Das PDF nennt Klassen nur bei den Item-Anforderungen. Die Entscheidung wird erst hier gebraucht.
 

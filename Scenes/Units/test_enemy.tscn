@@ -154,7 +154,7 @@ platform_on_leave = 2
 platform_floor_layers = 0
 script = ExtResource("1_x3aji")
 LootTableId = "test_loot"
-LifeBase = 258
+LifeBaseBonus = 249
 Movementspeed = 50.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=495005380]

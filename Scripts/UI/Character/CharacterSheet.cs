@@ -30,6 +30,18 @@ public partial class CharacterSheet : Control
     {
         statdisplay = GetNode<Statdisplay>(nameof(Statdisplay));
         statdisplay.Render(player);
+
+        //Hält die Anzeige aktuell, wenn sich Attribute ändern, z.B. beim Verteilen von Punkten nach einem Level-up
+        player.StatsChanged += RerenderStatdisplay;
+    }
+
+    public override void _ExitTree()
+    {
+        if (player is null)
+            return;
+
+        player.StatsChanged -= RerenderStatdisplay;
+        player.LeveledUp    -= PlayerOnLeveledUp;
     }
 
     private void SubscribeEquipmentEvents()

@@ -182,7 +182,7 @@ public partial class Lootsystem : Node
 
     private ItemModifier RollAffix(AffixType affixType, BaseItem item)
     {
-        var filteredAffixes    = FilterAffixesByType(affixType, item);
+        var filteredAffixes    = FilterAffixesByType(affixType, item).Where(affix => !IsAlreadyOn(item, affixType, affix)).ToArray();
         var possibleAffixTiers = FindPossibleAffixTiers(item.ItemLevel, filteredAffixes);
         var totalWeight        = possibleAffixTiers.Sum(pat => pat.Weight) + 1;
         var luckyNumber        = GD.Randi() % totalWeight;
@@ -211,6 +211,12 @@ public partial class Lootsystem : Node
 
         return finalModifier;
     }
+
+    //Jeder Affix darf pro Item nur einmal vorkommen
+    private static bool IsAlreadyOn(BaseItem item, AffixType affixType, Affix affix)
+        => item.GetAllModifiers().Any(mod => mod.AffixType == affixType &&
+                                             mod.CombatStat == affix.AffectedCombatStat &&
+                                             mod.ModificationType == affix.ModificationType);
 
     private static AffixTier[] FindPossibleAffixTiers(int itemLevel, Affix[] filteredAffixes)
     {

@@ -37,8 +37,13 @@ public partial class Player2D : BaseUnit
     private          long            xpTotal;
     private          AnimationTree   AnimationTree { get; set; }
 
+    private double contactDamageCooldownLeftSec;
+
     [Export]
     public AudioStreamPlayer2D NoManaSound { get; set; }
+
+    [Export]
+    public float ContactDamageCooldownSec { get; set; } = 1f;
 
     public  int   ManaBase                 => 3 + AwarenessFinal + 5 * IntelligenceFinal;
     private float ManaAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Mana);
@@ -79,6 +84,9 @@ public partial class Player2D : BaseUnit
         PropertyChanged += OnPropertyChanged;
 
         base._Ready();
+
+        //Erst nach den abgeleiteten Modifiern füllen, sonst startet das Mana unter seinem Maximum
+        ManaCurrent = ManaMaximum;
 
         ConfigureSkillbar();
 
@@ -176,7 +184,7 @@ public partial class Player2D : BaseUnit
 
         ResolveManareg(delta);
         HandleMovementInputs();
-        HandleCollision();
+        HandleCollision(delta);
     }
 
     private void ResolveManareg(double delta)
@@ -196,21 +204,31 @@ public partial class Player2D : BaseUnit
         lifeOrb.SetRessource(LifeCurrent);
     }
 
-    private void HandleCollision()
+    private void HandleCollision(double delta)
     {
+        contactDamageCooldownLeftSec = Math.Max(0, contactDamageCooldownLeftSec - delta);
+
+        if (contactDamageCooldownLeftSec > 0)
+            return;
+
         for (var i = 0; i < GetSlideCollisionCount(); i++)
         {
             var collision = GetSlideCollision(i);
             var collider  = collision.GetCollider() as Node;
 
-            if (collider != null && collider.IsInGroup("monsters"))
-            {
-                var hit = new HitResult(10, HitType.Normal, LifeModificationMode.Damage, this, CombatStat.Armor);
+            if (collider == null || !collider.IsInGroup("monsters"))
+                continue;
 
-                ReceiveDamage(hit);
+            var hit = new HitResult(10, HitType.Normal, LifeModificationMode.Damage, this, CombatStat.Armor);
 
-                lifeOrb.SetRessource(LifeCurrent);
-            }
+            ReceiveDamage(hit);
+
+            lifeOrb.SetRessource(LifeCurrent);
+
+            //Höchstens ein Kontakttreffer pro Abklingzeit, egal wie viele Gegner berührt werden
+            contactDamageCooldownLeftSec = ContactDamageCooldownSec;
+
+            return;
         }
     }
 
@@ -254,6 +272,8 @@ public partial class Player2D : BaseUnit
             CombatStatModifiers.Add(newModifier);
         }
 
+        RefreshAttributeDerivedStats();
+
         EquipmentChanged?.Invoke();
     }
 
@@ -265,6 +285,7 @@ public partial class Player2D : BaseUnit
         var itemId = item.ToString();
 
         RemoveModifiers(itemId);
+        RefreshAttributeDerivedStats();
 
         EquipmentChanged?.Invoke();
     }

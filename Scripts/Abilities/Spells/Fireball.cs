@@ -12,7 +12,14 @@ namespace Hoellenspiralenspiel.Scripts.Abilities.Spells;
 public partial class Fireball : Area2D,
 								ISpell
 {
+	private const uint PlayerLayer          = 1;
+	private const uint MonsterLayer         = 2;
+	private const uint WallLayer            = 8;
+	private const uint MonsterAndWallLayers = MonsterLayer | WallLayer;
+	private const uint PlayerAndWallLayers  = PlayerLayer | WallLayer;
+
 	[Export] public AnimatedSprite2D AnimationSprite;
+	private         bool             IsShotByPlayer => skill?.Owner is Player2D;
 	private         List<BaseUnit>   forkTargets = new();
 	private         Vector2          richtung;
 	private         FireballSkill    skill;
@@ -35,6 +42,16 @@ public partial class Fireball : Area2D,
 	{
 		if (body is TileMapLayer tileMapLayer && tileMapLayer.Name == "Walls")
 			QueueFree();
+
+		else if (!IsShotByPlayer)
+		{
+			if (body is not Player2D hitPlayer)
+				return;
+
+			hitPlayer.ReceiveDamage(skill.MakeRealDamage(hitPlayer));
+
+			QueueFree();
+		}
 
 		else
 		{
@@ -80,6 +97,9 @@ public partial class Fireball : Area2D,
 	{
 		this.skill     = s as FireballSkill;
 		GlobalPosition = startGlobal;
+
+		//Die Seite des Besitzers bestimmt, wen der Feuerball treffen kann
+		CollisionMask = IsShotByPlayer ? MonsterAndWallLayers : PlayerAndWallLayers;
 
 		richtung = destinationGlobal - startGlobal;
 

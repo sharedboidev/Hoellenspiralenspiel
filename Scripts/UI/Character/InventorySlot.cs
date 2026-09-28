@@ -25,6 +25,10 @@ public partial class InventorySlot
 
     public void Reset()
     {
+        //Verlässt ein Trank den Slot, darf der Slot nicht länger auf dessen Stapel hören
+        if (ContainedInventoryItem?.ContainedItem is ConsumableItem consumable)
+            consumable.OnStacksizeReduced -= ConsumableOnStacksizeReduced;
+
         IsOccupied             = false;
         ContainedInventoryItem = null;
     }
@@ -59,6 +63,7 @@ public partial class InventorySlot
     {
         UpdateAndShowStacksize(consumable);
 
+        consumable.OnStacksizeReduced -= ConsumableOnStacksizeReduced;
         consumable.OnStacksizeReduced += ConsumableOnStacksizeReduced;
     }
 

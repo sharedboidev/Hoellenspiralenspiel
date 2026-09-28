@@ -111,6 +111,9 @@ public partial class EnemyController : Node
 
         AggroMyGroup(enemy);
         player.GainExperience(enemy.XpGranted);
+
+        //Died feuert genau einmal pro Gegner, daher entsteht der Loot hier und nicht bei jeder Lebensänderung
+        SpawnLootbags(enemy);
     }
 
     private void SpawnOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -120,8 +123,6 @@ public partial class EnemyController : Node
 
         if (enemy.IsAggressive)
             AggroMyGroup(enemy);
-        if (enemy.LifeCurrent <= 0)
-            SpawnLootbag(enemy);
     }
 
     private void AggroMyGroup(BaseEnemy hitEnemy)
@@ -134,20 +135,32 @@ public partial class EnemyController : Node
             groupMember.IsAggressive = true;
     }
 
-    private void SpawnLootbag(BaseEnemy enemy)
+    private void SpawnLootbags(BaseEnemy enemy)
     {
         var loot = Lootsystem.GenerateLoot(enemy);
 
         if (loot is null || loot.Length == 0)
             return;
 
-        InstantiateLootbag(enemy, loot[0]);
+        for (var i = 0; i < loot.Length; i++)
+            InstantiateLootbag(enemy, loot[i], GetLootbagOffset(i, loot.Length));
     }
 
-    private void InstantiateLootbag(BaseEnemy enemy, BaseItem loot)
+    //Mehrere Beutel werden im Kreis um den Gegner verteilt, damit sie sich nicht überdecken
+    private static Vector2 GetLootbagOffset(int index, int totalAmount)
+    {
+        const float spreadRadiusPx = 48f;
+
+        if (totalAmount <= 1)
+            return Vector2.Zero;
+
+        return Vector2.Right.Rotated(Mathf.Tau * index / totalAmount) * spreadRadiusPx;
+    }
+
+    private void InstantiateLootbag(BaseEnemy enemy, BaseItem loot, Vector2 offset)
     {
         var lootbagInstance = LootbagScene.Instantiate<Lootbag>();
-        lootbagInstance.GlobalPosition =  enemy.GlobalPosition;
+        lootbagInstance.GlobalPosition =  enemy.GlobalPosition + offset;
         lootbagInstance.ContainedItem  =  loot;
         lootbagInstance.LootClicked    += LootbagInstanceOnLootClicked;
 

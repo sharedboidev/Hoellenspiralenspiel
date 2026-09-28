@@ -11,6 +11,7 @@ border_width_right = 2
 border_width_bottom = 2
 
 [node name="LevelUpDialog" type="Control" unique_id=2024950051]
+z_index = 100
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
