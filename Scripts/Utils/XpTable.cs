@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Hoellenspiralenspiel.Scripts.Utils;
 
@@ -106,9 +107,10 @@ public static class XpTable
         { 98, 3638186694 },
         { 99, 3932818530 },
         { 100, 4250334444 },
-        { 101, 0 },
     };
 
+    public const int MaxLevel = 100;
+
     public static long GetTotalXpNeededForLevel(int level)
-        => ActualTable[level];
+        => ActualTable[Math.Clamp(level, 1, MaxLevel)];
 }

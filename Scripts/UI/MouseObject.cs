@@ -73,8 +73,11 @@ public partial class MouseObject : PanelContainer,
     {
         GD.Print($"{lootedItem?.Name ?? "Nothing"} looted.");
 
-        GetParent<Character.Inventory>().SetItem(lootedItem);
+        var couldLootItem = GetParent<Character.Inventory>().SetItem(lootedItem);
 
-        sender?.QueueFree();
+        if (couldLootItem)
+            sender?.QueueFree();
+        else
+            sender?.BounceAndFlip();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Controllers;
+using Hoellenspiralenspiel.Scripts.Models;
 
 namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
@@ -127,6 +128,14 @@ public abstract partial class BaseEnemy : BaseUnit
             if (e.PropertyName == nameof(MovementDirection) && MovementDirection.Length() > 0.0f)
                 SetAsOnlyVisibleSprite(RunSprite); //Hack, die Statemachine im Animationtree Startet die Animation nicht mehr
         }
+    }
+
+    public override void ReceiveDamage(HitResult hit)
+    {
+        //Auch ein ausgewichener Treffer macht den Gegner aggressiv
+        IsAggressive = true;
+
+        base.ReceiveDamage(hit);
     }
 
     protected override void DieProperly()

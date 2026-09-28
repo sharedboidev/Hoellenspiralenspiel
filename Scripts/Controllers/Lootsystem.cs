@@ -66,7 +66,9 @@ public partial class Lootsystem : Node
         {
             var newModifier = RollAffix(nextAffixToRoll, item);
 
-            item.AddModifier(newModifier);
+            //Kein passender Affix für diesen Slot vorhanden
+            if (newModifier is not null)
+                item.AddModifier(newModifier);
 
             nextAffixToRoll = nextAffixToRoll == AffixType.Prefix ? AffixType.Suffix : AffixType.Prefix;
         }

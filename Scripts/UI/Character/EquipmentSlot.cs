@@ -126,16 +126,21 @@ public partial class EquipmentSlot
                 WithdrawItem(mouseObject);
 
                 break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is null && mouseObject.HasItem && FittingItemSlot.Any(x => x == ((BaseItem)mouseObject.ContainedItem).ItemSlot):
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is null && CanEquipItemOf(mouseObject):
                 PutItemIntoSlot(mouseObject);
 
                 break;
-            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when mouseObject.HasItem && ContainedItem is not null && FittingItemSlot.Any(x => x == ((BaseItem)mouseObject.ContainedItem).ItemSlot):
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } when ContainedItem is not null && CanEquipItemOf(mouseObject):
                 SwapItems(mouseObject);
 
                 break;
         }
     }
+
+    private bool CanEquipItemOf(MouseObject mouseObject)
+        => mouseObject.ContainedItem is BaseItem item &&
+           FittingItemSlot.Any(slot => slot == item.ItemSlot) &&
+           item.CanBeEquipedBy(Player);
 
     private void SwapItems(MouseObject mouseObject)
     {

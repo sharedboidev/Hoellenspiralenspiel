@@ -49,7 +49,8 @@ public abstract partial class BaseUnit
     {
         var mainScene = GetTree().CurrentScene;
 
-        LifeCurrent -= hit.MitigatedDamage;
+        if (!hit.WasDodged)
+            LifeCurrent -= hit.MitigatedDamage;
 
         this.InstatiateFloatingCombatText(hit, mainScene, new Vector2(0, -75));
     }
@@ -110,10 +111,8 @@ public abstract partial class BaseUnit
     private void OnAttributeChanged(CombatStat attribute, int value)
     {
         var derivedStats = DerivedStatProvider.GetModifiersFor(attribute, value);
-        var modIds       = derivedStats.Select(stat => stat.OriginId).ToArray();
 
-        foreach (var modId in modIds)
-            RemoveModifiers(modId);
+        RemoveModifiers(DerivedStatProvider.GetOriginIdFor(attribute));
 
         CombatStatModifiers.AddRange(derivedStats);
 
@@ -121,10 +120,7 @@ public abstract partial class BaseUnit
     }
 
     protected void RemoveModifiers(string modId)
-    {
-        var modifierToRemove = CombatStatModifiers.Where(mod => mod.OriginId == modId).ToList();
-        CombatStatModifiers = CombatStatModifiers.Except(modifierToRemove).ToList();
-    }
+        => CombatStatModifiers.RemoveAll(mod => mod.OriginId == modId);
 
     public BaseEnemy[] FindClosestEnemyFrom(List<BaseEnemy> existingEnemies, int amountReturned = 1)
     {

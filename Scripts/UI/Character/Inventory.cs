@@ -189,7 +189,12 @@ public partial class Inventory : PanelContainer
         MouseObject.Show(retrievedItem);
     }
 
-    private void InventoryItemOnItemConsumed(InventorySlot fromrootslot) => FreeOccupation(fromrootslot);
+    private void InventoryItemOnItemConsumed(InventorySlot fromrootslot)
+    {
+        //Der Slot wird erst frei, wenn der letzte Trank des Stapels verbraucht wurde
+        if (!fromrootslot.IsOccupied)
+            FreeOccupation(fromrootslot);
+    }
 
     private void FreeOccupation(InventorySlot fromrootslot) => occupationMatrix[fromrootslot.InventoryCoordinate] = false;
 

@@ -89,7 +89,7 @@ public partial class Player2D : BaseUnit
 
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(XpTotal) && XpTotal >= XpForNextLevel)
+        if (e.PropertyName == nameof(XpTotal) && Level < XpTable.MaxLevel && XpTotal >= XpForNextLevel)
             LevelUp();
     }
 
@@ -206,13 +206,6 @@ public partial class Player2D : BaseUnit
             if (collider != null && collider.IsInGroup("monsters"))
             {
                 var hit = new HitResult(10, HitType.Normal, LifeModificationMode.Damage, this, CombatStat.Armor);
-
-                if (hit.WasDodged)
-                {
-                    this.InstatiateFloatingCombatText(hit, GetTree().CurrentScene, new Vector2(0, -75));
-
-                    continue;
-                }
 
                 ReceiveDamage(hit);
 

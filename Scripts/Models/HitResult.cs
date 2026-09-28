@@ -22,6 +22,9 @@ public record HitResult(float RawValue, HitType HitType, LifeModificationMode Li
 
     private bool ResolveDodge()
     {
+        if (LifeModificationMode != LifeModificationMode.Damage)
+            return false;
+
         GD.Randomize();
 
         if (dodgeSnapshot < 0)
