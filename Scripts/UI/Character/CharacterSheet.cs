@@ -3,6 +3,7 @@ using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.UI.Buttons;
 using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
@@ -149,7 +150,7 @@ public partial class CharacterSheet : Control
 
     public override void _Process(double delta)
     {
-        if (Input.IsActionJustPressed("B"))
+        if (Input.IsActionJustPressed(InputActions.ToggleCharacterSheet))
             ToggleVisibility();
     }
 

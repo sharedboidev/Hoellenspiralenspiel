@@ -18,8 +18,6 @@ using ResourceOrb = Hoellenspiralenspiel.Scripts.UI.Character.ResourceOrb;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
-public class FireballContainer { }
-
 public partial class Player2D : BaseUnit
 {
     public delegate void EquipmentChangedEventHandler();
@@ -164,7 +162,7 @@ public partial class Player2D : BaseUnit
         frostNovaActionBarItem.Init(skills.ElementAt(1), "res://Scenes/Spells/frost_nova.tscn", Key.E);
 
         var lightningStrikeActionBarItem = skillBarIcon.Instantiate<CooldownSkill>();
-        lightningStrikeActionBarItem.Init(skills.ElementAt(2), "res://very_cool_circle.tscn", Key.R);
+        lightningStrikeActionBarItem.Init(skills.ElementAt(2), "res://Scenes/Spells/very_cool_circle.tscn", Key.R);
 
         SkillBar.AddChild(fireballActionBarItem);
         SkillBar.AddChild(frostNovaActionBarItem);
@@ -234,7 +232,7 @@ public partial class Player2D : BaseUnit
 
     private void HandleMovementInputs()
     {
-        MovementDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+        MovementDirection = Input.GetVector(InputActions.MoveLeft, InputActions.MoveRight, InputActions.MoveUp, InputActions.MoveDown);
         Velocity          = MovementDirection * Movementspeed;
 
         if (MovementDirection != Vector2.Zero)

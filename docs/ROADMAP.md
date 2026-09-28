@@ -113,8 +113,8 @@ Hinweise zu den Korrekturen:
 | A5 | Zwei parallele Skill-Hierarchien, Skills und Manakosten fest im Code | Neue Skills brauchen Codeänderungen an mehreren Stellen |
 | A6 | UI wird per Code anhand der Fenstergröße platziert. Das Fenster ist fest 2560x1440 im exklusiven Vollbild. | Bricht bei anderen Auflösungen |
 | A7 | Lootbag-Code existiert dreimal mit unterschiedlichem Verhalten | Quelle von F9 |
-| A8 | `.idea`, `*.user` und `obj` sind eingecheckt. Shader und Testszenen liegen im Projektwurzelordner. Leere Klassen wie `SceneDispenser` und `StaticMemory` existieren. | Unübersichtlich |
-| A9 | Eingabeaktionen heißen wie Tasten (`F`, `B`, `Tab`) statt nach ihrer Funktion | Tastenbelegung lässt sich nicht sauber ändern |
+| A8 | Behoben am 28.09.2026. `.idea`, `*.user` und `obj` waren eingecheckt. Shader und Testszenen lagen im Projektwurzelordner. Leere Klassen wie `SceneDispenser` und `StaticMemory` existierten. | Unübersichtlich |
+| A9 | Behoben am 28.09.2026. Eingabeaktionen hießen wie Tasten (`F`, `B`, `Tab`) statt nach ihrer Funktion. Die Namen stehen jetzt zentral in `InputActions`. Die Skill-Tasten sind weiter fest im Code und gehören zu M3. | Tastenbelegung lässt sich nicht sauber ändern |
 | A10 | Zauber unterscheiden Freund und Feind über Typprüfungen auf `Player2D` und `BaseEnemy`, die Gruppe `monsters`, feste Kollisionsebenen und den `EnemyController` | Ein Zauber verhält sich nicht gleich für jeden, der ihn wirkt. Begleiter und Koop-Spieler sind nicht abgedeckt. |
 
 Hinweis zu A10: Fireball, Frost Nova und Lightning Strike sind Testzauber und werden in M3 neu gebaut. Sie werden bis dahin nicht umgebaut. Der Feuerball kennt seit F6 zwei Seiten, entscheidet aber weiter über den Typ des Besitzers.
@@ -134,9 +134,15 @@ Größen: S bedeutet wenige Abende, M ein bis zwei Wochen Hobbyzeit, L mehrere W
 Ziel: stabile Basis, bevor umgebaut wird.
 
 - Erledigt am 28.09.2026: alle bekannten Fehler F1 bis F22.
-- Offen: `.gitignore` erweitern, eingecheckte IDE- und Build-Dateien entfernen, Wurzelordner aufräumen, tote Klassen löschen.
-- Offen: Eingabeaktionen nach Funktion benennen.
+- Erledigt am 28.09.2026: `.gitignore` erweitert, eingecheckte IDE- und Build-Dateien aus dem Repo entfernt, Wurzelordner aufgeräumt, tote Klassen gelöscht.
+- Erledigt am 28.09.2026: Eingabeaktionen nach Funktion benannt, ungenutzte Aktionen `F` und `+` entfernt.
 - Offen: Branch `master_MeleeCombat` nach `master` zusammenführen.
+
+Bewusst nicht angefasst:
+
+- `Scripts/Skills` ist der begonnene Umbau der Skills und bleibt für M3.
+- `Player.cs` und `test_plane_3d.tscn` sind der 3D-Prototyp und bleiben bis zur Entscheidung 2D oder 3D.
+- `Scenes/Spells/thunder_shader.tres` wird von keiner Szene benutzt. Dasselbe gilt für ungenutzten Code im `EnemyController` rund um den Spawn-Timer.
 
 Fertig, wenn das Testlevel ohne die genannten Fehler läuft und der Wurzelordner nur noch Projektdateien enthält.
 
@@ -240,7 +246,7 @@ Ziel: die Spielstruktur steht.
 - Mehrere Ebenen pro Kreis, Treppen, Checkpoints, Town-Portal.
 - Hub-Funktionen: Truhe und Händler. Dafür braucht es eine Währung.
 - Freischaltung des nächsten Kreises nach dem Boss.
-- Einstellungen für Auflösung, Tasten, Lautstärke. UI über Anker statt Code. Behebt A6, A9.
+- Einstellungen für Auflösung, Tasten, Lautstärke. UI über Anker statt Code. Behebt A6.
 
 Fertig, wenn man vom Hauptmenü in den Hub, in einen Kreis, zurück und wieder hinein kommt.
 

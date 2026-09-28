@@ -1,4 +1,5 @@
 using Godot;
+using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
@@ -27,7 +28,7 @@ public partial class Player : CharacterBody3D
 
     private void HandleMovementInputs()
     {
-        var kek = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+        var kek = Input.GetVector(InputActions.MoveLeft, InputActions.MoveRight, InputActions.MoveUp, InputActions.MoveDown);
 
         MovementDirection = new Vector3(kek.X, 0, kek.Y);
 

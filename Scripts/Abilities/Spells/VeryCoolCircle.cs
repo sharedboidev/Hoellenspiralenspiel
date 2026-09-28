@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
+using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.Abilities.Spells;
 
@@ -34,7 +35,7 @@ public partial class VeryCoolCircle
         if (!isPositionFixed)
             GlobalPosition = GetViewport().GetCamera2D().GetGlobalMousePosition();
 
-        if (!Input.IsActionJustPressed("mouse_left") || executed)
+        if (!Input.IsActionJustPressed(InputActions.PrimaryAction) || executed)
             return;
 
         BeFixed();

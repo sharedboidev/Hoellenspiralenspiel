@@ -14,3 +14,14 @@ export_credentials.cfg
 .mono/
 data_*/
 mono_crash.*.json
+
+# .NET build output
+bin/
+obj/
+
+# IDE settings (Rider, Visual Studio, VS Code)
+.idea/
+.vs/
+.vscode/
+*.user
+*.DotSettings.user

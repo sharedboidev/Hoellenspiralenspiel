@@ -1,5 +1,6 @@
 using Godot;
 using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
@@ -21,7 +22,7 @@ public partial class OverlayMapViewport : SubViewport
     {
         Camera.Position = Player.Position;
 
-        if (Input.IsActionJustPressed("Tab"))
+        if (Input.IsActionJustPressed(InputActions.ToggleOverlayMap))
         {
             var parent = GetParent<SubViewportContainer>();
             parent.Visible = !parent.Visible;
