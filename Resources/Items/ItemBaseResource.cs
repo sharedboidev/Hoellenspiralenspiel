@@ -8,8 +8,6 @@ namespace Hoellenspiralenspiel.Resources.Items;
 [GlobalClass]
 public abstract partial class ItemBaseResource : Resource
 {
-    private ItemDefinition definition;
-
     [Export]
     public string Id { get; set; } = string.Empty;
 
@@ -26,7 +24,7 @@ public abstract partial class ItemBaseResource : Resource
     public Dictionary<Requirement, int> Requirements { get; set; } = new();
 
     //Die Definition entsteht beim ersten Zugriff. Wer danach Werte der Resource ändert, sieht davon nichts
-    public ItemDefinition Definition => definition ??= CreateBaseDefinition() with
+    public ItemDefinition Definition => field ??= CreateBaseDefinition() with
     {
         Width = Math.Max(1, SlotSize.X),
         Height = Math.Max(1, SlotSize.Y),
