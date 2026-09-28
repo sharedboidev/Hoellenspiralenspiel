@@ -5,9 +5,11 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Godot;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
+using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Core.Stats;
 using Hoellenspiralenspiel.Scripts.Extensions;
-using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
@@ -20,21 +22,33 @@ public abstract partial class BaseUnit
 
     public delegate void StatsChangedEventHandler();
 
-    protected Sprite2D AttackSprite;
-    protected Sprite2D DeathSprite;
-    protected Sprite2D IdleSprite;
-    private   Vector2  movementDirection = Vector2.Zero;
-    protected Sprite2D RunSprite;
+    private const float MinPickRadiusPx      = 40f;
+    private const float PickRadiusPerScalePx = 22f;
+
+    private readonly List<StatusTick> statusTicks = new();
+    protected        Sprite2D         AttackSprite;
+    private          CollisionShape2D bodyShape;
+    protected        Sprite2D         DeathSprite;
+    protected        Sprite2D         IdleSprite;
+    private          Vector2          movementDirection = Vector2.Zero;
+    protected        Sprite2D         RunSprite;
 
     protected BaseUnit()
     {
         PushBaseValuesToStats();
 
-        Stats.Changed += OnStatsChanged;
+        StatusEffects = new StatusEffectTracker(Stats);
+
+        Stats.Changed         += OnStatsChanged;
+        StatusEffects.Started += OnStatusEffectStarted;
     }
 
     //Alle Stats der Einheit. Gerechnet wird im Kern, diese Klasse hält nur die Grundwerte für den Inspector
     public StatSheet Stats { get; } = new();
+
+    public StatusEffectTracker StatusEffects { get; }
+
+    public abstract Faction Faction { get; }
 
     [Export]
     public Vector2 MovementDirection
@@ -43,7 +57,20 @@ public abstract partial class BaseUnit
         set => SetField(ref movementDirection, value);
     }
 
-    public bool                              IsDead => LifeCurrent <= 0;
+    public bool IsDead => LifeCurrent <= 0;
+
+    //Tote und sterbende Einheiten können weder angeklickt noch getroffen werden
+    public virtual bool IsTargetable => !IsDead;
+
+    //Die Mitte des Körpers. Abstände im Kampf werden zwischen diesen Punkten gemessen
+    public Vector2 BodyCenter => bodyShape?.GlobalPosition ?? GlobalPosition;
+
+    //Radius um die Körpermitte, in dem ein Mausklick die Einheit trifft
+    public float PickRadius => Math.Max(MinPickRadiusPx, PickRadiusPerScalePx * Scale.X);
+
+    //Versatz von der Position der Einheit, an dem Schadenszahlen erscheinen
+    public virtual Vector2 CombatTextOffset => new(0, -75);
+
     public event PropertyChangedEventHandler PropertyChanged;
     public event DiedEventHandler            Died;
 
@@ -51,20 +78,70 @@ public abstract partial class BaseUnit
     public event StatsChangedEventHandler StatsChanged;
 
     public override void _PhysicsProcess(double delta)
-        => ResolveLifeReg(delta);
+    {
+        ResolveLifeReg(delta);
+        AdvanceStatusEffects(delta);
+    }
 
+    public bool IsHostileTo(BaseUnit other)
+        => other is not null && other.Faction != Faction;
+
+    public float DistanceTo(BaseUnit other)
+        => BodyCenter.DistanceTo(other.BodyCenter);
+
+    //Wendet einen gewürfelten Treffer an: Leben abziehen, Statuseffekt auflegen, Ergebnis anzeigen
     public virtual void ReceiveDamage(HitResult hit)
     {
-        var mainScene = GetTree().CurrentScene;
+        if (!IsTargetable)
+            return;
 
-        if (!hit.WasDodged)
-            LifeCurrent -= hit.MitigatedDamage;
+        if (hit.HasLanded)
+        {
+            LifeCurrent -= hit.FinalDamage;
 
-        this.InstatiateFloatingCombatText(hit, mainScene, new Vector2(0, -75));
+            if (hit.InflictedEffect is not null && !IsDead)
+                StatusEffects.Apply(hit.InflictedEffect);
+        }
+
+        this.ShowHit(hit);
+    }
+
+    //Würfelt, ob die nächste Aktion der Einheit fehlschlägt, z.B. unter Shock
+    public bool RollActionFailure()
+    {
+        var chance = StatusEffects.ActionFailureChance;
+
+        return chance > 0 && GameRandom.Shared.NextFloat() < chance;
+    }
+
+    //Die feindliche Einheit, deren Klickfläche den Punkt enthält. Bei mehreren gewinnt die nächste
+    public BaseUnit FindHostileUnitAt(Vector2 globalPoint)
+    {
+        BaseUnit nearestUnit     = null;
+        var      nearestDistance = float.MaxValue;
+
+        foreach (var unit in UnitRegistry.Units)
+        {
+            if (!IsHostileTo(unit) || !unit.IsTargetable)
+                continue;
+
+            var distance = unit.BodyCenter.DistanceTo(globalPoint);
+
+            if (distance > unit.PickRadius || distance >= nearestDistance)
+                continue;
+
+            nearestUnit     = unit;
+            nearestDistance = distance;
+        }
+
+        return nearestUnit;
     }
 
     protected virtual void ResolveLifeReg(double delta)
     {
+        if (IsDead)
+            return;
+
         if (LiferegenerationFinal > 0 && LifeCurrent < LifeMaximum)
         {
             LifeCurrent += LiferegenerationFinal * (float)delta;
@@ -72,12 +149,55 @@ public abstract partial class BaseUnit
         }
     }
 
+    private void AdvanceStatusEffects(double delta)
+    {
+        if (!StatusEffects.HasAny)
+            return;
+
+        if (IsDead)
+        {
+            StatusEffects.Clear();
+
+            return;
+        }
+
+        statusTicks.Clear();
+        StatusEffects.Advance(delta, statusTicks);
+
+        foreach (var tick in statusTicks)
+        {
+            if (IsDead)
+                break;
+
+            LifeCurrent -= tick.Damage;
+
+            this.ShowStatusTick(tick);
+        }
+    }
+
+    private void OnStatusEffectStarted(StatusEffectKind kind)
+    {
+        if (IsInsideTree())
+            this.ShowStatusStarted(kind);
+    }
+
+    public override void _EnterTree()
+        => UnitRegistry.Register(this);
+
+    public override void _ExitTree()
+        => UnitRegistry.Unregister(this);
+
     public override void _Ready()
     {
         LoadSpriteNodes();
 
+        bodyShape = GetNodeOrNull<CollisionShape2D>(nameof(CollisionShape2D));
+
         LifeCurrent = LifeMaximum;
     }
+
+    //Hebt die Einheit hervor, solange der Mauszeiger auf ihr liegt
+    public virtual void SetHighlight(bool active) { }
 
     protected void LoadSpriteNodes()
     {
@@ -184,6 +304,9 @@ public abstract partial class BaseUnit
             sheet.SetBase(CombatStat.FrostResistance, frostResiBase);
             sheet.SetBase(CombatStat.LightningResistance, lightningResiBase);
             sheet.SetBase(CombatStat.Movementspeed, movementspeed);
+            sheet.SetBase(CombatStat.HitChance, CombatRules.BaseHitChance);
+            sheet.SetBase(CombatStat.CriticalDamage, CombatRules.BaseCriticalDamage);
+            sheet.SetBase(CombatStat.BlockReduction, CombatRules.BaseBlockReduction);
         });
 
     #region Attributes
@@ -242,8 +365,9 @@ public abstract partial class BaseUnit
     private int attackspeedBase;
     private int spellDamageBase;
 
-    public int AttackspeedFinal => Stats.GetFinalWhole(CombatStat.Attackspeed);
-    public int SpellDamageFinal => Stats.GetFinalWhole(CombatStat.SpellDamage);
+    //Angriffe pro Sekunde. Beim Spieler kommt der Grundwert von der Waffe
+    public float AttacksPerSecondFinal => Stats.GetFinal(CombatStat.Attackspeed);
+    public int   SpellDamageFinal      => Stats.GetFinalWhole(CombatStat.SpellDamage);
 
     [Export]
     public int AttackspeedBase
@@ -288,11 +412,12 @@ public abstract partial class BaseUnit
         set => SetBaseStat(ref lifeBaseBonus, value, CombatStat.Life);
     }
 
+    //Das Leben bleibt zwischen 0 und dem Maximum
     [Export]
     public float LifeCurrent
     {
         get => lifeCurrent;
-        set => SetField(ref lifeCurrent, Math.Min(value, LifeMaximum));
+        set => SetField(ref lifeCurrent, Math.Max(0, Math.Min(value, LifeMaximum)));
     }
 
     [Export]

@@ -48,5 +48,11 @@ public enum CombatStat
     //Neue Werte nur hier am Ende anhängen: Affixe speichern den Stat als Zahl
     [Description("Light Radius")]
     LightRadius,
-    Movementspeed
+    Movementspeed,
+    [Description("Hit Chance")]
+    HitChance,
+
+    //Anteil des Schadens in Prozent, den ein Block abfängt
+    [Description("Blocked Damage")]
+    BlockReduction
 }

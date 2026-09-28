@@ -1,6 +1,6 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
-Stand: 28.09.2026. M0 liegt auf `master`, M1 auf dem Branch `master_StatCore`.
+Stand: 28.09.2026. M0 bis M2 liegen auf `master`.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code (rund 5.500 Zeilen) plus Szenen.
 Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler und F19 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
@@ -22,7 +22,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler und F19
 | Attribute | Alle fünf Attribute mit abgeleiteten Werten und Obergrenzen | Obergrenzen stimmen exakt. Wachstum ist logistisch statt beschränkt. Lichtradius fehlt. |
 | Leben und Mana | Basisformeln, Regeneration, Orbs mit Shader | Formeln stimmen exakt |
 | Modifier-System | Flat, Percentage (increased) und More, sauber getrennt | Trägt das ganze Stat-Konzept |
-| Waffen | Schadensspanne, Angriffe pro Sekunde, Swingtimer, Typ, Schadensart, Krit, Anforderungen | Werte vorhanden, werden aber im Kampf nicht benutzt. Klassen-Anforderung fehlt. |
+| Waffen | Schadensspanne, Angriffe pro Sekunde, Swingtimer, Typ, Schadensart, Krit, Anforderungen | Seit M2 bestimmen die Werte den Nahkampf. Klassen-Anforderung fehlt. |
 | Rüstung | Helm, Torso, Handschuhe mit Rüstungswert | 3 von 16 Slots haben Item-Basen |
 | Affixe | 16 Affixe mit Tiers, Gewichten, Itemlevel-Grenze, Prefix/Suffix, lokale und globale Mods | Slot-Tabelle aus dem PDF nur teilweise abgedeckt |
 | Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen | Funktioniert im Testlevel |
@@ -30,8 +30,9 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler und F19
 | Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF |
 | Leveling | XP-Tabelle bis Level 100, Level-up-Effekt, Attributspunkte, XP-Balken | Nicht im PDF, funktioniert |
 | Zauber | Fireball mit Fork, Frost Nova, Lightning Strike, Skillbar mit Cooldowns | Elementarschaden wird über Resistenzen gemindert |
-| Schadensminderung | Rüstungsformel, Resistenzen und Dodge für alle Einheiten | Parry und Block fehlen |
-| Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Rare/Elite, Lebensbalken, Schadenszahlen | Nur Blobs und ein Testgegner |
+| Kampf | Zentrale Trefferauflösung, Nahkampf, Schadensarten mit Effekten, Statuseffekte, Tod und Respawn | Seit M2. Frost-Effekt war im PDF leer und ist jetzt Verlangsamung. |
+| Schadensminderung | Rüstungsformel, Resistenzen, Dodge, Parry und Block für alle Einheiten | Parry und Block haben noch keine Quelle, weil Schilde fehlen |
+| Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Rare/Elite, Lebensbalken, Schadenszahlen, eigene Angriffe | Nur Blobs und ein Testgegner |
 | Atmosphäre | Punktlichter mit Schatten, abgedunkelte Szene, Overlay-Karte | Passt zum düsteren Vibe |
 | 3D | Ein Prototyp, der nur Bewegung kann | Offene Frage aus dem PDF |
 
@@ -39,15 +40,15 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler und F19
 
 Ohne diese Systeme gibt es kein spielbares Spiel, nur eine Testszene.
 
-1. **Spielertod.** Das Leben kann unter null fallen, ohne dass etwas passiert. Es gibt kein Game Over und keinen Respawn.
-2. **Nahkampf.** Der Spieler hat keinen Angriff. Waffenwerte existieren nur im Tooltip.
-3. **Gegnerangriffe.** Die Blobs haben keinen eigenen Angriff und schaden nur durch Berührung. Nur der Testgegner greift an, mit Feuerbällen.
+1. **Spielertod.** Erledigt in M2. Vorher konnte das Leben unter null fallen, ohne dass etwas passierte.
+2. **Nahkampf.** Erledigt in M2. Vorher existierten Waffenwerte nur im Tooltip.
+3. **Gegnerangriffe.** Erledigt in M2. Vorher schadeten die Blobs nur durch Berührung.
 4. **Speichern und Laden.** Es gibt keine Persistenz für Charakter, Inventar oder Fortschritt.
 5. **Spielstruktur.** Hub, Levelwechsel, Hauptmenü, Pausenmenü und Freischaltung fehlen. Die Kellertür schreibt nur eine Logzeile.
 6. **Levelgenerierung.** Es gibt nur ein handgebautes Testlevel.
 7. **Wegfindung.** Gegner laufen in gerader Linie und bleiben an Wänden hängen.
-8. **Statuseffekte.** Bleed, stapelnder Feuer-DoT, Action-Failure und Frost-Effekt aus dem PDF fehlen. Die Schadensart-Klassen sind leere Hüllen.
-9. **Parry, Block, Krit aus Stats.** Die Werte werden berechnet, aber nirgends im Kampf ausgewertet.
+8. **Statuseffekte.** Erledigt in M2: Bleed, stapelnder Burn, Shock und Chill. Die leeren Schadensart-Klassen sind durch eine Aufzählung im Kern ersetzt.
+9. **Parry, Block, Krit aus Stats.** Erledigt in M2. Die Trefferauflösung wertet alle drei aus.
 10. **Skill-Erwerb.** Die drei Zauber sind fest im Spieler verdrahtet. Klassen und Skill-Fortschritt fehlen.
 11. **Skalierung.** Itemlevel ist immer 1. Monsterlevel und Bereichslevel existieren nicht.
 12. **Inhalt.** Kein einziger Höllenkreis, kein Boss, kein Intro.
@@ -87,7 +88,8 @@ Status vom 28.09.2026. Die Zeilennummern beziehen sich auf den Stand vor den Kor
 
 Hinweise zu den Korrekturen:
 
-- F2, F5 und F6 sind pragmatisch behoben. M1 und M2 ersetzen diese Lösungen später durch den Stat-Kern und die Kampf-Pipeline.
+- F2 war pragmatisch behoben und ist seit M1 durch den Stat-Kern ersetzt.
+- F4, F5 und F6 waren pragmatisch behoben und sind seit M2 durch die Kampf-Pipeline ersetzt. Der Kontaktschaden aus F5 ist entfallen, Gegner greifen jetzt selbst an.
 - F17 führt den exportierten Wert `LifeBaseBonus` ein. Er wird auf das Basisleben aus den Attributen addiert.
 - F18 ändert die Einheit von `DriftVelocity` auf Pixel pro Sekunde.
 
@@ -101,7 +103,8 @@ Hinweise zu den Korrekturen:
 | P4 | Ein Feuerball kann sich auf bis zu 63 Projektile aufspalten. Jeder Treffer sortiert alle Gegner der Karte nach Entfernung. | [Fireball.cs:55](../Scripts/Abilities/Spells/Fireball.cs) |
 | P5 | Das Inventar nutzt Godot-Dictionaries mit Float-Vektoren als Schlüssel. Jeder Zugriff wird zwischen C# und Engine konvertiert. | [Inventory.cs:17](../Scripts/UI/Character/Inventory.cs) |
 | P6 | Knoten werden in Property-Gettern bei jedem Zugriff neu gesucht | [Inventory.cs:21](../Scripts/UI/Character/Inventory.cs), [EquipmentPanel.cs:26](../Scripts/UI/Character/EquipmentPanel.cs) |
-| P7 | Der Zufallsgenerator wird bei jedem Dodge-Wurf neu initialisiert. Viele getrennte Zufallsquellen verhindern später Seeds und Koop. | [HitResult.cs:25](../Scripts/Models/HitResult.cs) |
+| P7 | Für den Kampf behoben in M2: Alle Würfe laufen über eine Zufallsquelle mit Seed. Offen bleiben die eigenen Zufallsquellen von Loot (M4) und Spawns (M5). | [GameRandom.cs](../Scripts/Core/Rng/GameRandom.cs), [Lootsystem.cs](../Scripts/Controllers/Lootsystem.cs), [EnemyController.cs](../Scripts/Controllers/EnemyController.cs) |
+| P8 | Neu seit M2: Jede Schadenszahl ist ein eigener Knoten. Brennen viele Gegner gleichzeitig, entstehen pro Sekunde zwei Zahlen je Gegner. Bisher ohne messbare Folgen, Pooling steht in M9. | [FCTExtensions.cs](../Scripts/Extensions/FCTExtensions.cs) |
 
 ### 3.3 Architektur
 
@@ -118,7 +121,19 @@ Hinweise zu den Korrekturen:
 | A9 | Behoben am 28.09.2026. Eingabeaktionen hießen wie Tasten (`F`, `B`, `Tab`) statt nach ihrer Funktion. Die Namen stehen jetzt zentral in `InputActions`. Die Skill-Tasten sind weiter fest im Code und gehören zu M3. | Tastenbelegung lässt sich nicht sauber ändern |
 | A10 | Zauber unterscheiden Freund und Feind über Typprüfungen auf `Player2D` und `BaseEnemy`, die Gruppe `monsters`, feste Kollisionsebenen und den `EnemyController` | Ein Zauber verhält sich nicht gleich für jeden, der ihn wirkt. Begleiter und Koop-Spieler sind nicht abgedeckt. |
 
-Hinweis zu A10: Fireball, Frost Nova und Lightning Strike sind Testzauber und werden in M3 neu gebaut. Sie werden bis dahin nicht umgebaut. Der Feuerball kennt seit F6 zwei Seiten, entscheidet aber weiter über den Typ des Besitzers.
+Hinweis zu A10: Fireball, Frost Nova und Lightning Strike sind Testzauber und werden in M3 neu gebaut. Sie werden bis dahin nicht umgebaut. Der Feuerball kennt seit F6 zwei Seiten, entscheidet aber weiter über den Typ des Besitzers. Seit M2 würfeln die Testzauber ihren Schaden über die zentrale Trefferauflösung, ihr Aufbau ist unverändert.
+
+Vorarbeit für A10 aus M2: Jede Einheit hat eine Fraktion, und `UnitRegistry` kennt alle Einheiten im Szenenbaum. Der Nahkampf sucht seine Ziele bereits darüber.
+
+### 3.4 Balance
+
+Beobachtungen aus der Laufzeitprüfung von M2. Der Balance-Durchgang steht in M8.
+
+| Nr. | Beobachtung | Stelle |
+|---|---|---|
+| B1 | Rare und Elite bekommen 25 Stärke und regenerieren dadurch 5 Leben pro Sekunde. Ein unbewaffneter Spieler macht weniger Schaden und kann sie nicht töten. | [EnemyExtensions.cs](../Scripts/Extensions/EnemyExtensions.cs), [StatFormulas.cs](../Scripts/Core/Stats/StatFormulas.cs) |
+| B2 | Der Spieler startet mit 9 Leben. Im Testlevel hat er 50 Bonusleben bekommen, damit ein Kampf länger als zwei Treffer dauert. | [test_plane.tscn](../Scenes/test_plane.tscn) |
+| B3 | Jeder Treffer mit Fire, Frost, Lightning oder Slash löst seinen Effekt sicher aus. Eine Chance statt Gewissheit wäre eine Stellschraube. | [StatusEffectRules.cs](../Scripts/Core/Combat/StatusEffects/StatusEffectRules.cs) |
 
 ## 4. Meilensteinplan
 
@@ -161,7 +176,7 @@ Ziel: ein Stat-System, das schnell, testbar und unabhängig von 2D oder 3D ist.
 
 Fertig, wenn alle Werte im Charakterbogen aus dem neuen Kern kommen und die Tests grün sind.
 
-Stand des Fertig-Kriteriums: Die Tests sind grün. Drei Werte im Charakterbogen kommen noch aus der Ausrüstung statt aus dem Kern: Krit-Chance, Krit-Schaden und Angriffstempo. Sie hängen an der Waffe und werden erst mit dem Nahkampf in M2 sauber definiert.
+Stand des Fertig-Kriteriums: Die Tests sind grün. Krit-Chance, Krit-Schaden und Angriffstempo kamen nach M1 noch aus der Ausrüstung. Seit M2 kommen auch sie aus dem Kern, das Kriterium ist damit erfüllt.
 
 So funktioniert der Kern:
 
@@ -186,26 +201,82 @@ dotnet test Hoellenspiralenspiel.Tests
 
 Das Testprojekt bindet `Scripts/Core` als Quelltext ein. Hängt eine Datei dort von Godot ab, schlägt der Test-Build fehl.
 
-### M2: Kampf-Pipeline, Tod und Nahkampf (M)
+### M2: Kampf-Pipeline, Tod und Nahkampf (M, umgesetzt am 28.09.2026 auf `master_CombatPipeline`)
 
 Ziel: eine vollständige Kampfschleife. Das ist der erste Meilenstein, der sich wie ein Spiel anfühlt.
 
-- Eine zentrale Trefferauflösung: Ausweichen, Parry, Block, Krit, Minderung, Anwenden. Einmal würfeln, Ergebnis unveränderlich. Behebt F4, F5, P7.
-- Nahkampfangriff des Spielers mit Waffenwerten: Swingtimer, Schadensspanne, Krit-Chance.
-- Gegnerangriffe mit Windup und Recovery. Gegnerprojektile treffen den Spieler. Behebt F6.
-- Spielertod mit XP-Verlust und Respawn.
-- Schadensarten aus dem PDF: Crush, Pierce, Slash mit ihren Effekten.
-- Statuseffekt-System: Bleed, stapelnder Feuer-DoT, Action-Failure, Frost-Verlangsamung.
+- Erledigt: Eine zentrale Trefferauflösung: Treffen, Ausweichen, Parry, Block, Krit, Minderung. Einmal würfeln, Ergebnis unveränderlich. Behebt F4, F5 und den Kampf-Anteil von P7.
+- Erledigt: Nahkampfangriff des Spielers mit Waffenwerten: Swingtimer, Schadensspanne, Krit-Chance.
+- Erledigt: Gegnerangriffe mit Windup und Recovery. Gegnerprojektile treffen den Spieler. Behebt F6.
+- Erledigt: Spielertod mit XP-Verlust und Respawn.
+- Erledigt: Schadensarten aus dem PDF mit ihren Effekten, physisch und elementar.
+- Erledigt: Statuseffekt-System mit Bleed, stapelndem Burn, Shock und Chill.
+- Zusätzlich: Krit-Chance, Krit-Schaden und Angriffstempo im Charakterbogen kommen aus dem Kern.
+- Zusätzlich: Fraktionen und `UnitRegistry` als Vorarbeit für A10.
 
 Fertig, wenn Spieler und Gegner sich gegenseitig töten können und jede Schadensart ihren Effekt auslöst.
 
-Offene Designfrage: Der Frost-Effekt ist im PDF leer. Vorschlag ist Verlangsamung von Bewegung und Angriff.
+Stand des Fertig-Kriteriums: erfüllt. 89 neue Unit-Tests decken den Kern ab. Eine Laufzeitprüfung mit 72 Schritten im Testlevel lief fünfmal hintereinander fehlerfrei, zusätzlich gab es eine Sichtprüfung mit Bildschirmfotos. Crush, Slash, Fire, Frost und Lightning sind im Testlevel erreichbar. Pierce hat noch keine Waffe und keinen Gegner und wurde mit einem umgestellten Gegner geprüft.
+
+Getroffene Designentscheidungen vom 28.09.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| Frost-Effekt | Chill: Bewegung und Angriffe 30 % langsamer für 3 Sekunden, jeder Frosttreffer erneuert die Dauer |
+| Parry und Block | Parry wehrt den Treffer ganz ab. Block fängt einen Anteil ab, Standard 50 %. Der Anteil ist der Stat `BlockReduction` und durch Items und Skills veränderbar. |
+| Skills | Trennung in ATTACK und SPELL. Attacks sind Nah- und Fernkampfskills mit Waffen und skalieren mit dem Waffenschaden. Spells haben eigenen Grundschaden, den Affixe und Skills verändern. |
+| Standardangriff | Eine ATTACK mit 100 % Waffenschaden. Vorerst fest auf der linken Maustaste. |
+| Auslösen des Angriffs | Nur bei Klick auf einen Gegner. Außer Reichweite läuft der Held zuerst hin. WASD oder ein Klick auf einen anderen Gegner übersteuert das. |
+| Tod | Verlust von 10 % der XP-Spanne des aktuellen Levels, kein Levelverlust. Respawn am Startpunkt mit vollem Leben und Mana. Gegner bleiben, wie sie sind. |
+
+So funktioniert die Pipeline:
+
+- `HitRequests` baut aus den Stats des Angreifers einen `HitRequest`. `ForAttack` nimmt Waffe und Attack, `ForSpell` nimmt den Zauber.
+- `HitResolver.Resolve` würfelt sechs Werte vorab und in fester Reihenfolge: Treffen, Ausweichen, Parry, Block, Krit, Schaden. Jeder Treffer verbraucht dadurch gleich viele Würfe, und derselbe Seed ergibt denselben Kampf.
+- Das Ergebnis ist ein unveränderliches `HitResult`. Es enthält auch den Statuseffekt, den der Treffer auslöst.
+- `BaseUnit.ReceiveDamage` wendet das Ergebnis an: Leben abziehen, Effekt auflegen, Zahl anzeigen.
+- `StatusEffectTracker` lässt die Effekte ablaufen. Chill legt seine Modifier selbst auf das Stat-Blatt und nimmt sie wieder herunter.
+- `AttackCycle` ist der Takt aus Ausholen, Treffer und Erholen. Spieler und Gegner benutzen denselben.
+- Die Waffe legt Angriffstempo und Krit-Chance als Grundwerte ins Stat-Blatt. Ohne Waffe gilt `WeaponProfile.Unarmed`.
+- Abstände im Kampf werden zwischen den Körpermitten gemessen, also zwischen den Kollisionsformen.
+
+Stellschrauben, alle in [CombatRules.cs](../Scripts/Core/Combat/CombatRules.cs):
+
+| Wert | Standard |
+|---|---|
+| Crush, mehr Schaden | 20 % |
+| Pierce, weniger Trefferchance | 50 % |
+| Bleed | 50 % des ungeminderten Treffers über 4 s, nur der stärkste wirkt |
+| Burn | 25 % des erlittenen Schadens über 4 s, höchstens 10 Stapel |
+| Shock | 25 % Fehlschlag für 4 s |
+| Chill | 30 % langsamer für 3 s |
+| Krit-Schaden | +50 % |
+| Trefferchance | 100 % |
+| Abgefangener Anteil beim Block | 50 % |
+| Takt der Schadenszahlen | 0,5 s |
+| Unbewaffnet | 1 bis 3 Crush, 1,2 Angriffe pro Sekunde, 5 % Krit, Reichweite 100 |
+| XP-Verlust beim Tod | 10 %, in [DeathPenalty.cs](../Scripts/Core/Progression/DeathPenalty.cs) |
+
+Bewusst offen gelassen:
+
+- Parry und Block haben die Grundchance 0. Eine Quelle kommt erst mit Schilden und passenden Waffen in M4 und M8.
+- Parry und Block unterscheiden nur ATTACK und SPELL. Fernkampf-Attacks benutzen die Werte des Nahkampfs.
+- Der Held läuft in gerader Linie zum Ziel. Bleibt er hängen, gibt er das Ziel nach 0,4 Sekunden auf. Wegfindung kommt in M5.
+- Die Angriffsanimation des Spielers benutzt das vorhandene graue Platzhalter-Sprite und spielt für alle Waffen die Einhand-Animation.
+- Ein fehlgeschlagener Zauber wird im Skillbar-Button behandelt. Das gehört zu A3 und wandert in M3 in die Skill-Logik.
+- Gegner finden den Spieler weiter über den festen Namen in der Szene. Das gehört zu A1.
 
 ### M3: Skills als Daten (M)
 
 Ziel: neue Skills ohne Codeänderung am Spieler.
 
 - Skill-Definition als Resource: Kosten, Cooldown, Schaden, Schadensart, Szene, Icon.
+- Zwei Arten von Skills, entschieden am 28.09.2026:
+  - ATTACK: Nah- und Fernkampfskills mit Waffen. Schaden ist ein Prozentsatz des Waffenschadens. Beispiel: "Lightning Strike" verursacht 180 % Waffenschaden als Blitzschaden und schießt ein Projektil nach vorne.
+  - SPELL: eigener Grundschaden, den Affixe auf Items und Skills verändern. Skaliert nicht mit der Waffe.
+  - Der Kern kennt beide seit M2 als `AttackDefinition` und `SpellDefinition`. M3 macht daraus Resources.
+- Der Standardangriff ist eine ATTACK wie jede andere und lässt sich auf verschiedene Tasten legen. Die feste Bindung an die linke Maustaste aus M2 entfällt.
+- Fernkampf-Attacks mit Projektilen, damit Bögen und Pierce spielbar werden.
 - Eine Skill-Hierarchie statt zwei. Zauberlogik raus aus dem Skillbar-Button. Behebt A3, A5.
 - Skillbar frei belegbar.
 - Die drei Testzauber werden neu gebaut, nicht umgebaut. Behebt P4.
@@ -230,6 +301,8 @@ Ziel: Charakter und Fortschritt überleben einen Neustart.
 - Aufgehobene Tränke landen automatisch auf vorhandenen Stapeln.
 - Eine einzige Lootbag-Logik. Alle gewürfelten Items fallen. Behebt F7, F9, A7.
 - Keine doppelten Affixe, verschachtelte Loot-Tabellen. Behebt F13, F14.
+- Schilde und Waffen als Quelle für Parry und Block. Affix für den abgefangenen Anteil beim Block (`BlockReduction`).
+- Loot würfelt über die gemeinsame Zufallsquelle mit Seed. Behebt den Loot-Anteil von P7.
 - Speichern und Laden von Charakter, Inventar, Ausrüstung und Fortschritt.
 
 Fertig, wenn ein Charakter mit Ausrüstung nach Neustart identisch geladen wird.
@@ -240,7 +313,8 @@ Ziel: Gegner, die sich durch Level bewegen und mit der Tiefe stärker werden.
 
 - Gegner-Definition als Resource: Attribute, Level, Loot-Tabelle, XP, Angriffe. Behebt F17.
 - Zustandsmaschine: Idle, Verfolgen, Windup, Angriff, Recovery, Tod. Todesanimation läuft zu Ende. Behebt F15.
-- Wegfindung auf einem logischen Gitter, das für 2D und 3D gleich funktioniert.
+- Wegfindung auf einem logischen Gitter, das für 2D und 3D gleich funktioniert. Auch der Held benutzt sie, wenn er zu einem angeklickten Gegner läuft.
+- Spawns und Rare/Elite würfeln über die gemeinsame Zufallsquelle mit Seed. Behebt den Spawn-Anteil von P7.
 - Nur Gegner in Spielernähe werden simuliert. Behebt P3.
 - Monsterlevel bestimmt Itemlevel. Rare und Elite bekommen eigene Modifikatoren.
 
@@ -284,7 +358,7 @@ Ziel: ein Kreis in Endqualität als Vorlage für alle weiteren.
 - Vorschlag ist der zweite Kreis aus dem PDF: Wollust, ewiger Sturm. Wind als Levelmechanik.
 - Vier bis fünf Gegnertypen, ein Boss, zwei Event-Räume.
 - Item-Basen für alle 16 Slots und Affixe nach der Slot-Tabelle des PDF.
-- Balance-Durchgang für Leben, Schaden, XP und Loot.
+- Balance-Durchgang für Leben, Schaden, XP und Loot. Dazu gehören B1 bis B3 und die Stellschrauben aus M2.
 - Ton und Musik.
 
 Fertig, wenn ein Durchlauf des Kreises 30 bis 60 Minuten dauert und Spaß macht.

@@ -154,6 +154,12 @@ platform_on_leave = 2
 platform_floor_layers = 0
 script = ExtResource("1_x3aji")
 LootTableId = "test_loot"
+AttackRange = 350.0
+AttackWindeupTimeSec = 0.6
+AttackRecoveryTimeSec = 1.0
+AttackDamageMin = 3
+AttackDamageMax = 6
+AttackDamageType = 3
 LifeBaseBonus = 249
 Movementspeed = 50.0
 

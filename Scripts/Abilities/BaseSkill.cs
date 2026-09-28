@@ -1,53 +1,29 @@
-﻿using System;
-using Hoellenspiralenspiel.Enums;
-using Hoellenspiralenspiel.Scripts.Models;
+using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.Abilities;
 
 public abstract class BaseSkill
 {
-    private readonly decimal    baseCritModifier = 1.3m;
-    private readonly int        baseCritRate;
-    private readonly int        baseDamageMax;
-    private readonly int        baseDamageMin;
-    private readonly Random     baseDamageRng = new();
-    private readonly Random     critRng       = new();
-    private readonly CombatStat mitigatedBy;
+    private readonly SpellDefinition definition;
 
     public BaseSkill(int        baseDamageMin,
                      int        baseDamageMax,
                      int        baseCritRate,
                      double     baseCooldown,
-                     CombatStat mitigatedBy,
+                     DamageType damageType,
                      BaseUnit   owner)
-    {   
-        this.baseDamageMin = baseDamageMin;
-        this.baseDamageMax = baseDamageMax;
-        this.baseCritRate  = baseCritRate;
-        this.mitigatedBy   = mitigatedBy;
-        RealCooldown       = baseCooldown;
-        Owner              = owner;
+    {
+        definition   = new SpellDefinition(GetType().Name, baseDamageMin, baseDamageMax, damageType, baseCritRate);
+        RealCooldown = baseCooldown;
+        Owner        = owner;
     }
 
     public BaseUnit Owner        { get; }
     public double   RealCooldown { get; }
 
+    //Würfelt den Treffer über die zentrale Trefferauflösung. Angewendet wird er vom Ziel
     public HitResult MakeRealDamage(BaseUnit target)
-    {
-        var val              = critRng.Next(0, 101);
-        var isCrit           = val <= baseCritRate;
-        var rolledBaseDamage = (float)baseDamageRng.Next(baseDamageMin, baseDamageMax + 1);
-
-        if (this is BaseSpell)
-        {
-            rolledBaseDamage += Owner.Stats.GetAddedFlat(CombatStat.SpellDamage);
-            rolledBaseDamage *= Owner.Stats.GetTotalMultiplier(CombatStat.SpellDamage);
-        }
-
-        var realDamage       = isCrit ? rolledBaseDamage * (float)baseCritModifier : rolledBaseDamage;
-        var hitType          = isCrit ? HitType.Critical : HitType.Normal;
-
-        return new HitResult(realDamage, hitType, LifeModificationMode.Damage, target, mitigatedBy);
-    }
+        => HitResolver.Resolve(HitRequests.ForSpell(Owner.Stats, definition), target.Stats, GameRandom.Shared);
 }

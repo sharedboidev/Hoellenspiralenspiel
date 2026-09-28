@@ -4,8 +4,6 @@ namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 public partial class YellowBlob : BaseEnemy
 {
-    protected override PackedScene AttackScene { get; }
-
     public override void _Ready()
     {
         base._Ready();
@@ -14,6 +12,4 @@ public partial class YellowBlob : BaseEnemy
     }
 
     protected override Sprite2D MovementSprite => GetNode<Sprite2D>("RunSprite");
-
-    protected override void ExecuteAttack() { }
 }

@@ -4,8 +4,6 @@ namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 public partial class BlueBlob : BaseEnemy
 {
-    protected override PackedScene AttackScene { get; }
-
     public override void _Ready()
     {
         base._Ready();
@@ -27,6 +25,4 @@ public partial class BlueBlob : BaseEnemy
 
         AnimationTree.Active = true;
     }
-
-    protected override void ExecuteAttack() { }
 }

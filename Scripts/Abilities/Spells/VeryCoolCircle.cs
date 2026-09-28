@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
 using Hoellenspiralenspiel.Scripts.Utils;
 
@@ -28,6 +29,9 @@ public partial class VeryCoolCircle
     {
         BodyEntered += OnBodyEntered;
         BodyExited  += OnBodyExited;
+
+        //Der nächste Klick platziert den Zauber und soll keinen Angriff auslösen
+        AddToGroup(Player2D.PrimaryClickReservedGroup);
     }
 
     public override void _Process(double delta)
@@ -41,6 +45,9 @@ public partial class VeryCoolCircle
         BeFixed();
         BeCool();
         executed = true;
+
+        //Verzögert, damit der Klick, der den Zauber platziert hat, nicht noch beim Spieler ankommt
+        CallDeferred(Node.MethodName.RemoveFromGroup, Player2D.PrimaryClickReservedGroup);
     }
 
     private void OnBodyEntered(Node2D body)

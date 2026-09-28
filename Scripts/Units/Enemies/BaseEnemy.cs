@@ -1,21 +1,37 @@
+using System;
 using System.ComponentModel;
 using Godot;
+using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Controllers;
-using Hoellenspiralenspiel.Scripts.Models;
+using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Rng;
+using Hoellenspiralenspiel.Scripts.Extensions;
 
 namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 public abstract partial class BaseEnemy : BaseUnit
 {
-    private            AttackPhase    attackPhase = AttackPhase.Ready;
-    private            double         attackPhaseTimeLeftSec;
-    protected          Player2D       ChasedPlayer;
-    protected          Node           CurrentScene;
-    private            ProgressBar    healthbar;
-    private            ShaderMaterial hiddenInFogShaderMaterial;
-    protected abstract PackedScene    AttackScene { get; }
-    public             string         SpawnGroup  { get; set; }
-    public             bool           IsDying     { get; private set; }
+    //Der Treffer landet noch, wenn der Spieler während des Ausholens ein Stück aus der Reichweite gerückt ist
+    private const float RangeTolerance     = 1.25f;
+    private const float MinAttackspeedRate = 0.1f;
+
+    //Färbt den Gegner, solange er ausholt, damit der Angriff zu sehen ist
+    private static readonly Color WindupTint = new(1.6f, 0.7f, 0.7f);
+
+    private readonly AttackCycle     attackCycle = new();
+    private          AnimationPlayer animationPlayer;
+    private          bool            attackFailed;
+    protected        Player2D        ChasedPlayer;
+    protected        Node            CurrentScene;
+    private          ProgressBar     healthbar;
+    private          ShaderMaterial  hiddenInFogShaderMaterial;
+    private          bool            isAttackAnimationRunning;
+    protected virtual PackedScene    AttackScene => null;
+    public            string         SpawnGroup  { get; set; }
+    public            bool           IsDying     { get; private set; }
+
+    public override Faction Faction      => Faction.Monster;
+    public override bool    IsTargetable => !IsDead && !IsDying;
 
     [Export]
     public int XpGranted { get; set; } = 100;
@@ -26,6 +42,7 @@ public abstract partial class BaseEnemy : BaseUnit
     [Export]
     public float AggroRange { get; set; } = 500f;
 
+    //Abstand in Pixeln zwischen den Körpermitten, ab dem der Gegner angreift
     [Export]
     public float AttackRange { get; set; } = 150f;
 
@@ -34,6 +51,18 @@ public abstract partial class BaseEnemy : BaseUnit
 
     [Export]
     public float AttackRecoveryTimeSec { get; set; } = 0.2f;
+
+    [Export]
+    public int AttackDamageMin { get; set; } = 1;
+
+    [Export]
+    public int AttackDamageMax { get; set; } = 3;
+
+    [Export]
+    public DamageType AttackDamageType { get; set; } = DamageType.Crush;
+
+    [Export(PropertyHint.Range, "0.0, 100.0,")]
+    public float AttackCriticalHitChance { get; set; } = 5f;
 
     [Export]
     public string LootTableId { get; set; }
@@ -47,6 +76,7 @@ public abstract partial class BaseEnemy : BaseUnit
 
         CurrentScene       = GetTree().CurrentScene;
         AnimationTree      = GetNode<AnimationTree>(nameof(AnimationTree));
+        animationPlayer    = GetNodeOrNull<AnimationPlayer>(nameof(AnimationPlayer));
         healthbar          = GetNode<ProgressBar>("%Healthbar");
         healthbar.MaxValue = LifeMaximum;
         healthbar.Value    = LifeCurrent;
@@ -88,7 +118,7 @@ public abstract partial class BaseEnemy : BaseUnit
         }
     }
 
-    public void SetHighlight(bool active)
+    public override void SetHighlight(bool active)
         => MovementSprite.SelfModulate = active ? new Color(3f, 1f, 2.0f) : new Color(1, 1, 1);
 
     private void SetAsOnlyVisibleSprite(Sprite2D sprite)
@@ -149,15 +179,16 @@ public abstract partial class BaseEnemy : BaseUnit
         }
         else
         {
-            if (e.PropertyName == nameof(MovementDirection) && MovementDirection.Length() > 0.0f)
+            if (e.PropertyName == nameof(MovementDirection) && MovementDirection.Length() > 0.0f && !isAttackAnimationRunning)
                 SetAsOnlyVisibleSprite(RunSprite); //Hack, die Statemachine im Animationtree Startet die Animation nicht mehr
         }
     }
 
     public override void ReceiveDamage(HitResult hit)
     {
-        //Auch ein ausgewichener Treffer macht den Gegner aggressiv
-        IsAggressive = true;
+        //Auch ein abgewehrter Treffer macht den Gegner aggressiv
+        if (IsTargetable)
+            IsAggressive = true;
 
         base.ReceiveDamage(hit);
     }
@@ -171,7 +202,10 @@ public abstract partial class BaseEnemy : BaseUnit
         IsDying           = true;
         healthbar.Visible = false;
         Velocity          = Vector2.Zero;
-        attackPhase       = AttackPhase.Ready;
+
+        attackCycle.Reset();
+        EndAttackLook();
+        StatusEffects.Clear();
 
         GetNodeOrNull<CollisionShape2D>(nameof(CollisionShape2D))?.SetDeferred(CollisionShape2D.PropertyName.Disabled, true);
 
@@ -187,8 +221,6 @@ public abstract partial class BaseEnemy : BaseUnit
 
     private double GetDeathAnimationLengthSec()
     {
-        var animationPlayer = GetNodeOrNull<AnimationPlayer>(nameof(AnimationPlayer));
-
         if (animationPlayer is null || !animationPlayer.HasAnimation(Animation.DieDown))
             return 0;
 
@@ -201,7 +233,17 @@ public abstract partial class BaseEnemy : BaseUnit
             QueueFree();
     }
 
-    protected abstract void ExecuteAttack();
+    //Ohne eigene Umsetzung greift ein Gegner im Nahkampf an: eine ATTACK mit den Werten aus dem Inspector
+    protected virtual void ExecuteAttack()
+    {
+        if (DistanceTo(ChasedPlayer) > AttackRange * RangeTolerance)
+            return;
+
+        var weapon  = new WeaponProfile(AttackDamageMin, AttackDamageMax, 1f, AttackCriticalHitChance, AttackDamageType, AttackRange);
+        var request = HitRequests.ForAttack(Stats, weapon, AttackDefinition.Standard);
+
+        ChasedPlayer.ReceiveDamage(HitResolver.Resolve(request, ChasedPlayer.Stats, GameRandom.Shared));
+    }
 
     public void ChasePlayer()
     {
@@ -213,13 +255,10 @@ public abstract partial class BaseEnemy : BaseUnit
         }
 
         //Während Windup und Recovery bleibt der Gegner stehen
-        if (attackPhase != AttackPhase.Ready)
+        if (!attackCycle.IsReady)
             return;
 
-        var distance  = ChasedPlayer.Position.DistanceTo(Position);
-        var isInRange = distance < AttackRange;
-
-        if (isInRange)
+        if (DistanceTo(ChasedPlayer) < AttackRange)
             StartAttack();
         else
             RunAtPlayer();
@@ -227,50 +266,88 @@ public abstract partial class BaseEnemy : BaseUnit
 
     private void StartAttack()
     {
-        Velocity               = Vector2.Zero;
-        attackPhase            = AttackPhase.Windup;
-        attackPhaseTimeLeftSec = AttackWindeupTimeSec;
+        var toPlayer = ChasedPlayer.BodyCenter - BodyCenter;
+
+        //Chill und andere Modifier auf das Angriffstempo strecken oder stauchen den Takt
+        var attackspeedRate = Math.Max(MinAttackspeedRate, Stats.GetTotalMultiplier(CombatStat.Attackspeed));
+
+        Velocity          = Vector2.Zero;
+        MovementDirection = Vector2.Zero;
+        attackFailed      = RollActionFailure();
+
+        attackCycle.Start(AttackWindeupTimeSec / attackspeedRate, AttackRecoveryTimeSec / attackspeedRate);
+
+        BeginAttackLook(toPlayer, (AttackWindeupTimeSec + AttackRecoveryTimeSec) / attackspeedRate);
     }
 
     private void AdvanceAttack(double delta)
     {
-        if (attackPhase == AttackPhase.Ready)
+        if (attackCycle.IsReady)
             return;
 
-        attackPhaseTimeLeftSec -= delta;
-
-        if (attackPhaseTimeLeftSec > 0)
-            return;
-
-        if (attackPhase == AttackPhase.Recovery)
+        if (attackCycle.Advance(delta))
         {
-            attackPhase = AttackPhase.Ready;
+            Modulate = Colors.White;
 
-            return;
+            if (attackFailed)
+                this.ShowCombatText("Failed", Colors.Yellow, 28);
+            else if (!ChasedPlayer.IsDead)
+                ExecuteAttack();
         }
 
-        if (!ChasedPlayer.IsDead)
-            ExecuteAttack();
+        if (attackCycle.IsReady)
+            EndAttackLook();
+    }
 
-        attackPhase            = AttackPhase.Recovery;
-        attackPhaseTimeLeftSec = AttackRecoveryTimeSec;
+    private void BeginAttackLook(Vector2 direction, double attackSec)
+    {
+        Modulate = WindupTint;
+
+        var animationName = GetAttackAnimationName(direction);
+
+        if (AttackSprite is null || animationPlayer is null || !animationPlayer.HasAnimation(animationName) || attackSec <= 0)
+            return;
+
+        isAttackAnimationRunning = true;
+        AnimationTree.Active     = false;
+
+        SetAsOnlyVisibleSprite(AttackSprite);
+
+        animationPlayer.Play(animationName, customSpeed: (float)(animationPlayer.GetAnimation(animationName).Length / attackSec));
+    }
+
+    private void EndAttackLook()
+    {
+        Modulate = Colors.White;
+
+        if (!isAttackAnimationRunning)
+            return;
+
+        isAttackAnimationRunning = false;
+
+        animationPlayer.Stop();
+
+        SetAsOnlyVisibleSprite(IdleSprite ?? RunSprite);
+
+        AnimationTree.Active = true;
+    }
+
+    private static string GetAttackAnimationName(Vector2 direction)
+    {
+        if (Math.Abs(direction.X) > Math.Abs(direction.Y))
+            return direction.X > 0 ? Animation.AttackRight : Animation.AttackLeft;
+
+        return direction.Y > 0 ? Animation.AttackDown : Animation.AttackTop;
     }
 
     private void RunAtPlayer()
     {
-        var rawDirection = ChasedPlayer.Position - Position;
+        var rawDirection = ChasedPlayer.GlobalPosition - GlobalPosition;
         var direction    = rawDirection.Normalized();
 
         MovementDirection = direction;
         Velocity          = MovementspeedFinal * direction;
 
         MoveAndSlide();
-    }
-
-    private enum AttackPhase
-    {
-        Ready,
-        Windup,
-        Recovery
     }
 }

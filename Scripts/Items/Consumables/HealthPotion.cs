@@ -1,8 +1,6 @@
 using System.Text;
 using Godot;
-using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Extensions;
-using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.Items.Consumables;
@@ -25,6 +23,6 @@ public partial class HealthPotion : ConsumableItem
         var healedAmount = consumee.LifeMaximum * TotalHealthRestoredPercentage / 100f;
         consumee.LifeCurrent += (int)healedAmount;
 
-        consumee.InstatiateFloatingCombatText(new HitResult(healedAmount, HitType.Normal, LifeModificationMode.Heal, consumee, CombatStat.Life), consumee.GetParent(), new Vector2(0, -128));
+        consumee.ShowHeal(healedAmount, new Vector2(0, -128));
     }
 }

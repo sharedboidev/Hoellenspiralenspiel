@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-91_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-180_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -96,23 +96,44 @@ Beispiel: 14 % und 22 % increased von der Ausrüstung, dazu 2,97 % more aus Inte
 
 | Feature | Beschreibung |
 |---|---|
+| Trefferauflösung | Jeder Treffer läuft durch dieselbe Kette: Treffen, Ausweichen, Parry, Block, Krit, Minderung |
+| Nahkampf | Klick auf einen Gegner, der Held läuft hin und schlägt im Takt der Waffe zu |
+| ATTACK und SPELL | Attacks skalieren mit dem Waffenschaden, Spells bringen eigenen Grundschaden mit |
+| Sechs Schadensarten | Crush, Pierce, Slash, Fire, Frost, Lightning, jede mit eigenem Effekt |
+| Statuseffekte | Bleed, stapelnder Burn, Shock mit Fehlschlägen, Chill mit Verlangsamung |
+| Schadensminderung | Rüstung gegen physischen Schaden, Resistenzen gegen Feuer, Frost und Blitz |
+| Parry und Block | Parry wehrt ganz ab, Block fängt 50 % ab. Der Anteil ist ein eigener Wert für Items und Skills |
+| Kritische Treffer | Chance von Waffe oder Zauber, verstärkt durch Awareness |
+| Tod und Respawn | Todesanzeige, Verlust von 10 % der XP des Levels, Rückkehr zum Startpunkt |
 | Drei Testzauber | Fireball mit Fork, Frost Nova als Flächenzauber, Lightning Strike mit Zielkreis |
 | Skillbar | Cooldowns, Manakosten, Ton bei leerem Mana |
-| Schadensminderung | Rüstung gegen physischen Schaden, Resistenzen gegen Feuer, Frost und Blitz |
-| Ausweichen | Gilt für Spieler und Gegner |
-| Kritische Treffer | Für Zauber, mit eigener Farbe in den Schadenszahlen |
-| Schadenszahlen | Schweben über dem Ziel, getrennt nach Schaden, Heilung und Krit |
-| Kontaktschaden | Berührung mit Gegnern schadet, mit Abklingzeit |
+| Schadenszahlen | Schweben über dem Ziel, mit eigenen Farben für Krit, Heilung und jeden Statuseffekt |
+
+<details>
+<summary>Was jede Schadensart bewirkt</summary>
+
+| Schadensart | Gruppe | Wirkung |
+|---|---|---|
+| Crush | Physisch | 20 % mehr Schaden |
+| Pierce | Physisch | Trifft nur halb so oft, ignoriert dafür die Rüstung |
+| Slash | Physisch | Bleed: 50 % des ungeminderten Treffers über 4 Sekunden, nur der stärkste wirkt |
+| Fire | Elementar | Burn: 25 % des erlittenen Schadens über 4 Sekunden, stapelt bis 10 Mal |
+| Frost | Elementar | Chill: Bewegung und Angriffe 30 % langsamer für 3 Sekunden |
+| Lightning | Elementar | Shock: Aktionen schlagen 4 Sekunden lang mit 25 % Chance fehl |
+
+Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
+
+</details>
 
 ### 👹 Gegner
 
 | Feature | Beschreibung |
 |---|---|
-| Drei Gegnertypen | Blue Blob, Yellow Blob und ein Testgegner, der Feuerbälle wirft |
+| Drei Gegnertypen | Blue Blob mit Frost, Yellow Blob mit Blitz und ein Testgegner, der Feuerbälle wirft |
 | Spawn-Marker | Gegner erscheinen in Gruppen an festgelegten Orten |
 | Aggro | Reichweite pro Gegner, die ganze Gruppe reagiert auf einen Treffer |
 | Rare und Elite | Stärkere Varianten mit mehr Leben, Tempo und Erfahrung |
-| Angriffstakt | Ausholen, Angriff, Erholen |
+| Angriffe | Ausholen, Treffer, Erholen. Beim Ausholen färbt sich der Gegner |
 | Tod | Erfahrung und Beute sofort, danach läuft die Todesanimation |
 
 ### 🎒 Items und Beute
@@ -153,13 +174,12 @@ Beispiel: 14 % und 22 % increased von der Ausrüstung, dazu 2,97 % more aus Inte
 
 ### 🚧 Noch nicht enthalten
 
-- Tod des Spielers mit Respawn
-- Nahkampf mit Waffen
 - Speichern und Laden
 - Hub, Levelwechsel und Menüs
 - Prozedurale Level und Wegfindung
-- Statuseffekte wie Bleed oder Verbrennung
-- Parieren und Blocken im Kampf
+- Schilde und Waffen, die Parry oder Block mitbringen
+- Fernkampf mit Waffen und weitere Attacks neben dem Standardangriff
+- Frei belegbare Tasten für Attacks und Zauber
 - Klassen und Erwerb von Skills
 
 ---
@@ -168,7 +188,8 @@ Beispiel: 14 % und 22 % increased von der Ausrüstung, dazu 2,97 % more aus Inte
 
 | Taste | Aktion |
 |---|---|
-| `W` `A` `S` `D` | Bewegen |
+| `W` `A` `S` `D` | Bewegen, bricht Hinlaufen und Ausholen ab |
+| Linke Maustaste auf Gegner | Hinlaufen und angreifen, gedrückt halten greift weiter an |
 | `F` | Fireball in Richtung der Maus |
 | `E` | Frost Nova um den Spieler |
 | `R`, dann linke Maustaste | Lightning Strike platzieren und auslösen |
@@ -183,8 +204,8 @@ Beispiel: 14 % und 22 % increased von der Ausrüstung, dazu 2,97 % more aus Inte
 
 ```mermaid
 flowchart LR
-    M0(["M0 Aufräumen"]):::done --> M1(["M1 Stat-Kern"]):::done --> M2(["M2 Kampf"]):::next
-    M2 --> M3(["M3 Skills"]):::open
+    M0(["M0 Aufräumen"]):::done --> M1(["M1 Stat-Kern"]):::done --> M2(["M2 Kampf"]):::done
+    M2 --> M3(["M3 Skills"]):::next
     M2 --> M4(["M4 Items und Speichern"]):::open
     M4 --> M5(["M5 Gegner-KI"]):::open --> D{"2D oder 3D"}:::decision
     D --> M6(["M6 Level"]):::open --> M7(["M7 Hub"]):::open --> M8(["M8 Höllenkreis"]):::open
@@ -201,8 +222,8 @@ flowchart LR
 |---|---|---|---|
 | ✅ | **M0** Aufräumen | Alle bekannten Fehler behoben, Repo aufgeräumt | klein |
 | ✅ | **M1** Stat-Kern | Stats als reines C#, Tests, Lichtradius | mittel |
-| ⏭️ | **M2** Kampf | Trefferauflösung, Tod des Spielers, Nahkampf, Statuseffekte | mittel |
-| ⬜ | **M3** Skills | Skills als Daten, freie Skillbar, Zauber unabhängig vom Wirkenden | mittel |
+| ✅ | **M2** Kampf | Trefferauflösung, Tod des Spielers, Nahkampf, Statuseffekte | mittel |
+| ⏭️ | **M3** Skills | Attacks und Spells als Daten, freie Tastenbelegung, Zauber unabhängig vom Wirkenden | mittel |
 | ⬜ | **M4** Items und Speichern | Items als Daten, Inventar-Modell, Speichern und Laden | mittel |
 | ⬜ | **M5** Gegner-KI | Zustandsmaschine, Wegfindung, Skalierung nach Level | mittel |
 | 🔀 | **Entscheidung** | 2D oder 3D, per kurzem Vergleichsprototyp | klein |
@@ -264,7 +285,10 @@ dotnet test Hoellenspiralenspiel.Tests
 Hoellenspiralenspiel
 ├── Scripts
 │   ├── Core            Spiellogik ohne Godot, vollständig getestet
-│   │   └── Stats       Stat-Blatt, Rechenregeln, abgeleitete Werte
+│   │   ├── Stats       Stat-Blatt, Rechenregeln, abgeleitete Werte
+│   │   ├── Combat      Trefferauflösung, Schadensarten, Statuseffekte, Angriffstakt
+│   │   ├── Rng         Zufallsquelle mit Seed
+│   │   └── Progression XP-Verlust beim Tod
 │   ├── Units           Spieler und Gegner
 │   ├── Abilities       Skills und Zauber
 │   ├── Items           Waffen, Rüstung, Verbrauchsgüter

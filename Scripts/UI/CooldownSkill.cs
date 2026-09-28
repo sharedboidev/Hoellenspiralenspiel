@@ -1,6 +1,7 @@
 using Godot;
 using Hoellenspiralenspiel.Scripts.Abilities;
 using Hoellenspiralenspiel.Scripts.Abilities.Spells;
+using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
@@ -45,9 +46,9 @@ public partial class CooldownSkill : TextureButton
 
 	public void Use()
 	{
-		if (skill.Owner is not Player2D player)
+		if (skill.Owner is not Player2D player || player.IsDead)
 			return;
-		
+
 		var manaCost = 2;
 
 		if (!player.CanUseAbility(manaCost))
@@ -57,7 +58,17 @@ public partial class CooldownSkill : TextureButton
 		}
 
 		player.ReduceMana(manaCost);
-		
+
+		//Ein fehlgeschlagener Zauber kostet Mana und Abklingzeit, wirkt aber nicht
+		if (player.RollActionFailure())
+		{
+			player.ShowCombatText("Failed", Colors.Yellow, 28);
+
+			StartCooldown();
+
+			return;
+		}
+
 		var someSkill = visualScene.Instantiate<Area2D>();
 		
 		if (someSkill is ISpell spellSkill)
@@ -69,6 +80,11 @@ public partial class CooldownSkill : TextureButton
 		}
 		GetTree().CurrentScene.GetNode<Node2D>("Environment").AddChild(someSkill);
 
+		StartCooldown();
+	}
+
+	private void StartCooldown()
+	{
 		TimerCooldown.Start();
 		Disabled = true;
 		SetProcess(true);

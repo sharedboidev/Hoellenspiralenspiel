@@ -59,12 +59,12 @@ public partial class Statdisplay : PanelContainer
         lightRadiusLabel.Text   = player.LightRadiusFinal.ToString("N0") + "%";
     }
 
-    //Krit und Angriffstempo hängen an der Waffe und kommen bis zum Nahkampf in M2 weiter aus der Ausrüstung
+    //Die Waffe liefert die Grundwerte für Krit-Chance und Angriffstempo, gerechnet wird im Stat-Blatt
     private void RenderOffences(Player2D player)
     {
-        meleeCritChanceLabel.Text = equipmentPanel.GetTotalMeleeCritChance().ToString("0.##") + "%";
-        critDamageLabel.Text      = "+" + equipmentPanel.GetTotalCriticalDamage().ToString("N0") + "%";
-        attackspeedLabel.Text     = "+" + equipmentPanel.GetTotalIncreasedAttackspeed().ToString("N0") + "%";
+        meleeCritChanceLabel.Text = player.Stats.GetFinal(CombatStat.CriticalHitChance).ToString("0.##") + "%";
+        critDamageLabel.Text      = "+" + player.Stats.GetFinal(CombatStat.CriticalDamage).ToString("N0") + "%";
+        attackspeedLabel.Text     = player.AttacksPerSecondFinal.ToString("0.##") + "/s";
         spellDamageLabel.Text     = AsBonusPercent(player, CombatStat.SpellDamage);
     }
 

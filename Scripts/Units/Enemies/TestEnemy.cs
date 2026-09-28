@@ -1,4 +1,3 @@
-using System;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Abilities;
 using Hoellenspiralenspiel.Scripts.Abilities.Spells;
@@ -16,8 +15,9 @@ public partial class TestEnemy : BaseEnemy
 		ChasedPlayer = CurrentScene.GetNode<Player2D>("%Player 2D");
 	}
 
-	protected override Sprite2D MovementSprite => throw new NotImplementedException("Noone cares");
+	protected override Sprite2D MovementSprite => GetNode<Sprite2D>(nameof(Sprite2D));
 
+	//Der Feuerball ist ein SPELL und bringt seinen Grundschaden aus dem Inspector mit
 	protected override void ExecuteAttack()
 	{
 		Velocity = Vector2.Zero;
@@ -30,6 +30,6 @@ public partial class TestEnemy : BaseEnemy
 			   .GetNode<Node2D>("Environment")
 			   .AddChild(fireball);
 
-		fireball.Init(new FireballSkill(this), Position, ChasedPlayer.Position);
+		fireball.Init(new FireballSkill(this, AttackDamageMin, AttackDamageMax), GlobalPosition, ChasedPlayer.GlobalPosition);
 	}
 }

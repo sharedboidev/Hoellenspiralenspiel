@@ -1,4 +1,5 @@
 using Godot;
+using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.UI.Buttons;
 using Hoellenspiralenspiel.Scripts.UI.Character;
 using Hoellenspiralenspiel.Scripts.Units;
@@ -7,6 +8,7 @@ namespace Hoellenspiralenspiel.Scripts.Controllers;
 
 public partial class GameController : Node
 {
+    private DeathScreen             deathScreen;
     private LevelUpDialog           levelUpDialog;
     private OpenLevelUpDialogButton openLevelUpDialogButton;
     private Player2D                player;
@@ -20,16 +22,21 @@ public partial class GameController : Node
     private void SubscribeToEvents()
     {
         player.LeveledUp                          += PlayerOnLeveledUp;
+        player.Died                               += PlayerOnDied;
+        deathScreen.RespawnRequested              += player.Respawn;
         openLevelUpDialogButton.OpenDialogPressed += OpenLevelUpDialogButtonOnOpenDialogPressed;
     }
 
     private void OpenLevelUpDialogButtonOnOpenDialogPressed()
         => levelUpDialog.ShowDialog();
 
+    private void PlayerOnDied(BaseUnit unit)
+        => deathScreen.ShowFor(player.LastXpLoss);
+
     private void PlayerOnLeveledUp(Player2D player2D)
     {
-        openLevelUpDialogButton.SpendablePointLabel.Text = player2D.AttributePointsAllowedToSpend < 10 
-                ? $"  {player2D.AttributePointsAllowedToSpend}" 
+        openLevelUpDialogButton.SpendablePointLabel.Text = player2D.AttributePointsAllowedToSpend < 10
+                ? $"  {player2D.AttributePointsAllowedToSpend}"
                 : $"{player2D.AttributePointsAllowedToSpend}";
 
         openLevelUpDialogButton.Visible = true;
@@ -38,6 +45,7 @@ public partial class GameController : Node
     private void LoadNodes()
     {
         player                  = GetNode<Player2D>("%Player 2D");
+        deathScreen             = GetNode<DeathScreen>($"%{nameof(DeathScreen)}");
         levelUpDialog           = GetNode<LevelUpDialog>($"%{nameof(LevelUpDialog)}");
         openLevelUpDialogButton = GetNode<OpenLevelUpDialogButton>($"%{nameof(OpenLevelUpDialogButton)}");
     }

@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Text;
 using Godot;
 using Hoellenspiralenspiel.Enums;
-using Hoellenspiralenspiel.Scripts.Configuration;
+using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.Items.Weapons;
@@ -42,21 +42,29 @@ public abstract partial class BaseWeapon : BaseItem
     private float  CriticalHitChanceMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.CriticalHitChance);
     public  double CriticalHitChanceFinal                => Math.Round((CriticalHitChanceBase + CriticalHitChanceAddedFlat) * CriticalHitChancePercentageMultiplier * CriticalHitChanceMoreMultiplierTotal, 2);
 
+    //Reichweite in Pixeln, gemessen zwischen den Positionen von Angreifer und Ziel
+    [Export]
+    public float Range { get; set; } = WeaponProfile.DefaultMeleeRange;
+
     [Export]
     public WeaponType WeaponType { get; set; }
 
     [Export]
     public WieldStrategy WieldStrategie { get; set; }
 
-    public          DamageType DamageType  { get; private set; }
-    public override bool       IsStackable => false;
-
-    public override void Init()
+    public DamageType DamageType => WeaponType switch
     {
-        base.Init();
+        WeaponType.Sword => DamageType.Slash,
+        WeaponType.Axe   => DamageType.Slash,
+        WeaponType.Bow   => DamageType.Pierce,
+        _                => DamageType.Crush
+    };
 
-        SetDamagetypeByWeapon();
-    }
+    public override bool IsStackable => false;
+
+    //Die Werte der Waffe samt ihrer lokalen Modifier, so wie der Kampf sie braucht
+    public WeaponProfile ToProfile()
+        => new(MinDamageFinal, MaxDamageFinal, (float)AttacksPerSecondFinal, (float)CriticalHitChanceFinal, DamageType, Range);
 
     protected override void SetExceptionalName()
         => ExceptionalName = NameGenerator.GenerateRareWeapon();
@@ -64,19 +72,8 @@ public abstract partial class BaseWeapon : BaseItem
     protected override void AppendItembaseStats(StringBuilder emil)
     {
         emil.AppendLine($"{WieldStrategie.GetDescription()} {WeaponType.GetDescription()}");
-        emil.AppendLine($"{DamageType.Name} Damage: {GetStyledValue(MinDamageFinal, MinDamageBase):N0} to {GetStyledValue(MaxDamageFinal, MaxDamageBase):N0}");
+        emil.AppendLine($"{DamageType} Damage: {GetStyledValue(MinDamageFinal, MinDamageBase):N0} to {GetStyledValue(MaxDamageFinal, MaxDamageBase):N0}");
         emil.AppendLine($"Attacks per Second: {GetStyledValue(AttacksPerSecondFinal, AttacksPerSecondBase):0.##}");
         emil.AppendLine($"Critical Hit Chance: {GetStyledValue(CriticalHitChanceFinal, CriticalHitChanceBase):0.##}%");
     }
-
-    private void SetDamagetypeByWeapon()
-        => DamageType = WeaponType switch
-        {
-            WeaponType.Sword => new SlashDamage(),
-            WeaponType.Axe   => new SlashDamage(),
-            WeaponType.Flail => new CrushDamage(),
-            WeaponType.Staff => new CrushDamage(),
-            WeaponType.Bow   => new PierceDamage(),
-            _                => null
-        };
 }

@@ -16,6 +16,7 @@ theme_override_constants/margin_bottom = 8
 layout_mode = 2
 bbcode_enabled = true
 text = "[center]Hotkeys[/center]
+- LMB on Enemy: Attack
 - R -> LMB -> OK
 -Tab: \"Map\"
 -B:     Inventory

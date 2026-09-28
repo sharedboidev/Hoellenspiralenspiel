@@ -1,12 +1,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Items;
-using Hoellenspiralenspiel.Scripts.Items.Armors;
-using Hoellenspiralenspiel.Scripts.Items.Weapons;
 using Hoellenspiralenspiel.Scripts.UI.Tooltips;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Utils.EventArgs;
@@ -44,33 +41,6 @@ public partial class EquipmentPanel : PanelContainer
             }
         }
     }
-
-    public int GetTotalIncreasedAttackspeed()
-    {
-        var ke = (int)equipmentSlots
-                     .Where(slot => slot.ContainedItem is not null)
-                     .Select(slot => slot.ContainedItem)
-                     .Cast<BaseItem>()
-                     .Sum(mod => ((1 + mod.GetModifierSumOf(ModificationType.Percentage, CombatStat.Attackspeed)) * mod.GetTotalMoreMultiplierOf(CombatStat.Attackspeed) - 1) * 100);
-
-        return ke;
-    }
-
-    public int GetTotalCriticalDamage()
-        => 50;
-
-    public float GetTotalMeleeCritChance()
-        => (float)(((BaseWeapon)slotMap[ItemSlot.PhysicalWeapon].ContainedItem)?.CriticalHitChanceFinal ?? 0);
-
-    public float GetTotalDodge()
-        => 0f;
-
-    public int GetTotalArmor()
-        => equipmentSlots
-          .Where(slot => slot.ContainedItem is BaseArmor)
-          .Select(slot => slot.ContainedItem)
-          .Cast<BaseArmor>()
-          .Sum(armor => armor.ArmorvalueFinal);
 
     private void EquipmentSlotOnPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
