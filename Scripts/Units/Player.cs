@@ -16,7 +16,24 @@ public partial class Player : CharacterBody3D
     {
         base._Process(delta);
 
+        HandleMovementInputs();
         ResolveInvincibility(delta);
+    }
+
+    [Export]
+    public Vector3 MovementDirection { get; set; }
+
+    public float Movementspeed { get; set; } = 100;
+
+    private void HandleMovementInputs()
+    {
+        var kek = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+
+        MovementDirection = new Vector3(kek.X, 0, kek.Y);
+
+        Velocity = MovementDirection * Movementspeed;
+
+        MoveAndSlide();
     }
 
     private void ResolveInvincibility(double delta)
