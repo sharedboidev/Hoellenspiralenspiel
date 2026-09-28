@@ -54,7 +54,15 @@ public abstract partial class BaseEnemy : BaseUnit
         LoadSpriteNodes();
 
         PropertyChanged                += OnPropertyChanged;
+        StatsChanged                   += OnStatsChanged;
         AnimationTree.AnimationStarted += AnimationTreeOnAnimationStarted;
+    }
+
+    //Ändert sich das maximale Leben, muss der Balken das neue Maximum kennen
+    private void OnStatsChanged()
+    {
+        healthbar.MaxValue = LifeMaximum;
+        healthbar.Value    = LifeCurrent;
     }
 
     private void AnimationTreeOnAnimationStarted(StringName animname)
@@ -254,7 +262,7 @@ public abstract partial class BaseEnemy : BaseUnit
         var direction    = rawDirection.Normalized();
 
         MovementDirection = direction;
-        Velocity          = Movementspeed * direction;
+        Velocity          = MovementspeedFinal * direction;
 
         MoveAndSlide();
     }

@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using Godot;
-using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
@@ -21,51 +20,35 @@ public partial class ResourceOrb : Control
 	[Export] public TextureRect    OrbTexture;
 	private         Player2D       player;
 	[Export] public Label          ResourceText;
-	private         string         resourceTextFormat = "{current} / {max}";
+	private         int            shownCurrent    = int.MinValue;
+	private         float          shownFillAmount = float.NaN;
+	private         int            shownMaximum    = int.MinValue;
 	private         ResourceType   type;
 
 	public override void _Ready()
 		=> current = MaxRessource;
 
-	public void Init(Player2D adherentPlayer, ResourceType resourceTypetype)
+	public void Init(Player2D adherentPlayer, ResourceType resourceType)
 	{
 		player = adherentPlayer;
+		type   = resourceType;
 
 		ConfigureOrbColors();
-		SetRessourceValues(resourceTypetype);
-		SetPositionInViewport(resourceTypetype);
+		SetPositionInViewport(resourceType);
 
 		player.PropertyChanged += PlayerOnPropertyChanged;
-		player.AttributeChanged += PlayerOnAttributeChanged;
-		player.EquipmentChanged += PlayerOnEquipmentChanged;
+		player.StatsChanged    += Refresh;
 
 		ApplyColor();
-		SetRessource(current);
+		Refresh();
 	}
 
-	private void PlayerOnAttributeChanged(CombatStat attribute, int value)
+	//Liest Maximum und aktuellen Wert neu vom Spieler
+	private void Refresh()
 	{
-		SetRessourceValues(type);
-		SetRessource(current);
-	}
-
-	private void PlayerOnEquipmentChanged()
-	{
-		SetRessourceValues(type);
-		SetRessource(current);
-	}
-
-	private void SetRessourceValues(ResourceType resourceTypetype)
-	{
-		type         = resourceTypetype;
 		MaxRessource = type == ResourceType.Life ? player.LifeMaximum : player.ManaMaximum;
-		current      = type == ResourceType.Life ? player.LifeCurrent : player.ManaCurrent;
 
-		if (player.ManaCurrent > player.ManaMaximum)
-			player.ManaCurrent = player.ManaMaximum;
-
-		if (player.LifeCurrent > player.LifeMaximum)
-			player.LifeCurrent = player.LifeMaximum;
+		SetRessource(type == ResourceType.Life ? player.LifeCurrent : player.ManaCurrent);
 	}
 
 	private void SetPositionInViewport(ResourceType resourceTypetype)
@@ -84,6 +67,7 @@ public partial class ResourceOrb : Control
 
 		Position = orbPosition;
 	}
+
 	private void ConfigureOrbColors()
 	{
 		var original = OrbTexture.Material as ShaderMaterial;
@@ -102,19 +86,20 @@ public partial class ResourceOrb : Control
 			case ResourceType.Life when e.PropertyName == nameof(BaseUnit.LifeCurrent):
 				SetRessource(player.LifeCurrent);
 				break;
-			case ResourceType.Life when e.PropertyName == nameof(BaseUnit.LifeMaximum):
-				SetRessourceValues(ResourceType.Life);
-				break;
 			case ResourceType.Mana when e.PropertyName == nameof(Player2D.ManaCurrent):
 				SetRessource(player.ManaCurrent);
-				break;
-			case ResourceType.Mana when e.PropertyName == nameof(Player2D.ManaMaximum):
-				SetRessourceValues(ResourceType.Mana);
 				break;
 		}
 	}
 
-	public override void _ExitTree() => player.PropertyChanged -= PlayerOnPropertyChanged;
+	public override void _ExitTree()
+	{
+		if (player is null)
+			return;
+
+		player.PropertyChanged -= PlayerOnPropertyChanged;
+		player.StatsChanged    -= Refresh;
+	}
 
 	private void ApplyColor()
 	{
@@ -125,14 +110,29 @@ public partial class ResourceOrb : Control
 		orbShader?.SetShaderParameter("liquid_color", c);
 	}
 
+	//Text und Shader werden nur angefasst, wenn sich das Angezeigte wirklich ändert
 	public void SetRessource(float newValue)
 	{
 		current = Mathf.Clamp(newValue, 0f, MaxRessource);
-		var fillAmount = current / MaxRessource;
 
-		ResourceText.Text = resourceTextFormat.Replace("{current}", ((int)current).ToString())
-											  .Replace("{max}", MaxRessource.ToString());
+		var fillAmount = MaxRessource > 0 ? current / MaxRessource : 0f;
 
-		orbShader.SetShaderParameter("fill_amount", fillAmount);
+		if (!fillAmount.Equals(shownFillAmount))
+		{
+			shownFillAmount = fillAmount;
+
+			orbShader.SetShaderParameter("fill_amount", fillAmount);
+		}
+
+		var currentToShow = (int)current;
+		var maximumToShow = (int)MaxRessource;
+
+		if (currentToShow == shownCurrent && maximumToShow == shownMaximum)
+			return;
+
+		shownCurrent = currentToShow;
+		shownMaximum = maximumToShow;
+
+		ResourceText.Text = $"{currentToShow} / {maximumToShow}";
 	}
 }

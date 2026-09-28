@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Godot;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Core.Stats;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Models;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
-using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
@@ -16,8 +16,6 @@ public abstract partial class BaseUnit
         : CharacterBody2D,
           INotifyPropertyChanged
 {
-    public delegate void AttributeChangedEventHandler(CombatStat attribute, int value);
-
     public delegate void DiedEventHandler(BaseUnit unit);
 
     public delegate void StatsChangedEventHandler();
@@ -28,6 +26,16 @@ public abstract partial class BaseUnit
     private   Vector2  movementDirection = Vector2.Zero;
     protected Sprite2D RunSprite;
 
+    protected BaseUnit()
+    {
+        PushBaseValuesToStats();
+
+        Stats.Changed += OnStatsChanged;
+    }
+
+    //Alle Stats der Einheit. Gerechnet wird im Kern, diese Klasse hält nur die Grundwerte für den Inspector
+    public StatSheet Stats { get; } = new();
+
     [Export]
     public Vector2 MovementDirection
     {
@@ -35,16 +43,11 @@ public abstract partial class BaseUnit
         set => SetField(ref movementDirection, value);
     }
 
-    [Export]
-    public float Movementspeed { get; set; }
+    public bool                              IsDead => LifeCurrent <= 0;
+    public event PropertyChangedEventHandler PropertyChanged;
+    public event DiedEventHandler            Died;
 
-    public bool                               IsDead              => LifeCurrent <= 0;
-    public List<CombatStatModifier>           CombatStatModifiers { get; protected set; } = new();
-    public event PropertyChangedEventHandler  PropertyChanged;
-    public event AttributeChangedEventHandler AttributeChanged;
-    public event DiedEventHandler             Died;
-
-    //Feuert, nachdem die abgeleiteten Modifier neu berechnet sind. Anzeigen sollen hierauf hören, nicht auf AttributeChanged
+    //Feuert, nachdem alle Stats neu berechnet sind. Anzeigen hören hierauf
     public event StatsChangedEventHandler StatsChanged;
 
     public override void _PhysicsProcess(double delta)
@@ -69,29 +72,10 @@ public abstract partial class BaseUnit
         }
     }
 
-    public float GetTotalMoreMultiplierOf(CombatStat combatStat)
-    {
-        var totalMoreMultiplier = 1f;
-
-        foreach (var modifier in GetModifierOf(ModificationType.More, combatStat))
-            totalMoreMultiplier *= 1 + modifier.Value;
-
-        return totalMoreMultiplier;
-    }
-
-    public float GetModifierSumOf(ModificationType modificationType, CombatStat combatStat)
-        => GetModifierOf(modificationType, combatStat).Sum(mod => mod.Value);
-
-    private IEnumerable<CombatStatModifier> GetModifierOf(ModificationType modificationType, CombatStat combatStat)
-        => CombatStatModifiers.Where(mod => mod.AffectedStat == combatStat &&
-                                            mod.ModificationType == modificationType);
-
     public override void _Ready()
     {
         LoadSpriteNodes();
-        SubscribeAndInitAttributeDerivedStats();
 
-        //Erst nach den abgeleiteten Modifiern füllen, sonst startet die Einheit unter ihrem Maximum
         LifeCurrent = LifeMaximum;
     }
 
@@ -103,38 +87,20 @@ public abstract partial class BaseUnit
         DeathSprite  = GetNodeOrNull<Sprite2D>("DeathSprite");
     }
 
-    private void SubscribeAndInitAttributeDerivedStats()
+    private void OnStatsChanged()
     {
-        AttributeChanged += OnAttributeChanged;
+        if (LifeCurrent > LifeMaximum)
+            LifeCurrent = LifeMaximum;
 
-        RefreshAttributeDerivedStats();
-    }
+        OnStatsRecalculated();
 
-    //Muss nach jeder Änderung an Modifiern laufen, die ein Attribut betreffen können, z.B. durch Ausrüstung
-    protected void RefreshAttributeDerivedStats()
-    {
-        AttributeChanged?.Invoke(CombatStat.Strength, StrengthFinal);
-        AttributeChanged?.Invoke(CombatStat.Dexterity, DexterityFinal);
-        AttributeChanged?.Invoke(CombatStat.Intelligence, IntelligenceFinal);
-        AttributeChanged?.Invoke(CombatStat.Constitution, ConstitutionFinal);
-        AttributeChanged?.Invoke(CombatStat.Awareness, AwarenessFinal);
-    }
-
-    private void OnAttributeChanged(CombatStat attribute, int value)
-    {
-        var derivedStats = DerivedStatProvider.GetModifiersFor(attribute, value);
-
-        RemoveModifiers(DerivedStatProvider.GetOriginIdFor(attribute));
-
-        CombatStatModifiers.AddRange(derivedStats);
-
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LifeMaximum))); //Hack, weil Racecondition zwischen ResourceOrb und Der Zeile hier drüber, obwohl beide Das selbe Event subscriben
+        OnPropertyChanged(nameof(LifeMaximum));
 
         StatsChanged?.Invoke();
     }
 
-    protected void RemoveModifiers(string modId)
-        => CombatStatModifiers.RemoveAll(mod => mod.OriginId == modId);
+    //Für abgeleitete Klassen, die auf neue Stats reagieren müssen, bevor die Anzeigen informiert werden
+    protected virtual void OnStatsRecalculated() { }
 
     public BaseEnemy[] FindClosestEnemyFrom(List<BaseEnemy> existingEnemies, int amountReturned = 1)
     {
@@ -166,37 +132,7 @@ public abstract partial class BaseUnit
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        switch (propertyName)
-        {
-            case nameof(StrengthBase):
-                AttributeChanged?.Invoke(CombatStat.Strength, StrengthFinal);
-
-                break;
-
-            case nameof(DexterityBase):
-                AttributeChanged?.Invoke(CombatStat.Dexterity, DexterityFinal);
-
-                break;
-
-            case nameof(IntelligenceBase):
-                AttributeChanged?.Invoke(CombatStat.Intelligence, IntelligenceFinal);
-
-                break;
-
-            case nameof(ConstitutionBase):
-                AttributeChanged?.Invoke(CombatStat.Constitution, ConstitutionFinal);
-
-                break;
-
-            case nameof(AwarenessBase):
-                AttributeChanged?.Invoke(CombatStat.Awareness, AwarenessFinal);
-
-                break;
-        }
-    }
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     protected void SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
     {
@@ -207,109 +143,150 @@ public abstract partial class BaseUnit
         OnPropertyChanged(propertyName);
     }
 
+    //Setzt einen Grundwert und gibt ihn an den Kern weiter
+    protected void SetBaseStat(ref int field, int value, CombatStat stat, [CallerMemberName] string propertyName = null)
+    {
+        if (field == value)
+            return;
+
+        field = value;
+
+        Stats.SetBase(stat, value);
+        OnPropertyChanged(propertyName);
+    }
+
+    protected void SetBaseStat(ref float field, float value, CombatStat stat, [CallerMemberName] string propertyName = null)
+    {
+        if (field.Equals(value))
+            return;
+
+        field = value;
+
+        Stats.SetBase(stat, value);
+        OnPropertyChanged(propertyName);
+    }
+
+    //Die Felder tragen die Standardwerte für den Inspector, der Kern kennt sie erst nach dieser Übergabe
+    private void PushBaseValuesToStats()
+        => Stats.Update(sheet =>
+        {
+            sheet.SetBase(CombatStat.Strength, strengthBase);
+            sheet.SetBase(CombatStat.Dexterity, dexterityBase);
+            sheet.SetBase(CombatStat.Intelligence, intelligenceBase);
+            sheet.SetBase(CombatStat.Constitution, constitutionBase);
+            sheet.SetBase(CombatStat.Awareness, awarenessBase);
+            sheet.SetBase(CombatStat.Attackspeed, attackspeedBase);
+            sheet.SetBase(CombatStat.SpellDamage, spellDamageBase);
+            sheet.SetBase(CombatStat.Life, lifeBaseBonus);
+            sheet.SetBase(CombatStat.Armor, armorBase);
+            sheet.SetBase(CombatStat.Dodge, dodgeBase);
+            sheet.SetBase(CombatStat.FireResistance, fireResiBase);
+            sheet.SetBase(CombatStat.FrostResistance, frostResiBase);
+            sheet.SetBase(CombatStat.LightningResistance, lightningResiBase);
+            sheet.SetBase(CombatStat.Movementspeed, movementspeed);
+        });
+
     #region Attributes
 
-    private int   awarenessBase    = 1;
-    private int   constitutionBase = 1;
-    private int   dexterityBase    = 1;
-    private int   intelligenceBase = 1;
-    private int   strengthBase     = 1;
-    private float AwarenessAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Awareness);
-    private float AwarenessPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Awareness);
-    private float AwarenessMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Awareness);
-    public  int   AwarenessFinal                => (int)((AwarenessBase + AwarenessAddedFlat) * AwarenessPercentageMultiplier * AwarenessMoreMultiplierTotal);
+    private int awarenessBase    = 1;
+    private int constitutionBase = 1;
+    private int dexterityBase    = 1;
+    private int intelligenceBase = 1;
+    private int strengthBase     = 1;
 
-    [Export]
-    public int AwarenessBase
-    {
-        get => awarenessBase;
-        set => SetField(ref awarenessBase, value);
-    }
-
-    private float ConstitutionAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Constitution);
-    private float ConstitutionPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Constitution);
-    private float ConstitutionMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Constitution);
-    public  int   ConstitutionFinal                => (int)((ConstitutionBase + ConstitutionAddedFlat) * ConstitutionPercentageMultiplier * ConstitutionMoreMultiplierTotal);
-
-    [Export]
-    public int ConstitutionBase
-    {
-        get => constitutionBase;
-        set => SetField(ref constitutionBase, value);
-    }
-
-    private float IntelligenceAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Intelligence);
-    private float IntelligencePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Intelligence);
-    private float IntelligenceMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Intelligence);
-    public  int   IntelligenceFinal                => (int)((IntelligenceBase + IntelligenceAddedFlat) * IntelligencePercentageMultiplier * IntelligenceMoreMultiplierTotal);
-
-    [Export]
-    public int IntelligenceBase
-    {
-        get => intelligenceBase;
-        set => SetField(ref intelligenceBase, value);
-    }
-
-    private float DexterityAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Dexterity);
-    private float DexterityPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Dexterity);
-    private float DexterityMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Dexterity);
-    public  int   DexterityFinal                => (int)((DexterityBase + DexterityAddedFlat) * DexterityPercentageMultiplier * DexterityMoreMultiplierTotal);
-
-    [Export]
-    public int DexterityBase
-    {
-        get => dexterityBase;
-        set => SetField(ref dexterityBase, value);
-    }
-
-    private float StrengthAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Strength);
-    private float StrengthPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Strength);
-    public  float StrengthMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Strength);
-    public  int   StrengthFinal                => (int)((StrengthBase + StrengthAddedFlat) * StrengthPercentageMultiplier * StrengthMoreMultiplierTotal);
+    public int StrengthFinal     => Stats.GetFinalWhole(CombatStat.Strength);
+    public int DexterityFinal    => Stats.GetFinalWhole(CombatStat.Dexterity);
+    public int IntelligenceFinal => Stats.GetFinalWhole(CombatStat.Intelligence);
+    public int ConstitutionFinal => Stats.GetFinalWhole(CombatStat.Constitution);
+    public int AwarenessFinal    => Stats.GetFinalWhole(CombatStat.Awareness);
 
     [Export]
     public int StrengthBase
     {
         get => strengthBase;
-        set => SetField(ref strengthBase, value);
+        set => SetBaseStat(ref strengthBase, value, CombatStat.Strength);
+    }
+
+    [Export]
+    public int DexterityBase
+    {
+        get => dexterityBase;
+        set => SetBaseStat(ref dexterityBase, value, CombatStat.Dexterity);
+    }
+
+    [Export]
+    public int IntelligenceBase
+    {
+        get => intelligenceBase;
+        set => SetBaseStat(ref intelligenceBase, value, CombatStat.Intelligence);
+    }
+
+    [Export]
+    public int ConstitutionBase
+    {
+        get => constitutionBase;
+        set => SetBaseStat(ref constitutionBase, value, CombatStat.Constitution);
+    }
+
+    [Export]
+    public int AwarenessBase
+    {
+        get => awarenessBase;
+        set => SetBaseStat(ref awarenessBase, value, CombatStat.Awareness);
     }
 
     #endregion
 
     #region Offences
 
-    [Export]
-    public int AttackspeedBase { get; set; }
+    private int attackspeedBase;
+    private int spellDamageBase;
 
-    public float AttackspeedAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Attackspeed);
-    public float AttackspeedPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Attackspeed);
-    public float AttackspeedMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Attackspeed);
-    public int   AttackspeedFinal                => (int)((AttackspeedBase + AttackspeedAddedFlat) * AttackspeedPercentageMultiplier * AttackspeedMoreMultiplierTotal);
+    public int AttackspeedFinal => Stats.GetFinalWhole(CombatStat.Attackspeed);
+    public int SpellDamageFinal => Stats.GetFinalWhole(CombatStat.SpellDamage);
 
     [Export]
-    public int SpellDamageBase { get; set; }
+    public int AttackspeedBase
+    {
+        get => attackspeedBase;
+        set => SetBaseStat(ref attackspeedBase, value, CombatStat.Attackspeed);
+    }
 
-    public float SpellDamageAddedFlat                 => GetModifierSumOf(ModificationType.Flat, CombatStat.SpellDamage);
-    public float SpellDamagePercentageMultiplier      => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.SpellDamage);
-    public float SpellDamageMoreMultiplierTotal       => GetTotalMoreMultiplierOf(CombatStat.SpellDamage);
-    public int   SpellDamageFinal                     => (int)((SpellDamageBase + SpellDamageAddedFlat) * SpellDamagePercentageMultiplier * SpellDamageMoreMultiplierTotal);
-    public float CriticalHitChanceMoreMultiplierTotal => GetTotalMoreMultiplierOf(CombatStat.CriticalHitChance);
-    public float PhysicalDamageMoreMultiplierTotal    => GetTotalMoreMultiplierOf(CombatStat.PhysicalDamage);
+    [Export]
+    public int SpellDamageBase
+    {
+        get => spellDamageBase;
+        set => SetBaseStat(ref spellDamageBase, value, CombatStat.SpellDamage);
+    }
 
     #endregion
 
     #region Defences
 
-    public  float LifeAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Life);
-    public  float LifePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Life);
-    public  float LifeMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Life);
-    public  float LifeMaximum              => (int)((LifeBase + LifeAddedFlat) * LifePercentageMultiplier * LifeMoreMultiplierTotal);
-    public  int   LifeBase                 => 5 + StrengthFinal + 3 * ConstitutionFinal + LifeBaseBonus;
+    private int   armorBase;
+    private int   dodgeBase = 6;
+    private int   fireResiBase;
+    private int   frostResiBase;
+    private int   lifeBaseBonus;
     private float lifeCurrent;
+    private int   lightningResiBase;
+
+    public float LifeMaximum           => Stats.GetFinalWhole(CombatStat.Life);
+    public int   LifeBase              => (int)Stats.GetEffectiveBase(CombatStat.Life);
+    public int   LiferegenerationFinal => Stats.GetFinalWhole(CombatStat.Liferegeneration);
+    public int   ArmorFinal            => Stats.GetFinalWhole(CombatStat.Armor);
+    public int   DodgeFinal            => Stats.GetFinalWhole(CombatStat.Dodge);
+    public int   FireResiFinal         => Stats.GetFinalWhole(CombatStat.FireResistance);
+    public int   FrostResiFinal        => Stats.GetFinalWhole(CombatStat.FrostResistance);
+    public int   LightningResiFinal    => Stats.GetFinalWhole(CombatStat.LightningResistance);
 
     //Fester Zuschlag auf das Basisleben, z.B. für Gegner, deren Leben nicht nur aus Attributen kommen soll
     [Export]
-    public int LifeBaseBonus { get; set; }
+    public int LifeBaseBonus
+    {
+        get => lifeBaseBonus;
+        set => SetBaseStat(ref lifeBaseBonus, value, CombatStat.Life);
+    }
 
     [Export]
     public float LifeCurrent
@@ -318,53 +295,56 @@ public abstract partial class BaseUnit
         set => SetField(ref lifeCurrent, Math.Min(value, LifeMaximum));
     }
 
-    public int   LiferegenerationBase                 => (int)(StrengthFinal / 5f + ConstitutionFinal / 3f);
-    public float LiferegenerationAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Liferegeneration);
-    public float LiferegenerationPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Liferegeneration);
-    public float LiferegenerationMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Liferegeneration);
-    public int   LiferegenerationFinal                => (int)((LiferegenerationBase + LiferegenerationAddedFlat) * LiferegenerationPercentageMultiplier * LiferegenerationMoreMultiplierTotal);
+    [Export]
+    public int ArmorBase
+    {
+        get => armorBase;
+        set => SetBaseStat(ref armorBase, value, CombatStat.Armor);
+    }
 
     [Export]
-    public int ArmorBase { get; set; }
-
-    public float ArmorAddedFlat                => GetModifierSumOf(ModificationType.Flat, CombatStat.Armor);
-    public float ArmorPercentageMultiplier     => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Armor);
-    public float ArmorMoreMultiplierTotal      => GetTotalMoreMultiplierOf(CombatStat.Armor);
-    public int   ArmorFinal                    => (int)((ArmorBase + ArmorAddedFlat) * ArmorPercentageMultiplier * ArmorMoreMultiplierTotal);
-    public float MeleeParryMoreMultiplierTotal => GetTotalMoreMultiplierOf(CombatStat.MeleeParry);
-    public float MeleeBlockMoreMultiplierTotal => GetTotalMoreMultiplierOf(CombatStat.MeleeBlock);
+    public int DodgeBase
+    {
+        get => dodgeBase;
+        set => SetBaseStat(ref dodgeBase, value, CombatStat.Dodge);
+    }
 
     [Export]
-    public int DodgeBase { get; set; } = 6;
-
-    public float DodgeAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Dodge);
-    public float DodgePercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Dodge);
-    public float DodgeMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Dodge);
-    public int   DodgeFinal                => (int)((DodgeBase + DodgeAddedFlat) * DodgePercentageMultiplier * DodgeMoreMultiplierTotal);
-
-    [Export]
-    public int FireResiBase { get; set; }
-
-    private float FireResiAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.FireResistance);
-    private float FireResiPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.FireResistance);
-    private float FireResiMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.FireResistance);
-    public  int   FireResiFinal                => (int)((FireResiBase + FireResiAddedFlat) * FireResiPercentageMultiplier * FireResiMoreMultiplierTotal);
+    public int FireResiBase
+    {
+        get => fireResiBase;
+        set => SetBaseStat(ref fireResiBase, value, CombatStat.FireResistance);
+    }
 
     [Export]
-    public int FrostResiBase { get; set; }
-
-    private float FrostResiAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.FrostResistance);
-    private float FrostResiPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.FrostResistance);
-    private float FrostResiMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.FrostResistance);
-    public  int   FrostResiFinal                => (int)((FrostResiBase + FrostResiAddedFlat) * FrostResiPercentageMultiplier * FrostResiMoreMultiplierTotal);
+    public int FrostResiBase
+    {
+        get => frostResiBase;
+        set => SetBaseStat(ref frostResiBase, value, CombatStat.FrostResistance);
+    }
 
     [Export]
-    public int LightningResiBase { get; set; }
+    public int LightningResiBase
+    {
+        get => lightningResiBase;
+        set => SetBaseStat(ref lightningResiBase, value, CombatStat.LightningResistance);
+    }
 
-    private float LightningResiAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.LightningResistance);
-    private float LightningResiPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.LightningResistance);
-    private float LightningResiMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.LightningResistance);
-    public  int   LightningResiFinal                => (int)((LightningResiBase + LightningResiAddedFlat) * LightningResiPercentageMultiplier * LightningResiMoreMultiplierTotal);
+    #endregion
+
+    #region Utilities
+
+    private float movementspeed;
+
+    public float MovementspeedFinal => Stats.GetFinal(CombatStat.Movementspeed);
+
+    //Grundwert der Bewegungsgeschwindigkeit. Für die Bewegung zählt MovementspeedFinal
+    [Export]
+    public float Movementspeed
+    {
+        get => movementspeed;
+        set => SetBaseStat(ref movementspeed, value, CombatStat.Movementspeed);
+    }
 
     #endregion
 }

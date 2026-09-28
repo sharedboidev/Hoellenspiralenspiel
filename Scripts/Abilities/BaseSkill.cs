@@ -41,12 +41,8 @@ public abstract class BaseSkill
 
         if (this is BaseSpell)
         {
-            var flatSpellDamage = Owner.GetModifierSumOf(ModificationType.Flat, CombatStat.SpellDamage);
-            rolledBaseDamage += flatSpellDamage;
-
-            var spellDamageMultiplier = 1 + Owner.GetModifierSumOf(ModificationType.Percentage, CombatStat.SpellDamage);
-            rolledBaseDamage *= spellDamageMultiplier;
-            rolledBaseDamage *= Owner.GetTotalMoreMultiplierOf(CombatStat.SpellDamage);
+            rolledBaseDamage += Owner.Stats.GetAddedFlat(CombatStat.SpellDamage);
+            rolledBaseDamage *= Owner.Stats.GetTotalMultiplier(CombatStat.SpellDamage);
         }
 
         var realDamage       = isCrit ? rolledBaseDamage * (float)baseCritModifier : rolledBaseDamage;

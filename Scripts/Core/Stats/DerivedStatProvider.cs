@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Hoellenspiralenspiel.Enums;
-using Hoellenspiralenspiel.Scripts.Models;
 
-namespace Hoellenspiralenspiel.Scripts.Utils;
+namespace Hoellenspiralenspiel.Scripts.Core.Stats;
 
 //Graphplotting & Feinjustierung: https://www.desmos.com/calculator
 public static class DerivedStatProvider
@@ -19,7 +18,7 @@ public static class DerivedStatProvider
     private const float MoreParryChanceCeiling       = 200f;
     private const float MoreBlockChanceCeiling       = 200f;
     private const float MoreCriticalHitChanceCeiling = 200f;
-    private const float FlatLightRadiusCeiling       = 400f;
+    private const float MoreLightRadiusCeiling       = 400f;
     private static readonly Dictionary<float, float> GrowthParameterMap = new()
     {
         { 100f, 0.0009f },
@@ -59,7 +58,10 @@ public static class DerivedStatProvider
         var derivedCriticalHitChanceValue = GetLogisticGrowthValue(awareness, MoreCriticalHitChanceCeiling);
         var criticalHitChanceModifier     = new CombatStatModifier(CombatStat.CriticalHitChance, ModificationType.More, derivedCriticalHitChanceValue / 100, originId);
 
-        return [meleeParryModifier, meleeBlockModifier, criticalHitChanceModifier];
+        var derivedLightRadiusValue = GetLogisticGrowthValue(awareness, MoreLightRadiusCeiling);
+        var lightRadiusModifier     = new CombatStatModifier(CombatStat.LightRadius, ModificationType.More, derivedLightRadiusValue / 100, originId);
+
+        return [meleeParryModifier, meleeBlockModifier, criticalHitChanceModifier, lightRadiusModifier];
     }
 
     private static CombatStatModifier[] GetDerivedConstitutionStats(int consti)

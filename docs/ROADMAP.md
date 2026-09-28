@@ -1,6 +1,7 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
-Stand: 28.09.2026, Branch `master_MeleeCombat`.
+Stand: 28.09.2026. M0 liegt auf `master`, M1 auf dem Branch `master_StatCore`.
+Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code (rund 5.500 Zeilen) plus Szenen.
 Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler und F19 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
 
@@ -94,8 +95,8 @@ Hinweise zu den Korrekturen:
 
 | Nr. | Problem | Stelle |
 |---|---|---|
-| P1 | Jeder Stat-Zugriff durchsucht die Modifikator-Liste mehrfach mit LINQ. Das passiert pro Einheit und pro Frame mehrfach und erzeugt laufend Müll für den Garbage Collector. | [BaseUnit.cs:66](../Scripts/Units/BaseUnit.cs) |
-| P2 | Die Orbs bauen jeden Frame Text neu und setzen Shader-Parameter, auch wenn sich nichts ändert | [Player2D.cs:182](../Scripts/Units/Player2D.cs), [ResourceOrb.cs:128](../Scripts/UI/Character/ResourceOrb.cs) |
+| P1 | Behoben in M1. Jeder Stat-Zugriff durchsuchte die Modifikator-Liste mehrfach mit LINQ. Das passierte pro Einheit und pro Frame mehrfach und erzeugte laufend Müll für den Garbage Collector. | [StatSheet.cs](../Scripts/Core/Stats/StatSheet.cs) |
+| P2 | Behoben in M1. Die Orbs bauten jeden Frame Text neu und setzten Shader-Parameter, auch wenn sich nichts änderte. | [ResourceOrb.cs](../Scripts/UI/Character/ResourceOrb.cs) |
 | P3 | Alle Gegner der Karte werden jeden Frame simuliert, egal wie weit sie entfernt sind | [EnemyController.cs:170](../Scripts/Controllers/EnemyController.cs) |
 | P4 | Ein Feuerball kann sich auf bis zu 63 Projektile aufspalten. Jeder Treffer sortiert alle Gegner der Karte nach Entfernung. | [Fireball.cs:55](../Scripts/Abilities/Spells/Fireball.cs) |
 | P5 | Das Inventar nutzt Godot-Dictionaries mit Float-Vektoren als Schlüssel. Jeder Zugriff wird zwischen C# und Engine konvertiert. | [Inventory.cs:17](../Scripts/UI/Character/Inventory.cs) |
@@ -107,7 +108,7 @@ Hinweise zu den Korrekturen:
 | Nr. | Problem | Folge |
 |---|---|---|
 | A1 | Rund 27 Stellen suchen Spieler, Controller oder `Environment` über feste Namen in der aktuellen Szene | Jedes neue Level muss exakt wie das Testlevel aufgebaut sein |
-| A2 | Alle Stats stecken in einer 2D-Physik-Klasse | Blockiert die 2D/3D-Entscheidung, Tests und Koop |
+| A2 | Behoben in M1. Alle Stats steckten in einer 2D-Physik-Klasse. Die Rechnung liegt jetzt in `Scripts/Core/Stats` ohne Godot. | Blockierte die 2D/3D-Entscheidung, Tests und Koop |
 | A3 | Spiellogik steckt in UI-Klassen. Der Skillbar-Button zaubert und zieht Mana ab. | Logik ist ohne UI nicht nutzbar und nicht testbar |
 | A4 | Items sind Szenen-Knoten, die nie im Baum hängen | Speicherleck und nicht serialisierbar |
 | A5 | Zwei parallele Skill-Hierarchien, Skills und Manakosten fest im Code | Neue Skills brauchen Codeänderungen an mehreren Stellen |
@@ -146,18 +147,44 @@ Bewusst nicht angefasst:
 
 Fertig, wenn das Testlevel ohne die genannten Fehler läuft und der Wurzelordner nur noch Projektdateien enthält.
 
-### M1: Stat-Kern in reinem C# (M)
+### M1: Stat-Kern in reinem C# (M, umgesetzt am 28.09.2026 auf `master_StatCore`)
 
 Ziel: ein Stat-System, das schnell, testbar und unabhängig von 2D oder 3D ist.
 
-- Klasse für Stat-Blätter mit Basiswerten, Modifikatoren und zwischengespeicherten Endwerten. Neuberechnung nur bei Änderung. Behebt P1, F2, F11.
-- Abgeleitete Werte reagieren auf den Endwert eines Attributs, also auch auf Ausrüstung.
-- Einheiten halten ein Stat-Blatt, statt selbst 350 Zeilen Stat-Code zu enthalten. Behebt A2.
-- Echtes Testprojekt mit Tests für Stat-Berechnung und Wachstumskurven.
-- Lichtradius als Stat ergänzen und an das Spielerlicht koppeln.
-- Orbs nur bei Wertänderung aktualisieren. Behebt P2.
+- Erledigt: Klasse für Stat-Blätter mit Basiswerten, Modifikatoren und zwischengespeicherten Endwerten. Neuberechnung nur bei Änderung. Behebt P1, F2, F11.
+- Erledigt: Abgeleitete Werte reagieren auf den Endwert eines Attributs, also auch auf Ausrüstung.
+- Erledigt: Einheiten halten ein Stat-Blatt und rechnen nicht mehr selbst. Behebt A2.
+- Erledigt: Testprojekt `Hoellenspiralenspiel.Tests` mit NUnit für Stat-Berechnung und Wachstumskurven.
+- Erledigt: Lichtradius als Stat, gekoppelt an die Lichter des Spielers, mit eigener Zeile im Charakterbogen.
+- Erledigt: Orbs aktualisieren sich nur bei Wertänderung. Behebt P2.
+- Zusätzlich: Bewegungsgeschwindigkeit, Manaregeneration und Fläche laufen ebenfalls über den Kern.
 
 Fertig, wenn alle Werte im Charakterbogen aus dem neuen Kern kommen und die Tests grün sind.
+
+Stand des Fertig-Kriteriums: Die Tests sind grün. Drei Werte im Charakterbogen kommen noch aus der Ausrüstung statt aus dem Kern: Krit-Chance, Krit-Schaden und Angriffstempo. Sie hängen an der Waffe und werden erst mit dem Nahkampf in M2 sauber definiert.
+
+So funktioniert der Kern:
+
+- `StatSheet` rechnet bei jeder Änderung einmal alles neu und speichert die Endwerte. Lesen ist nur ein Zugriff auf ein Feld.
+- Reihenfolge der Rechnung: erst Attribute, dann die daraus abgeleiteten Modifier, dann alle übrigen Stats.
+- Bei Leben, Mana und Lebensregeneration ist der gesetzte Grundwert ein Zuschlag auf die Formel aus den Attributen.
+- Mehrere Änderungen lassen sich mit `Update` zusammenfassen, zum Beispiel beim Anlegen eines Items.
+- Neue Werte im Enum `CombatStat` nur am Ende anhängen, weil Affixe den Stat als Zahl speichern.
+
+Messung mit 200.000 Lesezugriffen auf drei Stats:
+
+| Stand | Dauer | Angeforderter Speicher |
+|---|---|---|
+| Vorher | rund 480 ms | rund 640 MB |
+| Nachher | rund 2,5 ms | 0 |
+
+Tests ausführen:
+
+```bash
+dotnet test Hoellenspiralenspiel.Tests
+```
+
+Das Testprojekt bindet `Scripts/Core` als Quelltext ein. Hängt eine Datei dort von Godot ab, schlägt der Test-Build fehl.
 
 ### M2: Kampf-Pipeline, Tod und Nahkampf (M)
 

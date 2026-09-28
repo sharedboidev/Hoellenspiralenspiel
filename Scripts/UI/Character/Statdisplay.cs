@@ -1,4 +1,5 @@
 using Godot;
+using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
@@ -26,6 +27,7 @@ public partial class Statdisplay : PanelContainer
     private          RichTextLabel  manaLabel;
     private          RichTextLabel  manaregenerationLabel;
     private          RichTextLabel  areaLabel;
+    private          RichTextLabel  lightRadiusLabel;
 
     public override void _Ready()
     {
@@ -46,23 +48,29 @@ public partial class Statdisplay : PanelContainer
     }
 
 
+    //Zeigt Increased und More eines Stats zusammen als Zuwachs in Prozent
+    private static string AsBonusPercent(Player2D player, CombatStat stat)
+        => "+" + ((player.Stats.GetTotalMultiplier(stat) - 1) * 100).ToString("0.##") + "%";
+
     private void RenderUtilities(Player2D player)
     {
-        movementspeedLabel.Text = player.Movementspeed.ToString("N0");
-        //areaLabel.Text = player.Area.ToString("N0");
+        movementspeedLabel.Text = player.MovementspeedFinal.ToString("N0");
+        areaLabel.Text          = AsBonusPercent(player, CombatStat.AreaOfEffect);
+        lightRadiusLabel.Text   = player.LightRadiusFinal.ToString("N0") + "%";
     }
 
+    //Krit und Angriffstempo hängen an der Waffe und kommen bis zum Nahkampf in M2 weiter aus der Ausrüstung
     private void RenderOffences(Player2D player)
     {
         meleeCritChanceLabel.Text = equipmentPanel.GetTotalMeleeCritChance().ToString("0.##") + "%";
         critDamageLabel.Text      = "+" + equipmentPanel.GetTotalCriticalDamage().ToString("N0") + "%";
         attackspeedLabel.Text     = "+" + equipmentPanel.GetTotalIncreasedAttackspeed().ToString("N0") + "%";
-        spellDamageLabel.Text     = "+" + ((player.SpellDamagePercentageMultiplier * player.SpellDamageMoreMultiplierTotal - 1) * 100).ToString("#.##") + "%";
+        spellDamageLabel.Text     = AsBonusPercent(player, CombatStat.SpellDamage);
     }
 
     private void RenderDefences(Player2D player)
     {
-        armorLabel.Text         = equipmentPanel.GetTotalArmor().ToString("N0");
+        armorLabel.Text         = player.ArmorFinal.ToString("N0");
         dodgeLabel.Text         = player.DodgeFinal.ToString("0.##") + "%";
         fireResiLabel.Text      = player.FireResiFinal.ToString("N0") + "%";
         frostResistance.Text    = player.FrostResiFinal.ToString("N0") + "%";
@@ -74,7 +82,7 @@ public partial class Statdisplay : PanelContainer
         lifeLabel.Text             = player.LifeMaximum.ToString("N0");
         liferegenerationLabel.Text = player.LiferegenerationFinal.ToString("N0");
         manaLabel.Text             = player.ManaMaximum.ToString("N0");
-        manaregenerationLabel.Text = player.manaProSekunde.ToString("0.##");
+        manaregenerationLabel.Text = player.ManaregenerationFinal.ToString("0.##");
 
     }
     private void RenderAttributes(Player2D player)
@@ -89,7 +97,8 @@ public partial class Statdisplay : PanelContainer
     private void FindUtilities()
     {
         movementspeedLabel = GetNode<RichTextLabel>("%Movementspeed");
-        areaLabel = GetNode<RichTextLabel>("%Area");
+        areaLabel          = GetNode<RichTextLabel>("%Area");
+        lightRadiusLabel   = GetNode<RichTextLabel>("%LightRadius");
     }
 
     private void FindDefences()

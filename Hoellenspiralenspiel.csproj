@@ -13,4 +13,10 @@
     <ItemGroup>
         <Content Include="Resources\Desert.tres"/>
     </ItemGroup>
+    <ItemGroup>
+        <!-- Das Testprojekt liegt im Projektordner und darf nicht ins Spiel kompiliert werden -->
+        <Compile Remove="Hoellenspiralenspiel.Tests\**"/>
+        <EmbeddedResource Remove="Hoellenspiralenspiel.Tests\**"/>
+        <None Remove="Hoellenspiralenspiel.Tests\**"/>
+    </ItemGroup>
 </Project>

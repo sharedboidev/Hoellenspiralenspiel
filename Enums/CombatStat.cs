@@ -43,5 +43,10 @@ public enum CombatStat
     [Description("Melee Block")]
     MeleeBlock,
     [Description("Spell Block")]
-    SpellBlock
+    SpellBlock,
+
+    //Neue Werte nur hier am Ende anhängen: Affixe speichern den Stat als Zahl
+    [Description("Light Radius")]
+    LightRadius,
+    Movementspeed
 }

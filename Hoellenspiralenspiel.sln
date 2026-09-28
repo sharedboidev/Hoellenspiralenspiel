@@ -2,6 +2,8 @@
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hoellenspiralenspiel", "Hoellenspiralenspiel.csproj", "{902348D7-22F8-403D-BC1E-50EA11F39D02}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hoellenspiralenspiel.Tests", "Hoellenspiralenspiel.Tests\Hoellenspiralenspiel.Tests.csproj", "{DE7B5DA8-5F04-41FC-9AF9-4BD4C9E5617D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 	Debug|Any CPU = Debug|Any CPU
@@ -15,5 +17,9 @@ Global
 		{902348D7-22F8-403D-BC1E-50EA11F39D02}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
 		{902348D7-22F8-403D-BC1E-50EA11F39D02}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
 		{902348D7-22F8-403D-BC1E-50EA11F39D02}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{DE7B5DA8-5F04-41FC-9AF9-4BD4C9E5617D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE7B5DA8-5F04-41FC-9AF9-4BD4C9E5617D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE7B5DA8-5F04-41FC-9AF9-4BD4C9E5617D}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE7B5DA8-5F04-41FC-9AF9-4BD4C9E5617D}.ExportRelease|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 EndGlobal

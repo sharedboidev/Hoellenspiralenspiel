@@ -24,18 +24,28 @@ public partial class Player2D : BaseUnit
 
     public delegate void LeveledUpEventHandler(Player2D player);
 
-    private readonly PackedScene     skillBarIcon = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
-    private readonly List<BaseSkill> skills       = new();
-    private          LevelUpEffect   levelUpEffect;
-    [Export] private ResourceOrb     lifeOrb;
-    private          float           manaCurrent;
-    [Export] private ResourceOrb     manaOrb;
-    public          float           manaProSekunde = .5f;
-    [Export] public  HBoxContainer   SkillBar;
-    private          long            xpTotal;
-    private          AnimationTree   AnimationTree { get; set; }
+    //Lichter des Spielers mit der Größe, die in der Szene eingestellt ist
+    private readonly Dictionary<PointLight2D, float> lightBaseScales = new();
+    private readonly PackedScene                     skillBarIcon    = ResourceLoader.Load<PackedScene>("res://Scenes/UI/cooldown_skill.tscn"); //.Instantiate<CooldownSkill>();
+    private readonly List<BaseSkill>                 skills          = new();
+    private          double                          contactDamageCooldownLeftSec;
+    private          LevelUpEffect                   levelUpEffect;
+    [Export] private ResourceOrb                     lifeOrb;
+    private          int                             lightRadiusBase = 100;
+    private          float                           manaCurrent;
+    [Export] private ResourceOrb                     manaOrb;
+    private          float                           manaregenerationBase = .5f;
+    [Export] public  HBoxContainer                   SkillBar;
+    private          long                            xpTotal;
 
-    private double contactDamageCooldownLeftSec;
+    public Player2D()
+        => Stats.Update(sheet =>
+        {
+            sheet.SetBase(CombatStat.Manaregeneration, manaregenerationBase);
+            sheet.SetBase(CombatStat.LightRadius, lightRadiusBase);
+        });
+
+    private AnimationTree AnimationTree { get; set; }
 
     [Export]
     public AudioStreamPlayer2D NoManaSound { get; set; }
@@ -43,11 +53,26 @@ public partial class Player2D : BaseUnit
     [Export]
     public float ContactDamageCooldownSec { get; set; } = 1f;
 
-    public  int   ManaBase                 => 3 + AwarenessFinal + 5 * IntelligenceFinal;
-    private float ManaAddedFlat            => GetModifierSumOf(ModificationType.Flat, CombatStat.Mana);
-    private float ManaPercentageMultiplier => 1 + GetModifierSumOf(ModificationType.Percentage, CombatStat.Mana);
-    public  float ManaMoreMultiplierTotal  => GetTotalMoreMultiplierOf(CombatStat.Mana);
-    public  float ManaMaximum              => (int)((ManaBase + ManaAddedFlat) * ManaPercentageMultiplier * ManaMoreMultiplierTotal);
+    //Mana pro Sekunde
+    [Export]
+    public float ManaregenerationBase
+    {
+        get => manaregenerationBase;
+        set => SetBaseStat(ref manaregenerationBase, value, CombatStat.Manaregeneration);
+    }
+
+    //Lichtradius in Prozent. 100 entspricht der Größe, die in der Szene eingestellt ist
+    [Export]
+    public int LightRadiusBase
+    {
+        get => lightRadiusBase;
+        set => SetBaseStat(ref lightRadiusBase, value, CombatStat.LightRadius);
+    }
+
+    public int   ManaBase              => (int)Stats.GetEffectiveBase(CombatStat.Mana);
+    public float ManaMaximum           => Stats.GetFinalWhole(CombatStat.Mana);
+    public float ManaregenerationFinal => Stats.GetFinal(CombatStat.Manaregeneration);
+    public float LightRadiusFinal      => Stats.GetFinal(CombatStat.LightRadius);
 
     public long XpTotal
     {
@@ -73,8 +98,6 @@ public partial class Player2D : BaseUnit
 
     public override void _Ready()
     {
-        ManaCurrent = ManaMaximum;
-
         lifeOrb.Init(this, ResourceType.Life);
         manaOrb.Init(this, ResourceType.Mana);
 
@@ -83,14 +106,41 @@ public partial class Player2D : BaseUnit
 
         base._Ready();
 
-        //Erst nach den abgeleiteten Modifiern füllen, sonst startet das Mana unter seinem Maximum
         ManaCurrent = ManaMaximum;
 
+        LoadLights();
         ConfigureSkillbar();
 
         AnimationTree = GetNode<AnimationTree>(nameof(AnimationTree));
         levelUpEffect = GetNode<LevelUpEffect>(nameof(LevelUpEffect));
         //AnimationTree = GetNode<AnimationTree>("AnimationTreeNEW");
+    }
+
+    protected override void OnStatsRecalculated()
+    {
+        if (ManaCurrent > ManaMaximum)
+            ManaCurrent = ManaMaximum;
+
+        ApplyLightRadius();
+
+        OnPropertyChanged(nameof(ManaMaximum));
+    }
+
+    private void LoadLights()
+    {
+        foreach (var light in this.GetAllChildren<PointLight2D>())
+            lightBaseScales[light] = light.TextureScale;
+
+        ApplyLightRadius();
+    }
+
+    //Der Lichtradius skaliert die Lichter relativ zu ihrer Größe aus der Szene
+    private void ApplyLightRadius()
+    {
+        var factor = LightRadiusFinal / 100f;
+
+        foreach (var (light, baseScale) in lightBaseScales)
+            light.TextureScale = baseScale * factor;
     }
 
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -114,11 +164,11 @@ public partial class Player2D : BaseUnit
     {
         Level++;
         AttributePointsAllowedToSpend++;
-        
+
         XpForNextLevel = XpTable.GetTotalXpNeededForLevel(Level + 1);
 
         levelUpEffect.Emit();
-        
+
         LeveledUp?.Invoke(this);
     }
 
@@ -185,21 +235,14 @@ public partial class Player2D : BaseUnit
         HandleCollision(delta);
     }
 
+    //Die Orbs hören auf die Änderung von ManaCurrent und LifeCurrent und müssen nicht eigens angestoßen werden
     private void ResolveManareg(double delta)
     {
         if (ManaCurrent < ManaMaximum)
         {
-            ManaCurrent += manaProSekunde * (float)delta;
+            ManaCurrent += ManaregenerationFinal * (float)delta;
             ManaCurrent =  Mathf.Clamp(ManaCurrent, 0, ManaMaximum);
-            manaOrb.SetRessource(ManaCurrent);
         }
-    }
-
-    protected override void ResolveLifeReg(double delta)
-    {
-        base.ResolveLifeReg(delta);
-
-        lifeOrb.SetRessource(LifeCurrent);
     }
 
     private void HandleCollision(double delta)
@@ -221,8 +264,6 @@ public partial class Player2D : BaseUnit
 
             ReceiveDamage(hit);
 
-            lifeOrb.SetRessource(LifeCurrent);
-
             //Höchstens ein Kontakttreffer pro Abklingzeit, egal wie viele Gegner berührt werden
             contactDamageCooldownLeftSec = ContactDamageCooldownSec;
 
@@ -233,7 +274,7 @@ public partial class Player2D : BaseUnit
     private void HandleMovementInputs()
     {
         MovementDirection = Input.GetVector(InputActions.MoveLeft, InputActions.MoveRight, InputActions.MoveUp, InputActions.MoveDown);
-        Velocity          = MovementDirection * Movementspeed;
+        Velocity          = MovementDirection * MovementspeedFinal;
 
         if (MovementDirection != Vector2.Zero)
         {
@@ -254,36 +295,26 @@ public partial class Player2D : BaseUnit
     }
 
     public void ReduceMana(float mana)
-    {
-        ManaCurrent -= mana;
-        manaOrb.SetRessource(ManaCurrent);
-    }
+        => ManaCurrent -= mana;
 
+    //Alle Modifier eines Items tragen dessen Herkunft, damit sie beim Ablegen gemeinsam entfernt werden
     public void EquipItem(BaseItem item)
     {
-        if (item is BaseArmor armor)
-            ArmorBase += armor.ArmorvalueFinal;
-
-        foreach (var modifier in item.GetExtrinsicModifiers())
+        Stats.Update(sheet =>
         {
-            var newModifier = item.CreateCombatStatModifier(modifier);
-            CombatStatModifiers.Add(newModifier);
-        }
+            if (item is BaseArmor armor)
+                sheet.AddModifier(item.CreateCombatStatModifier(CombatStat.Armor, ModificationType.Flat, armor.ArmorvalueFinal));
 
-        RefreshAttributeDerivedStats();
+            foreach (var modifier in item.GetExtrinsicModifiers())
+                sheet.AddModifier(item.CreateCombatStatModifier(modifier));
+        });
 
         EquipmentChanged?.Invoke();
     }
 
     public void UnequipItem(BaseItem item)
     {
-        if (item is BaseArmor armor)
-            ArmorBase -= armor.ArmorvalueFinal;
-        
-        var itemId = item.ToString();
-
-        RemoveModifiers(itemId);
-        RefreshAttributeDerivedStats();
+        Stats.RemoveModifiersOf(item.ToString());
 
         EquipmentChanged?.Invoke();
     }
