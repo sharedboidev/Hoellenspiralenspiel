@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellSkillResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Skills/SpellSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://c7udd6aj0mrqh" path="res://Textures/Spells/Icons_Fire Spell.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/fireball.tscn" id="3_scene"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "fireball"
+DisplayName = "Fireball"
+Description = "A ball of fire that splits on impact and seeks out nearby enemies."
+Icon = ExtResource("2_icon")
+ManaCost = 2.0
+CooldownSec = 0.25
+Delivery = 1
+EffectScene = ExtResource("3_scene")
+ProjectileSpeed = 800.0
+ProjectileLifetimeSec = 2.5
+ForkCount = 2
+ForkGenerations = 2
+ForkRange = 600.0
+MinDamage = 50.0
+MaxDamage = 75.0
+DamageType = 3
+CriticalHitChance = 10.0

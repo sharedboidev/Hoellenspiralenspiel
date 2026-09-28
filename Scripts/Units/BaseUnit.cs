@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Godot;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
+using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Stats;
 using Hoellenspiralenspiel.Scripts.Extensions;
-using Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
@@ -48,7 +48,18 @@ public abstract partial class BaseUnit
 
     public StatusEffectTracker StatusEffects { get; }
 
+    public SkillCooldowns SkillCooldowns { get; } = new();
+
     public abstract Faction Faction { get; }
+
+    //Die Werte, mit denen die Einheit bei einer ATTACK zuschlägt
+    public virtual WeaponProfile Weapon => WeaponProfile.Unarmed;
+
+    //Das Projektil, das eine Fernkampfwaffe verschießt
+    public virtual PackedScene WeaponProjectileScene => null;
+
+    //Mana, das für Skills bereitsteht. Einheiten ohne Mana zahlen nichts
+    public virtual float AvailableMana => SkillGate.UnlimitedMana;
 
     [Export]
     public Vector2 MovementDirection
@@ -81,6 +92,26 @@ public abstract partial class BaseUnit
     {
         ResolveLifeReg(delta);
         AdvanceStatusEffects(delta);
+
+        if (SkillCooldowns.HasAny)
+            SkillCooldowns.Advance(delta);
+    }
+
+    public virtual void SpendMana(float amount) { }
+
+    //Prüft Abklingzeit und Mana. Zahlt bei Erfolg die Kosten und startet die Abklingzeit, die mindestens minCooldownSec dauert
+    public SkillUseCheck TryPayFor(SkillResource skill, double minCooldownSec = 0)
+    {
+        var definition = skill.Definition;
+        var check      = SkillGate.Check(definition, SkillCooldowns, AvailableMana);
+
+        if (check != SkillUseCheck.Ready)
+            return check;
+
+        SpendMana(definition.ManaCost);
+        SkillCooldowns.Start(definition.Id, Math.Max(definition.CooldownSec, minCooldownSec));
+
+        return check;
     }
 
     public bool IsHostileTo(BaseUnit other)
@@ -221,25 +252,6 @@ public abstract partial class BaseUnit
 
     //Für abgeleitete Klassen, die auf neue Stats reagieren müssen, bevor die Anzeigen informiert werden
     protected virtual void OnStatsRecalculated() { }
-
-    public BaseEnemy[] FindClosestEnemyFrom(List<BaseEnemy> existingEnemies, int amountReturned = 1)
-    {
-        var enemyDistanceDict = new Godot.Collections.Dictionary<BaseEnemy, float>();
-
-        foreach (var existingEnemy in existingEnemies)
-        {
-            var distance = GlobalPosition.DistanceSquaredTo(existingEnemy.GlobalPosition);
-
-            enemyDistanceDict.Add(existingEnemy, distance);
-        }
-
-        var nearestBois = enemyDistanceDict.OrderBy(dd => dd.Value)
-                                           .Take(amountReturned)
-                                           .Select(dd => dd.Key)
-                                           .ToArray();
-
-        return nearestBois;
-    }
 
     protected void RaiseDied()
         => Died?.Invoke(this);

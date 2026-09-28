@@ -1,9 +1,9 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
-Stand: 28.09.2026. M0 bis M2 liegen auf `master`.
+Stand: 28.09.2026. M0 bis M3 liegen auf `master`.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code (rund 5.500 Zeilen) plus Szenen.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler und F19 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 und M3 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -22,17 +22,17 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler und F19
 | Attribute | Alle fünf Attribute mit abgeleiteten Werten und Obergrenzen | Obergrenzen stimmen exakt. Wachstum ist logistisch statt beschränkt. Lichtradius fehlt. |
 | Leben und Mana | Basisformeln, Regeneration, Orbs mit Shader | Formeln stimmen exakt |
 | Modifier-System | Flat, Percentage (increased) und More, sauber getrennt | Trägt das ganze Stat-Konzept |
-| Waffen | Schadensspanne, Angriffe pro Sekunde, Swingtimer, Typ, Schadensart, Krit, Anforderungen | Seit M2 bestimmen die Werte den Nahkampf. Klassen-Anforderung fehlt. |
+| Waffen | Schadensspanne, Angriffe pro Sekunde, Swingtimer, Typ, Schadensart, Krit, Anforderungen | Seit M2 bestimmen die Werte den Nahkampf, seit M3 gibt es Fernkampfwaffen mit Projektil. Klassen-Anforderung fehlt. |
 | Rüstung | Helm, Torso, Handschuhe mit Rüstungswert | 3 von 16 Slots haben Item-Basen |
 | Affixe | 16 Affixe mit Tiers, Gewichten, Itemlevel-Grenze, Prefix/Suffix, lokale und globale Mods | Slot-Tabelle aus dem PDF nur teilweise abgedeckt |
 | Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen | Funktioniert im Testlevel |
 | Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF, aber fertig nutzbar |
 | Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF |
 | Leveling | XP-Tabelle bis Level 100, Level-up-Effekt, Attributspunkte, XP-Balken | Nicht im PDF, funktioniert |
-| Zauber | Fireball mit Fork, Frost Nova, Lightning Strike, Skillbar mit Cooldowns | Elementarschaden wird über Resistenzen gemindert |
+| Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
 | Kampf | Zentrale Trefferauflösung, Nahkampf, Schadensarten mit Effekten, Statuseffekte, Tod und Respawn | Seit M2. Frost-Effekt war im PDF leer und ist jetzt Verlangsamung. |
 | Schadensminderung | Rüstungsformel, Resistenzen, Dodge, Parry und Block für alle Einheiten | Parry und Block haben noch keine Quelle, weil Schilde fehlen |
-| Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Rare/Elite, Lebensbalken, Schadenszahlen, eigene Angriffe | Nur Blobs und ein Testgegner |
+| Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Rare/Elite, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler | Nur Blobs und ein Testgegner |
 | Atmosphäre | Punktlichter mit Schatten, abgedunkelte Szene, Overlay-Karte | Passt zum düsteren Vibe |
 | 3D | Ein Prototyp, der nur Bewegung kann | Offene Frage aus dem PDF |
 
@@ -49,7 +49,7 @@ Ohne diese Systeme gibt es kein spielbares Spiel, nur eine Testszene.
 7. **Wegfindung.** Gegner laufen in gerader Linie und bleiben an Wänden hängen.
 8. **Statuseffekte.** Erledigt in M2: Bleed, stapelnder Burn, Shock und Chill. Die leeren Schadensart-Klassen sind durch eine Aufzählung im Kern ersetzt.
 9. **Parry, Block, Krit aus Stats.** Erledigt in M2. Die Trefferauflösung wertet alle drei aus.
-10. **Skill-Erwerb.** Die drei Zauber sind fest im Spieler verdrahtet. Klassen und Skill-Fortschritt fehlen.
+10. **Skill-Erwerb.** Seit M3 sind Skills Daten und die Leiste ist frei belegbar. Der Held kennt vorerst alle Skills. Klassen und Skill-Fortschritt fehlen.
 11. **Skalierung.** Itemlevel ist immer 1. Monsterlevel und Bereichslevel existieren nicht.
 12. **Inhalt.** Kein einziger Höllenkreis, kein Boss, kein Intro.
 13. **Einstellungen.** Auflösung, Tastenbelegung und Lautstärke sind nicht einstellbar.
@@ -100,40 +100,42 @@ Hinweise zu den Korrekturen:
 | P1 | Behoben in M1. Jeder Stat-Zugriff durchsuchte die Modifikator-Liste mehrfach mit LINQ. Das passierte pro Einheit und pro Frame mehrfach und erzeugte laufend Müll für den Garbage Collector. | [StatSheet.cs](../Scripts/Core/Stats/StatSheet.cs) |
 | P2 | Behoben in M1. Die Orbs bauten jeden Frame Text neu und setzten Shader-Parameter, auch wenn sich nichts änderte. | [ResourceOrb.cs](../Scripts/UI/Character/ResourceOrb.cs) |
 | P3 | Alle Gegner der Karte werden jeden Frame simuliert, egal wie weit sie entfernt sind | [EnemyController.cs:170](../Scripts/Controllers/EnemyController.cs) |
-| P4 | Ein Feuerball kann sich auf bis zu 63 Projektile aufspalten. Jeder Treffer sortiert alle Gegner der Karte nach Entfernung. | [Fireball.cs:55](../Scripts/Abilities/Spells/Fireball.cs) |
+| P4 | Behoben in M3. Ein Feuerball konnte sich auf bis zu 63 Projektile aufspalten, und jeder Treffer sortierte alle Gegner der Karte nach Entfernung. Jetzt sind es höchstens 7, die Zielsuche läuft in einem Durchlauf ohne Sortieren. | [SkillProjectile.cs](../Scripts/Skills/Effects/SkillProjectile.cs), [NearestPicker.cs](../Scripts/Core/Skills/NearestPicker.cs) |
 | P5 | Das Inventar nutzt Godot-Dictionaries mit Float-Vektoren als Schlüssel. Jeder Zugriff wird zwischen C# und Engine konvertiert. | [Inventory.cs:17](../Scripts/UI/Character/Inventory.cs) |
 | P6 | Knoten werden in Property-Gettern bei jedem Zugriff neu gesucht | [Inventory.cs:21](../Scripts/UI/Character/Inventory.cs), [EquipmentPanel.cs:26](../Scripts/UI/Character/EquipmentPanel.cs) |
 | P7 | Für den Kampf behoben in M2: Alle Würfe laufen über eine Zufallsquelle mit Seed. Offen bleiben die eigenen Zufallsquellen von Loot (M4) und Spawns (M5). | [GameRandom.cs](../Scripts/Core/Rng/GameRandom.cs), [Lootsystem.cs](../Scripts/Controllers/Lootsystem.cs), [EnemyController.cs](../Scripts/Controllers/EnemyController.cs) |
 | P8 | Neu seit M2: Jede Schadenszahl ist ein eigener Knoten. Brennen viele Gegner gleichzeitig, entstehen pro Sekunde zwei Zahlen je Gegner. Bisher ohne messbare Folgen, Pooling steht in M9. | [FCTExtensions.cs](../Scripts/Extensions/FCTExtensions.cs) |
+| P9 | Neu seit M3: Flächen und die Suche nach dem Gegner unter dem Mauszeiger gehen alle Einheiten der Karte durch. Bei rund 100 Gegnern ohne messbare Folgen. Eine räumliche Aufteilung gehört zu M5, zusammen mit P3. | [SkillArea.cs](../Scripts/Skills/Effects/SkillArea.cs), [BaseUnit.cs](../Scripts/Units/BaseUnit.cs) |
 
 ### 3.3 Architektur
 
 | Nr. | Problem | Folge |
 |---|---|---|
-| A1 | Rund 27 Stellen suchen Spieler, Controller oder `Environment` über feste Namen in der aktuellen Szene | Jedes neue Level muss exakt wie das Testlevel aufgebaut sein |
+| A1 | Rund 24 Stellen suchen Spieler, Controller oder `Environment` über feste Namen in der aktuellen Szene. Skills gehören seit M3 nicht mehr dazu. | Jedes neue Level muss exakt wie das Testlevel aufgebaut sein |
 | A2 | Behoben in M1. Alle Stats steckten in einer 2D-Physik-Klasse. Die Rechnung liegt jetzt in `Scripts/Core/Stats` ohne Godot. | Blockierte die 2D/3D-Entscheidung, Tests und Koop |
-| A3 | Spiellogik steckt in UI-Klassen. Der Skillbar-Button zaubert und zieht Mana ab. | Logik ist ohne UI nicht nutzbar und nicht testbar |
+| A3 | Für Skills behoben in M3. Der Skillbar-Button zauberte und zog Mana ab. Jetzt zeigt die Leiste nur noch an. Offen bleibt das Inventar, das zu M4 gehört. | Logik ist ohne UI nicht nutzbar und nicht testbar |
 | A4 | Items sind Szenen-Knoten, die nie im Baum hängen | Speicherleck und nicht serialisierbar |
-| A5 | Zwei parallele Skill-Hierarchien, Skills und Manakosten fest im Code | Neue Skills brauchen Codeänderungen an mehreren Stellen |
+| A5 | Behoben in M3. Es gab zwei parallele Skill-Hierarchien, Skills und Manakosten standen fest im Code. Beide Hierarchien sind durch Skill-Resources ersetzt. | Neue Skills brauchen Codeänderungen an mehreren Stellen |
 | A6 | UI wird per Code anhand der Fenstergröße platziert. Das Fenster ist fest 2560x1440 im exklusiven Vollbild. | Bricht bei anderen Auflösungen |
 | A7 | Lootbag-Code existiert dreimal mit unterschiedlichem Verhalten | Quelle von F9 |
 | A8 | Behoben am 28.09.2026. `.idea`, `*.user` und `obj` waren eingecheckt. Shader und Testszenen lagen im Projektwurzelordner. Leere Klassen wie `SceneDispenser` und `StaticMemory` existierten. | Unübersichtlich |
-| A9 | Behoben am 28.09.2026. Eingabeaktionen hießen wie Tasten (`F`, `B`, `Tab`) statt nach ihrer Funktion. Die Namen stehen jetzt zentral in `InputActions`. Die Skill-Tasten sind weiter fest im Code und gehören zu M3. | Tastenbelegung lässt sich nicht sauber ändern |
-| A10 | Zauber unterscheiden Freund und Feind über Typprüfungen auf `Player2D` und `BaseEnemy`, die Gruppe `monsters`, feste Kollisionsebenen und den `EnemyController` | Ein Zauber verhält sich nicht gleich für jeden, der ihn wirkt. Begleiter und Koop-Spieler sind nicht abgedeckt. |
+| A9 | Behoben am 28.09.2026. Eingabeaktionen hießen wie Tasten (`F`, `B`, `Tab`) statt nach ihrer Funktion. Die Namen stehen jetzt zentral in `InputActions`. Seit M3 hat jeder Platz der Skill-Leiste eine eigene Aktion. | Tastenbelegung lässt sich nicht sauber ändern |
+| A10 | Behoben in M3. Zauber unterschieden Freund und Feind über Typprüfungen auf `Player2D` und `BaseEnemy`, die Gruppe `monsters`, feste Kollisionsebenen und den `EnemyController`. Jetzt entscheidet allein die Fraktion. | Ein Zauber verhält sich nicht gleich für jeden, der ihn wirkt. Begleiter und Koop-Spieler sind nicht abgedeckt. |
 
-Hinweis zu A10: Fireball, Frost Nova und Lightning Strike sind Testzauber und werden in M3 neu gebaut. Sie werden bis dahin nicht umgebaut. Der Feuerball kennt seit F6 zwei Seiten, entscheidet aber weiter über den Typ des Besitzers. Seit M2 würfeln die Testzauber ihren Schaden über die zentrale Trefferauflösung, ihr Aufbau ist unverändert.
-
-Vorarbeit für A10 aus M2: Jede Einheit hat eine Fraktion, und `UnitRegistry` kennt alle Einheiten im Szenenbaum. Der Nahkampf sucht seine Ziele bereits darüber.
+Hinweis zu A10: Die alten Testzauber Fireball, Frost Nova und Lightning Strike sind in M3 entfallen und neu gebaut worden. Die Vorarbeit aus M2 trägt das: Jede Einheit hat eine Fraktion, und `UnitRegistry` kennt alle Einheiten im Szenenbaum.
 
 ### 3.4 Balance
 
-Beobachtungen aus der Laufzeitprüfung von M2. Der Balance-Durchgang steht in M8.
+Beobachtungen aus den Laufzeitprüfungen von M2 und M3. Der Balance-Durchgang steht in M8.
 
 | Nr. | Beobachtung | Stelle |
 |---|---|---|
 | B1 | Rare und Elite bekommen 25 Stärke und regenerieren dadurch 5 Leben pro Sekunde. Ein unbewaffneter Spieler macht weniger Schaden und kann sie nicht töten. | [EnemyExtensions.cs](../Scripts/Extensions/EnemyExtensions.cs), [StatFormulas.cs](../Scripts/Core/Stats/StatFormulas.cs) |
 | B2 | Der Spieler startet mit 9 Leben. Im Testlevel hat er 50 Bonusleben bekommen, damit ein Kampf länger als zwei Treffer dauert. | [test_plane.tscn](../Scenes/test_plane.tscn) |
 | B3 | Jeder Treffer mit Fire, Frost, Lightning oder Slash löst seinen Effekt sicher aus. Eine Chance statt Gewissheit wäre eine Stellschraube. | [StatusEffectRules.cs](../Scripts/Core/Combat/StatusEffects/StatusEffectRules.cs) |
+| B4 | Der Held startet mit 9 Mana und regeneriert 0,5 pro Sekunde. Das reicht für vier Feuerbälle oder zwei Thunderbolts. | [Resources/Skills/Player](../Resources/Skills/Player) |
+| B5 | Die Schadenswerte der Zauber stammen von den alten Testzaubern. Ein Thunderbolt mit 50 bis 350 tötet jeden Gegner des Testlevels mit einem Treffer. | [thunderbolt.tres](../Resources/Skills/Player/thunderbolt.tres) |
+| B6 | Pierce trifft nur halb so oft. Mit dem Bogen geht deshalb jeder zweite Pfeil daneben, obwohl er sichtbar durch den Gegner fliegt. | [CombatRules.cs](../Scripts/Core/Combat/CombatRules.cs) |
 
 ## 4. Meilensteinplan
 
@@ -260,37 +262,100 @@ Stellschrauben, alle in [CombatRules.cs](../Scripts/Core/Combat/CombatRules.cs):
 Bewusst offen gelassen:
 
 - Parry und Block haben die Grundchance 0. Eine Quelle kommt erst mit Schilden und passenden Waffen in M4 und M8.
-- Parry und Block unterscheiden nur ATTACK und SPELL. Fernkampf-Attacks benutzen die Werte des Nahkampfs.
+- Parry und Block unterscheiden nur ATTACK und SPELL. Fernkampf-Attacks benutzen die Werte des Nahkampfs. Das gilt auch nach M3.
 - Der Held läuft in gerader Linie zum Ziel. Bleibt er hängen, gibt er das Ziel nach 0,4 Sekunden auf. Wegfindung kommt in M5.
 - Die Angriffsanimation des Spielers benutzt das vorhandene graue Platzhalter-Sprite und spielt für alle Waffen die Einhand-Animation.
-- Ein fehlgeschlagener Zauber wird im Skillbar-Button behandelt. Das gehört zu A3 und wandert in M3 in die Skill-Logik.
+- Ein fehlgeschlagener Zauber wurde im Skillbar-Button behandelt. Seit M3 regelt das der Spieler.
 - Gegner finden den Spieler weiter über den festen Namen in der Szene. Das gehört zu A1.
 
-### M3: Skills als Daten (M)
+### M3: Skills als Daten (M, umgesetzt am 28.09.2026 auf `master_SkillsAsData`)
 
 Ziel: neue Skills ohne Codeänderung am Spieler.
 
-- Skill-Definition als Resource: Kosten, Cooldown, Schaden, Schadensart, Szene, Icon.
-- Zwei Arten von Skills, entschieden am 28.09.2026:
-  - ATTACK: Nah- und Fernkampfskills mit Waffen. Schaden ist ein Prozentsatz des Waffenschadens. Beispiel: "Lightning Strike" verursacht 180 % Waffenschaden als Blitzschaden und schießt ein Projektil nach vorne.
-  - SPELL: eigener Grundschaden, den Affixe auf Items und Skills verändern. Skaliert nicht mit der Waffe.
-  - Der Kern kennt beide seit M2 als `AttackDefinition` und `SpellDefinition`. M3 macht daraus Resources.
-- Der Standardangriff ist eine ATTACK wie jede andere und lässt sich auf verschiedene Tasten legen. Die feste Bindung an die linke Maustaste aus M2 entfällt.
-- Fernkampf-Attacks mit Projektilen, damit Bögen und Pierce spielbar werden.
-- Eine Skill-Hierarchie statt zwei. Zauberlogik raus aus dem Skillbar-Button. Behebt A3, A5.
-- Skillbar frei belegbar.
-- Die drei Testzauber werden neu gebaut, nicht umgebaut. Behebt P4.
-- Zauber sind unabhängig davon, wer sie wirkt. Behebt A10.
-  - Jede Einheit bekommt eine Fraktion. Ein Zauber trifft Einheiten, deren Fraktion sich von der des Wirkenden unterscheidet.
-  - Trefferlogik arbeitet nur mit `BaseUnit`, ohne Typprüfung auf Spieler oder Gegner.
-  - Zielsuche für Fork und Flächenzauber fragt "feindliche Einheiten in der Nähe" ab, nicht den `EnemyController`.
-  - Die Kollisionsmaske ergibt sich aus der Fraktion. Wände werden über ihre Kollisionsebene erkannt, nicht über den Knotennamen.
-  - Geschwindigkeit, Lebenszeit und Anzahl der Forks kommen aus der Skill-Definition.
-  - Erzeugte Projektile hängen am Elternknoten des Auslösers, ohne festen Pfad durch die Szene.
+- Erledigt: Skill-Definition als Resource mit Kosten, Cooldown, Schaden, Schadensart, Szene und Icon.
+- Erledigt: Zwei Arten von Skills als Resource, `AttackSkillResource` und `SpellSkillResource`. Der Kern kennt beide als `SkillDefinition`.
+- Erledigt: Der Standardangriff ist eine ATTACK wie jede andere und liegt auf einem Platz der Leiste. Die feste Bindung an die linke Maustaste ist entfallen.
+- Erledigt: Fernkampf-Attacks mit Projektilen. Ein Bogen als Platzhalter macht Pierce spielbar.
+- Erledigt: Eine Skill-Hierarchie statt zwei. Die Leiste zeigt nur noch an. Behebt A3 für Skills und A5.
+- Erledigt: Skillbar frei belegbar, mit zehn Plätzen.
+- Erledigt: Die drei Testzauber sind neu gebaut. Behebt P4.
+- Erledigt: Skills sind unabhängig davon, wer sie einsetzt. Behebt A10.
+  - Ein Skill trifft Einheiten, deren Fraktion sich von der des Wirkenden unterscheidet.
+  - Die Trefferlogik arbeitet nur mit `BaseUnit`, ohne Typprüfung auf Spieler oder Gegner.
+  - Die Zielsuche für Forks und Flächen fragt `UnitRegistry`, nicht den `EnemyController`.
+  - Die Kollisionsmaske eines Projektils ergibt sich aus der Fraktion. Alles andere auf der Maske ist eine Wand.
+  - Geschwindigkeit, Lebenszeit und Anzahl der Forks kommen aus der Skill-Resource.
+  - Projektile und Flächen hängen am Elternknoten des Wirkenden, ohne festen Pfad durch die Szene.
+- Zusätzlich: Flächen als zweite allgemeine Wirkung neben dem Projektil, um den Wirkenden oder am gezielten Punkt.
+- Zusätzlich: Gegner bekommen ihren Skill in der Szene zugewiesen. Der Testgegner hat keinen eigenen Angriffscode mehr.
 
 Fertig, wenn ein neuer Zauber nur aus einer Resource und einer Szene besteht und derselbe Zauber von Spieler und Gegner gewirkt werden kann.
 
-Offene Designfrage: Gibt es Klassen, und wie bekommt man Skills? Das PDF nennt Klassen nur bei den Item-Anforderungen. Die Entscheidung wird erst hier gebraucht.
+Stand des Fertig-Kriteriums: erfüllt. 55 neue Unit-Tests decken den Kern ab, insgesamt sind es 235. Eine Laufzeitprüfung mit 109 Schritten im Testlevel lief achtmal hintereinander fehlerfrei, zusätzlich gab es eine Sichtprüfung mit Bildschirmfotos. In der Prüfung wirkt der Testgegner den Feuerball des Helden und trifft damit den Helden, aber kein Monster.
+
+Getroffene Designentscheidungen vom 28.09.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| Klassen und Skill-Erwerb | Vertagt. Der Held kennt alle Skills im Ordner `Resources/Skills/Player`. Die Skill-Resource hat ein Feld für Anforderungen, das leer bleibt. |
+| Plätze der Leiste | Zehn: linke und rechte Maustaste, Q, E, R, F, 1, 2, 3, 4 |
+| Zuweisen | Rechtsklick auf einen Platz öffnet die Liste aller bekannten Skills, ein Klick legt den Skill dort ab |
+| Fernkampf | Klick auf einen Gegner: Der Held läuft in Reichweite und schießt. Ohne Gegner unter dem Mauszeiger schießt er aus dem Stand in Richtung Maus. |
+
+Von mir festgelegt, weil es sich aus dem Umbau ergab. Alles lässt sich in den Resources ändern:
+
+| Punkt | Festlegung |
+|---|---|
+| Name des Zaubers mit Zielkreis | Thunderbolt. Lightning Strike heißt jetzt die ATTACK aus dem Beispiel vom 28.09.2026. |
+| Auslösen des Thunderbolt | Sofort am Mauszeiger, der Blitz schlägt nach 0,5 Sekunden ein. Der zweite Klick zum Platzieren ist entfallen, weil die linke Maustaste jetzt selbst ein Platz der Leiste ist. |
+| Forks | Jeder Wurf trifft jede Einheit höchstens einmal. Zwei Forks pro Treffer über zwei Generationen ergeben höchstens 7 Projektile. |
+| Reichweite des Feuerballs | 2000 statt vorher 12000 |
+| Gehaltene Taste | Wiederholt den Skill, sobald er wieder bereit ist. Ein Zauber ohne Abklingzeit ist nach 0,1 Sekunden wieder bereit. |
+| Startbelegung | Attack, Lightning Strike, leer, Frost Nova, Thunderbolt, Fireball, danach vier leere Plätze |
+
+So funktionieren Skills:
+
+- Eine Skill-Resource liegt unter `Resources/Skills`. `SkillLibrary` lädt alle Resources aus `Resources/Skills/Player`, ein neuer Skill braucht dort keinen Eintrag.
+- `Delivery` bestimmt, wie der Skill ins Ziel kommt: `Weapon`, `Projectile`, `AreaAroundCaster` oder `AreaAtPoint`.
+- Bei `Weapon` entscheidet die Waffe. Nahkampfwaffen treffen direkt, Fernkampfwaffen schießen die Szene, die an der Waffe hängt.
+- `SkillExecutor.Execute` bringt die Wirkung in die Welt. Spieler und Gegner rufen dieselbe Methode auf.
+- `SkillCast` hält Fraktion und Treffer fest. Beides steht beim Auslösen fest, ein Projektil wirkt also weiter, wenn sein Wirkender inzwischen tot ist.
+- Für die Wirkung gibt es zwei allgemeine Skripte: `SkillProjectile` und `SkillArea`. Eine neue Szene hängt eines davon an ihren Wurzelknoten und bringt nur Aussehen und Kollisionsform mit.
+- Flächen suchen ihre Ziele über den Abstand, nicht über die Physik. Der Boden ist isometrisch gestaucht, der Abstand nach oben und unten zählt deshalb doppelt.
+- Kosten und Abklingzeit regelt, wer den Skill einsetzt. `BaseUnit.TryPayFor` prüft beides über `SkillGate` und zahlt.
+- Eine ATTACK läuft über den Takt der Waffe und zahlt beim Ausholen. Ein SPELL wirkt sofort.
+- Die Belegung der Leiste ist ein `SkillLoadout` im Kern und speichert nur die Ids der Skills. Die Startbelegung steht in `Resources/Skills/starting_loadout.tres`.
+- Jeder Platz hat eine Eingabeaktion `skill_slot_1` bis `skill_slot_10` in den Projekteinstellungen.
+
+Ein neuer Skill in drei Schritten:
+
+1. Szene anlegen, Wurzelknoten `Area2D` mit `SkillProjectile` oder `Node2D` mit `SkillArea`. Projektile zeigen nach rechts.
+2. Resource vom Typ `AttackSkillResource` oder `SpellSkillResource` unter `Resources/Skills/Player` anlegen, Id vergeben und die Szene eintragen.
+3. Im Spiel per Rechtsklick auf einen Platz legen.
+
+Vorläufige Werte der Skills, alle in [Resources/Skills](../Resources/Skills):
+
+| Skill | Art | Schaden | Mana | Abklingzeit | Wirkung |
+|---|---|---|---|---|---|
+| Attack | ATTACK | 100 % Waffenschaden | 0 | keine | Treffer der Waffe |
+| Lightning Strike | ATTACK | 180 % Waffenschaden als Lightning | 3 | keine | Projektil, Reichweite 770 |
+| Fireball | SPELL | 50 bis 75 Fire | 2 | 0,25 s | Projektil, Reichweite 2000, Forks bis 600 |
+| Frost Nova | SPELL | 10 bis 50 Frost | 2 | 0,5 s | Fläche um den Helden, Radius 355, wächst in 0,2 s |
+| Thunderbolt | SPELL | 50 bis 350 Lightning | 4 | 1 s | Fläche am Mauszeiger, Radius 243, nach 0,5 s |
+| Fire Spit | SPELL | 3 bis 6 Fire | 0 | keine | Skill des Testgegners, dieselbe Szene wie Fireball |
+| Short Bow | Waffe | 5 bis 11 Pierce | | | 1,2 Angriffe pro Sekunde, Reichweite 700 |
+
+Bewusst offen gelassen:
+
+- Klassen und Skill-Erwerb. Die Frage muss vor dem Meilenstein beantwortet sein, der Skills freischaltet.
+- Die Tasten lassen sich nur in den Projekteinstellungen ändern. Eine Einstellung im Spiel kommt in M7.
+- Die Belegung der Leiste wird nicht gespeichert. Das gehört zum Speichern in M4.
+- Gegner zahlen für Skills weder Mana noch Abklingzeit. Ihr Takt kommt weiter aus Windup und Recovery. Das gehört zu M5.
+- Gegner finden den Spieler weiter über den festen Namen in der Szene. Das gehört zu A1.
+- Zauber haben keine Zauberzeit und keine Animation am Helden.
+- Der Bogen ist ein Platzhalter mit gezeichnetem Icon und fällt bei Blue Blobs. Die Angriffsanimation bleibt die Einhand-Animation.
+- Die Leiste wird weiter per Code platziert. Das gehört zu A6.
+- Icons der Skills stammen aus dem vorhandenen Archiv unter `Textures/Spells/Archive/icons`.
 
 ### M4: Items als Daten und Speichern (M)
 

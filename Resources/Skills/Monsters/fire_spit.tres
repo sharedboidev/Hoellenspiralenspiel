@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellSkillResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Skills/SpellSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://c7udd6aj0mrqh" path="res://Textures/Spells/Icons_Fire Spell.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/fireball.tscn" id="3_scene"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "fire_spit"
+DisplayName = "Fire Spit"
+Description = "A weak ball of fire. Uses the same scene as Fireball, only the numbers differ."
+Icon = ExtResource("2_icon")
+Delivery = 1
+EffectScene = ExtResource("3_scene")
+ProjectileSpeed = 800.0
+ProjectileLifetimeSec = 2.5
+MinDamage = 3.0
+MaxDamage = 6.0
+DamageType = 3
+CriticalHitChance = 5.0

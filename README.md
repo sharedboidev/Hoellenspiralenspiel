@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-180_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-235_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -98,6 +98,7 @@ Beispiel: 14 % und 22 % increased von der Ausrüstung, dazu 2,97 % more aus Inte
 |---|---|
 | Trefferauflösung | Jeder Treffer läuft durch dieselbe Kette: Treffen, Ausweichen, Parry, Block, Krit, Minderung |
 | Nahkampf | Klick auf einen Gegner, der Held läuft hin und schlägt im Takt der Waffe zu |
+| Fernkampf | Mit einem Bogen läuft der Held in Reichweite und schießt. Ohne Gegner unter der Maus schießt er in ihre Richtung |
 | ATTACK und SPELL | Attacks skalieren mit dem Waffenschaden, Spells bringen eigenen Grundschaden mit |
 | Sechs Schadensarten | Crush, Pierce, Slash, Fire, Frost, Lightning, jede mit eigenem Effekt |
 | Statuseffekte | Bleed, stapelnder Burn, Shock mit Fehlschlägen, Chill mit Verlangsamung |
@@ -105,8 +106,6 @@ Beispiel: 14 % und 22 % increased von der Ausrüstung, dazu 2,97 % more aus Inte
 | Parry und Block | Parry wehrt ganz ab, Block fängt 50 % ab. Der Anteil ist ein eigener Wert für Items und Skills |
 | Kritische Treffer | Chance von Waffe oder Zauber, verstärkt durch Awareness |
 | Tod und Respawn | Todesanzeige, Verlust von 10 % der XP des Levels, Rückkehr zum Startpunkt |
-| Drei Testzauber | Fireball mit Fork, Frost Nova als Flächenzauber, Lightning Strike mit Zielkreis |
-| Skillbar | Cooldowns, Manakosten, Ton bei leerem Mana |
 | Schadenszahlen | Schweben über dem Ziel, mit eigenen Farben für Krit, Heilung und jeden Statuseffekt |
 
 <details>
@@ -125,22 +124,52 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 
 </details>
 
+### ✨ Skills
+
+| Feature | Beschreibung |
+|---|---|
+| Skills als Daten | Jeder Skill ist eine Resource mit Kosten, Abklingzeit, Schaden und Szene. Ein neuer Skill braucht keinen Code |
+| Fünf Skills | Attack, Lightning Strike, Fireball, Frost Nova und Thunderbolt |
+| Projektile | Fliegen bis zum ersten Feind oder zur Wand. Der Feuerball spaltet sich und sucht die nächsten Gegner |
+| Flächen | Um den Helden oder am Mauszeiger, sofort oder mit Verzögerung |
+| Für jeden gleich | Wen ein Skill trifft, entscheidet die Fraktion. Gegner setzen dieselben Skills ein wie der Held |
+| Skill-Leiste | Zehn Plätze mit Icon, Taste und Abklingzeit |
+| Freie Belegung | Rechtsklick auf einen Platz öffnet die Liste aller Skills |
+| Gehaltene Taste | Wiederholt den Skill, sobald er wieder bereit ist |
+| Kosten | Mana und Abklingzeit pro Skill, Ton bei leerem Mana |
+
+<details>
+<summary>Die Skills im Überblick</summary>
+
+| Skill | Art | Schaden | Mana | Abklingzeit | Wirkung |
+|---|---|---|---|---|---|
+| Attack | ATTACK | 100 % Waffenschaden | 0 | keine | Treffer der Waffe, mit dem Bogen ein Pfeil |
+| Lightning Strike | ATTACK | 180 % Waffenschaden als Lightning | 3 | keine | Schwung mit Blitzprojektil |
+| Fireball | SPELL | 50 bis 75 Fire | 2 | 0,25 s | Projektil, das sich bis zu zweimal aufspaltet |
+| Frost Nova | SPELL | 10 bis 50 Frost | 2 | 0,5 s | Ring um den Helden |
+| Thunderbolt | SPELL | 50 bis 350 Lightning | 4 | 1 s | Einschlag am Mauszeiger nach 0,5 Sekunden |
+
+Alle Werte sind vorläufig und stehen in `Resources/Skills`.
+
+</details>
+
 ### 👹 Gegner
 
 | Feature | Beschreibung |
 |---|---|
-| Drei Gegnertypen | Blue Blob mit Frost, Yellow Blob mit Blitz und ein Testgegner, der Feuerbälle wirft |
+| Drei Gegnertypen | Blue Blob mit Frost, Yellow Blob mit Blitz und ein Testgegner, der Feuer spuckt |
 | Spawn-Marker | Gegner erscheinen in Gruppen an festgelegten Orten |
 | Aggro | Reichweite pro Gegner, die ganze Gruppe reagiert auf einen Treffer |
 | Rare und Elite | Stärkere Varianten mit mehr Leben, Tempo und Erfahrung |
 | Angriffe | Ausholen, Treffer, Erholen. Beim Ausholen färbt sich der Gegner |
+| Skills | Jeder Gegner bekommt seinen Skill in der Szene zugewiesen, ohne Angabe schlägt er im Nahkampf zu |
 | Tod | Erfahrung und Beute sofort, danach läuft die Todesanimation |
 
 ### 🎒 Items und Beute
 
 | Feature | Beschreibung |
 |---|---|
-| Item-Basen | Schwert, Stab, Helm, Torso, Handschuhe, Heil- und Manatrank |
+| Item-Basen | Schwert, Stab, Bogen, Helm, Torso, Handschuhe, Heil- und Manatrank |
 | Affixe | 16 Affixe mit Stufen, Gewichten und Mindest-Itemlevel |
 | Prefix und Suffix | Bis zu 8 Affixe pro Item, keiner doppelt |
 | Lokal und global | Manche Affixe verbessern das Item selbst, andere den Charakter |
@@ -178,25 +207,30 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 - Hub, Levelwechsel und Menüs
 - Prozedurale Level und Wegfindung
 - Schilde und Waffen, die Parry oder Block mitbringen
-- Fernkampf mit Waffen und weitere Attacks neben dem Standardangriff
-- Frei belegbare Tasten für Attacks und Zauber
-- Klassen und Erwerb von Skills
+- Tasten im Spiel umbelegen
+- Klassen und Erwerb von Skills, der Held kennt vorerst alle
 
 ---
 
 ## 🎮 Steuerung
 
+Die Skills liegen zu Beginn wie unten auf den Tasten. Jeder Platz der Leiste lässt sich im Spiel neu belegen.
+
 | Taste | Aktion |
 |---|---|
 | `W` `A` `S` `D` | Bewegen, bricht Hinlaufen und Ausholen ab |
-| Linke Maustaste auf Gegner | Hinlaufen und angreifen, gedrückt halten greift weiter an |
-| `F` | Fireball in Richtung der Maus |
+| Linke Maustaste | Attack: auf einen Gegner klicken, der Held läuft hin und greift an |
+| Rechte Maustaste | Lightning Strike in Richtung der Maus |
 | `E` | Frost Nova um den Spieler |
-| `R`, dann linke Maustaste | Lightning Strike platzieren und auslösen |
+| `R` | Thunderbolt am Mauszeiger |
+| `F` | Fireball in Richtung der Maus |
+| `Q`, `1` bis `4` | Freie Plätze der Skill-Leiste |
+| Taste gedrückt halten | Wiederholt den Skill |
+| Rechtsklick auf einen Platz der Leiste | Skill für diesen Platz auswählen |
 | `B` | Charakterbogen und Inventar |
 | `Tab` | Overlay-Karte |
-| Linke Maustaste | Item aufheben, im Inventar greifen und ablegen |
-| Rechte Maustaste | Item anlegen oder Trank trinken |
+| Linke Maustaste auf Item | Aufheben, im Inventar greifen und ablegen |
+| Rechte Maustaste im Inventar | Item anlegen oder Trank trinken |
 
 ---
 
@@ -205,8 +239,8 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 ```mermaid
 flowchart LR
     M0(["M0 Aufräumen"]):::done --> M1(["M1 Stat-Kern"]):::done --> M2(["M2 Kampf"]):::done
-    M2 --> M3(["M3 Skills"]):::next
-    M2 --> M4(["M4 Items und Speichern"]):::open
+    M2 --> M3(["M3 Skills"]):::done
+    M2 --> M4(["M4 Items und Speichern"]):::next
     M4 --> M5(["M5 Gegner-KI"]):::open --> D{"2D oder 3D"}:::decision
     D --> M6(["M6 Level"]):::open --> M7(["M7 Hub"]):::open --> M8(["M8 Höllenkreis"]):::open
     M8 --> M9(["M9 Inhalt"]):::open --> M10(["M10 Koop"]):::optional
@@ -223,8 +257,8 @@ flowchart LR
 | ✅ | **M0** Aufräumen | Alle bekannten Fehler behoben, Repo aufgeräumt | klein |
 | ✅ | **M1** Stat-Kern | Stats als reines C#, Tests, Lichtradius | mittel |
 | ✅ | **M2** Kampf | Trefferauflösung, Tod des Spielers, Nahkampf, Statuseffekte | mittel |
-| ⏭️ | **M3** Skills | Attacks und Spells als Daten, freie Tastenbelegung, Zauber unabhängig vom Wirkenden | mittel |
-| ⬜ | **M4** Items und Speichern | Items als Daten, Inventar-Modell, Speichern und Laden | mittel |
+| ✅ | **M3** Skills | Attacks und Spells als Daten, frei belegbare Leiste, Skills unabhängig vom Wirkenden | mittel |
+| ⏭️ | **M4** Items und Speichern | Items als Daten, Inventar-Modell, Speichern und Laden | mittel |
 | ⬜ | **M5** Gegner-KI | Zustandsmaschine, Wegfindung, Skalierung nach Level | mittel |
 | 🔀 | **Entscheidung** | 2D oder 3D, per kurzem Vergleichsprototyp | klein |
 | ⬜ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
@@ -287,15 +321,16 @@ Hoellenspiralenspiel
 │   ├── Core            Spiellogik ohne Godot, vollständig getestet
 │   │   ├── Stats       Stat-Blatt, Rechenregeln, abgeleitete Werte
 │   │   ├── Combat      Trefferauflösung, Schadensarten, Statuseffekte, Angriffstakt
+│   │   ├── Skills      Skill-Definition, Abklingzeiten, Kosten, Belegung der Leiste
 │   │   ├── Rng         Zufallsquelle mit Seed
 │   │   └── Progression XP-Verlust beim Tod
 │   ├── Units           Spieler und Gegner
-│   ├── Abilities       Skills und Zauber
+│   ├── Skills          Ausführung der Skills, Projektil und Fläche
 │   ├── Items           Waffen, Rüstung, Verbrauchsgüter
 │   ├── Controllers     Gegnersteuerung, Beute, Spielablauf
 │   └── UI              Charakterbogen, Inventar, Orbs, Tooltips
 ├── Scenes              Szenen für Level, Einheiten, Items, Zauber, Oberfläche
-├── Resources           Affixe, Loot-Tabellen, Themes
+├── Resources           Affixe, Loot-Tabellen, Skills, Themes
 ├── Enums               Gemeinsame Aufzählungen
 ├── Hoellenspiralenspiel.Tests   Unit-Tests mit NUnit
 └── docs                Roadmap und Analyse

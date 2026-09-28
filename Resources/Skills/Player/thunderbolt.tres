@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SpellSkillResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Skills/SpellSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://nyameg4pm306" path="res://Textures/Spells/Archive/icons/tesla_ball.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/thunderbolt.tscn" id="3_scene"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "thunderbolt"
+DisplayName = "Thunderbolt"
+Description = "Marks the ground under the cursor. A moment later lightning strikes everything inside the circle."
+Icon = ExtResource("2_icon")
+ManaCost = 4.0
+CooldownSec = 1.0
+Delivery = 3
+EffectScene = ExtResource("3_scene")
+AreaRadius = 243.0
+AreaDelaySec = 0.5
+MinDamage = 50.0
+MaxDamage = 350.0
+DamageType = 5
+CriticalHitChance = 25.0

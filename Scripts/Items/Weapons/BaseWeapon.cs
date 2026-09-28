@@ -46,6 +46,16 @@ public abstract partial class BaseWeapon : BaseItem
     [Export]
     public float Range { get; set; } = WeaponProfile.DefaultMeleeRange;
 
+    //Fernkampfwaffen verschießen diese Szene. Ohne Projektil ist die Waffe eine Nahkampfwaffe
+    [Export]
+    public PackedScene ProjectileScene { get; set; }
+
+    //Geschwindigkeit des Projektils in Pixeln pro Sekunde
+    [Export]
+    public float ProjectileSpeed { get; set; } = 1400f;
+
+    public bool IsRanged => ProjectileScene is not null;
+
     [Export]
     public WeaponType WeaponType { get; set; }
 
@@ -64,7 +74,7 @@ public abstract partial class BaseWeapon : BaseItem
 
     //Die Werte der Waffe samt ihrer lokalen Modifier, so wie der Kampf sie braucht
     public WeaponProfile ToProfile()
-        => new(MinDamageFinal, MaxDamageFinal, (float)AttacksPerSecondFinal, (float)CriticalHitChanceFinal, DamageType, Range);
+        => new(MinDamageFinal, MaxDamageFinal, (float)AttacksPerSecondFinal, (float)CriticalHitChanceFinal, DamageType, Range, IsRanged, ProjectileSpeed);
 
     protected override void SetExceptionalName()
         => ExceptionalName = NameGenerator.GenerateRareWeapon();
@@ -75,5 +85,8 @@ public abstract partial class BaseWeapon : BaseItem
         emil.AppendLine($"{DamageType} Damage: {GetStyledValue(MinDamageFinal, MinDamageBase):N0} to {GetStyledValue(MaxDamageFinal, MaxDamageBase):N0}");
         emil.AppendLine($"Attacks per Second: {GetStyledValue(AttacksPerSecondFinal, AttacksPerSecondBase):0.##}");
         emil.AppendLine($"Critical Hit Chance: {GetStyledValue(CriticalHitChanceFinal, CriticalHitChanceBase):0.##}%");
+
+        if (IsRanged)
+            emil.AppendLine($"Range: {Range:N0}");
     }
 }

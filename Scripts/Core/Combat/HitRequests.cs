@@ -1,5 +1,6 @@
 using System;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Stats;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Combat;
@@ -45,6 +46,16 @@ public static class HitRequests
                               attacker.GetFinal(CombatStat.HitChance),
                               GetCriticalHitChance(attacker, spell.CriticalHitChance),
                               attacker.GetFinal(CombatStat.CriticalDamage));
+    }
+
+    //Ein Skill ist entweder ATTACK oder SPELL. Die Waffe zählt nur für ATTACK
+    public static HitRequest ForSkill(StatSheet attacker, WeaponProfile weapon, SkillDefinition skill)
+    {
+        ArgumentNullException.ThrowIfNull(skill);
+
+        return skill.Kind == SkillKind.Spell
+                ? ForSpell(attacker, skill.Spell)
+                : ForAttack(attacker, weapon, skill.Attack);
     }
 
     //Die Grundchance kommt von Waffe oder Zauber, die Modifier vom Angreifer

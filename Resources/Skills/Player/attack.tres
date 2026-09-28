@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="AttackSkillResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Skills/AttackSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://iro2pd1blvre" path="res://Textures/Items/Weapons/Swords/WoodenSword.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "attack"
+DisplayName = "Attack"
+Description = "Strikes with the equipped weapon. Melee weapons need an enemy under the cursor, ranged weapons shoot towards it."
+Icon = ExtResource("2_icon")

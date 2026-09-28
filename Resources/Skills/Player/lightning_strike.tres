@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="AttackSkillResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Skills/AttackSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bwtjpb177qmvu" path="res://Textures/Spells/Archive/icons/light.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/lightning_bolt.tscn" id="3_scene"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "lightning_strike"
+DisplayName = "Lightning Strike"
+Description = "Swings the weapon and hurls a bolt of lightning forward."
+Icon = ExtResource("2_icon")
+ManaCost = 3.0
+Delivery = 1
+EffectScene = ExtResource("3_scene")
+ProjectileSpeed = 1100.0
+ProjectileLifetimeSec = 0.7
+WeaponDamagePercent = 180.0
+ConvertsDamageType = true
+DealtAs = 5

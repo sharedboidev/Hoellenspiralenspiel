@@ -16,8 +16,8 @@ theme_override_constants/margin_bottom = 8
 layout_mode = 2
 bbcode_enabled = true
 text = "[center]Hotkeys[/center]
-- LMB on Enemy: Attack
-- R -> LMB -> OK
+- LMB, RMB, Q E R F, 1-4: Skills
+- RMB on Skill Slot: Change Skill
 -Tab: \"Map\"
 -B:     Inventory
            - RMB: Use Item

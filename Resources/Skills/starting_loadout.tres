@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SkillLoadoutResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Skills/SkillLoadoutResource.cs" id="1_script"]
+[ext_resource type="Script" path="res://Resources/Skills/SkillResource.cs" id="2_skill"]
+[ext_resource type="Resource" path="res://Resources/Skills/Player/attack.tres" id="3_attack"]
+[ext_resource type="Resource" path="res://Resources/Skills/Player/lightning_strike.tres" id="4_strike"]
+[ext_resource type="Resource" path="res://Resources/Skills/Player/frost_nova.tres" id="5_nova"]
+[ext_resource type="Resource" path="res://Resources/Skills/Player/thunderbolt.tres" id="6_thunder"]
+[ext_resource type="Resource" path="res://Resources/Skills/Player/fireball.tres" id="7_fireball"]
+
+[resource]
+script = ExtResource("1_script")
+Slots = Array[ExtResource("2_skill")]([ExtResource("3_attack"), ExtResource("4_strike"), null, ExtResource("5_nova"), ExtResource("6_thunder"), ExtResource("7_fireball"), null, null, null, null])

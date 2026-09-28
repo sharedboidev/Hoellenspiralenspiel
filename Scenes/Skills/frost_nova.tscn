@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Skills/Effects/SkillArea.cs" id="1_area"]
+[ext_resource type="Texture2D" uid="uid://bimy6yugt0oad" path="res://Textures/Spells/frost nova.png" id="2_nova"]
+
+[node name="FrostNova" type="Node2D" node_paths=PackedStringArray("Visual")]
+script = ExtResource("1_area")
+Visual = NodePath("Visual")
+VisualRadius = 179.0
+
+[node name="Visual" type="Sprite2D" parent="."]
+scale = Vector2(1, 0.75)
+texture = ExtResource("2_nova")

@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Skills/Effects/SkillProjectile.cs" id="1_proj"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_arrow"]
+size = Vector2(84, 14)
+
+[node name="Arrow" type="Area2D"]
+z_index = 1
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_proj")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_arrow")
+
+[node name="Outline" type="Polygon2D" parent="."]
+color = Color(0.12, 0.08, 0.05, 1)
+polygon = PackedVector2Array(-50, -11, -34, -5, 22, -5, 22, -12, 48, 0, 22, 12, 22, 5, -34, 5, -50, 11, -43, 0)
+
+[node name="Shaft" type="Polygon2D" parent="."]
+color = Color(0.93, 0.78, 0.52, 1)
+polygon = PackedVector2Array(-38, -2.5, 24, -2.5, 24, 2.5, -38, 2.5)
+
+[node name="Head" type="Polygon2D" parent="."]
+color = Color(0.92, 0.93, 0.97, 1)
+polygon = PackedVector2Array(24, -9, 44, 0, 24, 9)
+
+[node name="Fletching" type="Polygon2D" parent="."]
+color = Color(0.9, 0.22, 0.2, 1)
+polygon = PackedVector2Array(-47, -9, -33, -2.5, -33, 2.5, -47, 9, -41, 0)

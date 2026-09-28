@@ -2,21 +2,23 @@ using System;
 using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
-using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Extensions;
+using Hoellenspiralenspiel.Scripts.Skills;
 
 namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
 public abstract partial class BaseEnemy : BaseUnit
 {
-    //Der Treffer landet noch, wenn der Spieler während des Ausholens ein Stück aus der Reichweite gerückt ist
-    private const float RangeTolerance     = 1.25f;
     private const float MinAttackspeedRate = 0.1f;
 
     //Färbt den Gegner, solange er ausholt, damit der Angriff zu sehen ist
     private static readonly Color WindupTint = new(1.6f, 0.7f, 0.7f);
+
+    //Gilt für Gegner, denen kein Skill zugewiesen ist
+    private static readonly AttackSkillResource StandardAttack = new() { Id = "attack", DisplayName = AttackDefinition.Standard.Name };
 
     private readonly AttackCycle     attackCycle = new();
     private          AnimationPlayer animationPlayer;
@@ -26,12 +28,18 @@ public abstract partial class BaseEnemy : BaseUnit
     private          ProgressBar     healthbar;
     private          ShaderMaterial  hiddenInFogShaderMaterial;
     private          bool            isAttackAnimationRunning;
-    protected virtual PackedScene    AttackScene => null;
-    public            string         SpawnGroup  { get; set; }
-    public            bool           IsDying     { get; private set; }
+    public           string          SpawnGroup { get; set; }
+    public           bool            IsDying    { get; private set; }
 
     public override Faction Faction      => Faction.Monster;
     public override bool    IsTargetable => !IsDead && !IsDying;
+
+    //Die Angriffswerte aus dem Inspector sind die Waffe des Gegners. Eine ATTACK skaliert damit
+    public override WeaponProfile Weapon => new(AttackDamageMin, AttackDamageMax, 1f, AttackCriticalHitChance, AttackDamageType, AttackRange);
+
+    //Der Skill, mit dem der Gegner angreift. Ohne Angabe ist es der Standardangriff im Nahkampf
+    [Export]
+    public SkillResource AttackSkill { get; set; }
 
     [Export]
     public int XpGranted { get; set; } = 100;
@@ -233,17 +241,9 @@ public abstract partial class BaseEnemy : BaseUnit
             QueueFree();
     }
 
-    //Ohne eigene Umsetzung greift ein Gegner im Nahkampf an: eine ATTACK mit den Werten aus dem Inspector
+    //Gegner setzen Skills auf demselben Weg ein wie der Spieler. Mana und Abklingzeit zählen für sie noch nicht
     protected virtual void ExecuteAttack()
-    {
-        if (DistanceTo(ChasedPlayer) > AttackRange * RangeTolerance)
-            return;
-
-        var weapon  = new WeaponProfile(AttackDamageMin, AttackDamageMax, 1f, AttackCriticalHitChance, AttackDamageType, AttackRange);
-        var request = HitRequests.ForAttack(Stats, weapon, AttackDefinition.Standard);
-
-        ChasedPlayer.ReceiveDamage(HitResolver.Resolve(request, ChasedPlayer.Stats, GameRandom.Shared));
-    }
+        => SkillExecutor.Execute(this, AttackSkill ?? StandardAttack, new SkillAim(ChasedPlayer.BodyCenter, ChasedPlayer));
 
     public void ChasePlayer()
     {

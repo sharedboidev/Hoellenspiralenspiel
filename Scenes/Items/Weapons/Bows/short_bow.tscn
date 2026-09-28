@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Items/Weapons/Bows/ShortBow.cs" id="1_bow"]
+[ext_resource type="Texture2D" path="res://Textures/Items/Weapons/Bows/ShortBow.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/arrow.tscn" id="3_arrow"]
+
+[node name="ShortBow" type="Node2D" node_paths=PackedStringArray("Icon")]
+script = ExtResource("1_bow")
+MinDamageBase = 5
+MaxDamageBase = 11
+AttacksPerSecondBase = 1.2
+CriticalHitChanceBase = 6.0
+Range = 700.0
+ProjectileScene = ExtResource("3_arrow")
+WeaponType = 6
+WieldStrategie = 4
+Icon = NodePath("Icon")
+SlotSize = Vector2(1, 3)
+Requirements = Dictionary[int, int]({
+1: 2,
+5: 1
+})
+
+[node name="Icon" type="TextureRect" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("2_icon")
