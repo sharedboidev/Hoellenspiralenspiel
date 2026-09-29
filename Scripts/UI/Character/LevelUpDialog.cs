@@ -1,25 +1,27 @@
 using Godot;
 using Hoellenspiralenspiel.Enums;
-using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Interfaces;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 public partial class LevelUpDialog : Control
 {
-    private Player2D player;
+    private          IHero hero;
+    [Export] private Node  player;
 
     public override void _Ready()
     {
-        LoadNodes();
+        hero = player as IHero;
+
+        if (hero is null)
+            GD.PushError($"Der Level-up-Dialog braucht einen Helden, {player?.Name} ist keiner.");
+
         SubscribeClickEvents();
         SetPositionInViewport();
     }
 
     public void ShowDialog()
         => Visible = true;
-
-    private void LoadNodes()
-        => player = GetTree().CurrentScene.GetNodeOrNull<Player2D>("%Player 2D");
 
     private void SubscribeClickEvents()
     {
@@ -35,43 +37,16 @@ public partial class LevelUpDialog : Control
         var viewportSize = GetViewportRect().Size;
         var panelSize    = GetNode<PanelContainer>(nameof(PanelContainer)).Size;
 
-        var position = (viewportSize*new Vector2(1f, 1.25f) - panelSize) / 2;
-        Position = position;
+        Position = (viewportSize * new Vector2(1f, 1.25f) - panelSize) / 2;
     }
 
     private void OnAttributeRaisedClicked(Attributes attribute)
     {
-        if (player is null)
+        if (hero is null)
             return;
 
-        switch (attribute)
-        {
-            case Attributes.Strength:
-                player.StrengthBase++;
+        hero.RaiseAttribute(attribute);
 
-                break;
-            case Attributes.Dexterity:
-                player.DexterityBase++;
-
-                break;
-            case Attributes.Intelligence:
-                player.IntelligenceBase++;
-
-                break;
-            case Attributes.Constitution:
-                player.ConstitutionBase++;
-
-                break;
-            case Attributes.Awareness:
-                player.AwarenessBase++;
-
-                break;
-        }
-
-        GD.Print($"{attribute} raised");
-
-        player.AttributePointsAllowedToSpend--;
-        
-        Visible = player.AttributePointsAllowedToSpend > 0;
+        Visible = hero.AttributePoints > 0;
     }
 }

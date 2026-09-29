@@ -1,0 +1,76 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Environment/CellarDoor.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="2_ps1"]
+[ext_resource type="Texture2D" path="res://Textures/World/wall_brick.png" id="3_brick"]
+
+[sub_resource type="BoxShape3D" id="Shape_pick"]
+size = Vector3(1.8, 0.4, 1.4)
+
+[sub_resource type="BoxMesh" id="Mesh_frame"]
+size = Vector3(1.8, 0.12, 1.4)
+
+[sub_resource type="ShaderMaterial" id="Mat_frame"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.8, 0.8, 0.8, 1)
+shader_parameter/albedo_texture = ExtResource("3_brick")
+shader_parameter/uv_scale = Vector2(2, 2)
+
+[sub_resource type="BoxMesh" id="Mesh_leaf"]
+size = Vector3(0.78, 0.08, 1.2)
+
+[sub_resource type="ShaderMaterial" id="Mat_leaf"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.32, 0.2, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_gap"]
+size = Vector3(0.06, 0.02, 1.2)
+
+[sub_resource type="ShaderMaterial" id="Mat_gap"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/emission = Color(1, 0.85, 0.5, 1)
+shader_parameter/emission_energy = 4.0
+
+[node name="CellarDoor" type="Area3D" node_paths=PackedStringArray("Glow")]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_script")
+Glow = NodePath("Glow")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+shape = SubResource("Shape_pick")
+
+[node name="Frame" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_frame")
+surface_material_override/0 = SubResource("Mat_frame")
+
+[node name="LeafLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.43, 0.15, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_leaf")
+surface_material_override/0 = SubResource("Mat_leaf")
+
+[node name="LeafRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.43, 0.15, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_leaf")
+surface_material_override/0 = SubResource("Mat_leaf")
+
+[node name="Glow" type="Node3D" parent="."]
+
+[node name="Gap" type="MeshInstance3D" parent="Glow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_gap")
+surface_material_override/0 = SubResource("Mat_gap")
+
+[node name="Light" type="OmniLight3D" parent="Glow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+light_color = Color(1, 0.85, 0.55, 1)
+light_energy = 3.0
+omni_range = 4.0

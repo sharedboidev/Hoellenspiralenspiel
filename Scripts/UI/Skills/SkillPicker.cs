@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Godot;
+using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Resources.Skills;
-using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Skills;
 
@@ -19,7 +19,7 @@ public partial class SkillPicker : PopupPanel
 
     public event SkillChosenEventHandler SkillChosen;
 
-    public void Open(int forSlot, IReadOnlyList<SkillResource> skills, Rect2 slotRect, BaseUnit caster)
+    public void Open(int forSlot, IReadOnlyList<SkillResource> skills, Rect2 slotRect, IHero caster)
     {
         slot = forSlot;
 
@@ -47,7 +47,7 @@ public partial class SkillPicker : PopupPanel
         Popup(new Rect2I(position.Max(Vector2I.Zero), size));
     }
 
-    private void AddEntry(SkillResource skill, BaseUnit caster)
+    private void AddEntry(SkillResource skill, IHero caster)
     {
         var entry = new SkillPickerEntry
         {

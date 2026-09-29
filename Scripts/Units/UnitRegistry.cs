@@ -1,14 +1,13 @@
 using System.Collections.Generic;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Spatial;
+using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
 public static class UnitRegistry
 {
-    private const float CellSizePx = 256f;
-
-    //Das Raster kennt die Position vom Beginn des Frames, der Zuschlag deckt die Bewegung seitdem ab
+    private const float CellSizePx      = 256f;
     private const float SearchPaddingPx = 48f;
 
     private static readonly SpatialHash<BaseUnit> Grid            = new(CellSizePx);
@@ -32,12 +31,12 @@ public static class UnitRegistry
 
     public static void Track(BaseUnit unit)
     {
-        var center = unit.BodyCenter;
+        var position = unit.GlobalPosition;
 
-        Grid.Place(unit, center.X, center.Y);
+        Grid.Place(unit, WorldScale.ToPx(position.X), WorldScale.ToPx(position.Z));
     }
 
     //Liefert eine Obermenge. Den genauen Abstand prüft der Aufrufer
-    public static void FindNear(Vector2 center, float radius, List<BaseUnit> results)
-        => Grid.Query(center.X, center.Y, radius + SearchPaddingPx, results);
+    public static void FindNear(Vector3 center, float radiusPx, List<BaseUnit> results)
+        => Grid.Query(WorldScale.ToPx(center.X), WorldScale.ToPx(center.Z), radiusPx + SearchPaddingPx, results);
 }

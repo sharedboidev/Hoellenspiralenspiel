@@ -30,17 +30,17 @@ public class AreaSettingsTests
         => Assert.That(new AreaSettings(300).GetRadiusAfter(-0.1), Is.Zero);
 
     [Test]
-    public void Contains_ZaehltDenAbstandNachObenDoppelt()
+    public void Contains_IstEinKreisAufDemBoden()
     {
         Assert.Multiple(() =>
         {
             Assert.That(AreaSettings.Contains(100, 0, 100), Is.True, "rechts am Rand");
             Assert.That(AreaSettings.Contains(101, 0, 100), Is.False, "rechts knapp außerhalb");
-            Assert.That(AreaSettings.Contains(0, 50, 100), Is.True, "unten am Rand");
-            Assert.That(AreaSettings.Contains(0, 51, 100), Is.False, "unten knapp außerhalb");
-            Assert.That(AreaSettings.Contains(0, -50, 100), Is.True, "oben am Rand");
-            Assert.That(AreaSettings.Contains(60, 40, 100), Is.True, "schräg innerhalb");
-            Assert.That(AreaSettings.Contains(80, 40, 100), Is.False, "schräg außerhalb");
+            Assert.That(AreaSettings.Contains(0, 100, 100), Is.True, "vorn am Rand");
+            Assert.That(AreaSettings.Contains(0, 101, 100), Is.False, "vorn knapp außerhalb");
+            Assert.That(AreaSettings.Contains(0, -100, 100), Is.True, "hinten am Rand");
+            Assert.That(AreaSettings.Contains(60, 80, 100), Is.True, "schräg am Rand");
+            Assert.That(AreaSettings.Contains(80, 70, 100), Is.False, "schräg außerhalb");
         });
     }
 

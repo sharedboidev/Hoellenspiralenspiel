@@ -8,17 +8,26 @@ using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Enemies;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Objects;
-using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
+using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.Controllers;
 
 public partial class EnemyController : Node
 {
+    private const float LootSpreadMeters = 0.48f;
+
     private readonly List<Enemy> enemies = new();
-    private          Node2D      container;
-    private          Player2D    player;
+
+    [Export]
+    public Hero Hero { get; set; }
+
+    [Export]
+    public Node3D EnemyContainer { get; set; }
+
+    [Export]
+    public Node SpawnMarkers { get; set; }
 
     [Export]
     public Lootsystem Lootsystem { get; set; }
@@ -67,25 +76,22 @@ public partial class EnemyController : Node
 
     public override void _Ready()
     {
-        var currentScene = GetTree().CurrentScene;
+        if (SpawnMarkers is null)
+            return;
 
-        player    = currentScene.GetNode<Player2D>("%Player 2D");
-        container = currentScene.GetNode<Node2D>("%Enemies");
-
-        foreach (var spawnMarker in GetParent().GetNode<Node2D>(nameof(SpawnMarker)).GetAllChildren<SpawnMarker>())
-            SpawnGroupAt(spawnMarker);
+        foreach (var marker in SpawnMarkers.GetAllChildren<SpawnMarker>())
+            SpawnGroupAt(marker);
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        var playerPosition          = player.GlobalPosition;
-        var simulationRadiusSquared = SimulationRadius * SimulationRadius;
+        var heroPosition = Hero.GlobalPosition;
 
         //Über den Index, weil ein Monster beim Denken weitere beschwören kann
         for (var i = 0; i < enemies.Count; i++)
         {
             var enemy   = enemies[i];
-            var isAwake = !enemy.IsResting || enemy.GlobalPosition.DistanceSquaredTo(playerPosition) <= simulationRadiusSquared;
+            var isAwake = !enemy.IsResting || WorldScale.GroundDistancePx(enemy.GlobalPosition, heroPosition) <= SimulationRadius;
 
             enemy.SetAwake(isAwake);
 
@@ -94,27 +100,27 @@ public partial class EnemyController : Node
         }
     }
 
-    private void SpawnGroupAt(SpawnMarker spawnMarker)
+    private void SpawnGroupAt(SpawnMarker marker)
     {
-        if (spawnMarker.Enemy is null)
+        if (marker.Enemy is null)
         {
-            GD.PushWarning($"Der Spawn-Marker {spawnMarker.Name} hat keinen Gegner.");
+            GD.PushWarning($"Der Spawn-Marker {marker.Name} hat keinen Gegner.");
 
             return;
         }
 
-        var level   = EnemyScaling.GetLevel(AreaLevel, spawnMarker.Enemy.LevelOffset, spawnMarker.LevelOffset);
+        var level   = EnemyScaling.GetLevel(AreaLevel, marker.Enemy.LevelOffset, marker.LevelOffset);
         var chances = new EnemyRarityChances(EliteChancePercent, RareEliteChancePercent);
 
-        for (var i = 0; i < spawnMarker.AmountToSpawn; i++)
+        for (var i = 0; i < marker.AmountToSpawn; i++)
         {
             var modCount = EnemyRarityRules.RollModCount(chances, GameRandom.Shared);
 
-            Spawn(spawnMarker.Enemy, spawnMarker.GetSpawnlocationFor(i), spawnMarker.Name, level, modCount);
+            Spawn(marker.Enemy, marker.GetSpawnPosition(i), marker.Name, level, modCount);
         }
     }
 
-    public Enemy Spawn(EnemyResource definition, Vector2 position, string spawnGroup, int level, int modCount = 0)
+    public Enemy Spawn(EnemyResource definition, Vector3 position, string spawnGroup, int level, int modCount = 0)
     {
         var traits = new MonsterTraits(level, definition.UsesProjectiles);
         var mods   = MonsterModRoller.Pick(MonsterModLibrary.Pool, modCount, traits, GameRandom.Shared)
@@ -124,7 +130,7 @@ public partial class EnemyController : Node
         return Spawn(definition, position, spawnGroup, level, mods);
     }
 
-    public Enemy Spawn(EnemyResource definition, Vector2 position, string spawnGroup, int level, IReadOnlyList<MonsterModResource> mods)
+    public Enemy Spawn(EnemyResource definition, Vector3 position, string spawnGroup, int level, IReadOnlyList<MonsterModResource> mods)
     {
         var enemy = definition.Scene.Instantiate<Enemy>();
 
@@ -133,12 +139,12 @@ public partial class EnemyController : Node
         enemy.Position   = position;
         enemy.SpawnGroup = spawnGroup;
         enemy.Controller = this;
-        enemy.Target     = player;
+        enemy.Target     = Hero;
         enemy.Provoked   += CallGroupToArms;
         enemy.Died       += OnEnemyDied;
 
         enemies.Add(enemy);
-        container.AddChild(enemy);
+        EnemyContainer.AddChild(enemy);
 
         return enemy;
     }
@@ -160,7 +166,7 @@ public partial class EnemyController : Node
 
         CallGroupToArms(enemy);
 
-        player.GainExperience(enemy.XpGranted);
+        Hero.GainExperience(enemy.XpGranted);
 
         //Died feuert genau einmal pro Gegner, daher entsteht der Loot hier und nicht bei jeder Lebensänderung
         SpawnLootbags(enemy);
@@ -177,20 +183,21 @@ public partial class EnemyController : Node
 
     private void SpawnLootbags(Enemy enemy)
     {
+        if (Lootsystem is null)
+            return;
+
         var loot = Lootsystem.GenerateLoot(enemy);
 
         for (var i = 0; i < loot.Count; i++)
-            Lootbag.Drop(player.GetParent(), enemy.GlobalPosition + GetLootbagOffset(i, loot.Count), loot[i], player.Items);
+            Lootbag.Drop(Hero.GetParent(), enemy.GlobalPosition + GetLootbagOffset(i, loot.Count), loot[i], Hero.Items);
     }
 
     //Mehrere Beutel werden im Kreis um den Gegner verteilt, damit sie sich nicht überdecken
-    private static Vector2 GetLootbagOffset(int index, int totalAmount)
+    private static Vector3 GetLootbagOffset(int index, int totalAmount)
     {
-        const float spreadRadiusPx = 48f;
-
         if (totalAmount <= 1)
-            return Vector2.Zero;
+            return Vector3.Zero;
 
-        return Vector2.Right.Rotated(Mathf.Tau * index / totalAmount) * spreadRadiusPx;
+        return Vector3.Right.Rotated(Vector3.Up, Mathf.Tau * index / totalAmount) * LootSpreadMeters;
     }
 }

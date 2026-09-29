@@ -1,10 +1,21 @@
-[gd_resource type="Resource" script_class="WeaponBaseResource" format=3]
+[gd_resource type="Resource" script_class="WeaponBaseResource" format=3 uid="uid://dhlgnahebbsll"]
 
-[ext_resource type="Script" path="res://Resources/Items/WeaponBaseResource.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://b1dxfvrfqmolb" path="res://Resources/Items/WeaponBaseResource.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://30hpggqgjfab" path="res://Textures/Items/Weapons/Staffs/Staff.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://Scenes/Items/wooden_staff.tscn" id="9_worn"]
 
 [resource]
 script = ExtResource("1_script")
+Slot = 18
+WeaponType = 4
+WieldStrategy = 4
+MinDamage = 10.0
+MaxDamage = 14.0
+AttacksPerSecond = 0.33
+CriticalHitChance = 3.0
+MeleeBlock = 10.0
+SpellBlock = 5.0
+WornModel = ExtResource("9_worn")
 Id = "wooden_staff"
 DisplayName = "Wooden Staff"
 Icon = ExtResource("2_icon")
@@ -13,12 +24,3 @@ Requirements = Dictionary[int, int]({
 2: 1,
 5: 1
 })
-MeleeBlock = 10.0
-SpellBlock = 5.0
-Slot = 18
-WeaponType = 4
-WieldStrategy = 4
-MinDamage = 10.0
-MaxDamage = 14.0
-AttacksPerSecond = 0.33
-CriticalHitChance = 3.0

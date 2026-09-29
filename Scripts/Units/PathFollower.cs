@@ -1,9 +1,10 @@
 using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Navigation;
+using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
-//Ohne Navigationsnetz im Level läuft die Einheit wie früher in gerader Linie
+//Ohne Navigationsnetz im Level läuft die Einheit in gerader Linie
 public sealed class PathFollower
 {
     private const double RepathIntervalSec = 0.4;
@@ -12,58 +13,59 @@ public sealed class PathFollower
 
     private static int createdCount;
 
-    private readonly NavigationAgent2D agent;
-    private readonly Node2D            body;
+    private readonly NavigationAgent3D agent;
+    private readonly Node3D            body;
     private readonly RepathTimer       timer;
 
-    public PathFollower(Node2D owner)
+    public PathFollower(Node3D owner)
     {
-        //Der Pfad gilt für die Mitte der Kollisionsform. Vom Ursprung der Einheit aus gerechnet bliebe sie an Ecken hängen
-        body  = owner.GetNodeOrNull<Node2D>(nameof(CollisionShape2D)) ?? owner;
-        agent = body.GetNodeOrNull<NavigationAgent2D>(nameof(NavigationAgent2D)) ?? CreateAgent(body);
-
-        //Der Versatz verteilt die Pfadsuche vieler Einheiten auf verschiedene Frames
+        body  = owner;
+        agent = owner.GetNodeOrNull<NavigationAgent3D>(nameof(NavigationAgent3D)) ?? CreateAgent(owner);
         timer = new RepathTimer(RepathIntervalSec, MinTargetShiftPx, RepathIntervalSec * (createdCount++ % StaggerSteps) / StaggerSteps);
     }
 
-    public Vector2 GetDirectionTo(Vector2 target, double deltaSec)
+    public Vector3 GetDirectionTo(Vector3 target, double deltaSec)
     {
         var position = body.GlobalPosition;
-        var direct   = position.DirectionTo(target);
+        var direct   = WorldScale.OnGround(target - position).Normalized();
 
-        if (NavigationServer2D.MapGetIterationId(agent.GetNavigationMap()) == 0)
+        if (NavigationServer3D.MapGetIterationId(agent.GetNavigationMap()) == 0)
             return direct;
 
-        if (timer.IsDue(deltaSec, target.X, target.Y))
+        if (timer.IsDue(deltaSec, WorldScale.ToPx(target.X), WorldScale.ToPx(target.Z)))
             agent.TargetPosition = target;
 
         if (agent.IsNavigationFinished())
             return direct;
 
-        var toNextPoint = agent.GetNextPathPosition() - position;
+        var toNextPoint = WorldScale.OnGround(agent.GetNextPathPosition() - position);
 
-        return toNextPoint.LengthSquared() < 1f ? direct : toNextPoint.Normalized();
+        return toNextPoint.LengthSquared() < 0.0001f ? direct : toNextPoint.Normalized();
     }
 
-    public Vector2 SnapToNavigation(Vector2 point)
+    public Vector3 SnapToNavigation(Vector3 point)
     {
         var map = agent.GetNavigationMap();
 
-        return NavigationServer2D.MapGetIterationId(map) == 0 ? point : NavigationServer2D.MapGetClosestPoint(map, point);
+        if (NavigationServer3D.MapGetIterationId(map) == 0)
+            return point;
+
+        return WorldScale.OnGround(NavigationServer3D.MapGetClosestPoint(map, point));
     }
 
     public void Reset()
         => timer.Reset();
 
-    private static NavigationAgent2D CreateAgent(Node2D parent)
+    //Das Netz liegt eine Zellenhöhe über dem Boden, die Abstände müssen diesen Versatz überbrücken
+    private static NavigationAgent3D CreateAgent(Node3D parent)
     {
-        var created = new NavigationAgent2D
+        var created = new NavigationAgent3D
         {
-            Name                  = nameof(NavigationAgent2D),
+            Name                  = nameof(NavigationAgent3D),
             AvoidanceEnabled      = false,
-            PathDesiredDistance   = 24f,
-            TargetDesiredDistance = 16f,
-            PathMaxDistance       = 96f
+            PathDesiredDistance   = 0.6f,
+            TargetDesiredDistance = 0.5f,
+            PathMaxDistance       = 2f
         };
 
         parent.AddChild(created);

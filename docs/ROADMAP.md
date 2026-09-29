@@ -1,16 +1,19 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
-Stand: 28.09.2026. M0 bis M4 liegen auf `master`, dazu die Nachträge zu M2 und M3: Bleed stapelt, Schadenswerte im Tooltip und ausgedünnte Kommentare.
-M5 ist auf dem Branch `master_EnemyAiAndScaling` umgesetzt.
+Stand: 29.09.2026. M0 bis M5 liegen auf `master`, dazu die Nachträge zu M2 und M3: Bleed stapelt, Schadenswerte im Tooltip und ausgedünnte Kommentare.
+Der Vergleich von 2D und 3D und die Umstellung M5.5 liegen auf dem Branch `master_Compare3D`. Das Spiel läuft seitdem in 3D im Look der PlayStation 1.
+Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen, die Hauptszene ist das 3D-Testlevel.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
-Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code (rund 5.500 Zeilen) plus Szenen.
+Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code samt Szenen. Die Zeilenzahl aus der ersten Analyse, rund 5.500, galt für die 2D-Fassung.
 Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 bis M5 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
 
 ## Getroffene Richtungsentscheidungen
 
 | Frage | Entscheidung |
 |---|---|
-| 2D oder 3D | Noch offen. Spiellogik wird zuerst von der Darstellung getrennt. |
+| 2D oder 3D | 3D im Look der PlayStation 1, Vorbild Silent Hill. Entschieden am 29.09.2026 nach dem Vergleich. |
+| Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen, auch das Amulett. Nur die Ringe bleiben unsichtbar. Gegner zeigen ihre Ausrüstung, sobald es Gegner mit Armen gibt. Entschieden am 29.09.2026. |
+| Modelle | Starre Teile ohne Skelett. Entschieden am 29.09.2026. |
 | Spielstruktur | Hub (Stadt) plus Abstieg in einen Höllenkreis mit mehreren Ebenen |
 | Leveldesign | Etwa 90 % prozedural, dazu handgebaute Räume und Event-Locations, die gezielt eingestreut werden |
 | Multiplayer | Singleplayer zuerst, Koop soll später nachrüstbar bleiben |
@@ -19,7 +22,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 
 | Bereich | Stand | Abgleich mit dem PDF |
 |---|---|---|
-| Isometrische Perspektive | Testlevel mit TileMap-Layern für Boden, Wände, Objekte | Entspricht dem PDF, aber nur ein Testlevel |
+| Isometrische Perspektive | Testlevel in 3D mit Boden, Mauern und ummauertem Hof, gesehen von schräg oben | Entspricht dem PDF, aber nur ein Testlevel |
 | Attribute | Alle fünf Attribute mit abgeleiteten Werten und Obergrenzen | Obergrenzen stimmen exakt. Wachstum ist logistisch statt beschränkt. Lichtradius fehlt. |
 | Leben und Mana | Basisformeln, Regeneration, Orbs mit Shader | Formeln stimmen exakt |
 | Modifier-System | Flat, Percentage (increased) und More, sauber getrennt | Trägt das ganze Stat-Konzept |
@@ -27,17 +30,17 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Rüstung | Helm, Torso, Handschuhe und Schild mit Rüstungswert | 4 von 16 Slots haben Item-Basen |
 | Affixe | 17 Affixe mit Tiers, Gewichten, Itemlevel-Grenze, Prefix/Suffix, lokale und globale Mods | Slot-Tabelle aus dem PDF nur teilweise abgedeckt |
 | Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle. Seit M5 bestimmt das Monsterlevel das Itemlevel. |
-| Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. |
-| Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. |
+| Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. Seit M5.5 hängt sie an der Schnittstelle `IHero` und läuft auch in 3D. |
+| Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. Seit M5.5 ist sie in 3D am Helden zu sehen. |
 | Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch | Nicht im PDF |
-| Leveling | XP-Tabelle bis Level 100, Level-up-Effekt, Attributspunkte, XP-Balken | Nicht im PDF, funktioniert |
+| Leveling | XP-Tabelle bis Level 100, Level-up-Effekt, Attributspunkte, XP-Balken. Seit M5.5 liegt die Regel für XP, Level und Punkte im Kern und treibt den 3D-Helden. | Nicht im PDF, funktioniert |
 | Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen, Tooltip mit DPS | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
 | Kampf | Zentrale Trefferauflösung, Nahkampf, Schadensarten mit Effekten, Statuseffekte, Tod und Respawn | Seit M2. Frost-Effekt war im PDF leer und ist jetzt Verlangsamung. |
 | Schadensminderung | Rüstungsformel, Resistenzen, Dodge, Parry und Block für alle Einheiten | Seit M4 bringen Schild, Stab und Schwert Block und Parry mit |
 | Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler. Seit M5 sind sie Resources mit Level, Ausrüstung und Verhalten, dazu Elite und Rare Elite mit Mods aus Bausteinen | Nur Blobs und ein Testgegner |
 | Wegfindung | Seit M5: Navigationsnetz pro Level, zur Laufzeit gebacken. Gegner und Held laufen um Wände herum | Nicht im PDF |
-| Atmosphäre | Punktlichter mit Schatten, abgedunkelte Szene, Overlay-Karte | Passt zum düsteren Vibe |
-| 3D | Ein Prototyp, der nur Bewegung kann | Offene Frage aus dem PDF |
+| Atmosphäre | Der Held trägt sein Licht, die Umgebung ist dunkel und neblig, dazu der PS1-Look und die Overlay-Karte | Passt zum düsteren Vibe |
+| 3D | Seit dem 29.09.2026 läuft das ganze Spiel in 3D auf dem unveränderten Kern. Alle Modelle sind Platzhalter aus Grundkörpern. | Offene Frage aus dem PDF, entschieden für 3D |
 
 ## 2. Was an kritischen Systemen fehlt
 
@@ -66,11 +69,11 @@ Status vom 28.09.2026. Die Zeilennummern beziehen sich auf den Stand vor den Kor
 
 | Nr. | Status | Problem | Stelle |
 |---|---|---|---|
-| F1 | Behoben | Stärke und Konstitution überschreiben gegenseitig ihren Rüstungsbonus, weil beide dieselbe Herkunfts-ID benutzen | [DerivedStatProvider.cs:65](../Scripts/Utils/DerivedStatProvider.cs), [DerivedStatProvider.cs:98](../Scripts/Utils/DerivedStatProvider.cs) |
+| F1 | Behoben | Stärke und Konstitution überschreiben gegenseitig ihren Rüstungsbonus, weil beide dieselbe Herkunfts-ID benutzen | [DerivedStatProvider.cs:65](../Scripts/Core/Stats/DerivedStatProvider.cs), [DerivedStatProvider.cs:98](../Scripts/Core/Stats/DerivedStatProvider.cs) |
 | F2 | Behoben | Attribute von Ausrüstung aktualisieren die abgeleiteten Werte nicht. Nur Änderungen am Basiswert lösen die Neuberechnung aus. | [BaseUnit.cs:155](../Scripts/Units/BaseUnit.cs) |
 | F3 | Behoben | Zauberschaden ignoriert den More-Multiplikator. Intelligenz erhöht den Schaden dadurch nicht. | [BaseSkill.cs:42](../Scripts/Abilities/BaseSkill.cs) |
-| F4 | Behoben | Treffer auf Gegner zeigen manchmal "Dodge" an, ziehen aber trotzdem Leben ab. Heilung konnte ebenfalls "Dodge" anzeigen. | [BaseUnit.cs:48](../Scripts/Units/BaseUnit.cs), [FCTExtensions.cs:17](../Scripts/Extensions/FCTExtensions.cs) |
-| F5 | Behoben | Kontaktschaden trifft in jedem Physik-Frame ohne Abklingzeit | [Player2D.cs:199](../Scripts/Units/Player2D.cs) |
+| F4 | Behoben | Treffer auf Gegner zeigen manchmal "Dodge" an, ziehen aber trotzdem Leben ab. Heilung konnte ebenfalls "Dodge" anzeigen. | [BaseUnit.cs:48](../Scripts/Units/BaseUnit.cs), [FCTExtensions.cs:17](../Scripts/UI/CombatText.cs) |
+| F5 | Behoben | Kontaktschaden trifft in jedem Physik-Frame ohne Abklingzeit | [Player2D.cs:199](../Scripts/Units/Hero.cs) |
 | F6 | Behoben | Gegner greifen ohne Cooldown an. Der Testgegner erzeugt pro Frame einen Feuerball. Windup und Recovery werden nicht benutzt. | BaseEnemy.cs:145, heute [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs). TestEnemy.cs:21, seit M5 entfallen |
 | F7 | Behoben | Ein Gegner kann mehrere Lootbags fallen lassen, wenn er nach dem Tod noch getroffen wird. Von mehreren gewürfelten Items fällt nur das erste. | [EnemyController.cs:116](../Scripts/Controllers/EnemyController.cs) |
 | F8 | Behoben | Einen Trank zu trinken gibt den Slot frei, obwohl der Stapel noch Tränke enthält. Das nächste Item landet darüber. | [Inventory.cs:192](../Scripts/UI/Character/Inventory.cs) |
@@ -81,11 +84,11 @@ Status vom 28.09.2026. Die Zeilennummern beziehen sich auf den Stand vor den Kor
 | F13 | Behoben | Verschachtelte Loot-Tabellen sind als Typ angelegt, aber nicht umgesetzt | [LootTable.cs:42](../Resources/LootTable.cs) |
 | F14 | Behoben | Derselbe Affix kann mehrfach auf einem Item landen | [Lootsystem.cs:57](../Scripts/Controllers/Lootsystem.cs) |
 | F15 | Behoben | Die Todesanimation ist nie zu sehen, weil der Gegner beim Start der Animation entfernt wird | BaseEnemy.cs:60, heute [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs) |
-| F16 | Behoben | Auf Level 100 ist die nächste XP-Schwelle 0. Jeder XP-Gewinn löst dann ein Level-up aus und das Level danach wirft eine Ausnahme. | [XpTable.cs:109](../Scripts/Utils/XpTable.cs) |
+| F16 | Behoben | Auf Level 100 ist die nächste XP-Schwelle 0. Jeder XP-Gewinn löst dann ein Level-up aus und das Level danach wirft eine Ausnahme. | [XpTable.cs:109](../Scripts/Core/Progression/XpTable.cs) |
 | F17 | Behoben | `LifeBase = 75` in den Gegner-Szenen wird ignoriert. Alle Gegner haben 9 Leben, der Feuerball macht 50 bis 75 Schaden. | [yellow_blob.tscn](../Scenes/Units/Enemies/yellow_blob.tscn) |
 | F18 | Behoben | Schadenszahlen driften pro Frame statt pro Sekunde und sind damit abhängig von der Bildrate | [FloatingCombatText.cs:58](../Scripts/UI/FloatingCombatText.cs) |
 | F19 | Behoben | Ein Slot meldet sich nie vom Stapel-Ereignis eines Tranks ab. Wird ein verschobener Trankstapel leer getrunken, löscht der alte Slot den fremden Trankstapel, der inzwischen dort liegt. | [InventorySlot.cs:62](../Scripts/UI/Character/InventorySlot.cs) |
-| F20 | Behoben | Einheiten füllen Leben und Mana, bevor die abgeleiteten Modifier berechnet sind. Sie starten dadurch knapp unter ihrem Maximum. | [BaseUnit.cs:84](../Scripts/Units/BaseUnit.cs), [Player2D.cs:76](../Scripts/Units/Player2D.cs) |
+| F20 | Behoben | Einheiten füllen Leben und Mana, bevor die abgeleiteten Modifier berechnet sind. Sie starten dadurch knapp unter ihrem Maximum. | [BaseUnit.cs:84](../Scripts/Units/BaseUnit.cs), [Player2D.cs:76](../Scripts/Units/Hero.cs) |
 | F21 | Behoben | Das Inventar hat einen höheren Z-Index als der Level-up-Dialog und verdeckt ihn | [level_up_dialog.tscn](../Scenes/UI/level_up_dialog.tscn) |
 | F22 | Behoben | Das Statdisplay zeichnet sich nach dem Verteilen eines Attributpunkts nicht neu | [CharacterSheet.cs](../Scripts/UI/Character/CharacterSheet.cs), [BaseUnit.cs](../Scripts/Units/BaseUnit.cs) |
 
@@ -107,14 +110,14 @@ Hinweise zu den Korrekturen:
 | P5 | Behoben in M4. Das Inventar nutzte Godot-Dictionaries mit Float-Vektoren als Schlüssel. Jeder Zugriff wurde zwischen C# und Engine konvertiert. Jetzt rechnet ein Raster im Kern mit ganzen Feldern. | [InventoryGrid.cs](../Scripts/Core/Items/InventoryGrid.cs) |
 | P6 | Behoben in M4. Knoten wurden in Property-Gettern bei jedem Zugriff neu gesucht. Inventar und Ausrüstung holen ihre Knoten jetzt einmal. | [Inventory.cs](../Scripts/UI/Character/Inventory.cs), [EquipmentPanel.cs](../Scripts/UI/Character/EquipmentPanel.cs) |
 | P7 | Behoben: für den Kampf in M2, für Loot in M4, für Spawns und Seltenheit in M5. Alle Würfe laufen über eine Zufallsquelle mit Seed. | [GameRandom.cs](../Scripts/Core/Rng/GameRandom.cs), [LootRoller.cs](../Scripts/Core/Items/LootRoller.cs), [EnemyController.cs](../Scripts/Controllers/EnemyController.cs) |
-| P8 | Neu seit M2: Jede Schadenszahl ist ein eigener Knoten. Brennen viele Gegner gleichzeitig, entstehen pro Sekunde zwei Zahlen je Gegner. Bisher ohne messbare Folgen, Pooling steht in M9. | [FCTExtensions.cs](../Scripts/Extensions/FCTExtensions.cs) |
+| P8 | Neu seit M2: Jede Schadenszahl ist ein eigener Knoten. Brennen viele Gegner gleichzeitig, entstehen pro Sekunde zwei Zahlen je Gegner. Bisher ohne messbare Folgen, Pooling steht in M9. | [FCTExtensions.cs](../Scripts/UI/CombatText.cs) |
 | P9 | Behoben in M5. Flächen, Forks und die Suche nach dem Gegner unter dem Mauszeiger gingen alle Einheiten der Karte durch. Jetzt fragen sie ein Raster und sehen nur die Einheiten in der Nähe. | [SpatialHash.cs](../Scripts/Core/Spatial/SpatialHash.cs), [UnitRegistry.cs](../Scripts/Units/UnitRegistry.cs) |
 
 ### 3.3 Architektur
 
 | Nr. | Problem | Folge |
 |---|---|---|
-| A1 | Rund 15 Stellen suchen Spieler, Controller oder Tooltip über feste Namen in der aktuellen Szene. Skills gehören seit M3 nicht mehr dazu, Items und Lootbags seit M4, Gegner seit M5. Der `EnemyController` selbst sucht Held und Gegner-Container weiter über feste Namen. | Jedes neue Level muss exakt wie das Testlevel aufgebaut sein |
+| A1 | Weitgehend behoben in M5.5: Held und Controller kommen als Felder aus dem Inspector, feste Namen brauchen nur noch Tooltip, Dialoge und Todesbildschirm. Vorher suchten rund 15 Stellen Spieler, Controller oder Tooltip über feste Namen in der aktuellen Szene. Skills gehören seit M3 nicht mehr dazu, Items und Lootbags seit M4, Gegner seit M5, der XP-Balken seit M5.5. Der `EnemyController` selbst sucht Held und Gegner-Container weiter über feste Namen. | Jedes neue Level muss exakt wie das Testlevel aufgebaut sein |
 | A2 | Behoben in M1. Alle Stats steckten in einer 2D-Physik-Klasse. Die Rechnung liegt jetzt in `Scripts/Core/Stats` ohne Godot. | Blockierte die 2D/3D-Entscheidung, Tests und Koop |
 | A3 | Für Skills behoben in M3, für das Inventar in M4. Der Skillbar-Button zauberte und zog Mana ab, das Inventar rechnete in seinen Knoten. Jetzt zeigen Leiste und Inventar nur noch an. | Logik ist ohne UI nicht nutzbar und nicht testbar |
 | A4 | Behoben in M4. Items waren Szenen-Knoten, die nie im Baum hingen. Jetzt sind sie reine Daten. | Speicherleck und nicht serialisierbar |
@@ -134,7 +137,7 @@ Beobachtungen aus den Laufzeitprüfungen von M2 bis M5. Der Balance-Durchgang st
 | Nr. | Beobachtung | Stelle |
 |---|---|---|
 | B1 | Erledigt in M5. Rare und Elite bekamen 25 Stärke und regenerierten dadurch 5 Leben pro Sekunde. Seit M5 kommt die Stärke von Elite und Rare Elite allein aus ihren Mods. | [Resources/MonsterMods/Pool](../Resources/MonsterMods/Pool) |
-| B2 | Der Spieler startet mit 9 Leben. Im Testlevel hat er 50 Bonusleben bekommen, damit ein Kampf länger als zwei Treffer dauert. | [test_plane.tscn](../Scenes/test_plane.tscn) |
+| B2 | Der Spieler startet mit 9 Leben. Im Testlevel hat er 50 Bonusleben bekommen, damit ein Kampf länger als zwei Treffer dauert. | [test_level.tscn](../Scenes/test_level.tscn) |
 | B3 | Jeder Treffer mit Fire, Frost, Lightning oder Slash löst seinen Effekt sicher aus. Eine Chance statt Gewissheit wäre eine Stellschraube. | [StatusEffectRules.cs](../Scripts/Core/Combat/StatusEffects/StatusEffectRules.cs) |
 | B4 | Der Held startet mit 9 Mana und regeneriert 0,5 pro Sekunde. Das reicht für vier Feuerbälle oder zwei Thunderbolts. | [Resources/Skills/Player](../Resources/Skills/Player) |
 | B5 | Die Schadenswerte der Zauber stammen von den alten Testzaubern. Ein Thunderbolt mit 50 bis 350 tötet jeden Gegner des Testlevels mit einem Treffer. | [thunderbolt.tres](../Resources/Skills/Player/thunderbolt.tres) |
@@ -169,8 +172,8 @@ Ziel: stabile Basis, bevor umgebaut wird.
 Bewusst nicht angefasst:
 
 - `Scripts/Skills` ist der begonnene Umbau der Skills und bleibt für M3.
-- `Player.cs` und `test_plane_3d.tscn` sind der 3D-Prototyp und bleiben bis zur Entscheidung 2D oder 3D.
-- `Scenes/Spells/thunder_shader.tres` wird von keiner Szene benutzt. Dasselbe gilt für ungenutzten Code im `EnemyController` rund um den Spawn-Timer.
+- `Player.cs` und `test_plane_3d.tscn` sind der 3D-Prototyp und bleiben bis zur Entscheidung 2D oder 3D. Mit M5.5 sind beide entfallen.
+- `thunder_shader.tres` wird von keiner Szene benutzt und liegt seit M5.5 unter `Shaders/Archive2D`. Dasselbe gilt für ungenutzten Code im `EnemyController` rund um den Spawn-Timer.
 
 Fertig, wenn das Testlevel ohne die genannten Fehler läuft und der Wurzelordner nur noch Projektdateien enthält.
 
@@ -765,10 +768,189 @@ Bewusst offen gelassen:
 - Der `EnemyController` sucht Held und Gegner-Container weiter über feste Namen in der Szene. Das gehört zu A1.
 - Die Szenen `lightning_strike.tscn` und `thunderbolt.tscn` verweisen auf veraltete UIDs und melden beim Laden je eine Warnung. Das war vor M5 auch so.
 
-### Entscheidungspunkt: 2D oder 3D
+### Entscheidungspunkt: 2D oder 3D (entschieden am 29.09.2026)
 
-Spätestens hier muss die Entscheidung fallen, weil M6 Levelgrafik erzeugt.
-Vorschlag: ein zeitlich begrenzter Vergleich. Spieler, ein Gegner und ein Zauber laufen einmal in 3D auf demselben Logik-Kern. Danach wird der Aufwand pro neuem Gegner in beiden Varianten verglichen.
+Die Entscheidung musste spätestens hier fallen, weil M6 Levelgrafik erzeugt.
+
+Der Vergleich ist am 29.09.2026 auf dem Branch `master_Compare3D` gebaut. Held, drei Gegner und der Feuerball laufen in 3D auf demselben Logik-Kern, mit Grundkörpern als Platzhalter. Messwerte, Aufwand und Empfehlung stehen in [VERGLEICH_2D_3D.md](VERGLEICH_2D_3D.md).
+
+| Frage | Befund |
+|---|---|
+| Kern und Daten | Laufen in 3D unverändert |
+| Neu geschrieben | 2.204 Zeilen Hüllen unter `Scripts/Spike3D` |
+| Rechenzeit | Kein Unterschied von Belang |
+| Bildrate mit 200 Gegnern | 3D 63, 2D 107. Ohne Schatten liegt 3D gleichauf. |
+| Aufwand pro Gegner | In 3D kleiner, sobald ein Modell da ist |
+
+Entscheidung vom 29.09.2026: 3D im Look der PlayStation 1, Vorbild Silent Hill.
+
+| Punkt | Festlegung |
+|---|---|
+| Grund | Der 2D-Stil gefällt, die Sprites machen aber zu viel Arbeit. Low-Poly-Modelle lassen sich selbst bauen. |
+| Look | Wackelnde Eckpunkte, verzogene Texturen, 240 Bildzeilen, 15 Bit Farbtiefe mit Punktmuster, kleine ungefilterte Texturen, Dunkelheit |
+| Vorlage | `Scripts/Spike3D`, `Scenes/Spike3D` und `Shaders/Spike3D`, mit dem Abschluss von M5.5 aufgelöst |
+
+Noch offen: orthogonale oder perspektivische Kamera. Beide lassen sich im Level mit F2 umschalten.
+
+### M5.5: Umstellung auf 3D (M, abgeschlossen am 29.09.2026 auf `master_Compare3D`)
+
+Ziel: Die 3D-Fassung kann alles, was die 2D-Fassung kann. Danach entfällt die 2D-Schicht.
+
+- Erledigt mit dem Vergleich: Einheit, Held, Gegner, Projektil, Wegfindung, Schadenszahlen, Kamera.
+- Erledigt: PS1-Look mit zwei Shadern, im Level umschaltbar.
+- Erledigt: Der Held trägt Items, und angelegte Ausrüstung ist an ihm zu sehen. Auch das Amulett hat einen Befestigungspunkt.
+- Erledigt: Inventar, Charakterbogen, Skill-Leiste, Orbs und XP-Balken hängen an der Schnittstelle `IHero`.
+- Erledigt: Alle Skills wirken, als Projektil oder als Fläche auf dem Boden.
+- Erledigt: XP von Gegnern, Level-up mit Attributspunkt und Effekt, XP-Verlust beim Tod. Die Regel liegt als `HeroProgress` im Kern.
+- Erledigt: Level-up-Dialog und Todesbildschirm. Der Held steht erst auf, wenn der Spieler es verlangt.
+- Erledigt: Monster-Mods, Elite und Rare Elite, Namensschild.
+- Erledigt: Beutel am Boden und Beute von Gegnern.
+- Erledigt: Speichern und Laden. Der Spielstand der 2D-Fassung bleibt gültig.
+- Erledigt: Overlay-Karte und Kellertür.
+- Erledigt: Aufräumen. Code und Szenen der 2D-Fassung und der alte 3D-Prototyp sind entfallen, die 3D-Klassen tragen die endgültigen Namen, die Hauptszene ist `Scenes/test_level.tscn`.
+- Herausgenommen: eigene Modelle für Held, Gegner und Items. Sie entstehen in Blender und sind ein eigener Punkt, siehe unten.
+
+Fertig, wenn die Hauptszene in 3D läuft und die Laufzeitprüfungen aus M2 bis M5 dort bestehen.
+
+Stand des Fertig-Kriteriums: erfüllt. Eine Laufzeitprüfung mit 70 Schritten lief dreimal hintereinander fehlerfrei in der Hauptszene. Sie deckt Ausrüstung, Zweihandregel, Bogen und Trank, Nahkampf, Gegnerangriffe, Feuerball mit Fork, Frost Nova, Fraktionen, Verfolgen, Aufgeben und Heimkehr, den Weg um die Mauer des Hofs, Level 10, Elite, Rare Elite, Namensschild, die Mods Stalwart, Volatile, Broodmother und Meteor Caller, Beute, Beutel, Level-up-Dialog, Karte, Kellertür und Todesbildschirm ab. Ein zweiter Lauf startet das Spiel neu und vergleicht den geladenen Charakter mit dem gespeicherten, in 4 Schritten. Die 560 Unit-Tests sind grün, dazu kam eine Sichtprüfung mit Bildschirmfotos. Eine Nachprüfung mit 22 Schritten lief dreimal fehlerfrei und deckt den Radius der Beutel, das Hinlaufen, das Abbrechen, Aura und Größe von Elite und den Winkel der Karte ab.
+
+Getroffene Designentscheidungen vom 29.09.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| 2D oder 3D | 3D im Look der PlayStation 1 |
+| Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen |
+| Modelle | Starre Teile: Kopf, Torso, Arme und Beine sind einzelne Netze ohne Gewichte. Kein Skelett. |
+| Sichtbare Plätze | 12 von 16: Waffe, Nebenhand, Helm, Amulett, Schultern, Torso, Rücken, Gürtel, Handgelenke, Hände, Beine, Füße. Nur die vier Ringe bleiben unsichtbar. |
+| Ausrüstung an Gegnern | Ja, sobald es Gegner mit Armen gibt |
+| Kamera | Vertagt. Orthogonal und perspektivisch bleiben im Level mit F2 umschaltbar. |
+| Level-up | Derselbe Effekt wie in 2D, als Partikel in 3D |
+| Eigene Modelle | Kein Teil von M5.5. M5.5 schließt mit Platzhaltern aus Grundkörpern ab. |
+| Aufräumen | Code und Szenen der 2D-Fassung entfallen. Sprites, Tilesets und Texturen der 2D-Effekte bleiben im Repo. |
+| Overlay-Karte | Darf die echte Welt zeigen, aber aus dem Winkel der Spielkamera |
+| Beutel | Haben einen `PickupRadius`. Steht der Held außerhalb, läuft er erst hin. |
+| Elite | Sind größer und haben eine Aura, die leuchtet und glimmt |
+
+Von mir festgelegt, weil es sich aus dem Umbau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Namen der Klassen | Die 3D-Klassen heißen wie ihre Vorgänger in 2D: `BaseUnit`, `Enemy`, `SkillCast`, `SkillAim`, `SkillExecutor`, `SkillProjectile`, `SkillArea`, `UnitRegistry`, `PathFollower`, `LevelNavigation`, `SpawnMarker`. Der Held heißt `Hero`. |
+| Ordner | `Scripts/Spike3D` ist aufgelöst in `Scripts/Units`, `Scripts/Skills`, `Scripts/World` und `Scripts/UI`. Szenen liegen unter `Scenes/Units`, `Scenes/Items`, `Scenes/Skills` und `Scenes/Objects`. |
+| Shader und Texturen | `Shaders/Ps1` und `Textures/World`. Die Shader der 2D-Effekte liegen unter `Shaders/Archive2D`. |
+| Pfade der Szenen | Die 3D-Szenen von Gegnern und Skills liegen auf den Pfaden der 2D-Szenen. Gegner-, Skill- und Waffen-Resources zeigen dadurch ohne Änderung auf 3D. |
+| Paarige Plätze | Hände und Handgelenke haben links und rechts je einen Befestigungspunkt und bekommen das Modell an beiden |
+| Punkt fürs Amulett | `AttachNeck` sitzt am Halsansatz. Ein Amulett hängt von dort nach vorn auf die Brust. |
+| Hieb und Schuss | Beim Hieb hebt sich der rechte Arm um 40 Grad und schwingt 140 Grad quer. Beim Schuss hebt er sich um 80 Grad. |
+| Start-Items | Ein Charakter ohne Spielstand startet im Testlevel mit je einem Stück aller neun Item-Basen, Stärke 2 und Geschick 2. Ein geladener Charakter bringt seine eigenen Items und Attribute mit. |
+| Größe von Elite | Darstellung und Kollisionsform wachsen um denselben Faktor, 1,25 für Elite und 1,5 für Rare Elite. Klickfläche, Lebensbalken und Namensschild wachsen mit. Die Werte stehen am `EnemyController`. |
+| Aura von Elite | Ein Ring am Boden, ein pulsierendes Licht und ein glimmender Körper, alles in der Farbe des Namens: blau für Elite, golden für Rare Elite |
+| Radius der Beutel | 150 Pixel, also 1,5 m. Der Wert steht am Beutel im Feld `PickupRadius`. |
+| Namensschild | Liegt wie die Schadenszahlen auf der 2D-Ebene und folgt dem Monster. Schrift in der 3D-Welt ginge in den 240 Bildzeilen unter. |
+| Klick auf einen Beutel | Der Klick gehört zuerst dem Beutel, dann dem Skill auf der linken Maustaste. Eine Lauftaste oder ein Angriff bricht den Weg zum Beutel ab. |
+| Overlay-Karte | Halb durchsichtig über dem Spiel, der Held steht in der Mitte. Sie zeigt 60 m von oben nach unten, gut dreimal so viel wie das Spiel. |
+| Kellertür | Eine Falltür im Boden bei (4, 0, 5). Sie leuchtet unter der Maus und schreibt beim Klick weiter nur eine Logzeile. |
+| Form der Flächen | Ein Kreis auf dem Boden. Die Stauchung aus 2D ist entfallen, `AreaSettings.Contains` rechnet mit einem Kreis. |
+| Aussehen der Effekte | Leuchtende Ringe und Körper aus Grundformen |
+| Kollisionsebenen | Ebene 5 ist der Boden, Ebene 6 heißt `Interactive` und trägt Beutel und Kellertür |
+
+So ist die 3D-Fassung aufgebaut:
+
+- `BaseUnit` ist ein `CharacterBody3D` mit Stat-Blatt, Statuseffekten und Abklingzeiten. `Hero` und `Enemy` erben davon.
+- Kern und Resources rechnen in Pixeln, die Welt in Metern. `WorldScale` rechnet mit 100 Pixeln pro Meter um.
+- Das Testlevel hat drei Steuerknoten: `EnemyController` spawnt und lenkt Gegner, vergibt XP und Beute. `GameController` lädt und speichert und verbindet Held, Dialoge und Todesbildschirm. `Lootsystem` würfelt die Beute.
+- Beide Controller bekommen Held und Knoten als Felder im Inspector. Feste Namen in der Szene brauchen nur noch `%ItemTooltip`, `%DeathScreen`, `%LevelUpDialog` und `%OpenLevelUpDialogButton`.
+- Schadenszahlen und Namensschilder liegen auf der Ebene `CombatTextLayer` des Levels.
+
+So funktioniert sichtbare Ausrüstung:
+
+- Jede anlegbare Item-Basis hat das Feld `WornModel`. Es zeigt auf eine Szene mit dem Modell. Ohne Modell bleibt das Item unsichtbar.
+- Das Modell des Helden hat Befestigungspunkte. Ein Punkt heißt `Attach` plus Platz, etwa `AttachHelmet` oder `AttachPhysicalWeapon`.
+- Ein Platz ist sichtbar, wenn es einen solchen Punkt gibt. Es gibt dafür keine Liste im Code.
+- `WornItems` hört auf das Anlegen und Ablegen im Kern. Beim Anlegen hängt es das Modell an jeden passenden Punkt, beim Ablegen entfernt es das Modell.
+- Der Ursprung eines Modells ist der Befestigungspunkt. Ein Schwert hat seinen Griff im Ursprung, ein Helm die Mitte des Kopfes, ein Amulett den Halsansatz.
+- Gezeichnet werden die Modelle mit dem Material des PS1-Looks. `Ps1Look` stellt neue Modelle von selbst ein.
+
+Ein Item sichtbar machen in zwei Schritten:
+
+1. Szene mit dem Modell unter `Scenes/Items` anlegen, Wurzelknoten `Node3D`.
+2. Die Szene im Feld `WornModel` der Item-Basis eintragen.
+
+Einen Platz sichtbar machen: im Modell des Helden einen `Marker3D` mit dem Namen `Attach` plus Platz anlegen.
+
+<img src="images/ausruestung_3d_varianten.webp" alt="Der 3D-Held ohne Ausrüstung, mit Schwert und Schild, mit Stab und beim Schuss mit dem Bogen" width="860">
+
+So hängt die Oberfläche am Helden:
+
+- `IHero` nennt alles, was die Oberfläche vom Helden braucht: Werte, Statuseffekte, Items, Waffe, Belegung der Leiste, Abklingzeiten, bekannte Skills, Leben, Mana, Level, XP und Attributspunkte.
+- Drei Ereignisse melden Änderungen: `SheetChanged` für Werte und Level, `ResourcesChanged` für Leben und Mana, `XpChanged` für XP und Punkte.
+- Orbs, Skill-Leiste, XP-Balken, Charakterbogen und Level-up-Dialog haben das Feld `player`. Steht dort ein Held, binden sie sich beim Start selbst an ihn.
+- Beim Aufstieg sprüht `LevelUpEffect` Sterne. Die Szene hat die Werte des 2D-Effekts: 128 Sterne, 2 Sekunden, dieselbe Farbkurve.
+- Godot stellt eine Textur auf Kompression und Mipmaps um, sobald sie zum ersten Mal in 3D erscheint. In der `.import`-Datei des Sterns steht deshalb `detect_3d/compress_to=0`, wie bei den Texturen unter `Textures/World`.
+
+So funktionieren Skills in 3D:
+
+- Das Feld `EffectScene` der Skill-Resource zeigt auf die Szene der Wirkung. Eine Fernkampfwaffe bringt ihr Projektil im Feld `ProjectileScene` mit.
+- Ein Projektil hat den Wurzelknoten `Area3D` mit `SkillProjectile` und zeigt nach -Z. Seine Kollisionsform ist ein hoher Zylinder.
+- Eine Fläche hat den Wurzelknoten `Node3D` mit `SkillArea`. `Visual` zeigt den Radius und wächst in Breite und Tiefe, `VisualRadius` nennt den Radius in Metern ohne Skalierung.
+- `Impact` bleibt bis zum Einschlag unsichtbar. Ein Ton unter `Impact` spielt beim Einschlag und überlebt die Fläche.
+- Diese Schritte ersetzen die Anleitung unter M3, die für 2D geschrieben ist.
+
+Die Platzhalter, alle in [Scenes/Skills](../Scenes/Skills):
+
+| Skill | Szene | Aussehen |
+|---|---|---|
+| Fireball, Fire Spit | `fireball.tscn` | Glühende Kugel mit Schweif |
+| Short Bow | `arrow.tscn` | Pfeil mit Spitze und Federn |
+| Lightning Strike | `lightning_bolt.tscn` | Gezackter Blitz |
+| Frost Nova, Frost Pulse | `frost_nova.tscn` | Hellblauer Ring, der nach außen wächst |
+| Thunderbolt | `thunderbolt.tscn` | Blauer Kreis, dann ein Blitz von oben mit Licht und Ton |
+| Meteor | `meteor.tscn` | Roter Kreis, dann eine flache Kuppel aus Feuer |
+| Death Blast | `death_blast.tscn` | Dunkelroter Kreis um den Wirkenden, dann eine flache Kuppel aus Feuer |
+
+<img src="images/hud_und_flaechen_3d.webp" alt="Das 3D-Testlevel mit Orbs, Skill-Leiste und XP-Balken: Frost Nova, Einschlag von Thunderbolt, Einschlag eines Meteors und der Tooltip von Fireball" width="860">
+
+So funktionieren Beute, Karte und Kellertür:
+
+- `Lootbag` ist ein `Area3D` auf der Ebene `Interactive`. `Lootbag.Drop` legt einen Beutel in die Welt, `Collect` hebt ihn auf. Ist das Inventar voll, hüpft der Beutel und bleibt liegen.
+- Der Held prüft bei einem Linksklick zuerst mit einem Strahl, ob ein Beutel unter der Maus liegt. In Reichweite hebt er ihn sofort auf, sonst läuft er über das Navigationsnetz hin.
+- Die Karte ist ein `SubViewport` mit eigener Kamera und eigener Umgebung ohne Nebel. Die Kamera übernimmt die Ausrichtung der Spielkamera. Gerechnet wird die Karte nur, solange sie zu sehen ist.
+- `EliteAura` baut Ring und Licht eines Elite aus Farbe und Radius. Unter der Maus leuchtet ein Elite wie jedes Monster, danach glimmt er wieder in seiner Farbe.
+- Die Kellertür ist ein `Area3D`. Ihr Knoten `Glow` ist das Gegenstück zu den Lichtstrahlen der 2D-Tür.
+
+<img src="images/elite_aura_und_karte_3d.webp" alt="Links ein Elite und ein Rare Elite mit Aura, rechts die Overlay-Karte aus dem Winkel der Spielkamera" width="860">
+
+Das folgende Bild zeigt den Stand vor den Änderungswünschen, mit der Karte von oben und Elite ohne Aura.
+
+<img src="images/abschluss_m55_3d.webp" alt="Elite mit Namensschild, Beutel und leuchtende Kellertür, die Overlay-Karte, der Level-up-Dialog und der Todesbildschirm" width="860">
+
+Frühere Prüfungen aus M5.5, alle vom 29.09.2026: 70 Schritte für Ausrüstung und Kampf, 78 Schritte für Oberfläche, XP und Flächen, 8 Schritte für den Level-up-Effekt, dazu zwei Gegenproben im 2D-Testlevel mit 14 und 24 Schritten, solange es die 2D-Fassung gab.
+
+Offene Frage, Stand 29.09.2026:
+
+| Frage | Stand |
+|---|---|
+| Kamera orthogonal oder perspektivisch? | Vertagt. Beide lassen sich im Level mit F2 vergleichen. Verzogene Texturen gibt es nur perspektivisch. |
+
+Bewusst offen gelassen:
+
+- Gegner zeigen ihre Ausrüstung noch nicht.
+- Es gibt noch keine Item-Basis für Amulette. Der Platz wird mit dem ersten Amulett sichtbar, das ein Modell hat.
+- Die Karte zeigt die Welt, wie sie ist, mit Boden, Mauern und Nebel der Ferne. Eine gezeichnete Karte kommt mit M6, wenn sie den logischen Grundriss liest.
+- Beutel haben keinen Tooltip und kein Schimmern wie in 2D.
+- Tunika und Gugel decken den Körper nur zu. Ein Modell, das Körperteile ersetzt, gibt es noch nicht.
+- Die Sterne des Level-up-Effekts benutzen ein Standardmaterial, weil der Shader des PS1-Looks weder Partikelfarben noch additives Mischen kennt. Ihre Eckpunkte rasten deshalb nicht ein.
+- Die Beschreibungen unter M2 bis M5 sind für 2D geschrieben. Regeln und Kern gelten unverändert, Szenen und Knoten sind jetzt die aus diesem Abschnitt.
+- Sprites, Tilesets, die Texturen der 2D-Effekte und die Addons für 2D liegen ungenutzt im Repo.
+
+### Eigene Modelle (läuft neben den Meilensteinen)
+
+Ziel: Held, Gegner und Items bekommen eigene Low-Poly-Modelle aus Blender statt der Grundkörper.
+
+- Die Modelle bestehen aus starren Teilen ohne Skelett.
+- Der Held braucht die Knoten `Visual`, `Visual/Body`, `Visual/WeaponPivot` und die Befestigungspunkte mit dem Namen `Attach` plus Platz.
+- Ein Gegner braucht `Visual` und `Visual/Body`. An `Body` hängen Klickfläche, Hervorhebung und das Färben beim Ausholen.
+- Material ist der Shader `Shaders/Ps1/ps1_surface.gdshader`, Texturen sind klein und ungefiltert.
 
 ### M6: Prozedurale Level mit handgebauten Räumen (L)
 
@@ -824,7 +1006,7 @@ Fertig, wenn ein Durchlauf des Kreises 30 bis 60 Minuten dauert und Spaß macht.
 ```
 M0 -> M1 -> M2 -> M3
              |
-             +-> M4 -> M5 -> [2D/3D] -> M6 -> M7 -> M8 -> M9 -> M10
+             +-> M4 -> M5 -> [2D/3D] -> M5.5 -> M6 -> M7 -> M8 -> M9 -> M10
 ```
 
 M3 und M4 sind voneinander unabhängig und können getauscht werden.

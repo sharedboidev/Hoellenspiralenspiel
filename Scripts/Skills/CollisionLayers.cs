@@ -10,6 +10,11 @@ public static class CollisionLayers
     public const uint Monster = 2;
     public const uint Spells  = 4;
     public const uint Walls   = 8;
+    public const uint Ground  = 16;
+
+    public const uint Interactive = 32;
+
+    public const uint NavigationSources = Ground | Walls;
 
     public static uint GetBodyLayer(Faction faction)
         => faction == Faction.Player ? Player : Monster;

@@ -5,7 +5,7 @@ using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Enemies;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Core.Stats;
-using Hoellenspiralenspiel.Scripts.Extensions;
+using Hoellenspiralenspiel.Scripts.UI;
 
 namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
@@ -118,7 +118,7 @@ public sealed class MonsterModRuntime
                 return;
 
             if (!string.IsNullOrEmpty(effect.Announcement))
-                owner.ShowCombatText(effect.Announcement, AnnouncementColor, AnnouncementFontSize);
+                CombatText.Show(owner, effect.Announcement, AnnouncementColor, AnnouncementFontSize);
 
             //Ein Treffer wird mitten im Physikschritt gemeldet, neue Projektile und Monster dürfen erst danach entstehen
             Callable.From(() => Run(new ModContext(owner, other, hit))).CallDeferred();

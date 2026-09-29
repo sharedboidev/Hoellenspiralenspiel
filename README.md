@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-547_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-560_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -28,17 +28,18 @@ Gegner erschlagen, Beute sammeln, Charakter ausbauen.
 
 | Eckpunkt | Entscheidung |
 |---|---|
-| Perspektive | Klassisch isometrisch |
+| Perspektive | Klassisch isometrisch, von schräg oben |
 | Spielstruktur | Stadt als Hub, von dort Abstieg in einen Höllenkreis mit mehreren Ebenen |
 | Level | Überwiegend prozedural, dazu handgebaute Räume und Event-Orte |
 | Mehrspieler | Erst allein, Koop soll später nachrüstbar bleiben |
-| 2D oder 3D | Noch offen, die Spiellogik ist davon unabhängig gebaut |
+| 2D oder 3D | 3D im Look der PlayStation 1. Die frühere 2D-Fassung ist seit dem 29.09.2026 abgelöst |
 
 ---
 
 ## ✨ Feature-Umfang
 
 Das ist der Stand, der heute im Spiel steckt. Gespielt wird in einem Testlevel.
+Das Spiel läuft in 3D, mehr dazu im Abschnitt [3D im PS1-Look](#-3d-im-ps1-look).
 
 ### 🧙 Charakter
 
@@ -277,17 +278,61 @@ Der Held startet am Startpunkt mit vollem Leben und Mana.
 
 | Feature | Beschreibung |
 |---|---|
-| Isometrisches Testlevel | Boden, Wände und Objekte auf getrennten Ebenen |
+| Testlevel in 3D | Boden, Mauern, ein ummauerter Hof und eine Kellertür, gesehen von schräg oben |
 | Navigationsnetz | Entsteht beim Start des Levels aus den Wänden, für Gegner und Held |
-| Licht und Schatten | Punktlichter mit Schattenwurf in abgedunkelter Umgebung |
+| Licht und Schatten | Der Held trägt sein Licht mit sich, die Umgebung ist dunkel und neblig |
 | Lebens- und Mana-Orb | Mit Flüssigkeits-Shader |
 | Erfahrungsbalken | Unterteilt, mit Anzeige beim Überfahren |
-| Overlay-Karte | Lässt sich ein- und ausblenden |
+| Overlay-Karte | Das Level aus dem Winkel der Kamera, nur von weiter weg, mit `Tab` ein- und ausgeblendet |
+| Elite | Größer als ihre Art, mit Namensschild und einer Aura in der Farbe ihres Namens |
+| Beutel | Beute liegt als Beutel am Boden. Ein Klick hebt ihn auf, aus der Ferne läuft der Held erst hin |
+
+### 🧊 3D im PS1-Look
+
+Seit dem 29.09.2026 steht fest: Das Spiel ist 3D, im Look der PlayStation 1.
+Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und dieselben Daten.
+
+<div align="center">
+<img src="docs/images/vergleich_3d_ps1_perspektive.webp" alt="3D-Testlevel im PS1-Look mit Held, Gegnern und Feuerball" width="720">
+</div>
+
+| Feature | Beschreibung |
+|---|---|
+| PS1-Look | Wackelnde Eckpunkte, verzogene Texturen, 240 Bildzeilen, 15 Bit Farbtiefe mit Punktmuster |
+| Sichtbare Ausrüstung | Angelegte Waffen, Schilde und Rüstung erscheinen am Helden. Sichtbar sind alle Plätze außer den Ringen. |
+| Skills | Projektile fliegen, Flächen liegen als Kreis auf dem Boden |
+| Level-up | Ein Sternenregen aus Partikeln |
+| Platzhalter | Alle Modelle bestehen aus Grundkörpern, die Texturen sind erzeugt. Eigene Modelle folgen. |
+
+<div align="center">
+<img src="docs/images/ausruestung_3d_varianten.webp" alt="Der 3D-Held ohne Ausrüstung, mit Schwert und Schild, mit Stab und beim Schuss mit dem Bogen" width="720">
+</div>
+
+<div align="center">
+<img src="docs/images/hud_und_flaechen_3d.webp" alt="Das 3D-Testlevel mit Orbs, Skill-Leiste und XP-Balken: Frost Nova, Einschlag von Thunderbolt, Einschlag eines Meteors und der Tooltip von Fireball" width="720">
+</div>
+
+<div align="center">
+<img src="docs/images/elite_aura_und_karte_3d.webp" alt="Links ein Elite und ein Rare Elite mit Aura, rechts die Overlay-Karte aus dem Winkel der Spielkamera" width="720">
+</div>
+
+<details>
+<summary>Tasten für den Look</summary>
+
+| Taste | Aktion |
+|---|---|
+| `F1` | PS1-Look an und aus |
+| `F2` | Kamera orthogonal oder perspektivisch |
+| `F3` | 240, 360 oder 480 Bildzeilen |
+| `F4` | Schatten aus Lichtern statt dunkler Scheiben |
+
+</details>
 
 ### 🚧 Noch nicht enthalten
 
 - Hub, Levelwechsel und Menüs, damit auch mehrere Charaktere
 - Prozedurale Level
+- Eigene Modelle statt der Platzhalter aus Grundkörpern
 - Item-Basen für die übrigen zwölf Ausrüstungsplätze
 - Tasten im Spiel umbelegen
 - Klassen und Erwerb von Skills, der Held kennt vorerst alle
@@ -323,8 +368,8 @@ flowchart LR
     M0(["M0 Aufräumen"]):::done --> M1(["M1 Stat-Kern"]):::done --> M2(["M2 Kampf"]):::done
     M2 --> M3(["M3 Skills"]):::done
     M2 --> M4(["M4 Items und Speichern"]):::done
-    M4 --> M5(["M5 Gegner-KI"]):::done --> D{"2D oder 3D"}:::decision
-    D --> M6(["M6 Level"]):::open --> M7(["M7 Hub"]):::open --> M8(["M8 Höllenkreis"]):::open
+    M4 --> M5(["M5 Gegner-KI"]):::done --> D{"3D im PS1-Look"}:::done
+    D --> U(["M5.5 Umstellung auf 3D"]):::done --> M6(["M6 Level"]):::next --> M7(["M7 Hub"]):::open --> M8(["M8 Höllenkreis"]):::open
     M8 --> M9(["M9 Inhalt"]):::open --> M10(["M10 Koop"]):::optional
 
     classDef done fill:#2e7d32,color:#ffffff,stroke:#1b5e20
@@ -342,8 +387,9 @@ flowchart LR
 | ✅ | **M3** Skills | Attacks und Spells als Daten, frei belegbare Leiste, Skills unabhängig vom Wirkenden | mittel |
 | ✅ | **M4** Items und Speichern | Items als Daten, Inventar-Modell, Schild mit Block, Speichern und Laden | mittel |
 | ✅ | **M5** Gegner-KI | Gegner als Daten, Zustandsmaschine, Wegfindung, Level, Elite mit Mods | mittel |
-| ⏭️ | **Entscheidung** | 2D oder 3D, per kurzem Vergleichsprototyp | klein |
-| ⬜ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
+| ✅ | **Entscheidung** | 3D im Look der PlayStation 1, entschieden nach dem [Vergleich](docs/VERGLEICH_2D_3D.md) | klein |
+| ✅ | **M5.5** Umstellung auf 3D | Die 3D-Fassung kann alles, was die 2D-Fassung konnte, und hat sie abgelöst | mittel |
+| ⏭️ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
 | ⬜ | **M7** Hub | Stadt, Abstieg, Menüs, Truhe, Händler, Einstellungen | mittel |
 | ⬜ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
@@ -385,7 +431,7 @@ git clone https://github.com/sharedboidev/Hoellenspiralenspiel.git
 ```
 
 Danach den Ordner in Godot als Projekt importieren und mit `F5` starten.
-Die Hauptszene ist `Scenes/test_plane.tscn`.
+Die Hauptszene ist das Testlevel `Scenes/test_level.tscn`.
 
 **Tests ausführen**
 
@@ -410,27 +456,31 @@ Hoellenspiralenspiel
 │   │   ├── Spatial     Raster für die Suche nach Einheiten in der Nähe
 │   │   ├── Saving      Format des Spielstands, Lesen und Schreiben als JSON
 │   │   ├── Rng         Zufallsquelle mit Seed
-│   │   └── Progression XP-Verlust beim Tod
-│   ├── Units           Spieler, Gegner, Pfadfolger
+│   │   └── Progression XP-Tabelle, Level und Attributspunkte, XP-Verlust beim Tod
+│   ├── Units           Held, Gegner, Pfadfolger, sichtbare Ausrüstung
 │   ├── Skills          Ausführung der Skills, Projektil und Fläche
 │   ├── Items           Bibliothek aller Item-Basen
 │   ├── Enemies         Bibliothek aller Monster-Mods
-│   ├── World           Navigationsnetz des Levels
+│   ├── World           Navigationsnetz, Kamera, PS1-Look, Spawn-Marker
+│   ├── Objects         Beutel am Boden
+│   ├── Environment     Kellertür
 │   ├── Saving          Datei des Spielstands
 │   ├── Controllers     Gegnersteuerung, Beute, Spielablauf, Speichern
-│   └── UI              Charakterbogen, Inventar, Orbs, Tooltips
-├── Scenes              Szenen für Level, Einheiten, Zauber, Oberfläche
+│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder
+├── Scenes              Szenen für Level, Einheiten, Items, Skills, Objekte und Oberfläche
+├── Shaders             Shader, unter Ps1 die beiden für den PS1-Look, unter Archive2D die Effekte der 2D-Fassung
 ├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Gegner, Monster-Mods, Themes
+├── Interfaces          Schnittstellen, darunter IHero zwischen Held und Oberfläche
 ├── Enums               Gemeinsame Aufzählungen
 ├── Hoellenspiralenspiel.Tests   Unit-Tests mit NUnit
-└── docs                Roadmap und Analyse
+└── docs                Roadmap, Analyse und der Vergleich von 2D und 3D
 ```
 
 ### Leitlinien
 
 | Leitlinie | Warum |
 |---|---|
-| Logik getrennt von Darstellung | Hält die Entscheidung für 2D oder 3D offen und macht Logik testbar |
+| Logik getrennt von Darstellung | Macht Logik testbar und hat den Wechsel auf 3D möglich gemacht, ohne den Kern zu ändern |
 | Inhalte als Daten | Neue Gegner, Skills und Items ohne Änderung am Code |
 | Ein Zufallsgenerator mit Seed | Gleicher Seed ergibt gleiches Level, Voraussetzung für Koop |
 | Sparsame Kommentare | Namen sprechen für sich, Aufbau und Regeln erklärt die Roadmap |

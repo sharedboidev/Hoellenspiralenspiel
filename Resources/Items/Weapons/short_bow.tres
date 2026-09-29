@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://Resources/Items/WeaponBaseResource.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://bd8q4c4ld6k5r" path="res://Textures/Items/Weapons/Bows/ShortBow.png" id="2_icon"]
 [ext_resource type="PackedScene" path="res://Scenes/Skills/arrow.tscn" id="3_projectile"]
+[ext_resource type="PackedScene" path="res://Scenes/Items/short_bow.tscn" id="9_worn"]
 
 [resource]
 script = ExtResource("1_script")
@@ -22,3 +23,4 @@ AttacksPerSecond = 1.2
 CriticalHitChance = 6.0
 Range = 700.0
 ProjectileScene = ExtResource("3_projectile")
+WornModel = ExtResource("9_worn")

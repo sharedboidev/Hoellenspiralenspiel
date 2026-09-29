@@ -1,6 +1,5 @@
-using System.ComponentModel;
 using Godot;
-using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Interfaces;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
@@ -13,31 +12,36 @@ public enum ResourceType
 public partial class ResourceOrb : Control
 {
 	private         float          current;
+	private         IHero          hero;
 	private         Color          lifeColor    = new(0.65f, 0.08f, 0.10f);
 	private         Color          manaColor    = new(0.10f, 0.30f, 0.85f);
 	[Export] public float          MaxRessource = 100f;
 	private         ShaderMaterial orbShader;
 	[Export] public TextureRect    OrbTexture;
-	private         Player2D       player;
+	[Export] private Node          player;
 	[Export] public Label          ResourceText;
 	private         int            shownCurrent    = int.MinValue;
 	private         float          shownFillAmount = float.NaN;
 	private         int            shownMaximum    = int.MinValue;
-	private         ResourceType   type;
+	[Export] private ResourceType  type;
 
 	public override void _Ready()
-		=> current = MaxRessource;
-
-	public void Init(Player2D adherentPlayer, ResourceType resourceType)
 	{
-		player = adherentPlayer;
-		type   = resourceType;
+		current = MaxRessource;
+
+		if (player is IHero heroOfScene)
+			Init(heroOfScene, type);
+	}
+
+	public void Init(IHero adherentHero, ResourceType resourceType)
+	{
+		hero = adherentHero;
+		type = resourceType;
 
 		ConfigureOrbColors();
 		SetPositionInViewport(resourceType);
 
-		player.PropertyChanged += PlayerOnPropertyChanged;
-		player.StatsChanged    += Refresh;
+		hero.ResourcesChanged += Refresh;
 
 		ApplyColor();
 		Refresh();
@@ -45,9 +49,9 @@ public partial class ResourceOrb : Control
 
 	private void Refresh()
 	{
-		MaxRessource = type == ResourceType.Life ? player.LifeMaximum : player.ManaMaximum;
+		MaxRessource = type == ResourceType.Life ? hero.LifeMaximum : hero.ManaMaximum;
 
-		SetRessource(type == ResourceType.Life ? player.LifeCurrent : player.ManaCurrent);
+		SetRessource(type == ResourceType.Life ? hero.LifeCurrent : hero.ManaCurrent);
 	}
 
 	private void SetPositionInViewport(ResourceType resourceTypetype)
@@ -78,26 +82,10 @@ public partial class ResourceOrb : Control
 		OrbTexture.Modulate = Colors.White;
 	}
 
-	private void PlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-	{
-		switch (type)
-		{
-			case ResourceType.Life when e.PropertyName == nameof(BaseUnit.LifeCurrent):
-				SetRessource(player.LifeCurrent);
-				break;
-			case ResourceType.Mana when e.PropertyName == nameof(Player2D.ManaCurrent):
-				SetRessource(player.ManaCurrent);
-				break;
-		}
-	}
-
 	public override void _ExitTree()
 	{
-		if (player is null)
-			return;
-
-		player.PropertyChanged -= PlayerOnPropertyChanged;
-		player.StatsChanged    -= Refresh;
+		if (hero is not null)
+			hero.ResourcesChanged -= Refresh;
 	}
 
 	private void ApplyColor()

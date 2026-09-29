@@ -3,14 +3,12 @@ using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Skills;
 using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Resources.MonsterMods;
 
 public static class ModAimResolver
 {
-    //Der Boden ist isometrisch gestaucht, ein Kreis am Boden ist auf dem Bildschirm halb so hoch wie breit
-    private const float GroundSquash = 0.5f;
-
     public static bool TryResolve(ModContext context, ModAim aim, float radius, out SkillAim result)
     {
         result = default;
@@ -18,7 +16,7 @@ public static class ModAimResolver
         switch (aim)
         {
             case ModAim.Self:
-                result = new SkillAim(context.Owner.BodyCenter);
+                result = new SkillAim(context.Owner.GlobalPosition);
 
                 return true;
 
@@ -29,7 +27,7 @@ public static class ModAimResolver
                 return TryAimAt(context.OtherOrTarget, out result);
 
             case ModAim.RandomPointAroundSelf:
-                result = new SkillAim(GetRandomPointAround(context.Owner.BodyCenter, radius));
+                result = new SkillAim(GetRandomPointAround(context.Owner.GlobalPosition, radius));
 
                 return true;
 
@@ -37,7 +35,7 @@ public static class ModAimResolver
                 if (!TryAimAt(context.Owner.Target, out var atTarget))
                     return false;
 
-                result = new SkillAim(GetRandomPointAround(atTarget.Point, radius));
+                result = new SkillAim(GetRandomPointAround(atTarget.CurrentPoint, radius));
 
                 return true;
 
@@ -45,12 +43,12 @@ public static class ModAimResolver
         }
     }
 
-    public static Vector2 GetRandomPointAround(Vector2 center, float radius)
+    public static Vector3 GetRandomPointAround(Vector3 center, float radiusPx)
     {
         var angle    = GameRandom.Shared.NextFloat() * MathF.Tau;
-        var distance = MathF.Sqrt(GameRandom.Shared.NextFloat()) * Math.Max(0f, radius);
+        var distance = WorldScale.ToMeters(MathF.Sqrt(GameRandom.Shared.NextFloat()) * Math.Max(0f, radiusPx));
 
-        return center + new Vector2(MathF.Cos(angle), MathF.Sin(angle) * GroundSquash) * distance;
+        return WorldScale.OnGround(center) + new Vector3(MathF.Cos(angle), 0, MathF.Sin(angle)) * distance;
     }
 
     private static bool TryAimAt(BaseUnit unit, out SkillAim result)
@@ -60,7 +58,7 @@ public static class ModAimResolver
         if (!GodotObject.IsInstanceValid(unit) || !unit.IsTargetable)
             return false;
 
-        result = new SkillAim(unit.BodyCenter, unit);
+        result = new SkillAim(unit.GlobalPosition, unit);
 
         return true;
     }

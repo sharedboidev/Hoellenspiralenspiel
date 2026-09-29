@@ -4,9 +4,6 @@ namespace Hoellenspiralenspiel.Scripts.Core.Skills;
 
 public sealed record AreaSettings(float Radius, float ExpansionSec = 0f, float DelaySec = 0f)
 {
-    //Der Boden ist isometrisch gestaucht: Ein Kreis auf dem Boden ist auf dem Bildschirm halb so hoch wie breit
-    public const float GroundYScale = 0.5f;
-
     public float GetRadiusAfter(double activeSec)
     {
         if (activeSec < 0)
@@ -23,8 +20,6 @@ public sealed record AreaSettings(float Radius, float ExpansionSec = 0f, float D
         if (radius <= 0f)
             return false;
 
-        var groundY = offsetY / GroundYScale;
-
-        return offsetX * offsetX + groundY * groundY <= radius * radius;
+        return offsetX * offsetX + offsetY * offsetY <= radius * radius;
     }
 }

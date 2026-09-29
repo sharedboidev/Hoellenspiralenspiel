@@ -1,19 +1,20 @@
 using System.Collections.Generic;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
-using Hoellenspiralenspiel.Scripts.Extensions;
+using Hoellenspiralenspiel.Scripts.Skills;
 using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.Skills.Effects;
 
-//Die Szene muss nach rechts zeigen
-public partial class SkillProjectile : Area2D
+//Die Szene muss nach -Z zeigen. Ihre Kollisionsform ist ein hoher Zylinder, damit die Höhe des Ziels keine Rolle spielt
+public partial class SkillProjectile : Area3D
 {
     private readonly List<BaseUnit>     forkTargets  = new();
     private readonly List<BaseUnit>     unitsInRange = new();
     private          double             ageSec;
     private          SkillCast          cast;
-    private          Vector2            direction = Vector2.Right;
+    private          Vector3            direction = Vector3.Forward;
     private          int                generation;
     private          bool               isSpent;
     private          PackedScene        scene;
@@ -23,48 +24,44 @@ public partial class SkillProjectile : Area2D
     public void Launch(SkillCast          skillCast,
                        ProjectileSettings projectileSettings,
                        PackedScene        projectileScene,
-                       Vector2            flightDirection,
+                       Vector3            flightDirection,
                        int                forkGeneration = 0)
     {
+        var onGround = WorldScale.OnGround(flightDirection);
+
         cast       = skillCast;
         settings   = projectileSettings;
         scene      = projectileScene;
         generation = forkGeneration;
-        direction  = flightDirection.LengthSquared() < 0.0001f ? Vector2.Right : flightDirection.Normalized();
+        direction  = onGround.LengthSquared() < 0.0001f ? Vector3.Forward : onGround.Normalized();
 
         CollisionLayer = CollisionLayers.Spells;
         CollisionMask  = CollisionLayers.GetSkillMask(cast.Faction);
-        Rotation       = direction.Angle();
+        Rotation       = new Vector3(0, Mathf.Atan2(-direction.X, -direction.Z), 0);
     }
 
     public override void _Ready()
-    {
-        BodyEntered += OnBodyEntered;
-
-        foreach (var sprite in this.GetAllChildren<AnimatedSprite2D>())
-            sprite.Play();
-    }
+        => BodyEntered += OnBodyEntered;
 
     public override void _PhysicsProcess(double delta)
     {
         if (isSpent || cast is null)
             return;
 
-        GlobalPosition += direction * settings.Speed * (float)delta;
+        GlobalPosition += direction * WorldScale.ToMeters(settings.Speed) * (float)delta;
         ageSec         += delta;
 
         if (ageSec >= settings.LifetimeSec)
             Spend();
     }
 
-    private void OnBodyEntered(Node2D body)
+    private void OnBodyEntered(Node3D body)
     {
         if (isSpent || cast is null)
             return;
 
         if (body is not BaseUnit unit)
         {
-            //Die Maske enthält außer den feindlichen Körpern nur Wände
             Spend();
 
             return;
@@ -84,13 +81,13 @@ public partial class SkillProjectile : Area2D
         if (!settings.CanFork || generation >= settings.ForkGenerations)
             return;
 
-        var origin = hitUnit.BodyCenter;
+        var origin = hitUnit.GlobalPosition;
         var parent = GetParent();
 
         UnitRegistry.FindNear(origin, settings.ForkRange, unitsInRange);
 
         NearestPicker.Pick(unitsInRange,
-                           unit => cast.CanHit(unit) ? origin.DistanceSquaredTo(unit.BodyCenter) : -1f,
+                           unit => cast.CanHit(unit) ? GetDistanceSquaredPx(origin, unit) : -1f,
                            settings.ForkRange,
                            settings.ForkCount,
                            forkTargets);
@@ -99,14 +96,21 @@ public partial class SkillProjectile : Area2D
         {
             var fork = scene.Instantiate<SkillProjectile>();
 
-            fork.Launch(cast, settings, scene, target.BodyCenter - origin, generation + 1);
+            fork.Launch(cast, settings, scene, target.GlobalPosition - origin, generation + 1);
 
             //Der Treffer wird mitten im Physikschritt gemeldet, neue Flächen dürfen erst danach entstehen
             Callable.From(() => SpawnFork(parent, fork, origin)).CallDeferred();
         }
     }
 
-    private static void SpawnFork(Node parent, SkillProjectile fork, Vector2 origin)
+    private static float GetDistanceSquaredPx(Vector3 origin, BaseUnit unit)
+    {
+        var distancePx = WorldScale.GroundDistancePx(origin, unit.GlobalPosition);
+
+        return distancePx * distancePx;
+    }
+
+    private static void SpawnFork(Node parent, SkillProjectile fork, Vector3 origin)
     {
         if (!IsInstanceValid(parent))
         {

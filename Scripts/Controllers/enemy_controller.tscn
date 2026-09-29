@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://bg8s6qmxf15f8"]
-
-[ext_resource type="Script" uid="uid://k2gb16ifn72b" path="res://Scripts/Controllers/EnemyController.cs" id="1_lfrkg"]
-
-[node name="EnemyController" type="Node" unique_id=1289861331]
-script = ExtResource("1_lfrkg")

@@ -1,4 +1,5 @@
 using Godot;
+using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Resources.MonsterMods.Actions;
 
@@ -24,7 +25,7 @@ public partial class TeleportAction : ModAction
             return;
 
         var destination = aim.CurrentPoint;
-        var backOff     = destination.DirectionTo(owner.BodyCenter) * DistanceToDestination;
+        var backOff     = WorldScale.OnGround(owner.GlobalPosition - destination).Normalized() * WorldScale.ToMeters(DistanceToDestination);
 
         owner.TeleportTo(owner.SnapToNavigation(destination + backOff));
     }

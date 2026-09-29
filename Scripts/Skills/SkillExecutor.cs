@@ -6,6 +6,7 @@ using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Skills.Effects;
 using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.Skills;
 
@@ -31,7 +32,7 @@ public static class SkillExecutor
 
                 break;
             case SkillDelivery.AreaAroundCaster:
-                LaunchArea(caster, cast, skill.EffectScene, definition.Area, caster.BodyCenter);
+                LaunchArea(caster, cast, skill.EffectScene, definition.Area, caster.GlobalPosition);
 
                 break;
             case SkillDelivery.AreaAtPoint:
@@ -43,7 +44,7 @@ public static class SkillExecutor
 
     private static void StrikeInMelee(BaseUnit caster, SkillCast cast, SkillAim aim)
     {
-        if (!aim.HasTarget || !cast.CanHit(aim.Target) || caster.DistanceTo(aim.Target) > caster.Weapon.Reach)
+        if (!aim.HasTarget || !cast.CanHit(aim.Target) || caster.DistancePxTo(aim.Target) > caster.Weapon.Reach)
             return;
 
         cast.ApplyTo(aim.Target);
@@ -58,16 +59,16 @@ public static class SkillExecutor
             return;
         }
 
-        var origin    = caster.BodyCenter;
-        var direction = aim.CurrentPoint - origin;
+        var origin    = WorldScale.OnGround(caster.GlobalPosition);
+        var direction = WorldScale.OnGround(aim.CurrentPoint) - origin;
         var count     = Math.Max(1, caster.Stats.GetFinalWhole(CombatStat.ProjectileCount));
 
-        //Alle Projektile eines Wurfs teilen sich den Treffer, jede Einheit wird also höchstens einmal getroffen
         for (var i = 0; i < count; i++)
         {
             var projectile = scene.Instantiate<SkillProjectile>();
+            var spread     = Mathf.DegToRad(ProjectileSpread.GetOffsetDegrees(i, count));
 
-            projectile.Launch(cast, settings, scene, direction.Rotated(Mathf.DegToRad(ProjectileSpread.GetOffsetDegrees(i, count))));
+            projectile.Launch(cast, settings, scene, direction.Rotated(Vector3.Up, spread));
 
             caster.GetParent().AddChild(projectile);
 
@@ -75,7 +76,7 @@ public static class SkillExecutor
         }
     }
 
-    private static void LaunchArea(BaseUnit caster, SkillCast cast, PackedScene scene, AreaSettings settings, Vector2 center)
+    private static void LaunchArea(BaseUnit caster, SkillCast cast, PackedScene scene, AreaSettings settings, Vector3 center)
     {
         if (scene is null || settings is null)
         {
@@ -90,6 +91,6 @@ public static class SkillExecutor
 
         caster.GetParent().AddChild(area);
 
-        area.GlobalPosition = center;
+        area.GlobalPosition = WorldScale.OnGround(center);
     }
 }

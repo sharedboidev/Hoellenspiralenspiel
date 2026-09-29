@@ -6,7 +6,6 @@ using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.Skills;
 
-//Fraktion und Treffer stehen beim Auslösen fest, damit der Skill weiterwirkt, wenn der Wirkende inzwischen tot ist
 public sealed class SkillCast
 {
     private readonly BaseUnit       caster;
@@ -28,9 +27,6 @@ public sealed class SkillCast
            unit.IsTargetable &&
            unit.Faction != Faction &&
            !hitUnits.Contains(unit.GetInstanceId());
-
-    public bool HasHit(BaseUnit unit)
-        => GodotObject.IsInstanceValid(unit) && hitUnits.Contains(unit.GetInstanceId());
 
     public void ApplyTo(BaseUnit unit)
     {

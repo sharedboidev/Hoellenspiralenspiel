@@ -1,51 +1,53 @@
 [gd_scene format=3 uid="uid://cc0hfsra13pml"]
 
-[ext_resource type="Script" uid="uid://c6ieb4psqn6s1" path="res://Scripts/Objects/Lootbag.cs" id="1_2o4qr"]
-[ext_resource type="Texture2D" uid="uid://c71vm3fa1p17d" path="res://Textures/Objects/Loot/Lootbag.png" id="2_2o4qr"]
-[ext_resource type="Shader" uid="uid://2jawwqtcvfo7" path="res://Shaders/shine.gdshader" id="2_6clgo"]
+[ext_resource type="Script" uid="uid://c6ieb4psqn6s1" path="res://Scripts/Objects/Lootbag.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="2_ps1"]
+[ext_resource type="Texture2D" path="res://Textures/World/cloth_weave.png" id="3_cloth"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2o4qr"]
-bg_color = Color(0.6, 0.6, 0.6, 0)
+[sub_resource type="SphereShape3D" id="Shape_pick"]
+radius = 0.4
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_j2ms7"]
-shader = ExtResource("2_6clgo")
-shader_parameter/Angle_deg = 55.30700690208249
-shader_parameter/Brightness = 2.5
-shader_parameter/Band_Soft = 0.06
-shader_parameter/Stage_Count = 2
-shader_parameter/Stage1_Duration = 1.0
-shader_parameter/Stage2_Duration = 1.5
-shader_parameter/Stage3_Duration = 1.0
-shader_parameter/Stage1_Width = 0.12
-shader_parameter/Stage2_Width = 0.12
-shader_parameter/Stage3_Width = 0.12
-shader_parameter/Stage1_LeftToRight = true
-shader_parameter/Stage2_LeftToRight = false
-shader_parameter/Stage3_LeftToRight = true
-shader_parameter/One_Shot = false
-shader_parameter/OneShot_Delay = 0.0
-shader_parameter/Phase_Offset = 0.0
-shader_parameter/Wiggle_Angle = false
-shader_parameter/Wiggle_Amount_deg = 15.0
-shader_parameter/Shine_Pause = 0.4
+[sub_resource type="SphereMesh" id="Mesh_sack"]
+radius = 0.27
+height = 0.54
+radial_segments = 8
+rings = 4
 
-[node name="Lootbag" type="PanelContainer" unique_id=358972205]
-y_sort_enabled = true
-custom_minimum_size = Vector2(50, 50)
-anchors_preset = -1
-anchor_right = 0.026
-anchor_bottom = 0.035
-offset_right = -49.920002
-offset_bottom = -50.4
-pivot_offset = Vector2(25, 25)
-theme_override_styles/panel = SubResource("StyleBoxFlat_2o4qr")
-script = ExtResource("1_2o4qr")
+[sub_resource type="ShaderMaterial" id="Mat_sack"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.5, 0.34, 0.18, 1)
+shader_parameter/albedo_texture = ExtResource("3_cloth")
+shader_parameter/uv_scale = Vector2(2, 2)
+shader_parameter/emission = Color(1, 0.8, 0.4, 1)
+shader_parameter/emission_energy = 0.35
 
-[node name="TextureRect" type="TextureRect" parent="." unique_id=66317787]
-y_sort_enabled = true
-material = SubResource("ShaderMaterial_j2ms7")
-layout_mode = 2
-texture = ExtResource("2_2o4qr")
-expand_mode = 1
+[sub_resource type="BoxMesh" id="Mesh_knot"]
+size = Vector3(0.12, 0.12, 0.12)
 
-[connection signal="gui_input" from="." to="." method="_on_gui_input"]
+[sub_resource type="ShaderMaterial" id="Mat_knot"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.3, 0.2, 0.1, 1)
+shader_parameter/emission = Color(1, 0.8, 0.4, 1)
+shader_parameter/emission_energy = 0.35
+
+[node name="Lootbag" type="Area3D"]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("Shape_pick")
+
+[node name="Sack" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.85, 0, 0, 0, 1, 0, 0.23, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_sack")
+surface_material_override/0 = SubResource("Mat_sack")
+
+[node name="Knot" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_knot")
+surface_material_override/0 = SubResource("Mat_knot")

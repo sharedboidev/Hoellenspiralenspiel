@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Saving;
 using Hoellenspiralenspiel.Scripts.Items;
@@ -16,8 +15,10 @@ public partial class GameController : Node
     private bool                    isSaveDue;
     private LevelUpDialog           levelUpDialog;
     private OpenLevelUpDialogButton openLevelUpDialogButton;
-    private Player2D                player;
     private double                  secUntilSave;
+
+    [Export]
+    public Hero Hero { get; set; }
 
     //Aus, um im Editor mit einem frischen Charakter zu testen, ohne den Spielstand anzufassen
     [Export]
@@ -31,7 +32,7 @@ public partial class GameController : Node
         LoadNodes();
         SubscribeToEvents();
 
-        //Geladen wird erst, wenn Spieler und Oberfläche fertig aufgebaut sind
+        //Geladen wird erst, wenn Held und Oberfläche fertig aufgebaut sind
         Callable.From(LoadCharacter).CallDeferred();
     }
 
@@ -65,62 +66,55 @@ public partial class GameController : Node
         if (!SavingEnabled)
             return;
 
-        var save = new SaveGame { Character = player.CaptureProgress() };
+        var save = new SaveGame { Character = Hero.CaptureProgress() };
 
-        SaveGameMapper.CaptureLoadout(player.Loadout, save);
-        SaveGameMapper.CaptureItems(player.Items, save);
+        SaveGameMapper.CaptureLoadout(Hero.Loadout, save);
+        SaveGameMapper.CaptureItems(Hero.Items, save);
 
         SaveGameStore.Save(save);
     }
 
     private void LoadCharacter()
     {
-        if (!SavingEnabled)
-            return;
-
-        SaveGameStore.UseFileFromCommandLine();
-
-        var save = SaveGameStore.Load();
+        var save = SavingEnabled ? LoadSave() : null;
 
         if (save is not null)
             Restore(save);
+        else
+            Hero.GiveStartingItems();
 
-        WatchForChanges();
+        if (SavingEnabled)
+            WatchForChanges();
+    }
+
+    private static SaveGame LoadSave()
+    {
+        SaveGameStore.UseFileFromCommandLine();
+
+        return SaveGameStore.Load();
     }
 
     private void Restore(SaveGame save)
     {
-        player.RestoreProgress(save.Character);
+        Hero.RestoreProgress(save.Character);
 
-        SaveGameMapper.RestoreLoadout(save, player.Loadout);
+        SaveGameMapper.RestoreLoadout(save, Hero.Loadout);
 
-        foreach (var missingBaseId in SaveGameMapper.RestoreItems(save, player.Items, ItemLibrary.Catalog))
+        foreach (var missingBaseId in SaveGameMapper.RestoreItems(save, Hero.Items, ItemLibrary.Catalog))
             GD.PushWarning($"Die Item-Basis {missingBaseId} aus dem Spielstand gibt es nicht mehr, das Item fehlt.");
 
-        player.RefillResources();
+        Hero.RefillResources();
 
-        if (player.AttributePointsAllowedToSpend > 0)
+        if (Hero.AttributePoints > 0)
             ShowSpendablePoints();
     }
 
     private void WatchForChanges()
     {
-        player.Items.Changed       += RequestSave;
-        player.Loadout.SlotChanged += _ => RequestSave();
-        player.LeveledUp           += _ => RequestSave();
-        player.Died                += _ => RequestSave();
-        player.PropertyChanged     += PlayerOnPropertyChanged;
-    }
-
-    private void PlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(Player2D.XpTotal)
-                           or nameof(Player2D.StrengthBase)
-                           or nameof(Player2D.DexterityBase)
-                           or nameof(Player2D.IntelligenceBase)
-                           or nameof(Player2D.ConstitutionBase)
-                           or nameof(Player2D.AwarenessBase))
-            RequestSave();
+        Hero.Items.Changed       += RequestSave;
+        Hero.Loadout.SlotChanged += _ => RequestSave();
+        Hero.XpChanged           += RequestSave;
+        Hero.Died                += _ => RequestSave();
     }
 
     //Mehrere Änderungen kurz hintereinander ergeben einen einzigen Schreibvorgang
@@ -135,33 +129,21 @@ public partial class GameController : Node
 
     private void SubscribeToEvents()
     {
-        player.LeveledUp                          += PlayerOnLeveledUp;
-        player.Died                               += PlayerOnDied;
-        deathScreen.RespawnRequested              += player.Respawn;
-        openLevelUpDialogButton.OpenDialogPressed += OpenLevelUpDialogButtonOnOpenDialogPressed;
+        Hero.LeveledUp                            += ShowSpendablePoints;
+        Hero.Died                                 += _ => deathScreen.ShowFor(Hero.LastXpLoss);
+        deathScreen.RespawnRequested              += Hero.Respawn;
+        openLevelUpDialogButton.OpenDialogPressed += levelUpDialog.ShowDialog;
     }
-
-    private void OpenLevelUpDialogButtonOnOpenDialogPressed()
-        => levelUpDialog.ShowDialog();
-
-    private void PlayerOnDied(BaseUnit unit)
-        => deathScreen.ShowFor(player.LastXpLoss);
-
-    private void PlayerOnLeveledUp(Player2D player2D)
-        => ShowSpendablePoints();
 
     private void ShowSpendablePoints()
     {
-        openLevelUpDialogButton.SpendablePointLabel.Text = player.AttributePointsAllowedToSpend < 10
-                ? $"  {player.AttributePointsAllowedToSpend}"
-                : $"{player.AttributePointsAllowedToSpend}";
+        openLevelUpDialogButton.SpendablePointLabel.Text = Hero.AttributePoints < 10 ? $"  {Hero.AttributePoints}" : $"{Hero.AttributePoints}";
 
         openLevelUpDialogButton.Visible = true;
     }
 
     private void LoadNodes()
     {
-        player                  = GetNode<Player2D>("%Player 2D");
         deathScreen             = GetNode<DeathScreen>($"%{nameof(DeathScreen)}");
         levelUpDialog           = GetNode<LevelUpDialog>($"%{nameof(LevelUpDialog)}");
         openLevelUpDialogButton = GetNode<OpenLevelUpDialogButton>($"%{nameof(OpenLevelUpDialogButton)}");
