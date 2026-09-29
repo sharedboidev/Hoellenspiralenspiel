@@ -1,8 +1,7 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
-Stand: 29.09.2026. M0 bis M5.5 liegen auf `master`, dazu die Nachträge zu M2 und M3: Bleed stapelt, Schadenswerte im Tooltip und ausgedünnte Kommentare.
+Stand: 29.09.2026. M0 bis M5.5 liegen auf `master`, dazu die Nachträge zu M2, M3 und M5.5: Bleed stapelt, Schadenswerte im Tooltip, ausgedünnte Kommentare und die Rückmeldungen aus dem ersten Spielen.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
-Der Nachtrag zu M5.5 mit den Rückmeldungen aus dem ersten Spielen liegt auf dem Branch `master_PlaytestFeedback`.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen, die Hauptszene ist das 3D-Testlevel.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code samt Szenen. Die Zeilenzahl aus der ersten Analyse, rund 5.500, galt für die 2D-Fassung.
