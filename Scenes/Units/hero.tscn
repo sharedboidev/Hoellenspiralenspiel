@@ -76,16 +76,16 @@ size = Vector3(0.13, 0.6, 0.13)
 size = Vector3(0.12, 0.13, 0.12)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_2"]
-top_radius = 0.4
-bottom_radius = 0.4
+top_radius = 0.65
+bottom_radius = 0.65
 height = 0.01
-radial_segments = 10
+radial_segments = 16
 rings = 0
 
 [sub_resource type="StandardMaterial3D" id="Mat_blob_shadow"]
 transparency = 1
 shading_mode = 0
-albedo_color = Color(0, 0, 0, 0.5)
+albedo_color = Color(0, 0, 0, 0.35)
 
 [node name="Hero" type="CharacterBody3D" unique_id=1933913043 node_paths=PackedStringArray("NoManaSound")]
 collision_mask = 10
@@ -197,7 +197,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 [node name="AttachFeet" type="Marker3D" parent="Visual" unique_id=1015573040]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
 
-[node name="BlobShadow" type="MeshInstance3D" parent="." unique_id=408279629 groups=["blob_shadows"]]
+[node name="BlobShadow" type="MeshInstance3D" parent="." unique_id=408279629]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
 cast_shadow = 0
 mesh = SubResource("CylinderMesh_2")

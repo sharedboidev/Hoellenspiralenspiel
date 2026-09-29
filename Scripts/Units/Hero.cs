@@ -29,7 +29,8 @@ public partial class Hero
     public const int InventoryWidth  = 14;
     public const int InventoryHeight = 5;
 
-    //Auf dieser Ebene liegt der Körper des Helden samt Ausrüstung. Sein eigenes Licht wirft davon keinen Schatten
+    //Auf dieser Ebene liegt der Körper des Helden samt Ausrüstung. Sein eigenes Licht wirft davon keinen Schatten,
+    //dafür steht er in jedem Look auf seiner Scheibe. Deshalb gehört sein BlobShadow nicht zur Gruppe blob_shadows
     public const uint BodyLayer = 1u << 18;
 
     private const float  ImpactFraction     = 0.5f;

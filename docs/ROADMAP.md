@@ -3,6 +3,7 @@
 Stand: 29.09.2026. M0 bis M6 liegen auf `master`, dazu die Nachträge zu M2, M3, M5.5 und M6: Bleed stapelt, Schadenswerte im Tooltip, ausgedünnte Kommentare, die Rückmeldungen aus dem ersten Spielen und die Rückmeldungen zu Mauern und Räumen.
 Die erste von vier Etappen von M7 liegt ebenfalls auf `master`, samt den Rückmeldungen aus dem ersten Spielen.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
+Auf dem Branch `master_PauseMenu` liegt der Anfang von Etappe 2: das Pausenmenü, dazu Kamera und Schatten nach dem Spielen.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
@@ -29,6 +30,8 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | Weg durch einen Kreis | Treppen in beide Richtungen, ein Checkpoint je betretener Ebene, Town-Portal per Taste mit Abklingzeit. Entschieden am 29.09.2026 vor M7. |
 | Bestand | Ebenen, Karten und gefallene Gegner bleiben bis zum neuen Abstieg. Das Spiel beginnt nach dem Laden im Hub. Entschieden am 29.09.2026. |
 | Hub und Charaktere | Ein Portal je Kreis, drei feste Plätze für Charaktere. Entschieden am 29.09.2026. |
+| Pausenmenü | Hält das Spiel an. Escape schließt zuerst offene Fenster, die Leertaste auch. Inventar und Charakterbogen halten das Spiel nicht an. Entschieden am 29.09.2026. |
+| Schatten | Lichter werfen echte Schatten, das ist der Standard. Das Licht des Helden wirft keinen Schatten von Held und Ausrüstung, er steht dafür auf einem blassen Kreis. Entschieden am 29.09.2026 nach dem Spielen des Pausenmenüs. |
 
 ## 1. Was schon umgesetzt ist
 
@@ -51,10 +54,10 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | Schadensminderung | Rüstungsformel, Resistenzen, Dodge, Parry und Block für alle Einheiten | Seit M4 bringen Schild, Stab und Schwert Block und Parry mit |
 | Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler. Seit M5 sind sie Resources mit Level, Ausrüstung und Verhalten, dazu Elite und Rare Elite mit Mods aus Bausteinen. Seit dem Nachtrag zu M5.5 kollidieren sie miteinander und spawnen verstreut. Seit dem 29.09.2026 gibt es als vierten Typ das Skelett mit Knochen und Animationen. | Blobs, ein Testgegner und das Skelett |
 | Wegfindung | Seit M5: Navigationsnetz pro Level, zur Laufzeit gebacken. Gegner und Held laufen um Wände herum | Nicht im PDF |
-| Atmosphäre | Der Held trägt sein Licht, die Umgebung ist dunkel und neblig, dazu der PS1-Look und die Overlay-Karte. Seit M6 zeigt unter der Erde eine gezeichnete Karte, was der Held erkundet hat. | Passt zum düsteren Vibe |
+| Atmosphäre | Der Held trägt sein Licht, die Umgebung ist dunkel und neblig, dazu der PS1-Look und die Overlay-Karte. Seit M6 zeigt unter der Erde eine gezeichnete Karte, was der Held erkundet hat. Seit M7 werfen Lichter echte Schatten, der Held steht auf einem blassen Kreis. | Passt zum düsteren Vibe |
 | 3D | Seit dem 29.09.2026 läuft das ganze Spiel in 3D auf dem unveränderten Kern. Bis auf das Skelett sind alle Modelle Platzhalter aus Grundkörpern. | Offene Frage aus dem PDF, entschieden für 3D |
 | Level | Seit M6: Ebenen aus handgebauten Räumen und erzeugten Gängen, gesteuert über einen Seed. Ein Thema legt Räume, Aussehen und Gegnerpool fest. | Das PDF nennt nur die Kreise. Es gibt ein Testthema, noch keinen Höllenkreis. |
-| Spielstruktur | Seit M7, Etappe 1: Hauptmenü, Hub mit einem Portal je Kreis, mehrere Ebenen pro Kreis, Treppen, Checkpoints und Town-Portal | Das PDF fragt nach "Town-Portal mechanic mit zwischenversorgen" und lässt die Struktur offen |
+| Spielstruktur | Seit M7, Etappe 1: Hauptmenü, Hub mit einem Portal je Kreis, mehrere Ebenen pro Kreis, Treppen, Checkpoints und Town-Portal. Seit Etappe 2 ein Pausenmenü | Das PDF fragt nach "Town-Portal mechanic mit zwischenversorgen" und lässt die Struktur offen |
 
 ## 2. Was an kritischen Systemen fehlt
 
@@ -64,7 +67,7 @@ Ohne diese Systeme gibt es kein spielbares Spiel, nur eine Testszene.
 2. **Nahkampf.** Erledigt in M2. Vorher existierten Waffenwerte nur im Tooltip.
 3. **Gegnerangriffe.** Erledigt in M2. Vorher schadeten die Blobs nur durch Berührung.
 4. **Speichern und Laden.** Erledigt in M4. Vorher gab es keine Persistenz für Charakter, Inventar oder Fortschritt.
-5. **Spielstruktur.** Seit der ersten Etappe von M7 gibt es Hauptmenü, Hub, Treppen in beide Richtungen, Checkpoints und Town-Portal. Pausenmenü, Truhe, Händler und Freischaltung fehlen.
+5. **Spielstruktur.** Seit der ersten Etappe von M7 gibt es Hauptmenü, Hub, Treppen in beide Richtungen, Checkpoints und Town-Portal, seit der zweiten ein Pausenmenü. Truhe, Händler und Freischaltung fehlen.
 6. **Levelgenerierung.** Erledigt in M6. Vorher gab es nur das handgebaute Testlevel.
 7. **Wegfindung.** Erledigt in M5. Vorher liefen Gegner in gerader Linie und blieben an Wänden hängen.
 8. **Statuseffekte.** Erledigt in M2: Bleed, Burn, Shock und Chill. Bleed und Burn stapeln. Die leeren Schadensart-Klassen sind durch eine Aufzählung im Kern ersetzt.
@@ -1246,6 +1249,8 @@ Zum Testen der Kameradistanz verstellt das Mausrad die Sichthöhe der Kamera in 
 
 Der Nebel zählt ab der Kamera, in `game.tscn` von 38 bis 62 m. Ohne Ausgleich versank die Welt ab etwa 30 m Sichthöhe im Nebel. Die Kamera verschiebt Beginn und Ende deshalb um genau so viel, wie sie selbst näher oder weiter rückt. Der Nebel bleibt so gleich weit hinter dem Helden, bei 18 m Sichthöhe gelten die Werte aus der Szene. Das gilt auch für die orthogonale Sicht mit F2. Dort steht die Kamera 40 m entfernt, der Nebel beginnt damit bei 49,5 m statt bei 38 m.
 
+Nachtrag vom 29.09.2026: Nach dem Spielen des Pausenmenüs startet die Kamera bei 14 m Sichthöhe aus 22,2 m Abstand, und das ist zugleich die Obergrenze. Der Nebel in `game.tscn` reicht jetzt von 31,7 bis 55,7 m und gilt für 14 m. Mehr unter M7, Etappe 2.
+
 Stand: Die Laufzeitprüfung mit 14 Schritten lief fehlerfrei. Sie deckt das Mausrad samt Grenzen und Statuszeile ab, dazu die Breiten 0 bis 3 im Material und die Sichtbarkeit des Rechtecks. Die 692 Unit-Tests sind grün. Dazu kamen Bildschirmfotos aller Breiten und dreier Kameradistanzen.
 
 Offen:
@@ -1442,7 +1447,7 @@ Von mir festgelegt, weil es sich aus dem Bau ergab:
 |---|---|
 | Erkennung | Jeder Raum hat eine Fläche. Der Held steht im Raum, wenn er auf ihr steht. Ein Flag an der Tür braucht es nicht. |
 | Halb durchsichtig | Ein Schachbrett im Raster der Bildzeilen statt echter Durchsicht. Es passt zum Punktmuster des PS1-Looks und braucht kein Sortieren. |
-| Schatten | Auf Ansage des Users werfen alle Lichter die Schatten der Mauern, auch im PS1-Look: das Licht des Helden, Mondlicht, Altar, Kellertür, Auren und die Lichter der Skills. Figuren stehen weiter auf dunklen Scheiben. F4 schaltet wie bisher die übrigen Schatten ein. |
+| Schatten | Auf Ansage des Users werfen alle Lichter die Schatten der Mauern, auch im PS1-Look: das Licht des Helden, Mondlicht, Altar, Kellertür, Auren und die Lichter der Skills. Figuren stehen weiter auf dunklen Scheiben. F4 schaltet wie bisher die übrigen Schatten ein. Seit Etappe 2 von M7 sind die übrigen Schatten Standard, und der Held steht immer auf seiner Scheibe. |
 | Sichtkontakt | Der Held sieht, wer mit ihm im selben Raum steht und wen keine Mauer verdeckt. Geprüft wird von 1,5 m Höhe zur Mitte des Körpers und zu seinen beiden Rändern. |
 | Verborgen | Ein Gegner ohne Sichtkontakt zeigt weder Körper noch Aura, Lebensbalken, Namensschild oder Schadenszahlen und lässt sich nicht anklicken. Treffen kann er und kann man ihn trotzdem. |
 | Wirkungen | Projektile und Flächen der Gegner zeigen sich nur mit Sichtkontakt |
@@ -1467,7 +1472,7 @@ Bewusst offen gelassen:
 - Ein Mauerstück in einer Raumvorlage zeigt im Editor die Textur aus dem Testthema, bis das Thema ihm seine gibt.
 - Mit "einmal pro Kreis" ist vorerst einmal pro Ebene gemeint. Seit M7 hat ein Kreis mehrere Ebenen, ein Pflichtraum erscheint weiter in jeder von ihnen.
 
-### M7: Hub und Abstieg (M, Etappe 1 umgesetzt am 29.09.2026 auf `master_HubAndDescent`)
+### M7: Hub und Abstieg (M, Etappe 1 umgesetzt am 29.09.2026 auf `master_HubAndDescent`, das Pausenmenü aus Etappe 2 am selben Tag auf `master_PauseMenu`)
 
 Ziel: die Spielstruktur steht.
 
@@ -1476,13 +1481,13 @@ M7 läuft in vier Etappen:
 | Etappe | Inhalt | Stand |
 |---|---|---|
 | 1 | Hauptmenü, Hub, Portale, mehrere Ebenen pro Kreis, Treppen, Checkpoints, Town-Portal | Umgesetzt |
-| 2 | Pausenmenü, Ladebildschirm, Einstellungen für Auflösung, Tasten und Lautstärke. UI über Anker statt Code, behebt A6. | Offen |
+| 2 | Pausenmenü, Ladebildschirm, Einstellungen für Auflösung, Tasten und Lautstärke. UI über Anker statt Code, behebt A6. | Pausenmenü umgesetzt, der Rest offen |
 | 3 | Hub-Funktionen: Truhe und Händler. Dafür braucht es eine Währung. | Offen |
 | 4 | Platzhalter-Boss und Freischaltung des nächsten Kreises | Offen |
 
 Fertig, wenn man vom Hauptmenü in den Hub, in einen Kreis, zurück und wieder hinein kommt.
 
-Stand des Fertig-Kriteriums: erfüllt seit Etappe 1, geprüft im laufenden Spiel. Die Etappen 2 bis 4 stehen aus.
+Stand des Fertig-Kriteriums: erfüllt seit Etappe 1, geprüft im laufenden Spiel. Seit Etappe 2 führt das Pausenmenü auch zurück ins Hauptmenü. Von Etappe 2 stehen Ladebildschirm, Einstellungen und die UI über Anker aus, dazu die Etappen 3 und 4.
 
 #### Etappe 1: Struktur
 
@@ -1629,13 +1634,93 @@ Geprüft, alles fehlerfrei:
 
 Bewusst offen gelassen:
 
-- Aus dem Spiel führt kein Weg zurück ins Hauptmenü. Er kommt mit dem Pausenmenü in Etappe 2.
+- Aus dem Spiel führte kein Weg zurück ins Hauptmenü. Seit Etappe 2 führt das Pausenmenü dorthin.
 - Die Portale 2 bis 9 sind gesperrt, es gibt nur den Testkreis.
 - Die letzte Ebene endet in einem Ausgangsraum ohne Kellertür.
 - Im Hub gibt es weder Truhe noch Händler, und er hat keine Musik.
 - Gegner, die den Helden verfolgten, stehen bei seiner Rückkehr wieder an ihrem Platz.
 - Wer das Spiel in einer Ebene beendet, beginnt im Hub und geht über den Checkpoint an den Start der Ebene. An die alte Stelle führt nur ein offenes Town-Portal.
 - Das Town-Portal und die Portale der Kreise tragen keinen Ton.
+
+#### Etappe 2: Pausenmenü
+
+- Erledigt: Pausenmenü. `Esc` hält das Spiel an und bietet Resume, Settings, Main Menu und Quit Game.
+- Erledigt: `Esc` und die Leertaste schließen alle offenen Fenster.
+- Offen: Ladebildschirm, Einstellungen für Auflösung, Tasten und Lautstärke, UI über Anker statt Code.
+
+Getroffene Designentscheidungen vom 29.09.2026, auf meinen Vorschlag:
+
+| Frage | Entscheidung |
+|---|---|
+| Anhalten | Solange das Pausenmenü offen ist, steht alles still: Gegner, Projektile, Abklingzeiten, Regeneration |
+| Escape | Schließt zuerst alle offenen Fenster. Erst ein Escape ohne offenes Fenster öffnet das Pausenmenü, ein zweites schließt es. |
+| Leertaste | Schließt ebenfalls alle offenen Fenster, öffnet das Pausenmenü aber nie. Auf Wunsch des Users. |
+| Inventar und Charakterbogen | Halten das Spiel nicht an |
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Einträge | Resume, Settings, Main Menu, Quit Game. Englisch wie die übrige Oberfläche. |
+| Settings | Gesperrt mit dem Hinweis "Coming soon", bis es die Einstellungen gibt |
+| Speichern | Main Menu und Quit Game speichern vorher, ohne Nachfrage. Es geht nichts verloren. |
+| Fenster | Charakterbogen samt Inventar, die Karte über und unter der Erde, der Level-up-Dialog und der Dialog am Portal. Sie schließen alle auf einmal. |
+| Dialog am Portal | Hat kein eigenes Escape mehr, das Pausenmenü schließt ihn mit |
+| Leertaste im Menü | Drückt den Knopf mit dem Fokus, nach dem Öffnen ist das Resume |
+| Aussehen | Ein Kasten wie der Dialog am Portal, Titel "Paused", das Bild dahinter abgedunkelt |
+| Tasten | Aktionen `toggle_pause_menu` auf Escape und `close_windows` auf der Leertaste |
+
+So funktioniert es:
+
+- Fenster tragen die Schnittstelle `IClosableWindow` mit `IsOpen` und `Close`.
+- `PauseMenu` hängt in `Scenes/game.tscn` unter der Hud und sucht die offenen Fenster unter `WindowRoot`, dort ist das die Hud.
+- Es hört in `_Input`, also vor der Oberfläche. So drückt die Leertaste keinen Knopf, der nach einem Klick noch den Fokus hat, etwa im Level-up-Dialog.
+- Angehalten wird über `GetTree().Paused`. Das Menü selbst läuft mit `ProcessMode` Always weiter.
+- Vor dem Weg ins Hauptmenü oder aus dem Spiel ruft es `GameController.SaveCharacter` auf.
+
+So kommt ein neues Fenster dazu: `IClosableWindow` umsetzen und das Fenster unter die Hud hängen. Escape und Leertaste finden es von selbst.
+
+#### Rückmeldung aus dem Spielen des Pausenmenüs
+
+Der User fand das Pausenmenü am 29.09.2026 gut und wollte danach Kamera und Schatten anders haben.
+
+| Rückmeldung | Änderung |
+|---|---|
+| Die Kamera startet zu weit weg. Sie soll zwei Mausradstufen näher sein, und das ist auch der größte Abstand. | 14 m Sichthöhe aus 22,2 m Abstand statt 18 m aus 28,5 m. `MaxViewHeight` ist 14, heran geht es bis 6 m. |
+| Schatten per Standard an | `RealShadows` an `Ps1Look` ist an, F4 schaltet weiter auf Scheiben um |
+| Das Licht des Helden wirft keinen Schatten von ihm, auch nicht von der Ausrüstung | Körper und Ausrüstung liegen nur auf der Ebene `Hero.BodyLayer`, Ebene 19. Die Maske des Heldenlichts lässt sie aus. Andere Lichter werfen den Schatten des Helden weiter. |
+| Ganz ohne Schatten unter dem Helden wirkt es komisch. Ein blasser Kreisschatten, wie mit F4. | Die Scheibe des Helden ist in jedem Look sichtbar, mit 0,65 m Radius und 35 % Schwarz |
+
+Von mir dazu festgelegt:
+
+| Punkt | Festlegung |
+|---|---|
+| Nebel | In `game.tscn` von 31,7 bis 55,7 m statt von 38 bis 62 m. So liegt er beim Start so weit hinter dem Helden wie vorher nach zwei Stufen Zoom. Mit F2 beginnt er weiter bei 49,5 m. |
+| Masken der Lichter | `Ps1Look` merkt sich die Maske, die ein Licht von sich aus hat, und setzt sie bei echten Schatten wieder ein. Bisher setzte es sie auf alle Ebenen. |
+| Spätere Ausrüstung | Der Held hört auf `NodeAdded` und legt jedes neue Mesh unter `Visual` auf seine Ebene |
+| Scheibe | Gehört nicht mehr zur Gruppe `blob_shadows`, `Ps1Look` blendet sie deshalb nie aus. 16 statt 10 Ecken, damit sie auch größer rund bleibt. Die Scheiben der Gegner sind unverändert. |
+
+Zwei Befunde:
+
+- Godot lässt ein Mesh Schatten werfen, sobald irgendeine seiner Ebenen in der Maske des Lichts steht. Der erste Versuch legte den Helden zusätzlich auf die eigene Ebene, er blieb auf Ebene 1, und der Schatten blieb. Die Prüfung ohne Fenster sah nur die neue Ebene und bestand trotzdem. Erst das Bildschirmfoto zeigte den Fehler.
+- Die alte Scheibe mit 0,4 m Radius verdeckt der Körper des Helden aus dem Kamerawinkel fast ganz, auch mit F4 war sie kaum zu sehen. Verglichen habe ich 0,55 m mit 35 %, 0,65 m mit 35 % und mit 50 % und 0,8 m mit 30 %.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Unit-Tests | Keine neuen, alle 735 grün |
+| Pausenmenü, headless | 15 Schritte: Escape mit und ohne Fenster, Anhalten, Leertaste im Menü und ohne Fenster, alle Fenster auf einmal, Karte über der Erde, Weg ins Hauptmenü mit Spielstand |
+| Kamera und Schatten, headless | 10 Schritte: Start bei 14 m, Grenze beim Wegzoomen, Nebel, Schatten an, Maske des Heldenlichts, Ebene aller Meshes, Masken mit F4 |
+| Ausrüstung, headless | Tunika, Gugel, Handschuhe und Stab mitten im Spiel angelegt, alle 19 Meshes auf der Ebene des Körpers |
+| Mit Fenster | Bilder des Helden im Hub: der Schatten vor und nach der Korrektur, das Heldenlicht ohne Schatten zum Vergleich, fünf Größen der Scheibe, die Scheibe mit und ohne F4 |
+
+Bewusst offen gelassen:
+
+- Ladebildschirm, Einstellungen und UI über Anker stehen aus. Settings bleibt bis dahin gesperrt.
+- Escape mitten im Ortswechsel, solange der Vorhang unten ist, habe ich nicht geprüft.
+- Die Scheibe des Helden habe ich nur im Hub angesehen, nicht in einer erzeugten Ebene.
+- Die Scheiben der Gegner sind klein geblieben. Wie gut man sie mit F4 sieht, habe ich nicht geprüft.
 
 ### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L)
 

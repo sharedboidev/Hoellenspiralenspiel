@@ -291,11 +291,13 @@ Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints
 | Feature | Beschreibung |
 |---|---|
 | Hauptmenü | Drei Plätze für Charaktere: spielen, neu anlegen mit Namen, löschen |
+| Pausenmenü | `Esc` hält das Spiel an. "Main Menu" und "Quit Game" speichern vorher, "Settings" folgt mit den Einstellungen |
+| Fenster schließen | `Esc` und die Leertaste schließen alle offenen Fenster auf einmal. Erst `Esc` ohne offenes Fenster öffnet das Pausenmenü |
 | Neuer Charakter | Alle Attribute auf 1, ein weißes Training Sword in der Haupthand, das Inventar ist leer |
 | Hub | Ein ummauerter Platz mit neun Portalen, eines je Höllenkreis. Gesperrte Portale sind dunkel |
 | Testgelände | Das frühere Testlevel mit Hof und 37 Gegnern, zum Testen mit `F6` erreichbar |
 | Navigationsnetz | Entsteht beim Start des Levels aus den Wänden, für Gegner und Held |
-| Licht und Schatten | Der Held trägt sein Licht mit sich, die Umgebung ist dunkel und neblig |
+| Licht und Schatten | Der Held trägt sein Licht mit sich, die Umgebung ist dunkel und neblig. Lichter werfen echte Schatten, nur das Licht des Helden nicht von ihm selbst. Er steht dafür auf einem blassen Kreis |
 | Lebens- und Mana-Orb | Mit Flüssigkeits-Shader |
 | Erfahrungsbalken | Unterteilt, mit Anzeige beim Überfahren |
 | Overlay-Karte | Das Level aus dem Winkel der Kamera, nur von weiter weg, mit `Tab` ein- und ausgeblendet. Unter der Erde ist sie gezeichnet und zeigt nur, was der Held schon erkundet hat |
@@ -389,16 +391,16 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 | `F1` | PS1-Look an und aus |
 | `F2` | Kamera perspektivisch oder orthogonal, das Spiel startet perspektivisch |
 | `F3` | 240, 360 oder 480 Bildzeilen |
-| `F4` | Schatten aus Lichtern statt dunkler Scheiben |
+| `F4` | Dunkle Scheiben statt Schatten aus Lichtern, das Spiel startet mit Schatten. Der Held behält seinen Kreis in beiden Fällen |
 | `F5` | Ganze Karte der Ebene zeigen und zurück zum Erkundeten |
 | `F6` | Ins Testgelände und zurück in den Hub |
-| Mausrad | Abstand der Kamera in Schritten ändern, zum Testen. Die Statuszeile zeigt, wie viele Meter das Bild zeigt und wie weit die Kamera entfernt ist. Der Nebel rückt mit. |
+| Mausrad | Kamera in Schritten näher heranholen und zurück. Weiter weg als zum Start geht es nicht. Die Statuszeile zeigt, wie viele Meter das Bild zeigt und wie weit die Kamera entfernt ist. Der Nebel rückt mit. |
 
 </details>
 
 ### 🚧 Noch nicht enthalten
 
-- Pausenmenü, Ladebildschirm und Einstellungen für Auflösung, Tasten und Lautstärke
+- Ladebildschirm und Einstellungen für Auflösung, Tasten und Lautstärke
 - Truhe, Händler und Währung im Hub
 - Boss und Freischaltung des nächsten Kreises
 - Ein Höllenkreis mit eigenem Thema, bisher gibt es nur das Testthema
@@ -426,6 +428,8 @@ Die Skills liegen zu Beginn wie unten auf den Tasten. Jeder Platz der Leiste lä
 | Rechtsklick auf einen Platz der Leiste | Skill für diesen Platz auswählen |
 | `B` | Charakterbogen und Inventar |
 | `Tab` | Overlay-Karte |
+| `Esc` | Offene Fenster schließen. Ohne offenes Fenster Pausenmenü öffnen und wieder schließen |
+| Leertaste | Offene Fenster schließen |
 | Linke Maustaste auf Portal, Treppe oder Kellertür | Der Held läuft hin und benutzt den Durchgang |
 | `T` | Town-Portal öffnen, nur in einer Ebene |
 | `Alt` | Schilder der Beute an und aus |
@@ -464,7 +468,7 @@ flowchart LR
 | ✅ | **Entscheidung** | 3D im Look der PlayStation 1, entschieden nach dem [Vergleich](docs/VERGLEICH_2D_3D.md) | klein |
 | ✅ | **M5.5** Umstellung auf 3D | Die 3D-Fassung kann alles, was die 2D-Fassung konnte, und hat sie abgelöst | mittel |
 | ✅ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
-| ⏭️ | **M7** Hub | Etappe 1 von 4 steht: Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal. Offen: Menüs und Einstellungen, Truhe und Händler, Boss mit Freischaltung | mittel |
+| ⏭️ | **M7** Hub | Etappe 1 von 4 steht: Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal. Von Etappe 2 steht das Pausenmenü. Offen: Ladebildschirm und Einstellungen, Truhe und Händler, Boss mit Freischaltung | mittel |
 | ⬜ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
 | 💤 | **M10** Koop | Optional, baut auf Kern und Seeds auf | groß |
@@ -542,7 +546,7 @@ Hoellenspiralenspiel
 │   ├── Environment     Durchgänge: Kellertür, Treppe, Portal eines Kreises, Town-Portal
 │   ├── Saving          Dateien der Spielstände, drei Plätze
 │   ├── Controllers     Gegnersteuerung, Beute, Spielablauf, Speichern
-│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder, Schilder der Beute, Karte der Ebene, Hauptmenü, Dialog am Portal
+│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder, Schilder der Beute, Karte der Ebene, Hauptmenü, Pausenmenü, Dialog am Portal
 ├── Scenes              Szenen für Hauptmenü, Spiel, Orte, Räume, Einheiten, Items, Skills, Objekte und Oberfläche
 ├── Models              Modelle als .glb, unter Source die Dateien aus Blender. Godot übergeht Source
 ├── Shaders             Shader, unter Ps1 die für den PS1-Look, die Figuren samt Umriss und Sicht auf Gegner und der Stern der Beutel, unter Archive2D die Effekte der 2D-Fassung
