@@ -43,7 +43,9 @@
 [ext_resource type="Script" path="res://Scripts/World/Levels/WallSegment.cs" id="35_wall_segment"]
 [ext_resource type="Script" path="res://Scripts/World/Levels/RoomZone.cs" id="36_room_zone"]
 [ext_resource type="Resource" path="res://Resources/Enemies/skeleton.tres" id="37_skeleton"]
-[ext_resource type="Shader" uid="uid://b6satrjmt6gq" path="res://Shaders/Ps1/ps1_cutout.gdshader" id="38_cutout"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit_cutout.gdshader" id="38_cutout"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit.gdshader" id="39_unit"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit_outline.gdshader" id="40_outline"]
 
 [sub_resource type="BoxShape3D" id="Shape_yard_zone"]
 size = Vector3(8, 2.5, 8)
@@ -83,6 +85,13 @@ shader_parameter/emission_energy = 0.0
 shader_parameter/snap = 1.0
 shader_parameter/snap_resolution = Vector2(426, 240)
 shader_parameter/affine = 1.0
+
+[sub_resource type="QuadMesh" id="Mesh_unit_outline"]
+size = Vector2(2, 2)
+
+[sub_resource type="ShaderMaterial" id="Mat_unit_outline"]
+render_priority = 100
+shader = ExtResource("40_outline")
 
 [sub_resource type="ShaderMaterial" id="Mat_screen"]
 shader = ExtResource("14_screen")
@@ -275,10 +284,18 @@ far = 150.0
 script = ExtResource("3_camera")
 Target = NodePath("../Hero")
 
-[node name="Ps1Look" type="Node" parent="." unique_id=948654486 node_paths=PackedStringArray("Screen", "World")]
+[node name="UnitOutline" type="MeshInstance3D" parent="Camera"]
+cast_shadow = 0
+extra_cull_margin = 16384.0
+mesh = SubResource("Mesh_unit_outline")
+material_override = SubResource("Mat_unit_outline")
+
+[node name="Ps1Look" type="Node" parent="." unique_id=948654486 node_paths=PackedStringArray("Screen", "World", "UnitOutline")]
 script = ExtResource("12_look")
 SurfaceShader = ExtResource("13_surface")
-CutoutShader = ExtResource("38_cutout")
+UnitShader = ExtResource("39_unit")
+UnitCutoutShader = ExtResource("38_cutout")
+UnitOutline = NodePath("../Camera/UnitOutline")
 Screen = NodePath("../Ps1Screen/Picture")
 World = NodePath("..")
 
@@ -331,7 +348,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "WASD laufen · Skills über die Leiste · Rechtsklick auf einen Platz belegt ihn
 B Inventar und Ausrüstung · Rechtsklick auf ein Item legt es an · Tab Karte · Alt Namen der Beute
-F1 PS1-Look · F2 Kamera · F3 Bildzeilen · F4 Schatten · F5 ganze Karte
+F1 PS1-Look · F2 Kamera · F3 Bildzeilen · F4 Schatten · F5 ganze Karte · F6 Kontrast
 Die Kellertür führt hinab"
 
 [node name="LifeOrb" parent="Hud" unique_id=1868031920 node_paths=PackedStringArray("player") instance=ExtResource("23_orb")]

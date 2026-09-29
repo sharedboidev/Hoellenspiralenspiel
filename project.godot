@@ -124,6 +124,25 @@ skill_slot_10={
 ]
 }
 
+[shader_globals]
+
+unit_outline={
+"type": "float",
+"value": 0.0
+}
+unit_hover_outline={
+"type": "float",
+"value": 0.0
+}
+unit_rim={
+"type": "float",
+"value": 0.0
+}
+environment_contrast={
+"type": "float",
+"value": 0.0
+}
+
 [layer_names]
 
 2d_physics/layer_1="Player"

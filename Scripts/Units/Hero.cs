@@ -49,6 +49,7 @@ public partial class Hero
     private          ItemInstance  equippedWeapon;
     private          bool          hasDied;
     private          int           heldSlot = NoSlot;
+    private          BaseUnit      hoveredEnemy;
     private          IUsable       hoveredUsable;
     private          double        invulnerableTimeLeftSec;
     private          LevelUpEffect levelUpEffect;
@@ -278,6 +279,7 @@ public partial class Hero
 
         RegenerateMana(delta);
         UpdateHoveredUsable();
+        UpdateHoveredEnemy();
         RepeatHeldSkill();
         AdvanceAttack(delta);
         Move(GetWantedDirection(delta), delta);
@@ -825,6 +827,20 @@ public partial class Hero
 
         hoveredUsable = usableUnderMouse;
         hoveredUsable?.SetHighlight(true);
+    }
+
+    private void UpdateHoveredEnemy()
+    {
+        var enemyUnderMouse = FindHostileUnitUnderMouse();
+
+        if (enemyUnderMouse == hoveredEnemy)
+            return;
+
+        if (IsInstanceValid(hoveredEnemy))
+            hoveredEnemy.SetHighlighted(false);
+
+        hoveredEnemy = enemyUnderMouse;
+        hoveredEnemy?.SetHighlighted(true);
     }
 
     private Vector3 ApproachUsable(double delta)

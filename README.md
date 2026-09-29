@@ -367,6 +367,7 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 | `F3` | 240, 360 oder 480 Bildzeilen |
 | `F4` | Schatten aus Lichtern statt dunkler Scheiben |
 | `F5` | Ganze Karte der Ebene zeigen und zurück zum Erkundeten |
+| `F6` | Kontrast der Figuren durchschalten: ohne, Umriss, Umriss nur beim Anvisieren, Randlicht, Helligkeitskontrast, Umriss und Randlicht, alles zusammen |
 
 </details>
 

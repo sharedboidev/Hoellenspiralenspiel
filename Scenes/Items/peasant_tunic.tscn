@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="ps1"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit.gdshader" id="ps1"]
 [ext_resource type="Texture2D" path="res://Textures/World/cloth_weave.png" id="cloth"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]

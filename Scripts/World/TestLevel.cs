@@ -26,10 +26,13 @@ public partial class TestLevel : Node3D
 
     private string DescribeLook()
     {
-        if (Look is null || !Look.Enabled)
+        if (Look is null)
             return "PS1-Look aus";
 
-        return $"PS1-Look mit {Look.Lines} Zeilen, {(Look.RealShadows ? "Schatten aus Lichtern" : "Scheiben als Schatten")}";
+        if (!Look.Enabled)
+            return $"PS1-Look aus · {Look.DescribeContrast()}";
+
+        return $"PS1-Look mit {Look.Lines} Zeilen, {(Look.RealShadows ? "Schatten aus Lichtern" : "Scheiben als Schatten")} · {Look.DescribeContrast()}";
     }
 
     //Mit dem Seed des Abstiegs im Feld Seed des Knotens Descent entsteht dieselbe Folge von Ebenen noch einmal

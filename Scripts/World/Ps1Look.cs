@@ -5,6 +5,18 @@ using Hoellenspiralenspiel.Scripts.World.Levels;
 
 namespace Hoellenspiralenspiel.Scripts.World;
 
+//Wie sich Held und Gegner von der Umgebung abheben. F6 schaltet durch, zum Vergleich
+public enum UnitContrast
+{
+    Off,
+    Outline,
+    HoverOutline,
+    Rim,
+    Brightness,
+    OutlineAndRim,
+    All
+}
+
 public partial class Ps1Look : Node
 {
     public delegate void ChangedEventHandler();
@@ -19,6 +31,11 @@ public partial class Ps1Look : Node
     private static readonly StringName Resolution     = "resolution";
     private static readonly StringName ColorLevelsKey = "color_levels";
     private static readonly StringName DitherKey      = "dither";
+
+    private static readonly StringName UnitOutlineKey         = "unit_outline";
+    private static readonly StringName UnitHoverOutlineKey    = "unit_hover_outline";
+    private static readonly StringName UnitRimKey             = "unit_rim";
+    private static readonly StringName EnvironmentContrastKey = "environment_contrast";
 
     private readonly Dictionary<Light3D, bool> shadowOfLight = new();
 
@@ -46,10 +63,23 @@ public partial class Ps1Look : Node
     public bool RealShadows { get; set; }
 
     [Export]
+    public UnitContrast Contrast { get; set; } = UnitContrast.Outline;
+
+    [Export(PropertyHint.Range, "0,1,0.05")]
+    public float RimStrength { get; set; } = 0.5f;
+
+    [Export]
     public Shader SurfaceShader { get; set; }
 
     [Export]
-    public Shader CutoutShader { get; set; }
+    public Shader UnitShader { get; set; }
+
+    [Export]
+    public Shader UnitCutoutShader { get; set; }
+
+    //Das Rechteck über dem Bild, das den Rand um die Figuren zieht
+    [Export]
+    public GeometryInstance3D UnitOutline { get; set; }
 
     [Export]
     public ColorRect Screen { get; set; }
@@ -93,6 +123,10 @@ public partial class Ps1Look : Node
                 RealShadows = !RealShadows;
 
                 break;
+            case Key.F6:
+                Contrast = (UnitContrast)(((int)Contrast + 1) % Enum.GetValues<UnitContrast>().Length);
+
+                break;
             default:
                 return;
         }
@@ -117,8 +151,42 @@ public partial class Ps1Look : Node
         }
 
         TuneTree(World ?? GetParent(), resolution);
+        ApplyContrast(resolution);
 
         Changed?.Invoke();
+    }
+
+    public string DescribeContrast()
+        => Contrast switch
+        {
+            UnitContrast.Outline       => "Umriss",
+            UnitContrast.HoverOutline  => "Umriss beim Anvisieren",
+            UnitContrast.Rim           => "Randlicht",
+            UnitContrast.Brightness    => "Helligkeitskontrast",
+            UnitContrast.OutlineAndRim => "Umriss und Randlicht",
+            UnitContrast.All           => "alles zusammen",
+            _                          => "ohne Kontrasthilfe"
+        };
+
+    private void ApplyContrast(Vector2 resolution)
+    {
+        var outline = Contrast is UnitContrast.Outline or UnitContrast.OutlineAndRim or UnitContrast.All;
+        var hover   = outline || Contrast == UnitContrast.HoverOutline;
+        var rim     = Contrast is UnitContrast.Rim or UnitContrast.OutlineAndRim or UnitContrast.All;
+        var muted   = Contrast is UnitContrast.Brightness or UnitContrast.All;
+
+        RenderingServer.GlobalShaderParameterSet(UnitOutlineKey, outline ? 1f : 0f);
+        RenderingServer.GlobalShaderParameterSet(UnitHoverOutlineKey, hover ? 1f : 0f);
+        RenderingServer.GlobalShaderParameterSet(UnitRimKey, rim ? RimStrength : 0f);
+        RenderingServer.GlobalShaderParameterSet(EnvironmentContrastKey, muted ? 1f : 0f);
+
+        if (UnitOutline is null)
+            return;
+
+        //Ohne Rand liest niemand den Rauheitskanal, dann spart Godot sich dessen Aufbau
+        UnitOutline.Visible = hover;
+
+        (UnitOutline.MaterialOverride as ShaderMaterial)?.SetShaderParameter(SnapResolution, resolution);
     }
 
     private Vector2 GetResolution()
@@ -174,11 +242,14 @@ public partial class Ps1Look : Node
 
     private void Tune(Material material, Vector2 resolution)
     {
-        if (material is not ShaderMaterial surface || (surface.Shader != SurfaceShader && surface.Shader != CutoutShader && surface.Shader != WallFade.MasonryShader))
+        if (material is not ShaderMaterial surface || !IsPs1Shader(surface.Shader))
             return;
 
         surface.SetShaderParameter(Snap, Enabled && SnapVertices ? 1f : 0f);
         surface.SetShaderParameter(SnapResolution, resolution);
         surface.SetShaderParameter(Affine, Enabled ? AffineTextures : 0f);
     }
+
+    private bool IsPs1Shader(Shader shader)
+        => shader == SurfaceShader || shader == UnitShader || shader == UnitCutoutShader || shader == WallFade.MasonryShader;
 }

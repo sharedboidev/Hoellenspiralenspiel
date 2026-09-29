@@ -51,6 +51,16 @@ void vertex() {
 	affine_uv = vec3(uv * depth, depth);
 }
 
+// 1 macht die Flächen der Welt dunkler und blasser, damit sich Figuren davon abheben. Gesetzt von Ps1Look
+global uniform float environment_contrast;
+
+vec3 mute_environment(vec3 color) {
+	float luma = dot(color, vec3(0.299, 0.587, 0.114));
+	vec3 muted = mix(color, vec3(luma), 0.6) * 0.55;
+
+	return mix(color, muted, environment_contrast);
+}
+
 vec4 sample_texel(vec3 uv) {
 	return texture(albedo_texture, uv.xy / uv.z);
 }

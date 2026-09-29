@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bvfrvf4dbtkjw" path="res://Scripts/Units/Enemies/Enemy.cs" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://hppdxt5g5vne" path="res://Models/Units/Enemies/skeleton.glb" id="2_model"]
-[ext_resource type="Shader" uid="uid://b6satrjmt6gq" path="res://Shaders/Ps1/ps1_cutout.gdshader" id="90_cutout"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit_cutout.gdshader" id="90_cutout"]
 [ext_resource type="Texture2D" uid="uid://c7i4l2ybqppa2" path="res://Textures/Units/Enemies/Skeleton/skeleton_albedo.webp" id="91_albedo"]
 
 [sub_resource type="CapsuleShape3D" id="Shape_body"]

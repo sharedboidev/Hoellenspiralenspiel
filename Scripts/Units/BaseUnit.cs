@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Resources.Skills;
@@ -24,6 +25,8 @@ public abstract partial class BaseUnit : CharacterBody3D
     public delegate void LifeChangedEventHandler(BaseUnit unit);
 
     private const float MinPickRadius = 0.4f;
+
+    private static readonly StringName HighlightParameter = "highlight";
 
     private readonly List<StatusTick> statusTicks = new();
     private          CollisionShape3D bodyShape;
@@ -295,6 +298,16 @@ public abstract partial class BaseUnit : CharacterBody3D
 
     protected void RaiseDied()
         => Died?.Invoke(this);
+
+    //Die Einheit unter der Maus bekommt einen roten Rand, siehe ps1_unit_outline
+    public void SetHighlighted(bool isHighlighted)
+    {
+        if (Visual is null)
+            return;
+
+        foreach (var mesh in Visual.FindChildren("*", nameof(GeometryInstance3D), true, false).OfType<GeometryInstance3D>())
+            mesh.SetInstanceShaderParameter(HighlightParameter, isHighlighted ? 1f : 0f);
+    }
 
     public void NotifyHitDealt(HitResult hit, BaseUnit victim)
         => HitDealt?.Invoke(this, hit, victim);
