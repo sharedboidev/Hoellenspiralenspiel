@@ -1243,6 +1243,8 @@ Die Kosten hängen nicht von der Zahl der Gegner ab, nur von der Bildgröße und
 
 Zum Testen der Kameradistanz verstellt das Mausrad die Sichthöhe der Kamera in Schritten von 2 m, zwischen 6 und 40 m. Die Statuszeile zeigt Sichthöhe und Abstand. Bisher waren es 18 m Sichthöhe aus 28,5 m Abstand. Startwert, Grenzen und Schritt stehen als `ViewHeight`, `MinViewHeight`, `MaxViewHeight` und `ZoomStep` an der Kamera. Die Schilder der Beute ordnen sich nach jedem Schritt neu.
 
+Der Nebel zählt ab der Kamera, in `game.tscn` von 38 bis 62 m. Ohne Ausgleich versank die Welt ab etwa 30 m Sichthöhe im Nebel. Die Kamera verschiebt Beginn und Ende deshalb um genau so viel, wie sie selbst näher oder weiter rückt. Der Nebel bleibt so gleich weit hinter dem Helden, bei 18 m Sichthöhe gelten die Werte aus der Szene. Das gilt auch für die orthogonale Sicht mit F2. Dort steht die Kamera 40 m entfernt, der Nebel beginnt damit bei 49,5 m statt bei 38 m.
+
 Stand: Die Laufzeitprüfung mit 14 Schritten lief fehlerfrei. Sie deckt das Mausrad samt Grenzen und Statuszeile ab, dazu die Breiten 0 bis 3 im Material und die Sichtbarkeit des Rechtecks. Die 692 Unit-Tests sind grün. Dazu kamen Bildschirmfotos aller Breiten und dreier Kameradistanzen.
 
 Offen:

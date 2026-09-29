@@ -392,7 +392,7 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 | `F4` | Schatten aus Lichtern statt dunkler Scheiben |
 | `F5` | Ganze Karte der Ebene zeigen und zurück zum Erkundeten |
 | `F6` | Ins Testgelände und zurück in den Hub |
-| Mausrad | Abstand der Kamera in Schritten ändern, zum Testen. Die Statuszeile zeigt, wie viele Meter das Bild zeigt und wie weit die Kamera entfernt ist. |
+| Mausrad | Abstand der Kamera in Schritten ändern, zum Testen. Die Statuszeile zeigt, wie viele Meter das Bild zeigt und wie weit die Kamera entfernt ist. Der Nebel rückt mit. |
 
 </details>
 

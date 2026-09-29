@@ -4,8 +4,12 @@ namespace Hoellenspiralenspiel.Scripts.World;
 
 public partial class IsoCamera : Camera3D
 {
-    private Vector3 offset;
-    private float   viewHeight = 18f;
+    private float             baseDistance;
+    private float             fogBegin;
+    private float             fogEnd;
+    private Godot.Environment fogEnvironment;
+    private Vector3           offset;
+    private float             viewHeight = 18f;
 
     [Export]
     public Node3D Target { get; set; }
@@ -47,7 +51,15 @@ public partial class IsoCamera : Camera3D
     public float TargetDistance => offset.Length();
 
     public override void _Ready()
-        => ApplyProjection();
+    {
+        ApplyProjection();
+
+        //Der Nebel zählt ab der Kamera. Er rückt beim Zoomen mit, damit er gleich weit hinter dem Helden bleibt
+        fogEnvironment = GetWorld3D()?.Environment;
+        baseDistance   = TargetDistance;
+        fogBegin       = fogEnvironment?.FogDepthBegin ?? 0f;
+        fogEnd         = fogEnvironment?.FogDepthEnd ?? 0f;
+    }
 
     public override void _Process(double delta)
         => Follow();
@@ -99,6 +111,18 @@ public partial class IsoCamera : Camera3D
         }
 
         Follow();
+        ShiftFog();
+    }
+
+    private void ShiftFog()
+    {
+        if (fogEnvironment is null)
+            return;
+
+        var shift = TargetDistance - baseDistance;
+
+        fogEnvironment.FogDepthBegin = fogBegin + shift;
+        fogEnvironment.FogDepthEnd   = fogEnd + shift;
     }
 
     private void Follow()
