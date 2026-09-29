@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Interfaces;
@@ -166,6 +167,8 @@ public partial class Player2D
     public event ProgressRestoredEventHandler ProgressRestored;
     public event RespawnedEventHandler        Respawned;
     public event Action                       SheetChanged;
+    public event Action                       ResourcesChanged;
+    public event Action                       XpChanged;
 
     public override void _Ready()
     {
@@ -220,6 +223,23 @@ public partial class Player2D
             light.TextureScale = baseScale * factor;
     }
 
+    protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        base.OnPropertyChanged(propertyName);
+
+        switch (propertyName)
+        {
+            case nameof(LifeCurrent) or nameof(LifeMaximum) or nameof(ManaCurrent) or nameof(ManaMaximum):
+                ResourcesChanged?.Invoke();
+
+                break;
+            case nameof(XpTotal):
+                XpChanged?.Invoke();
+
+                break;
+        }
+    }
+
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
@@ -257,6 +277,7 @@ public partial class Player2D
 
         LeveledUp?.Invoke(this);
         SheetChanged?.Invoke();
+        XpChanged?.Invoke();
     }
 
     public int GetRequiredAttributevalue(Requirement requirement)
@@ -857,6 +878,7 @@ public partial class Player2D
 
         ProgressRestored?.Invoke();
         SheetChanged?.Invoke();
+        XpChanged?.Invoke();
     }
 
     public void RefillResources()

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Hoellenspiralenspiel.Scripts.Utils;
+namespace Hoellenspiralenspiel.Scripts.Core.Progression;
 
 public static class XpTable
 {

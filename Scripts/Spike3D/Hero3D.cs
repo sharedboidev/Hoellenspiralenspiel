@@ -8,8 +8,10 @@ using Hoellenspiralenspiel.Resources.Items;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Items;
+using Hoellenspiralenspiel.Scripts.Core.Progression;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Stats;
+using Hoellenspiralenspiel.Scripts.Skills;
 using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.Spike3D;
@@ -18,8 +20,6 @@ public partial class Hero3D
         : Unit3D,
           IHero
 {
-    public delegate void ManaChangedEventHandler();
-
     public const int InventoryWidth  = 14;
     public const int InventoryHeight = 5;
 
@@ -35,27 +35,29 @@ public partial class Hero3D
 
     private static readonly List<Unit3D> UnitsNearPoint = new();
 
-    private readonly AttackCycle    attackCycle = new();
-    private          PathFollower3D approachPath;
-    private          double         approachStuckSec;
-    private          Vector3        attackAimPoint;
-    private          Unit3D         attackTarget;
-    private          ItemInstance   equippedWeapon;
-    private          bool           hasDied;
-    private          int            heldSlot = NoSlot;
-    private          Unit3D         hoveredUnit;
-    private          double         invulnerableTimeLeftSec;
-    private          OmniLight3D    light;
-    private          float          lightBaseRange;
-    private          float          manaCurrent;
-    private          SkillResource  orderedSkill;
-    private          Vector3        spawnPosition;
-    private          bool           swingFailed;
-    private          Tween          swingLook;
-    private          SkillResource  swingSkill;
-    private          WeaponProfile  weapon = WeaponProfile.Unarmed;
-    private          Node3D         weaponPivot;
-    private          WornItems3D    wornItems;
+    private readonly AttackCycle     attackCycle = new();
+    private          PathFollower3D  approachPath;
+    private          double          approachStuckSec;
+    private          Vector3         attackAimPoint;
+    private          Unit3D          attackTarget;
+    private          ItemInstance    equippedWeapon;
+    private          bool            hasDied;
+    private          int             heldSlot = NoSlot;
+    private          Unit3D          hoveredUnit;
+    private          double          invulnerableTimeLeftSec;
+    private          LevelUpEffect3D levelUpEffect;
+    private          OmniLight3D     light;
+    private          float           lightBaseRange;
+    private          float           manaCurrent;
+    private          SkillResource   orderedSkill;
+    private readonly HeroProgress    progress = new();
+    private          Vector3         spawnPosition;
+    private          bool            swingFailed;
+    private          Tween           swingLook;
+    private          SkillResource   swingSkill;
+    private          WeaponProfile   weapon = WeaponProfile.Unarmed;
+    private          Node3D          weaponPivot;
+    private          WornItems3D     wornItems;
 
     public Hero3D()
     {
@@ -66,12 +68,26 @@ public partial class Hero3D
         Items.Equipment.Equipped   += OnItemEquipped;
         Items.Equipment.Unequipped += OnItemUnequipped;
         Items.Dropped              += OnItemDropped;
+
+        LifeChanged        += _ => ResourcesChanged?.Invoke();
+        progress.Changed   += () => XpChanged?.Invoke();
+        progress.LeveledUp += OnLeveledUp;
     }
 
     public CharacterItems Items { get; }
 
-    //Level und XP folgen mit der Umstellung, bis dahin bleibt der 3D-Held auf Level 1
-    public int Level => 1;
+    public SkillLoadout Loadout { get; } = new(InputActions.SkillSlots.Length);
+
+    //Bis entschieden ist, wie der Held Skills bekommt, kennt er alle
+    public IReadOnlyList<SkillResource> KnownSkills => SkillLibrary.PlayerSkills;
+
+    public int  Level               => progress.Level;
+    public long XpTotal             => progress.XpTotal;
+    public long XpFloorCurrentLevel => progress.XpFloor;
+    public long XpForNextLevel      => progress.XpForNextLevel;
+    public int  AttributePoints     => progress.AttributePoints;
+
+    public long LastXpLoss { get; private set; }
 
     public WornItems3D WornItems => wornItems;
 
@@ -79,9 +95,8 @@ public partial class Hero3D
     [Export]
     public Array<ItemBaseResource> StartingItems { get; set; } = new();
 
-    //Der Platz in der Liste ist der Platz der Skill-Leiste: linke Maustaste, rechte Maustaste, Q, E, R, F, 1 bis 4
     [Export]
-    public Array<SkillResource> Skills { get; set; } = new();
+    public AudioStreamPlayer NoManaSound { get; set; }
 
     [Export]
     public int LifeBonus { get; set; } = 50;
@@ -132,12 +147,13 @@ public partial class Hero3D
 
             manaCurrent = clamped;
 
-            ManaChanged?.Invoke();
+            ResourcesChanged?.Invoke();
         }
     }
 
-    public event ManaChangedEventHandler ManaChanged;
-    public event Action                  SheetChanged;
+    public event Action SheetChanged;
+    public event Action ResourcesChanged;
+    public event Action XpChanged;
 
     public override void _Ready()
     {
@@ -148,11 +164,13 @@ public partial class Hero3D
         approachPath  = new PathFollower3D(this);
         weaponPivot   = Visual?.GetNodeOrNull<Node3D>("WeaponPivot");
         light         = GetNodeOrNull<OmniLight3D>("Light");
+        levelUpEffect = GetNodeOrNull<LevelUpEffect3D>("LevelUpEffect");
 
         if (light is not null)
             lightBaseRange = light.OmniRange;
 
         ApplyLightRadius();
+        AssignStartingSkills();
 
         if (Visual is not null)
         {
@@ -204,6 +222,27 @@ public partial class Hero3D
     {
         if (IsDead && !hasDied)
             Die();
+    }
+
+    private void AssignStartingSkills()
+    {
+        var startingSlots = SkillLibrary.LoadStartingLoadout()?.Slots;
+
+        if (startingSlots is null)
+            return;
+
+        for (var slot = 0; slot < Math.Min(startingSlots.Count, Loadout.SlotCount); slot++)
+            Loadout.Assign(slot, startingSlots[slot]?.Id);
+    }
+
+    public void GainExperience(int experienceGained)
+        => progress.Gain(experienceGained);
+
+    private void OnLeveledUp()
+    {
+        levelUpEffect?.Emit();
+
+        SheetChanged?.Invoke();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -308,7 +347,7 @@ public partial class Hero3D
         if (IsDead)
             return;
 
-        for (var slot = 0; slot < Math.Min(Skills.Count, InputActions.SkillSlots.Length); slot++)
+        for (var slot = 0; slot < InputActions.SkillSlots.Length; slot++)
         {
             if (!@event.IsActionPressed(InputActions.SkillSlots[slot]))
                 continue;
@@ -328,23 +367,23 @@ public partial class Hero3D
     {
         var skill = GetSkill(slot);
 
-        return skill is not null && UseSkill(skill, new Aim3D(GetMouseGroundPoint(), FindHostileUnitUnderMouse()));
+        return skill is not null && UseSkill(skill, new Aim3D(GetMouseGroundPoint(), FindHostileUnitUnderMouse()), isRepeat);
     }
 
-    public bool UseSkill(SkillResource skill, Aim3D aim)
+    public bool UseSkill(SkillResource skill, Aim3D aim, bool isRepeat = false)
     {
         if (IsDead || skill is null)
             return false;
 
-        return skill.Kind == SkillKind.Attack ? OrderAttack(skill, aim) : CastSpell(skill, aim);
+        return skill.Kind == SkillKind.Attack ? OrderAttack(skill, aim, isRepeat) : CastSpell(skill, aim, isRepeat);
     }
 
     private SkillResource GetSkill(int slot)
-        => slot >= 0 && slot < Skills.Count ? Skills[slot] : null;
+        => SkillLibrary.Find(Loadout.GetSkillId(slot));
 
-    private bool CastSpell(SkillResource skill, Aim3D aim)
+    private bool CastSpell(SkillResource skill, Aim3D aim, bool isRepeat)
     {
-        if (TryPayFor(skill, CombatRules.MinSpellCooldownSec) != SkillUseCheck.Ready)
+        if (!Report(TryPayFor(skill, CombatRules.MinSpellCooldownSec), isRepeat))
             return false;
 
         if (RollActionFailure())
@@ -361,7 +400,7 @@ public partial class Hero3D
         return true;
     }
 
-    private bool OrderAttack(SkillResource skill, Aim3D aim)
+    private bool OrderAttack(SkillResource skill, Aim3D aim, bool isRepeat)
     {
         if (!aim.HasTarget && IsMelee(skill))
             return false;
@@ -369,7 +408,7 @@ public partial class Hero3D
         if (aim.HasTarget && !IsHostileTo(aim.Target))
             return false;
 
-        if (SkillGate.Check(skill.Definition, SkillCooldowns, AvailableMana) != SkillUseCheck.Ready)
+        if (!Report(SkillGate.Check(skill.Definition, SkillCooldowns, AvailableMana), isRepeat))
             return false;
 
         var previousTarget = attackTarget;
@@ -387,6 +426,15 @@ public partial class Hero3D
 
     private bool IsMelee(SkillResource skill)
         => skill.Delivery == SkillDelivery.Weapon && !Weapon.IsRanged;
+
+    //Bei gehaltener Taste bleibt der Ton für fehlendes Mana aus, sonst liefe er in Dauerschleife
+    private bool Report(SkillUseCheck check, bool isQuiet)
+    {
+        if (check == SkillUseCheck.NotEnoughMana && !isQuiet && NoManaSound is { Playing: false })
+            NoManaSound.Play();
+
+        return check == SkillUseCheck.Ready;
+    }
 
     private void RepeatHeldSkill()
     {
@@ -471,9 +519,10 @@ public partial class Hero3D
     private float GetEngageRange(SkillDefinition skill)
         => skill.Delivery switch
         {
-            SkillDelivery.Weapon     => Weapon.Range,
-            SkillDelivery.Projectile => skill.Projectile.Reach * EngageFraction,
-            _                        => float.MaxValue
+            SkillDelivery.Weapon           => Weapon.Range,
+            SkillDelivery.Projectile       => skill.Projectile.Reach * EngageFraction,
+            SkillDelivery.AreaAroundCaster => skill.Area.Radius * EngageFraction,
+            _                              => float.MaxValue
         };
 
     private void Move(Vector3 direction, double delta)
@@ -511,7 +560,7 @@ public partial class Hero3D
     //Bezahlt wird erst hier, denn auf dem Weg zum Ziel kann das Mana ausgegangen sein
     private void StartSwing(Vector3 toTarget)
     {
-        if (TryPayFor(orderedSkill) != SkillUseCheck.Ready)
+        if (!Report(TryPayFor(orderedSkill), true))
         {
             ClearOrder();
 
@@ -568,7 +617,7 @@ public partial class Hero3D
         if (target is null && IsMelee(skill) && IsValidTarget(previousTarget))
             target = previousTarget;
 
-        OrderAttack(skill, new Aim3D(GetMouseGroundPoint(), target));
+        OrderAttack(skill, new Aim3D(GetMouseGroundPoint(), target), true);
     }
 
     private void ClearOrder()
@@ -727,6 +776,8 @@ public partial class Hero3D
 
         heldSlot = NoSlot;
         Velocity = Vector3.Zero;
+
+        LastXpLoss = progress.LoseForDeath();
 
         if (Visual is not null)
             Visual.RotationDegrees = new Vector3(90, Visual.RotationDegrees.Y, 0);

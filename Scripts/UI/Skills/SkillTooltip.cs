@@ -1,9 +1,9 @@
 using System.Text;
 using Godot;
+using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
-using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Skills;
 
@@ -19,7 +19,7 @@ public static class SkillTooltip
     //Godot trennt Zeilen mit einem einzelnen Zeilenvorschub, der Wagenrücklauf von Windows ergäbe Leerzeilen
     private const char NewLine = '\n';
 
-    public static string Build(SkillResource skill, BaseUnit caster)
+    public static string Build(SkillResource skill, IHero caster)
     {
         var estimate = Estimate(skill, caster);
         var uses     = skill.Kind == SkillKind.Attack ? "Attacks" : "Casts";
@@ -66,12 +66,8 @@ public static class SkillTooltip
         return margin;
     }
 
-    public static SkillDamageEstimate Estimate(SkillResource skill, BaseUnit caster)
-        => SkillDamageEstimator.Estimate(caster.Stats,
-                                         caster.Weapon,
-                                         skill.Definition,
-                                         caster.StatusEffects.ActionFailureChance,
-                                         !float.IsPositiveInfinity(caster.AvailableMana));
+    public static SkillDamageEstimate Estimate(SkillResource skill, IHero caster)
+        => SkillDamageEstimator.Estimate(caster.Stats, caster.Weapon, skill.Definition, caster.StatusEffects.ActionFailureChance);
 
     private static string Title(string title)
         => $"[center][font_size={TitleFontSize}]{title}[/font_size][/center]";

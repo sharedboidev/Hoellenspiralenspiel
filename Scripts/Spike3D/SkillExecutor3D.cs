@@ -28,8 +28,12 @@ public static class SkillExecutor3D
                 LaunchProjectile(caster, cast, EffectScenes3D.Find(skill.Id), definition.Projectile, aim);
 
                 break;
-            default:
-                GD.PushWarning($"Flächen gibt es in 3D noch nicht, {skill.NameOrId} bleibt ohne Wirkung.");
+            case SkillDelivery.AreaAroundCaster:
+                LaunchArea(caster, cast, EffectScenes3D.Find(skill.Id), definition.Area, caster.GlobalPosition);
+
+                break;
+            case SkillDelivery.AreaAtPoint:
+                LaunchArea(caster, cast, EffectScenes3D.Find(skill.Id), definition.Area, aim.CurrentPoint);
 
                 break;
         }
@@ -67,5 +71,23 @@ public static class SkillExecutor3D
 
             projectile.GlobalPosition = origin;
         }
+    }
+
+    private static void LaunchArea(Unit3D caster, Cast3D cast, PackedScene scene, AreaSettings settings, Vector3 center)
+    {
+        if (scene is null || settings is null)
+        {
+            GD.PushWarning($"{caster.Name} hat keine Fläche für seinen Skill.");
+
+            return;
+        }
+
+        var area = scene.Instantiate<SkillArea3D>();
+
+        area.Launch(cast, settings);
+
+        caster.GetParent().AddChild(area);
+
+        area.GlobalPosition = WorldScale.OnGround(center);
     }
 }

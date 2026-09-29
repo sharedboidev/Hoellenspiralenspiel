@@ -71,6 +71,8 @@ public partial class Enemy3D : Unit3D
 
     public bool IsResting => brain.IsResting;
 
+    public int XpGranted => EnemyScaling.GetXp(Definition?.Xp ?? 0, 1f);
+
     public override Faction Faction      => Faction.Monster;
     public override bool    IsTargetable => !IsDead && !IsDying;
 
@@ -309,9 +311,10 @@ public partial class Enemy3D : Unit3D
 
         var skillRange = definition.Delivery switch
         {
-            SkillDelivery.Weapon     => Weapon.Range,
-            SkillDelivery.Projectile => definition.Projectile.Reach * EngageFraction,
-            _                        => float.MaxValue
+            SkillDelivery.Weapon           => Weapon.Range,
+            SkillDelivery.Projectile       => definition.Projectile.Reach * EngageFraction,
+            SkillDelivery.AreaAroundCaster => definition.Area.Radius * EngageFraction,
+            _                              => float.MaxValue
         };
 
         return Math.Min(skillRange, Definition?.AttackRange ?? skillRange);

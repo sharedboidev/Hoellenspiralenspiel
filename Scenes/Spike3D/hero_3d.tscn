@@ -3,9 +3,8 @@
 [ext_resource type="Shader" path="res://Shaders/Spike3D/ps1_surface.gdshader" id="ps1"]
 [ext_resource type="Texture2D" path="res://Textures/Spike3D/cloth_weave.png" id="cloth"]
 [ext_resource type="Script" path="res://Scripts/Spike3D/Hero3D.cs" id="hero"]
-[ext_resource type="Script" path="res://Resources/Skills/SkillResource.cs" id="skill"]
-[ext_resource type="Resource" path="res://Resources/Skills/Player/attack.tres" id="attack"]
-[ext_resource type="Resource" path="res://Resources/Skills/Player/fireball.tres" id="fireball"]
+[ext_resource type="AudioStream" path="res://Audio/no mana.mp3" id="no_mana"]
+[ext_resource type="PackedScene" path="res://Scenes/Spike3D/level_up_effect_3d.tscn" id="level_up"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.2
@@ -63,11 +62,11 @@ shader_parameter/albedo = Color(0.85, 0.66, 0.55, 1)
 [sub_resource type="BoxMesh" id="BoxMesh_9"]
 size = Vector3(0.06, 0.06, 0.09)
 
-[node name="Hero3D" type="CharacterBody3D"]
+[node name="Hero3D" type="CharacterBody3D" node_paths=PackedStringArray("NoManaSound")]
 collision_mask = 10
 motion_mode = 1
 script = ExtResource("hero")
-Skills = Array[ExtResource("skill")]([ExtResource("attack"), ExtResource("fireball")])
+NoManaSound = NodePath("NoManaSound")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
@@ -153,6 +152,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 [node name="AttachHelmet" type="Marker3D" parent="Visual"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 
+[node name="AttachNeck" type="Marker3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.44, 0)
+
 [node name="AttachShoulders" type="Marker3D" parent="Visual"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
 
@@ -176,6 +178,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
 cast_shadow = 0
 mesh = SubResource("CylinderMesh_2")
 surface_material_override/0 = SubResource("Mat_blob_shadow")
+
+[node name="LevelUpEffect" parent="." instance=ExtResource("level_up")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="NoManaSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("no_mana")
+volume_db = -20.0
 
 [node name="Light" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)

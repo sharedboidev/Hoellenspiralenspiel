@@ -2,7 +2,7 @@
 
 Stand: 29.09.2026. M0 bis M5 liegen auf `master`, dazu die Nachträge zu M2 und M3: Bleed stapelt, Schadenswerte im Tooltip und ausgedünnte Kommentare.
 Der Vergleich von 2D und 3D ist auf dem Branch `master_Compare3D` gebaut. Die Entscheidung ist gefallen: 3D im Look der PlayStation 1.
-Die Umstellung M5.5 hat auf demselben Branch begonnen: Der 3D-Held trägt Items, und angelegte Ausrüstung ist zu sehen.
+Die Umstellung M5.5 läuft auf demselben Branch: Der 3D-Held trägt sichtbare Ausrüstung, hat Skill-Leiste, Orbs und XP-Balken, sammelt XP und wirkt alle Skills.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code (rund 5.500 Zeilen) plus Szenen.
 Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 bis M5 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
@@ -12,7 +12,8 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Frage | Entscheidung |
 |---|---|
 | 2D oder 3D | 3D im Look der PlayStation 1, Vorbild Silent Hill. Entschieden am 29.09.2026 nach dem Vergleich. |
-| Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen. Entschieden am 29.09.2026. |
+| Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen, auch das Amulett. Nur die Ringe bleiben unsichtbar. Gegner zeigen ihre Ausrüstung, sobald es Gegner mit Armen gibt. Entschieden am 29.09.2026. |
+| Modelle | Starre Teile ohne Skelett. Entschieden am 29.09.2026. |
 | Spielstruktur | Hub (Stadt) plus Abstieg in einen Höllenkreis mit mehreren Ebenen |
 | Leveldesign | Etwa 90 % prozedural, dazu handgebaute Räume und Event-Locations, die gezielt eingestreut werden |
 | Multiplayer | Singleplayer zuerst, Koop soll später nachrüstbar bleiben |
@@ -32,14 +33,14 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. Seit M5.5 hängt sie an der Schnittstelle `IHero` und läuft auch in 3D. |
 | Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. Seit M5.5 ist sie in 3D am Helden zu sehen. |
 | Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch | Nicht im PDF |
-| Leveling | XP-Tabelle bis Level 100, Level-up-Effekt, Attributspunkte, XP-Balken | Nicht im PDF, funktioniert |
+| Leveling | XP-Tabelle bis Level 100, Level-up-Effekt, Attributspunkte, XP-Balken. Seit M5.5 liegt die Regel für XP, Level und Punkte im Kern und treibt den 3D-Helden. | Nicht im PDF, funktioniert |
 | Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen, Tooltip mit DPS | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
 | Kampf | Zentrale Trefferauflösung, Nahkampf, Schadensarten mit Effekten, Statuseffekte, Tod und Respawn | Seit M2. Frost-Effekt war im PDF leer und ist jetzt Verlangsamung. |
 | Schadensminderung | Rüstungsformel, Resistenzen, Dodge, Parry und Block für alle Einheiten | Seit M4 bringen Schild, Stab und Schwert Block und Parry mit |
 | Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler. Seit M5 sind sie Resources mit Level, Ausrüstung und Verhalten, dazu Elite und Rare Elite mit Mods aus Bausteinen | Nur Blobs und ein Testgegner |
 | Wegfindung | Seit M5: Navigationsnetz pro Level, zur Laufzeit gebacken. Gegner und Held laufen um Wände herum | Nicht im PDF |
 | Atmosphäre | Punktlichter mit Schatten, abgedunkelte Szene, Overlay-Karte | Passt zum düsteren Vibe |
-| 3D | Seit dem 29.09.2026: Held, drei Gegner, Feuerball und Wegfindung auf dem Kern, dazu der PS1-Look. Der alte Prototyp kann nur Bewegung. | Offene Frage aus dem PDF, entschieden für 3D |
+| 3D | Seit dem 29.09.2026: Held, drei Gegner und Wegfindung auf dem Kern, dazu der PS1-Look. Seit M5.5 kommen sichtbare Ausrüstung, Skill-Leiste, Orbs, XP und alle Skills dazu. Der alte Prototyp kann nur Bewegung. | Offene Frage aus dem PDF, entschieden für 3D |
 
 ## 2. Was an kritischen Systemen fehlt
 
@@ -83,7 +84,7 @@ Status vom 28.09.2026. Die Zeilennummern beziehen sich auf den Stand vor den Kor
 | F13 | Behoben | Verschachtelte Loot-Tabellen sind als Typ angelegt, aber nicht umgesetzt | [LootTable.cs:42](../Resources/LootTable.cs) |
 | F14 | Behoben | Derselbe Affix kann mehrfach auf einem Item landen | [Lootsystem.cs:57](../Scripts/Controllers/Lootsystem.cs) |
 | F15 | Behoben | Die Todesanimation ist nie zu sehen, weil der Gegner beim Start der Animation entfernt wird | BaseEnemy.cs:60, heute [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs) |
-| F16 | Behoben | Auf Level 100 ist die nächste XP-Schwelle 0. Jeder XP-Gewinn löst dann ein Level-up aus und das Level danach wirft eine Ausnahme. | [XpTable.cs:109](../Scripts/Utils/XpTable.cs) |
+| F16 | Behoben | Auf Level 100 ist die nächste XP-Schwelle 0. Jeder XP-Gewinn löst dann ein Level-up aus und das Level danach wirft eine Ausnahme. | [XpTable.cs:109](../Scripts/Core/Progression/XpTable.cs) |
 | F17 | Behoben | `LifeBase = 75` in den Gegner-Szenen wird ignoriert. Alle Gegner haben 9 Leben, der Feuerball macht 50 bis 75 Schaden. | [yellow_blob.tscn](../Scenes/Units/Enemies/yellow_blob.tscn) |
 | F18 | Behoben | Schadenszahlen driften pro Frame statt pro Sekunde und sind damit abhängig von der Bildrate | [FloatingCombatText.cs:58](../Scripts/UI/FloatingCombatText.cs) |
 | F19 | Behoben | Ein Slot meldet sich nie vom Stapel-Ereignis eines Tranks ab. Wird ein verschobener Trankstapel leer getrunken, löscht der alte Slot den fremden Trankstapel, der inzwischen dort liegt. | [InventorySlot.cs:62](../Scripts/UI/Character/InventorySlot.cs) |
@@ -116,7 +117,7 @@ Hinweise zu den Korrekturen:
 
 | Nr. | Problem | Folge |
 |---|---|---|
-| A1 | Rund 15 Stellen suchen Spieler, Controller oder Tooltip über feste Namen in der aktuellen Szene. Skills gehören seit M3 nicht mehr dazu, Items und Lootbags seit M4, Gegner seit M5. Der `EnemyController` selbst sucht Held und Gegner-Container weiter über feste Namen. | Jedes neue Level muss exakt wie das Testlevel aufgebaut sein |
+| A1 | Rund 15 Stellen suchen Spieler, Controller oder Tooltip über feste Namen in der aktuellen Szene. Skills gehören seit M3 nicht mehr dazu, Items und Lootbags seit M4, Gegner seit M5, der XP-Balken seit M5.5. Der `EnemyController` selbst sucht Held und Gegner-Container weiter über feste Namen. | Jedes neue Level muss exakt wie das Testlevel aufgebaut sein |
 | A2 | Behoben in M1. Alle Stats steckten in einer 2D-Physik-Klasse. Die Rechnung liegt jetzt in `Scripts/Core/Stats` ohne Godot. | Blockierte die 2D/3D-Entscheidung, Tests und Koop |
 | A3 | Für Skills behoben in M3, für das Inventar in M4. Der Skillbar-Button zauberte und zog Mana ab, das Inventar rechnete in seinen Knoten. Jetzt zeigen Leiste und Inventar nur noch an. | Logik ist ohne UI nicht nutzbar und nicht testbar |
 | A4 | Behoben in M4. Items waren Szenen-Knoten, die nie im Baum hingen. Jetzt sind sie reine Daten. | Speicherleck und nicht serialisierbar |
@@ -798,14 +799,16 @@ Ziel: Die 3D-Fassung kann alles, was die 2D-Fassung kann. Danach entfällt die 2
 - Erledigt mit dem Vergleich: Einheit, Held, Gegner, Projektil, Wegfindung, Schadenszahlen, Kamera.
 - Erledigt: PS1-Look mit zwei Shadern, im Level umschaltbar.
 - Erledigt: Der Held trägt Items. Waffe, Schild und Rüstung wirken über den Kern wie in 2D.
-- Erledigt: Angelegte Ausrüstung ist am Helden zu sehen.
+- Erledigt: Angelegte Ausrüstung ist am Helden zu sehen. Auch das Amulett hat einen Befestigungspunkt.
 - Erledigt: Fernkampfwaffen schießen, auch ohne Gegner unter dem Mauszeiger.
 - Erledigt: Inventar, Ausrüstung und Werteliste laufen im 3D-Level. Sie hängen an der Schnittstelle `IHero` statt am 2D-Helden.
-- Offen: Skill-Leiste, Orbs, XP-Balken, Level-up-Dialog und Todesbildschirm am 3D-Helden.
-- Offen: Flächen als Wirkung, damit Frost Nova, Thunderbolt, Meteor, Death Blast und Frost Pulse laufen. Dazu Lightning Strike.
+- Erledigt: Skill-Leiste, Orbs und XP-Balken hängen an `IHero` und laufen im 3D-Level. Der 3D-Held hat die Leiste mit zehn Plätzen und dieselbe Startbelegung wie in 2D.
+- Erledigt: Flächen als Wirkung. Frost Nova, Thunderbolt, Meteor, Death Blast und Frost Pulse laufen, dazu Lightning Strike als Projektil.
+- Erledigt: XP von Gegnern, Level-up mit Attributspunkt und XP-Verlust beim Tod. Die Regel liegt als `HeroProgress` im Kern.
+- Erledigt: Der Level-up-Effekt aus 2D als `GPUParticles3D` am Helden.
+- Offen: Level-up-Dialog und Todesbildschirm am 3D-Helden.
 - Offen: Monster-Mods, Elite und Rare Elite, Namensschild.
 - Offen: Beutel am Boden und Beute von Gegnern.
-- Offen: XP, Level-up und XP-Verlust beim Tod.
 - Offen: Speichern und Laden.
 - Offen: Overlay-Karte und Kellertür.
 - Offen: eigene Modelle für Held, Gegner und Items statt der Grundkörper.
@@ -819,19 +822,27 @@ Getroffene Designentscheidungen vom 29.09.2026:
 |---|---|
 | 2D oder 3D | 3D im Look der PlayStation 1 |
 | Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen |
+| Modelle | Starre Teile: Kopf, Torso, Arme und Beine sind einzelne Netze ohne Gewichte. Kein Skelett. |
+| Sichtbare Plätze | 12 von 16: Waffe, Nebenhand, Helm, Amulett, Schultern, Torso, Rücken, Gürtel, Handgelenke, Hände, Beine, Füße. Nur die vier Ringe bleiben unsichtbar. |
+| Ausrüstung an Gegnern | Ja, sobald es Gegner mit Armen gibt |
+| Kamera | Vertagt. Orthogonal und perspektivisch bleiben im Level mit F2 umschaltbar. |
+| Level-up | Derselbe Effekt wie in 2D, als Partikel in 3D. Der Text "Level up" aus dem ersten Wurf ist entfallen. |
 
 Von mir festgelegt, weil es sich aus dem Umbau ergab. Alles lässt sich in den Szenen ändern:
 
 | Punkt | Festlegung |
 |---|---|
-| Sichtbare Plätze | 11 von 16: Waffe, Nebenhand, Helm, Schultern, Torso, Rücken, Gürtel, Handgelenke, Hände, Beine, Füße. Amulett und die vier Ringe bleiben unsichtbar. |
 | Paarige Plätze | Hände und Handgelenke haben links und rechts je einen Befestigungspunkt und bekommen das Modell an beiden |
+| Punkt fürs Amulett | `AttachNeck` sitzt am Halsansatz. Ein Amulett hängt von dort nach vorn auf die Brust. |
 | Hieb | Der rechte Arm hebt sich um 40 Grad und schwingt 140 Grad quer |
 | Schuss | Der rechte Arm hebt sich um 80 Grad, der Bogen steht dabei senkrecht |
 | Items im Testlevel | Der Held startet mit je einem Stück aller neun Item-Basen im Inventar |
 | Attribute im Testlevel | Stärke 2 und Geschick 2, sonst ließen sich Schwert, Schild und Bogen nicht anlegen. Der Held hat dadurch 61 Leben statt 60. |
 | Fallengelassene Items | Kehren ins Inventar zurück, bis es Beutel in 3D gibt |
-| Level des Helden | Bleibt 1, bis XP umgestellt ist |
+| Form der Flächen | Ein Kreis auf dem Boden. Die Stauchung aus 2D gibt es in 3D nicht. |
+| Aussehen der Flächen | Leuchtende Ringe und Körper aus Grundformen |
+| Töne | Der Einschlag von Thunderbolt und fehlendes Mana klingen wie in 2D |
+| Leben und Mana im Testlevel | Die Balken oben links sind entfallen, die Orbs ersetzen sie |
 
 So funktioniert sichtbare Ausrüstung:
 
@@ -840,7 +851,7 @@ So funktioniert sichtbare Ausrüstung:
 - Ein Platz ist sichtbar, wenn es einen solchen Punkt gibt. Es gibt dafür keine Liste im Code.
 - `WornItems3D` hört auf das Anlegen und Ablegen im Kern. Beim Anlegen hängt es das Modell an jeden passenden Punkt, beim Ablegen entfernt es das Modell.
 - Die Punkte für Waffe und rechte Hand hängen am Arm. Sie schwingen beim Hieb mit.
-- Der Ursprung eines Modells ist der Befestigungspunkt. Ein Schwert hat seinen Griff im Ursprung, ein Helm die Mitte des Kopfes.
+- Der Ursprung eines Modells ist der Befestigungspunkt. Ein Schwert hat seinen Griff im Ursprung, ein Helm die Mitte des Kopfes, ein Amulett den Halsansatz.
 - Gezeichnet werden die Modelle mit dem Material des PS1-Looks. `Ps1Look` stellt neue Modelle von selbst ein.
 - Das 2D-Spiel lädt dieselben Item-Basen und beachtet das Feld nicht.
 
@@ -865,26 +876,65 @@ Die Platzhalter, alle in [Scenes/Spike3D/Items](../Scenes/Spike3D/Items):
 
 <img src="images/ausruestung_3d_varianten.webp" alt="Der 3D-Held ohne Ausrüstung, mit Schwert und Schild, mit Stab und beim Schuss mit dem Bogen" width="860">
 
-Geprüft: Eine Laufzeitprüfung mit 70 Schritten im 3D-Level lief fünfmal hintereinander fehlerfrei. Sie deckt Anforderungen, Anlegen und Ablegen, die Regel für Zweihandwaffen, Werte aus dem Kern, Modelle an den Befestigungspunkten, Hieb, Schuss, Trank und Charakterbogen ab, dazu die Kampfabläufe aus dem Vergleich. Eine zweite Prüfung mit 14 Schritten lief dreimal fehlerfrei im 2D-Testlevel und deckt Charakterbogen, Inventar, Werteliste und Level-up ab. Die 547 Unit-Tests sind grün, dazu kam eine Sichtprüfung mit Bildschirmfotos.
+So hängt die Oberfläche am Helden:
 
-Offene Fragen, Stand 29.09.2026. Sie warten auf eine Entscheidung und sind der Einstieg in die nächste Sitzung:
+- `IHero` nennt alles, was die Oberfläche vom Helden braucht: Werte, Statuseffekte, Items, Waffe, Belegung der Leiste, Abklingzeiten, bekannte Skills, Leben, Mana, Level und XP.
+- Drei Ereignisse melden Änderungen: `SheetChanged` für Werte und Level, `ResourcesChanged` für Leben und Mana, `XpChanged` für XP.
+- Orbs, Skill-Leiste und XP-Balken haben das Feld `player`. Steht dort ein Held, binden sie sich beim Start selbst an ihn.
+- Im 3D-Level liegen sie unter `Hud` und zeigen auf `Hero3D`. Im 2D-Level bindet weiter der Held seine Orbs und seine Leiste, nur der XP-Balken nutzt das Feld.
+- XP, Level und Attributspunkte rechnet `HeroProgress` im Kern. Ein Gewinn bringt höchstens ein Level, wie in 2D.
+- Beim Aufstieg sprüht `LevelUpEffect3D` Sterne. Die Szene `level_up_effect_3d.tscn` hat die Werte des 2D-Effekts: 128 Sterne, 2 Sekunden, dieselbe Farbkurve. Geschwindigkeit und Größe sind von Pixeln in Meter umgerechnet.
+- Der Stern ist dieselbe Textur wie in 2D. Godot stellt eine Textur auf Kompression und Mipmaps um, sobald sie zum ersten Mal in 3D erscheint. In ihrer `.import`-Datei steht deshalb `detect_3d/compress_to=0`, wie bei den Texturen unter `Textures/Spike3D`.
 
-| Nr. | Frage | Mein Vorschlag |
+So funktionieren Flächen in 3D:
+
+- `SkillArea3D` ist das Gegenstück zu `SkillArea`. Eine Szene hängt das Skript an ihren Wurzelknoten.
+- `Visual` zeigt den Radius und wächst mit der Fläche, nur in Breite und Tiefe. `VisualRadius` nennt den Radius in Metern, den `Visual` ohne Skalierung zeigt.
+- `Impact` bleibt bis zum Einschlag unsichtbar. Ein Ton unter `Impact` spielt beim Einschlag und überlebt die Fläche.
+- Getroffen wird, wer auf dem Boden höchstens den Radius vom Mittelpunkt entfernt steht.
+- Die 3D-Szene eines Skills steht in `EffectScenes3D` unter seiner Id.
+
+Ein Skill bekommt seine Wirkung in 3D in zwei Schritten:
+
+1. Szene unter `Scenes/Spike3D/Skills` anlegen. Eine Fläche hat den Wurzelknoten `Node3D` mit `SkillArea3D`, ein Projektil `Area3D` mit `Projectile3D`.
+2. Die Szene in `EffectScenes3D` unter der Id des Skills eintragen.
+
+Die Platzhalter, alle in [Scenes/Spike3D/Skills](../Scenes/Spike3D/Skills):
+
+| Skill | Szene | Aussehen |
 |---|---|---|
-| 1 | Bekommen die eigenen Modelle starre Teile oder ein Skelett? | Starre Teile: Kopf, Torso, Arme und Beine sind einzelne Netze ohne Gewichte. Das ist einfacher zu bauen und passt zum PS1-Look. |
-| 2 | Passen die 11 sichtbaren Plätze? | So lassen. Amulett und Ringe sind am Modell zu klein. |
-| 3 | Kamera orthogonal oder perspektivisch? | Kein Vorschlag. Beide lassen sich im Level mit F2 vergleichen. Verzogene Texturen gibt es nur perspektivisch. |
-| 4 | Sollen auch Gegner ihre Ausrüstung zeigen? | Ja, sobald es Gegner mit Armen gibt. `WornItems3D` ist nicht an den Helden gebunden. |
+| Fireball, Fire Spit | `fireball_3d.tscn` | Glühende Kugel mit Schweif |
+| Short Bow | `arrow_3d.tscn` | Pfeil mit Spitze und Federn |
+| Lightning Strike | `lightning_bolt_3d.tscn` | Gezackter Blitz |
+| Frost Nova, Frost Pulse | `frost_nova_3d.tscn` | Hellblauer Ring, der nach außen wächst |
+| Thunderbolt | `thunderbolt_3d.tscn` | Blauer Kreis, dann ein Blitz von oben mit Licht und Ton |
+| Meteor | `meteor_3d.tscn` | Roter Kreis, dann eine flache Kuppel aus Feuer |
+| Death Blast | `death_blast_3d.tscn` | Dunkelroter Kreis um den Wirkenden, dann eine flache Kuppel aus Feuer |
 
-Nächster Schritt: Skill-Leiste, Orbs und XP-Balken an `IHero` binden, danach Flächen als Wirkung. Die Frage nach starren Teilen oder Skelett sollte vor den ersten eigenen Modellen beantwortet sein.
+<img src="images/hud_und_flaechen_3d.webp" alt="Das 3D-Testlevel mit Orbs, Skill-Leiste und XP-Balken: Frost Nova, Einschlag von Thunderbolt, Einschlag eines Meteors und der Tooltip von Fireball" width="860">
+
+Geprüft in der ersten Sitzung: Eine Laufzeitprüfung mit 70 Schritten im 3D-Level lief fünfmal hintereinander fehlerfrei. Sie deckt Anforderungen, Anlegen und Ablegen, die Regel für Zweihandwaffen, Werte aus dem Kern, Modelle an den Befestigungspunkten, Hieb, Schuss, Trank und Charakterbogen ab, dazu die Kampfabläufe aus dem Vergleich. Eine zweite Prüfung mit 14 Schritten lief dreimal fehlerfrei im 2D-Testlevel und deckt Charakterbogen, Inventar, Werteliste und Level-up ab. Die 547 Unit-Tests waren grün, dazu kam eine Sichtprüfung mit Bildschirmfotos.
+
+Geprüft in der zweiten Sitzung: Eine Laufzeitprüfung mit 78 Schritten im 3D-Level lief fünfmal hintereinander fehlerfrei. Sie deckt beide Orbs, die Skill-Leiste mit Auswahl, Tooltip und Abklingzeit, den XP-Balken, XP von Gegnern, Level-up, XP-Verlust beim Tod und den Respawn ab. Dazu kommen alle fünf Flächen-Skills mit je einem Ziel innerhalb und außerhalb des Radius, Lightning Strike, der Ton bei fehlendem Mana und der Befestigungspunkt fürs Amulett. Eine zweite Prüfung mit 24 Schritten lief dreimal fehlerfrei im 2D-Testlevel und deckt Orbs, Leiste, Auswahl, XP-Balken, Level-up und Tod ab. 13 neue Unit-Tests decken `HeroProgress` ab, insgesamt sind es 560. Dazu kam eine Sichtprüfung mit Bildschirmfotos. Eine dritte Prüfung mit 8 Schritten und Bildschirmfotos deckt den Level-up-Effekt ab.
+
+Offene Frage, Stand 29.09.2026:
+
+| Frage | Stand |
+|---|---|
+| Kamera orthogonal oder perspektivisch? | Vertagt. Beide lassen sich im Level mit F2 vergleichen. Verzogene Texturen gibt es nur perspektivisch. |
+
+Nächster Schritt: Level-up-Dialog und Todesbildschirm an `IHero` binden, danach Monster-Mods mit Elite und Namensschild.
 
 Bewusst offen gelassen:
 
-- Der Held ist aus starren Teilen gebaut, ohne Skelett. Ob die späteren Modelle starre Teile oder ein Skelett bekommen, ist offen. Die Befestigungspunkte tragen beides.
 - Gegner zeigen ihre Ausrüstung noch nicht.
-- Die Skill-Leiste fehlt in 3D. Angriff und Feuerball liegen fest auf linker und rechter Maustaste.
-- 3D-Szenen für Projektile stehen in `EffectScenes3D` unter der Id von Skill oder Waffe, solange die Resources auf 2D-Szenen zeigen.
+- Es gibt noch keine Item-Basis für Amulette. Der Platz wird mit dem ersten Amulett sichtbar, das ein Modell hat.
+- Attributspunkte lassen sich in 3D noch nicht ausgeben. Sie sammeln sich an, bis der Level-up-Dialog am 3D-Helden hängt.
+- Der 2D-Held rechnet XP und Level weiter selbst. `HeroProgress` treibt nur den 3D-Helden, die Regeln sind dieselben.
+- Gegner geben in 3D die XP aus ihrer Resource. Der Faktor für Elite und Rare Elite folgt mit den Monster-Mods.
+- 3D-Szenen für Projektile und Flächen stehen in `EffectScenes3D` unter der Id von Skill oder Waffe, solange die Resources auf 2D-Szenen zeigen.
 - Tunika und Gugel decken den Körper nur zu. Ein Modell, das Körperteile ersetzt, gibt es noch nicht.
+- Die Sterne des Level-up-Effekts benutzen ein Standardmaterial, weil der Shader des PS1-Looks weder Partikelfarben noch additives Mischen kennt. Ihre Eckpunkte rasten deshalb nicht ein. Bildzeilen und Farbtiefe wirken auch auf sie.
 
 ### M6: Prozedurale Level mit handgebauten Räumen (L)
 

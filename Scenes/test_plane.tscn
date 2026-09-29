@@ -178,7 +178,8 @@ offset_top = 23.0
 offset_right = 233.0
 offset_bottom = 177.0
 
-[node name="SegmentedXpBar" parent="CanvasLayer" unique_id=843338992 instance=ExtResource("14_mor0q")]
+[node name="SegmentedXpBar" parent="CanvasLayer" unique_id=843338992 node_paths=PackedStringArray("player") instance=ExtResource("14_mor0q")]
+player = NodePath("../../Environment/Player 2D")
 
 [node name="LevelUpDialog" parent="CanvasLayer" unique_id=2024950051 instance=ExtResource("15_jd7t1")]
 unique_name_in_owner = true

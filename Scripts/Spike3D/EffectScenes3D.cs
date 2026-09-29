@@ -8,9 +8,15 @@ public static class EffectScenes3D
 {
     private static readonly Dictionary<string, string> PathOfSkill = new()
     {
-        ["fireball"]  = "res://Scenes/Spike3D/Skills/fireball_3d.tscn",
-        ["fire_spit"] = "res://Scenes/Spike3D/Skills/fireball_3d.tscn",
-        ["short_bow"] = "res://Scenes/Spike3D/Skills/arrow_3d.tscn"
+        ["fireball"]         = "res://Scenes/Spike3D/Skills/fireball_3d.tscn",
+        ["fire_spit"]        = "res://Scenes/Spike3D/Skills/fireball_3d.tscn",
+        ["short_bow"]        = "res://Scenes/Spike3D/Skills/arrow_3d.tscn",
+        ["lightning_strike"] = "res://Scenes/Spike3D/Skills/lightning_bolt_3d.tscn",
+        ["frost_nova"]       = "res://Scenes/Spike3D/Skills/frost_nova_3d.tscn",
+        ["frost_pulse"]      = "res://Scenes/Spike3D/Skills/frost_nova_3d.tscn",
+        ["thunderbolt"]      = "res://Scenes/Spike3D/Skills/thunderbolt_3d.tscn",
+        ["meteor"]           = "res://Scenes/Spike3D/Skills/meteor_3d.tscn",
+        ["death_blast"]      = "res://Scenes/Spike3D/Skills/death_blast_3d.tscn"
     };
 
     private static readonly Dictionary<string, PackedScene> Loaded = new();

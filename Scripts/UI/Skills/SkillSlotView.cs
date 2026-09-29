@@ -1,7 +1,7 @@
 using Godot;
+using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
-using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Skills;
 
@@ -13,7 +13,7 @@ public partial class SkillSlotView : Control
     private SkillCooldowns     cooldowns;
     private TextureRect        icon;
     private Label              keyLabel;
-    private BaseUnit           owner;
+    private IHero              owner;
     private SkillResource      skill;
     private Label              timeLabel;
 
@@ -22,7 +22,7 @@ public partial class SkillSlotView : Control
     public event PickerRequestedEventHandler PickerRequested;
 
     //Die Leiste entsteht, während die Szene noch lädt. _Ready läuft dann erst später, deshalb holt Init die Knoten selbst
-    public void Init(int slot, string keyText, BaseUnit skillOwner)
+    public void Init(int slot, string keyText, IHero skillOwner)
     {
         icon            = GetNode<TextureRect>("%Icon");
         cooldownOverlay = GetNode<TextureProgressBar>("%CooldownOverlay");

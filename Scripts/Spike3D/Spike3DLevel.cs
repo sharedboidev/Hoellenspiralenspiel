@@ -26,12 +26,6 @@ public partial class Spike3DLevel : Node3D
     public double RespawnDelaySec { get; set; } = 2;
 
     [Export]
-    public ProgressBar LifeBar { get; set; }
-
-    [Export]
-    public ProgressBar ManaBar { get; set; }
-
-    [Export]
     public Label Status { get; set; }
 
     [Export]
@@ -44,11 +38,7 @@ public partial class Spike3DLevel : Node3D
         foreach (var marker in this.GetAllChildren<SpawnMarker3D>())
             SpawnGroupAt(marker);
 
-        Hero.LifeChanged += _ => ShowResources();
-        Hero.ManaChanged += ShowResources;
-        Hero.Died        += _ => GetTree().CreateTimer(RespawnDelaySec).Timeout += Hero.Respawn;
-
-        ShowResources();
+        Hero.Died += _ => GetTree().CreateTimer(RespawnDelaySec).Timeout += Hero.Respawn;
     }
 
     public override void _Process(double delta)
@@ -123,6 +113,8 @@ public partial class Spike3DLevel : Node3D
         enemies.Remove(enemy);
 
         CallGroupToArms(enemy);
+
+        Hero.GainExperience(enemy.XpGranted);
     }
 
     private void CallGroupToArms(Enemy3D caller)
@@ -131,21 +123,6 @@ public partial class Spike3DLevel : Node3D
         {
             if (enemy != caller && !enemy.IsInCombat && enemy.SpawnGroup == caller.SpawnGroup)
                 enemy.Provoke();
-        }
-    }
-
-    private void ShowResources()
-    {
-        if (LifeBar is not null)
-        {
-            LifeBar.MaxValue = Hero.LifeMaximum;
-            LifeBar.Value    = Hero.LifeCurrent;
-        }
-
-        if (ManaBar is not null)
-        {
-            ManaBar.MaxValue = Hero.ManaMaximum;
-            ManaBar.Value    = Hero.ManaCurrent;
         }
     }
 }

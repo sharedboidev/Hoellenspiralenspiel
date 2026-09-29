@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-547_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-560_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -296,10 +296,13 @@ Die 3D-Fassung läuft in einem eigenen Testlevel neben dem 2D-Spiel und benutzt 
 
 | Feature | Beschreibung |
 |---|---|
-| Held und Gegner | Laufen, Nahkampf, Fernkampf, Feuerball, Verfolgen, Aufgeben, Tod und Respawn |
+| Held und Gegner | Laufen, Nahkampf, Fernkampf, Verfolgen, Aufgeben, Tod und Respawn |
+| Skills | Alle fünf Skills des Helden und die vier der Monster, als Projektil oder als Fläche auf dem Boden |
+| Skill-Leiste, Orbs, XP-Balken | Dieselbe Oberfläche wie im 2D-Spiel, mit Auswahl per Rechtsklick und Tooltip |
+| XP und Level | Gegner geben XP, der Held steigt mit einem Sternenregen auf, der Tod kostet XP |
 | Wegfindung | Navigationsnetz aus den Wänden, zur Laufzeit gebacken |
 | PS1-Look | Wackelnde Eckpunkte, verzogene Texturen, 240 Bildzeilen, 15 Bit Farbtiefe mit Punktmuster |
-| Sichtbare Ausrüstung | Angelegte Waffen, Schilde und Rüstung erscheinen am Helden |
+| Sichtbare Ausrüstung | Angelegte Waffen, Schilde und Rüstung erscheinen am Helden. Sichtbar sind alle Plätze außer den Ringen. |
 | Inventar und Charakterbogen | Dieselbe Oberfläche wie im 2D-Spiel |
 | Platzhalter | Alle Modelle bestehen aus Grundkörpern, die Texturen sind erzeugt |
 
@@ -307,7 +310,11 @@ Die 3D-Fassung läuft in einem eigenen Testlevel neben dem 2D-Spiel und benutzt 
 <img src="docs/images/ausruestung_3d_varianten.webp" alt="Der 3D-Held ohne Ausrüstung, mit Schwert und Schild, mit Stab und beim Schuss mit dem Bogen" width="720">
 </div>
 
-Es fehlen noch Skill-Leiste, Flächenzauber, Monster-Mods, Beute, XP und Speichern. Der Plan steht in der [Roadmap](docs/ROADMAP.md) unter M5.5.
+<div align="center">
+<img src="docs/images/hud_und_flaechen_3d.webp" alt="Das 3D-Testlevel mit Orbs, Skill-Leiste und XP-Balken: Frost Nova, Einschlag von Thunderbolt, Einschlag eines Meteors und der Tooltip von Fireball" width="720">
+</div>
+
+Es fehlen noch Level-up-Dialog, Todesbildschirm, Monster-Mods, Beute und Speichern. Der Plan steht in der [Roadmap](docs/ROADMAP.md) unter M5.5.
 
 <details>
 <summary>So startest du das 3D-Testlevel</summary>
@@ -317,8 +324,8 @@ Im Godot-Editor die Szene `Scenes/Spike3D/spike_3d.tscn` öffnen und mit `F6` st
 | Taste | Aktion |
 |---|---|
 | `W` `A` `S` `D` | Bewegen |
-| Linke Maustaste | Attack mit der angelegten Waffe |
-| Rechte Maustaste | Fireball |
+| Linke und rechte Maustaste, `Q` `E` `R` `F`, `1` bis `4` | Skill auf diesem Platz der Leiste |
+| Rechtsklick auf einen Platz | Platz neu belegen |
 | `B` | Charakterbogen und Inventar, der Held hat alle neun Items dabei |
 | `F1` | PS1-Look an und aus |
 | `F2` | Kamera orthogonal oder perspektivisch |
@@ -386,7 +393,7 @@ flowchart LR
 | ✅ | **M4** Items und Speichern | Items als Daten, Inventar-Modell, Schild mit Block, Speichern und Laden | mittel |
 | ✅ | **M5** Gegner-KI | Gegner als Daten, Zustandsmaschine, Wegfindung, Level, Elite mit Mods | mittel |
 | ✅ | **Entscheidung** | 3D im Look der PlayStation 1, entschieden nach dem [Vergleich](docs/VERGLEICH_2D_3D.md) | klein |
-| ⏭️ | **M5.5** Umstellung auf 3D | Die 3D-Fassung lernt alles, was die 2D-Fassung kann. Held, Gegner, Wegfindung, PS1-Look und sichtbare Ausrüstung stehen | mittel |
+| ⏭️ | **M5.5** Umstellung auf 3D | Die 3D-Fassung lernt alles, was die 2D-Fassung kann. Held, Gegner, Wegfindung, PS1-Look, sichtbare Ausrüstung, Skill-Leiste, Orbs, XP und alle Skills stehen | mittel |
 | ⬜ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
 | ⬜ | **M7** Hub | Stadt, Abstieg, Menüs, Truhe, Händler, Einstellungen | mittel |
 | ⬜ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
@@ -455,8 +462,8 @@ Hoellenspiralenspiel
 │   │   ├── Spatial     Raster für die Suche nach Einheiten in der Nähe
 │   │   ├── Saving      Format des Spielstands, Lesen und Schreiben als JSON
 │   │   ├── Rng         Zufallsquelle mit Seed
-│   │   └── Progression XP-Verlust beim Tod
-│   ├── Spike3D         Die 3D-Fassung: Held, Gegner, Projektil, Wegfindung, PS1-Look, sichtbare Ausrüstung
+│   │   └── Progression XP-Tabelle, Level und Attributspunkte, XP-Verlust beim Tod
+│   ├── Spike3D         Die 3D-Fassung: Held, Gegner, Projektil, Fläche, Wegfindung, PS1-Look, sichtbare Ausrüstung
 │   ├── Units           Spieler, Gegner, Pfadfolger
 │   ├── Skills          Ausführung der Skills, Projektil und Fläche
 │   ├── Items           Bibliothek aller Item-Basen

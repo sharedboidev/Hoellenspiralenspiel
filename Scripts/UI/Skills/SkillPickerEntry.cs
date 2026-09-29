@@ -1,16 +1,16 @@
 using Godot;
+using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Resources.Skills;
-using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Skills;
 
 public partial class SkillPickerEntry : Button
 {
-    private BaseUnit caster;
+    private IHero caster;
 
     public SkillResource Skill { get; private set; }
 
-    public void Init(SkillResource skill, BaseUnit skillCaster)
+    public void Init(SkillResource skill, IHero skillCaster)
     {
         Skill  = skill;
         caster = skillCaster;
