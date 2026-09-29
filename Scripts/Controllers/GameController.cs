@@ -6,6 +6,7 @@ using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.UI.Buttons;
 using Hoellenspiralenspiel.Scripts.UI.Character;
 using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Scripts.World.Levels;
 
 namespace Hoellenspiralenspiel.Scripts.Controllers;
 
@@ -26,6 +27,13 @@ public partial class GameController : Node
 
     [Export]
     public double SaveDelaySec { get; set; } = 1.0;
+
+    //Beim Erkunden ändert sich die Karte mit jedem Schritt, geschrieben wird deshalb seltener
+    [Export]
+    public double ExplorationSaveDelaySec { get; set; } = 10.0;
+
+    [Export]
+    public Descent Descent { get; set; }
 
     public override void _Ready()
     {
@@ -71,6 +79,13 @@ public partial class GameController : Node
         SaveGameMapper.CaptureLoadout(Hero.Loadout, save);
         SaveGameMapper.CaptureItems(Hero.Items, save);
 
+        if (Descent is not null)
+        {
+            Descent.RememberExploration();
+
+            SaveGameMapper.CaptureDescent(Descent.State, save);
+        }
+
         SaveGameStore.Save(save);
     }
 
@@ -107,6 +122,9 @@ public partial class GameController : Node
 
         if (Hero.AttributePoints > 0)
             ShowSpendablePoints();
+
+        if (Descent is not null && SaveGameMapper.RestoreDescent(save, Descent.State) && Descent.State.IsBelowGround)
+            Descent.Enter(Descent.State.Depth);
     }
 
     private void WatchForChanges()
@@ -115,16 +133,25 @@ public partial class GameController : Node
         Hero.Loadout.SlotChanged += _ => RequestSave();
         Hero.XpChanged           += RequestSave;
         Hero.Died                += _ => RequestSave();
+
+        if (Descent is null)
+            return;
+
+        Descent.LevelEntered += RequestSave;
+        Descent.Explored     += () => RequestSave(ExplorationSaveDelaySec);
     }
 
-    //Mehrere Änderungen kurz hintereinander ergeben einen einzigen Schreibvorgang
     private void RequestSave()
+        => RequestSave(SaveDelaySec);
+
+    //Mehrere Änderungen kurz hintereinander ergeben einen einzigen Schreibvorgang
+    private void RequestSave(double delaySec)
     {
-        if (isSaveDue)
+        if (isSaveDue && secUntilSave <= delaySec)
             return;
 
         isSaveDue    = true;
-        secUntilSave = SaveDelaySec;
+        secUntilSave = delaySec;
     }
 
     private void SubscribeToEvents()

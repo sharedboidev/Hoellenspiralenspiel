@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="LevelThemeResource" format=3 uid="uid://dwpd2tdbxay70"]
+
+[ext_resource type="Script" uid="uid://0v3hroisjaei" path="res://Resources/Levels/LevelThemeResource.cs" id="1_theme"]
+[ext_resource type="Script" uid="uid://bn7bb1uifndmt" path="res://Resources/Levels/EnemyPoolEntry.cs" id="2_entry"]
+[ext_resource type="Resource" path="res://Resources/Enemies/blue_blob.tres" id="3_blue"]
+[ext_resource type="Resource" path="res://Resources/Enemies/yellow_blob.tres" id="4_yellow"]
+[ext_resource type="Resource" path="res://Resources/Enemies/test_enemy.tres" id="5_caster"]
+[ext_resource type="PackedScene" path="res://Scenes/Rooms/start_room.tscn" id="10_start"]
+[ext_resource type="PackedScene" path="res://Scenes/Rooms/exit_room.tscn" id="11_exit"]
+[ext_resource type="PackedScene" path="res://Scenes/Rooms/chamber.tscn" id="12_chamber"]
+[ext_resource type="PackedScene" path="res://Scenes/Rooms/hall.tscn" id="13_hall"]
+[ext_resource type="PackedScene" path="res://Scenes/Rooms/gallery.tscn" id="14_gallery"]
+[ext_resource type="PackedScene" path="res://Scenes/Rooms/shrine.tscn" id="15_shrine"]
+[ext_resource type="Texture2D" uid="uid://bp4uxrb2dhk7x" path="res://Textures/World/floor_stone.png" id="20_floor"]
+[ext_resource type="Texture2D" uid="uid://vo27wofvjp82" path="res://Textures/World/wall_brick.png" id="21_wall"]
+
+[sub_resource type="Resource" id="Pool_blue"]
+script = ExtResource("2_entry")
+Enemy = ExtResource("3_blue")
+Weight = 3.0
+MinGroupSize = 3
+MaxGroupSize = 5
+
+[sub_resource type="Resource" id="Pool_yellow"]
+script = ExtResource("2_entry")
+Enemy = ExtResource("4_yellow")
+Weight = 2.0
+
+[sub_resource type="Resource" id="Pool_caster"]
+script = ExtResource("2_entry")
+Enemy = ExtResource("5_caster")
+MinAreaLevel = 3
+MinGroupSize = 1
+MaxGroupSize = 2
+
+[resource]
+script = ExtResource("1_theme")
+Id = "test_circle"
+DisplayName = "Testkreis"
+Rooms = Array[PackedScene]([ExtResource("10_start"), ExtResource("11_exit"), ExtResource("12_chamber"), ExtResource("13_hall"), ExtResource("14_gallery"), ExtResource("15_shrine")])
+Enemies = Array[ExtResource("2_entry")]([SubResource("Pool_blue"), SubResource("Pool_yellow"), SubResource("Pool_caster")])
+FloorTexture = ExtResource("20_floor")
+WallTexture = ExtResource("21_wall")

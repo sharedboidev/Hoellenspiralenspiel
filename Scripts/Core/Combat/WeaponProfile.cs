@@ -14,11 +14,12 @@ public sealed record WeaponProfile(float      MinDamage,
                                    float      ProjectileSpeed = 0f)
 {
     public const float DefaultMeleeRange = 100f;
+    public const float UnarmedRange      = 40f;
 
     //Der Treffer landet noch, wenn das Ziel während des Ausholens ein Stück aus der Reichweite gerückt ist
     public const float RangeTolerance = 1.25f;
 
-    public static WeaponProfile Unarmed { get; } = new(1, 3, 1.2f, 5, DamageType.Crush, DefaultMeleeRange);
+    public static WeaponProfile Unarmed { get; } = new(1, 3, 1.2f, 5, DamageType.Crush, UnarmedRange);
 
     public float Reach => Range * RangeTolerance;
 

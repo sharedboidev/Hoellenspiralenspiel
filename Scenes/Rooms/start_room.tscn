@@ -1,0 +1,39 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/World/Levels/RoomTemplate.cs" id="room"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/RoomDoor.cs" id="door"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/HeroStart.cs" id="start"]
+
+[sub_resource type="PlaneMesh" id="Mesh_preview"]
+size = Vector2(12, 12)
+
+[node name="StartRoom" type="Node3D"]
+script = ExtResource("room")
+WidthCells = 3
+HeightCells = 3
+Role = 1
+
+[node name="EditorPreview" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh_preview")
+
+[node name="Doors" type="Node3D" parent="."]
+
+[node name="North1" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+script = ExtResource("door")
+
+[node name="East1" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
+script = ExtResource("door")
+
+[node name="South1" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6)
+script = ExtResource("door")
+
+[node name="West1" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
+script = ExtResource("door")
+
+[node name="HeroStart" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("start")

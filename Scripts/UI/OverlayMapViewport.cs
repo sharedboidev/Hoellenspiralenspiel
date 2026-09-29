@@ -18,12 +18,22 @@ public partial class OverlayMapViewport : SubViewport
     [Export]
     public float DistanceMeters { get; set; } = 80f;
 
+    //Unter der Erde zeigt die gezeichnete Karte den Grundriss
+    public bool IsSuspended { get; set; }
+
     public override void _Ready()
         => GetParent<SubViewportContainer>().Visible = false;
 
     public override void _Process(double delta)
     {
         var container = GetParent<SubViewportContainer>();
+
+        if (IsSuspended)
+        {
+            container.Visible = false;
+
+            return;
+        }
 
         if (Input.IsActionJustPressed(InputActions.ToggleOverlayMap))
             container.Visible = !container.Visible;

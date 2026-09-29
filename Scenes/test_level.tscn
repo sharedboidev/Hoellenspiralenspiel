@@ -37,6 +37,14 @@
 [ext_resource type="Resource" uid="uid://dhlgnahebbsll" path="res://Resources/Items/Weapons/wooden_staff.tres" id="item_wooden_staff"]
 [ext_resource type="Resource" uid="uid://cy1t8bhyfu6h1" path="res://Resources/Items/Armors/wool_gloves.tres" id="item_wool_gloves"]
 [ext_resource type="Script" path="res://Scripts/UI/LootLabels.cs" id="31_loot_labels"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/Descent.cs" id="32_descent"]
+[ext_resource type="Resource" path="res://Resources/Levels/test_circle.tres" id="33_theme"]
+[ext_resource type="Script" path="res://Scripts/UI/LevelMap.cs" id="34_level_map"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/WallSegment.cs" id="35_wall_segment"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/RoomZone.cs" id="36_room_zone"]
+
+[sub_resource type="BoxShape3D" id="Shape_yard_zone"]
+size = Vector3(8, 2.5, 8)
 
 [sub_resource type="Environment" id="Env_level"]
 background_mode = 1
@@ -74,58 +82,6 @@ shader_parameter/snap = 1.0
 shader_parameter/snap_resolution = Vector2(426, 240)
 shader_parameter/affine = 1.0
 
-[sub_resource type="BoxShape3D" id="Shape_border_x"]
-size = Vector3(60.5, 1, 0.5)
-
-[sub_resource type="BoxMesh" id="Mesh_border_x"]
-size = Vector3(60.5, 1, 0.5)
-subdivide_width = 29
-
-[sub_resource type="ShaderMaterial" id="Mat_wall"]
-render_priority = 0
-shader = ExtResource("13_surface")
-shader_parameter/albedo = Color(1, 1, 1, 1)
-shader_parameter/albedo_texture = ExtResource("16_wall")
-shader_parameter/uv_scale = Vector2(1, 1)
-shader_parameter/world_uv_scale = 0.25
-shader_parameter/tint = Vector3(1, 1, 1)
-shader_parameter/emission = Color(0, 0, 0, 1)
-shader_parameter/emission_energy = 0.0
-shader_parameter/snap = 1.0
-shader_parameter/snap_resolution = Vector2(426, 240)
-shader_parameter/affine = 1.0
-
-[sub_resource type="BoxShape3D" id="Shape_border_z"]
-size = Vector3(0.5, 1, 60.5)
-
-[sub_resource type="BoxMesh" id="Mesh_border_z"]
-size = Vector3(0.5, 1, 60.5)
-subdivide_depth = 29
-
-[sub_resource type="BoxShape3D" id="Shape_yard_long_z"]
-size = Vector3(0.5, 2.5, 8.5)
-
-[sub_resource type="BoxMesh" id="Mesh_yard_long_z"]
-size = Vector3(0.5, 2.5, 8.5)
-subdivide_height = 1
-subdivide_depth = 5
-
-[sub_resource type="BoxShape3D" id="Shape_yard_long_x"]
-size = Vector3(8.5, 2.5, 0.5)
-
-[sub_resource type="BoxMesh" id="Mesh_yard_long_x"]
-size = Vector3(8.5, 2.5, 0.5)
-subdivide_width = 5
-subdivide_height = 1
-
-[sub_resource type="BoxShape3D" id="Shape_yard_gate"]
-size = Vector3(0.5, 2.5, 3)
-
-[sub_resource type="BoxMesh" id="Mesh_yard_gate"]
-size = Vector3(0.5, 2.5, 3)
-subdivide_height = 1
-subdivide_depth = 2
-
 [sub_resource type="ShaderMaterial" id="Mat_screen"]
 shader = ExtResource("14_screen")
 shader_parameter/resolution = Vector2(426, 240)
@@ -137,11 +93,12 @@ background_mode = 1
 ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
 
-[node name="TestLevel" type="Node3D" unique_id=528324007 node_paths=PackedStringArray("Enemies", "Status", "Look")]
+[node name="TestLevel" type="Node3D" unique_id=528324007 node_paths=PackedStringArray("Enemies", "Status", "Look", "Descent")]
 script = ExtResource("1_level")
 Enemies = NodePath("EnemyController")
 Status = NodePath("Hud/Margin/Rows/Status")
 Look = NodePath("Ps1Look")
+Descent = NodePath("Descent")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=416123770]
 environment = SubResource("Env_level")
@@ -170,121 +127,93 @@ mesh = SubResource("Mesh_floor")
 surface_material_override/0 = SubResource("Mat_floor")
 
 [node name="BorderNorth" type="StaticBody3D" parent="Environment" unique_id=1423845834]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -30)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -30)
 collision_layer = 8
 collision_mask = 0
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/BorderNorth" unique_id=798563887]
-shape = SubResource("Shape_border_x")
-debug_fill = false
-
-[node name="Mesh" type="MeshInstance3D" parent="Environment/BorderNorth" unique_id=2043489551]
-mesh = SubResource("Mesh_border_x")
-surface_material_override/0 = SubResource("Mat_wall")
+script = ExtResource("35_wall_segment")
+Length = 60.5
+Height = 1.0
+Texture = ExtResource("16_wall")
 
 [node name="BorderSouth" type="StaticBody3D" parent="Environment" unique_id=396444935]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 30)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 30)
 collision_layer = 8
 collision_mask = 0
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/BorderSouth" unique_id=1549913114]
-shape = SubResource("Shape_border_x")
-debug_fill = false
-
-[node name="Mesh" type="MeshInstance3D" parent="Environment/BorderSouth" unique_id=1301956464]
-mesh = SubResource("Mesh_border_x")
-surface_material_override/0 = SubResource("Mat_wall")
+script = ExtResource("35_wall_segment")
+Length = 60.5
+Height = 1.0
+Texture = ExtResource("16_wall")
 
 [node name="BorderWest" type="StaticBody3D" parent="Environment" unique_id=335362808]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0.5, 0)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -30, 0, 0)
 collision_layer = 8
 collision_mask = 0
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/BorderWest" unique_id=136927008]
-shape = SubResource("Shape_border_z")
-debug_fill = false
-
-[node name="Mesh" type="MeshInstance3D" parent="Environment/BorderWest" unique_id=1253498221]
-mesh = SubResource("Mesh_border_z")
-surface_material_override/0 = SubResource("Mat_wall")
+script = ExtResource("35_wall_segment")
+Length = 60.5
+Height = 1.0
+Texture = ExtResource("16_wall")
 
 [node name="BorderEast" type="StaticBody3D" parent="Environment" unique_id=1373988942]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0.5, 0)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 30, 0, 0)
 collision_layer = 8
 collision_mask = 0
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/BorderEast" unique_id=99109909]
-shape = SubResource("Shape_border_z")
-debug_fill = false
-
-[node name="Mesh" type="MeshInstance3D" parent="Environment/BorderEast" unique_id=2135307116]
-mesh = SubResource("Mesh_border_z")
-surface_material_override/0 = SubResource("Mat_wall")
+script = ExtResource("35_wall_segment")
+Length = 60.5
+Height = 1.0
+Texture = ExtResource("16_wall")
 
 [node name="YardWest" type="StaticBody3D" parent="Environment" unique_id=1394506611]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.25, 0)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 10, 0, 0)
 collision_layer = 8
 collision_mask = 0
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/YardWest" unique_id=2005084227]
-shape = SubResource("Shape_yard_long_z")
-debug_fill = false
-
-[node name="Mesh" type="MeshInstance3D" parent="Environment/YardWest" unique_id=85878288]
-mesh = SubResource("Mesh_yard_long_z")
-surface_material_override/0 = SubResource("Mat_wall")
+script = ExtResource("35_wall_segment")
+Length = 8.5
+Texture = ExtResource("16_wall")
 
 [node name="YardNorth" type="StaticBody3D" parent="Environment" unique_id=1077753738]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 1.25, -4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, -4)
 collision_layer = 8
 collision_mask = 0
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/YardNorth" unique_id=1430734260]
-shape = SubResource("Shape_yard_long_x")
-debug_fill = false
-
-[node name="Mesh" type="MeshInstance3D" parent="Environment/YardNorth" unique_id=1887593227]
-mesh = SubResource("Mesh_yard_long_x")
-surface_material_override/0 = SubResource("Mat_wall")
+script = ExtResource("35_wall_segment")
+Length = 8.5
+Texture = ExtResource("16_wall")
 
 [node name="YardSouth" type="StaticBody3D" parent="Environment" unique_id=461081889]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 1.25, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 4)
 collision_layer = 8
 collision_mask = 0
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/YardSouth" unique_id=1426852088]
-shape = SubResource("Shape_yard_long_x")
-debug_fill = false
-
-[node name="Mesh" type="MeshInstance3D" parent="Environment/YardSouth" unique_id=697135853]
-mesh = SubResource("Mesh_yard_long_x")
-surface_material_override/0 = SubResource("Mat_wall")
+script = ExtResource("35_wall_segment")
+Length = 8.5
+Texture = ExtResource("16_wall")
 
 [node name="YardGateNorth" type="StaticBody3D" parent="Environment" unique_id=1407749560]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1.25, -2.75)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 18, 0, -2.75)
 collision_layer = 8
 collision_mask = 0
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/YardGateNorth" unique_id=543137195]
-shape = SubResource("Shape_yard_gate")
-debug_fill = false
-
-[node name="Mesh" type="MeshInstance3D" parent="Environment/YardGateNorth" unique_id=176958842]
-mesh = SubResource("Mesh_yard_gate")
-surface_material_override/0 = SubResource("Mat_wall")
+script = ExtResource("35_wall_segment")
+Length = 3.0
+Texture = ExtResource("16_wall")
 
 [node name="YardGateSouth" type="StaticBody3D" parent="Environment" unique_id=1994101974]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1.25, 2.75)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 18, 0, 2.75)
 collision_layer = 8
 collision_mask = 0
+script = ExtResource("35_wall_segment")
+Length = 3.0
+Texture = ExtResource("16_wall")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/YardGateSouth" unique_id=1492330128]
-shape = SubResource("Shape_yard_gate")
+[node name="YardZone" type="Area3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 0)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+script = ExtResource("36_room_zone")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/YardZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+shape = SubResource("Shape_yard_zone")
 debug_fill = false
-
-[node name="Mesh" type="MeshInstance3D" parent="Environment/YardGateSouth" unique_id=2127332573]
-mesh = SubResource("Mesh_yard_gate")
-surface_material_override/0 = SubResource("Mat_wall")
 
 [node name="LevelNavigation" type="NavigationRegion3D" parent="." unique_id=1081918226 node_paths=PackedStringArray("SourceRoot")]
 script = ExtResource("2_navigation")
@@ -392,7 +321,8 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "WASD laufen · Skills über die Leiste · Rechtsklick auf einen Platz belegt ihn
 B Inventar und Ausrüstung · Rechtsklick auf ein Item legt es an · Tab Karte · Alt Namen der Beute
-F1 PS1-Look · F2 Kamera · F3 Bildzeilen · F4 Schatten"
+F1 PS1-Look · F2 Kamera · F3 Bildzeilen · F4 Schatten · F5 ganze Karte
+Die Kellertür führt hinab"
 
 [node name="LifeOrb" parent="Hud" unique_id=1868031920 node_paths=PackedStringArray("player") instance=ExtResource("23_orb")]
 player = NodePath("../../Hero")
@@ -456,6 +386,20 @@ projection = 1
 size = 70.0
 far = 200.0
 
+[node name="LevelMap" type="Control" parent="Hud" node_paths=PackedStringArray("Descent", "Hero", "SurfaceMap")]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("34_level_map")
+Descent = NodePath("../../Descent")
+Hero = NodePath("../../Hero")
+SurfaceMap = NodePath("../OverlayMapContainer/OverlayMapViewport")
+
 [node name="LevelUpDialog" parent="Hud" unique_id=171827443 node_paths=PackedStringArray("player") instance=ExtResource("28_level_up")]
 unique_name_in_owner = true
 visible = false
@@ -478,7 +422,19 @@ EnemyContainer = NodePath("../Enemies")
 SpawnMarkers = NodePath("../SpawnMarkers")
 Lootsystem = NodePath("../Lootsystem")
 
-[node name="GameController" type="Node" parent="." unique_id=1893615000 node_paths=PackedStringArray("Hero")]
+[node name="GameController" type="Node" parent="." unique_id=1893615000 node_paths=PackedStringArray("Hero", "Descent")]
 script = ExtResource("7_game")
 Hero = NodePath("../Hero")
 SavingEnabled = false
+Descent = NodePath("../Descent")
+
+[node name="Descent" type="Node" parent="." node_paths=PackedStringArray("Hero", "Enemies", "Navigation", "LevelRoot", "Entrance", "Surroundings", "Moonlight")]
+script = ExtResource("32_descent")
+Hero = NodePath("../Hero")
+Enemies = NodePath("../EnemyController")
+Navigation = NodePath("../LevelNavigation")
+LevelRoot = NodePath("../Environment")
+Entrance = NodePath("../CellarDoor")
+Theme = ExtResource("33_theme")
+Surroundings = NodePath("../WorldEnvironment")
+Moonlight = NodePath("../Moonlight")

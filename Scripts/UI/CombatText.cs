@@ -55,7 +55,7 @@ public static class CombatText
     {
         var scene = target.GetTree()?.CurrentScene;
 
-        if (scene is null)
+        if (scene is null || !target.IsSeen)
             return;
 
         var jitter = new Vector3((float)GD.RandRange(-JitterMeters, JitterMeters), (float)GD.RandRange(-JitterMeters / 2, JitterMeters / 2), 0);

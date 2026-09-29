@@ -1,11 +1,11 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
-Stand: 29.09.2026. M0 bis M5.5 liegen auf `master`, dazu die Nachträge zu M2, M3 und M5.5: Bleed stapelt, Schadenswerte im Tooltip, ausgedünnte Kommentare und die Rückmeldungen aus dem ersten Spielen.
+Stand: 29.09.2026. M0 bis M5.5 liegen auf `master`, dazu die Nachträge zu M2, M3 und M5.5: Bleed stapelt, Schadenswerte im Tooltip, ausgedünnte Kommentare und die Rückmeldungen aus dem ersten Spielen. M6 ist auf dem Branch `master_ProceduralLevels` umgesetzt.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen, die Hauptszene ist das 3D-Testlevel.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code samt Szenen. Die Zeilenzahl aus der ersten Analyse, rund 5.500, galt für die 2D-Fassung.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 bis M5.5 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 bis M6 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -17,12 +17,17 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Spielstruktur | Hub (Stadt) plus Abstieg in einen Höllenkreis mit mehreren Ebenen |
 | Leveldesign | Etwa 90 % prozedural, dazu handgebaute Räume und Event-Locations, die gezielt eingestreut werden |
 | Multiplayer | Singleplayer zuerst, Koop soll später nachrüstbar bleiben |
+| Kamera | Perspektivisch. Entschieden am 29.09.2026 vor M6. |
+| Grundriss | Handgebaute Räume auf einem Raster, der Generator zieht Gänge dazwischen. Entschieden am 29.09.2026. |
+| Wegführung | Verzweigt mit Schleifen: mehrere Wege und Rundläufe, der Ausgang muss gesucht werden. Entschieden am 29.09.2026. |
+| Mauern | Jede Mauer hat einen Sockel und Mauerwerk darüber. Steht sie zwischen Held und Kamera, wird das Mauerwerk im Lichtradius durchsichtig. Entschieden am 29.09.2026. |
+| Räume | Ein Raum, in dem der Held nicht steht, bleibt verschlossen und dunkel. Licht scheint nicht durch Mauern, Bewegung im Raum zeigt sich erst mit Sichtkontakt. Entschieden am 29.09.2026. |
 
 ## 1. Was schon umgesetzt ist
 
 | Bereich | Stand | Abgleich mit dem PDF |
 |---|---|---|
-| Isometrische Perspektive | Testlevel in 3D mit Boden, Mauern und ummauertem Hof, gesehen von schräg oben | Entspricht dem PDF, aber nur ein Testlevel |
+| Isometrische Perspektive | Testlevel in 3D mit Boden, Mauern und ummauertem Hof, gesehen von schräg oben. Seit M6 führt die Kellertür in erzeugte Ebenen. | Entspricht dem PDF |
 | Attribute | Alle fünf Attribute mit abgeleiteten Werten und Obergrenzen | Obergrenzen stimmen exakt. Wachstum ist logistisch statt beschränkt. Lichtradius fehlt. |
 | Leben und Mana | Basisformeln, Regeneration, Orbs mit Shader | Formeln stimmen exakt |
 | Modifier-System | Flat, Percentage (increased) und More, sauber getrennt | Trägt das ganze Stat-Konzept |
@@ -32,15 +37,16 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen. Seit dem Nachtrag zu M5.5 liegt Beute in einem Gitter und trägt Schilder mit dem Namen des Items. | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle. Seit M5 bestimmt das Monsterlevel das Itemlevel. |
 | Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. Seit M5.5 hängt sie an der Schnittstelle `IHero` und läuft auch in 3D. |
 | Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. Seit M5.5 ist sie in 3D am Helden zu sehen. |
-| Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch | Nicht im PDF |
+| Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch. Seit M6 auch der Abstieg mit Seed, Tiefe und erkundeter Karte. | Nicht im PDF |
 | Leveling | XP-Tabelle bis Level 100, Level-up-Effekt, Attributspunkte, XP-Balken. Seit M5.5 liegt die Regel für XP, Level und Punkte im Kern und treibt den 3D-Helden. | Nicht im PDF, funktioniert |
 | Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen, Tooltip mit DPS | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
 | Kampf | Zentrale Trefferauflösung, Nahkampf, Schadensarten mit Effekten, Statuseffekte, Tod und Respawn | Seit M2. Frost-Effekt war im PDF leer und ist jetzt Verlangsamung. |
 | Schadensminderung | Rüstungsformel, Resistenzen, Dodge, Parry und Block für alle Einheiten | Seit M4 bringen Schild, Stab und Schwert Block und Parry mit |
 | Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler. Seit M5 sind sie Resources mit Level, Ausrüstung und Verhalten, dazu Elite und Rare Elite mit Mods aus Bausteinen. Seit dem Nachtrag zu M5.5 kollidieren sie miteinander und spawnen verstreut. | Nur Blobs und ein Testgegner |
 | Wegfindung | Seit M5: Navigationsnetz pro Level, zur Laufzeit gebacken. Gegner und Held laufen um Wände herum | Nicht im PDF |
-| Atmosphäre | Der Held trägt sein Licht, die Umgebung ist dunkel und neblig, dazu der PS1-Look und die Overlay-Karte | Passt zum düsteren Vibe |
+| Atmosphäre | Der Held trägt sein Licht, die Umgebung ist dunkel und neblig, dazu der PS1-Look und die Overlay-Karte. Seit M6 zeigt unter der Erde eine gezeichnete Karte, was der Held erkundet hat. | Passt zum düsteren Vibe |
 | 3D | Seit dem 29.09.2026 läuft das ganze Spiel in 3D auf dem unveränderten Kern. Alle Modelle sind Platzhalter aus Grundkörpern. | Offene Frage aus dem PDF, entschieden für 3D |
+| Level | Seit M6: Ebenen aus handgebauten Räumen und erzeugten Gängen, gesteuert über einen Seed. Ein Thema legt Räume, Aussehen und Gegnerpool fest. | Das PDF nennt nur die Kreise. Es gibt ein Testthema, noch keinen Höllenkreis. |
 
 ## 2. Was an kritischen Systemen fehlt
 
@@ -50,13 +56,13 @@ Ohne diese Systeme gibt es kein spielbares Spiel, nur eine Testszene.
 2. **Nahkampf.** Erledigt in M2. Vorher existierten Waffenwerte nur im Tooltip.
 3. **Gegnerangriffe.** Erledigt in M2. Vorher schadeten die Blobs nur durch Berührung.
 4. **Speichern und Laden.** Erledigt in M4. Vorher gab es keine Persistenz für Charakter, Inventar oder Fortschritt.
-5. **Spielstruktur.** Hub, Levelwechsel, Hauptmenü, Pausenmenü und Freischaltung fehlen. Die Kellertür schreibt nur eine Logzeile.
-6. **Levelgenerierung.** Es gibt nur ein handgebautes Testlevel.
+5. **Spielstruktur.** Hub, Hauptmenü, Pausenmenü und Freischaltung fehlen. Seit M6 führt die Kellertür hinab, und der Ausgang jeder Ebene führt eine Ebene tiefer. Einen Weg zurück gibt es noch nicht.
+6. **Levelgenerierung.** Erledigt in M6. Vorher gab es nur das handgebaute Testlevel.
 7. **Wegfindung.** Erledigt in M5. Vorher liefen Gegner in gerader Linie und blieben an Wänden hängen.
 8. **Statuseffekte.** Erledigt in M2: Bleed, Burn, Shock und Chill. Bleed und Burn stapeln. Die leeren Schadensart-Klassen sind durch eine Aufzählung im Kern ersetzt.
 9. **Parry, Block, Krit aus Stats.** Erledigt in M2. Die Trefferauflösung wertet alle drei aus.
 10. **Skill-Erwerb.** Seit M3 sind Skills Daten und die Leiste ist frei belegbar. Der Held kennt vorerst alle Skills. Klassen und Skill-Fortschritt fehlen.
-11. **Skalierung.** Seit M5 hat jede Karte ein Bereichslevel, jedes Monster ein Level, und das Monsterlevel bestimmt das Itemlevel. Das Testlevel hat Bereichslevel 1. Ein Bereichslevel, das mit der Tiefe steigt, kommt mit M6 und M7.
+11. **Skalierung.** Seit M5 hat jede Karte ein Bereichslevel, jedes Monster ein Level, und das Monsterlevel bestimmt das Itemlevel. Das Testlevel hat Bereichslevel 1. Seit M6 steigt das Bereichslevel mit jeder Ebene um 1.
 12. **Inhalt.** Kein einziger Höllenkreis, kein Boss, kein Intro.
 13. **Einstellungen.** Auflösung, Tastenbelegung und Lautstärke sind nicht einstellbar.
 14. **Tests.** Vom Testprojekt existiert nur ein `obj`-Ordner ohne Quellcode.
@@ -117,7 +123,7 @@ Hinweise zu den Korrekturen:
 
 | Nr. | Problem | Folge |
 |---|---|---|
-| A1 | Weitgehend behoben in M5.5: Held und Controller kommen als Felder aus dem Inspector, feste Namen brauchen nur noch Tooltip, Dialoge und Todesbildschirm. Vorher suchten rund 15 Stellen Spieler, Controller oder Tooltip über feste Namen in der aktuellen Szene. Skills gehören seit M3 nicht mehr dazu, Items und Lootbags seit M4, Gegner seit M5, der XP-Balken seit M5.5. Der `EnemyController` selbst sucht Held und Gegner-Container weiter über feste Namen. | Jedes neue Level muss exakt wie das Testlevel aufgebaut sein |
+| A1 | Behoben in M5.5 und M6. Vorher suchten rund 15 Stellen Spieler, Controller oder Tooltip über feste Namen in der aktuellen Szene. Seit M5.5 kommen Held, Controller und Gegner-Container als Felder aus dem Inspector. Seit M6 ist eine Ebene nur noch Inhalt, der unter den Knoten `Environment` gebaut wird. Held, Oberfläche und Controller bleiben dieselben. Tooltip, Dialoge und Todesbildschirm finden sich weiter über ihren Namen, das schränkt Level nicht mehr ein. | Jedes neue Level musste exakt wie das Testlevel aufgebaut sein |
 | A2 | Behoben in M1. Alle Stats steckten in einer 2D-Physik-Klasse. Die Rechnung liegt jetzt in `Scripts/Core/Stats` ohne Godot. | Blockierte die 2D/3D-Entscheidung, Tests und Koop |
 | A3 | Für Skills behoben in M3, für das Inventar in M4. Der Skillbar-Button zauberte und zog Mana ab, das Inventar rechnete in seinen Knoten. Jetzt zeigen Leiste und Inventar nur noch an. | Logik ist ohne UI nicht nutzbar und nicht testbar |
 | A4 | Behoben in M4. Items waren Szenen-Knoten, die nie im Baum hingen. Jetzt sind sie reine Daten. | Speicherleck und nicht serialisierbar |
@@ -147,7 +153,7 @@ Beobachtungen aus den Laufzeitprüfungen von M2 bis M5. Der Balance-Durchgang st
 | B9 | Neu seit M5: Attribute wirken bei kleinen Werten kaum. Ein Blob auf Level 10 hat Stärke 10 statt 1 und schlägt damit nur 2,5 % härter zu. Sein Leben steigt dagegen von 9 auf rund 45, und er regeneriert 5 Leben pro Sekunde. Den Schaden hoher Level müssen Ausrüstung und Mods tragen. | [DerivedStatProvider.cs](../Scripts/Core/Stats/DerivedStatProvider.cs), [Resources/Enemies](../Resources/Enemies) |
 | B10 | Neu seit M5: Natürliche Waffen mit Frost, Fire oder Lightning wachsen mit keinem Attribut. Stärke verstärkt nur physischen Schaden, Intelligenz nur Spells. | [HitRequests.cs](../Scripts/Core/Combat/HitRequests.cs) |
 | B11 | Neu seit M5: Chancen für Elite und Rare Elite, alle Werte der Mods und der Schaden von Meteor, Death Blast und Frost Pulse sind geschätzt. Der Schaden der drei Skills wächst nicht mit dem Level. | [EnemyController.cs](../Scripts/Controllers/EnemyController.cs), [Resources/MonsterMods/Pool](../Resources/MonsterMods/Pool) |
-| B13 | Neu seit dem Nachtrag zu M5.5: Reichweiten zählen ab dem Rand des Körpers, die Werte stammen aus der Zeit der Körpermitten. Der Held trifft unbewaffnet mit 0,95 m Luft zum Gegner, ein Blob mit 0,79 m. Das sieht nach einem Schlag in die Luft aus. Vorschlag: rund 40 Pixel für unbewaffnet und 30 für Blobs. | [WeaponProfile.cs](../Scripts/Core/Combat/WeaponProfile.cs), [Resources/Enemies](../Resources/Enemies) |
+| B13 | Erledigt am 29.09.2026. Reichweiten zählen seit dem Nachtrag zu M5.5 ab dem Rand des Körpers, die Werte stammten aus der Zeit der Körpermitten. Der Held traf unbewaffnet mit 0,95 m Luft zum Gegner, ein Blob mit 0,79 m. Jetzt reicht der unbewaffnete Held 40 Pixel weit und ein Blob 30. Waffen behalten ihre Werte, das Übungsschwert reicht weiter 100 Pixel. | [WeaponProfile.cs](../Scripts/Core/Combat/WeaponProfile.cs), [Resources/Enemies](../Resources/Enemies) |
 | B12 | Neu seit M5: Ein Blue Blob läuft 25 Pixel pro Sekunde und gibt auf, sobald der Held 6 Sekunden lang außerhalb des Aggroradius bleibt. Aus der Ferne getroffen, kommt er deshalb nur 150 Pixel weit. | [blue_blob.tres](../Resources/Enemies/blue_blob.tres) |
 
 ## 4. Meilensteinplan
@@ -757,7 +763,7 @@ Messung mit 200 Gegnern im Testlevel, headless und damit ohne Zeichnen. Bei 60 B
 
 Bewusst offen gelassen:
 
-- Das Bereichslevel ist ein fester Wert am `EnemyController`. Ein Level, das mit der Tiefe steigt, kommt mit M6 und M7.
+- Das Bereichslevel ist ein Wert am `EnemyController`. Seit M6 setzt ihn der Abstieg: Bereichslevel der Oberfläche plus Tiefe.
 - Ausrüstung von Gegnern bekommt keine Affixe. Gewürfelte Affixe nach Monsterlevel wären ein Weg, den Schaden mit dem Level wachsen zu lassen, siehe B9.
 - XP und der Schaden der Mod-Skills wachsen nicht mit dem Level.
 - Gegner weichen einander nicht aus und stehen beim Helden übereinander. Das war vor M5 auch so.
@@ -791,7 +797,7 @@ Entscheidung vom 29.09.2026: 3D im Look der PlayStation 1, Vorbild Silent Hill.
 | Look | Wackelnde Eckpunkte, verzogene Texturen, 240 Bildzeilen, 15 Bit Farbtiefe mit Punktmuster, kleine ungefilterte Texturen, Dunkelheit |
 | Vorlage | `Scripts/Spike3D`, `Scenes/Spike3D` und `Shaders/Spike3D`, mit dem Abschluss von M5.5 aufgelöst |
 
-Noch offen: orthogonale oder perspektivische Kamera. Beide lassen sich im Level mit F2 umschalten.
+Die Kamera ist seit dem 29.09.2026 perspektivisch. F2 schaltet zum Vergleich weiter auf orthogonal um.
 
 ### M5.5: Umstellung auf 3D (M, abgeschlossen am 29.09.2026 auf `master_Compare3D`)
 
@@ -824,7 +830,7 @@ Getroffene Designentscheidungen vom 29.09.2026:
 | Modelle | Starre Teile: Kopf, Torso, Arme und Beine sind einzelne Netze ohne Gewichte. Kein Skelett. |
 | Sichtbare Plätze | 12 von 16: Waffe, Nebenhand, Helm, Amulett, Schultern, Torso, Rücken, Gürtel, Handgelenke, Hände, Beine, Füße. Nur die vier Ringe bleiben unsichtbar. |
 | Ausrüstung an Gegnern | Ja, sobald es Gegner mit Armen gibt |
-| Kamera | Vertagt. Orthogonal und perspektivisch bleiben im Level mit F2 umschaltbar. |
+| Kamera | In M5.5 vertagt, vor M6 entschieden: perspektivisch. F2 schaltet zum Vergleich weiter um. |
 | Level-up | Derselbe Effekt wie in 2D, als Partikel in 3D |
 | Eigene Modelle | Kein Teil von M5.5. M5.5 schließt mit Platzhaltern aus Grundkörpern ab. |
 | Aufräumen | Code und Szenen der 2D-Fassung entfallen. Sprites, Tilesets und Texturen der 2D-Effekte bleiben im Repo. |
@@ -927,17 +933,17 @@ Das folgende Bild zeigt den Stand vor den Änderungswünschen, mit der Karte von
 
 Frühere Prüfungen aus M5.5, alle vom 29.09.2026: 70 Schritte für Ausrüstung und Kampf, 78 Schritte für Oberfläche, XP und Flächen, 8 Schritte für den Level-up-Effekt, dazu zwei Gegenproben im 2D-Testlevel mit 14 und 24 Schritten, solange es die 2D-Fassung gab.
 
-Offene Frage, Stand 29.09.2026:
+Die offene Frage aus M5.5 ist entschieden:
 
 | Frage | Stand |
 |---|---|
-| Kamera orthogonal oder perspektivisch? | Vertagt. Beide lassen sich im Level mit F2 vergleichen. Verzogene Texturen gibt es nur perspektivisch. |
+| Kamera orthogonal oder perspektivisch? | Perspektivisch, entschieden am 29.09.2026 vor M6. Verzogene Texturen gibt es nur perspektivisch. |
 
 Bewusst offen gelassen:
 
 - Gegner zeigen ihre Ausrüstung noch nicht.
 - Es gibt noch keine Item-Basis für Amulette. Der Platz wird mit dem ersten Amulett sichtbar, das ein Modell hat.
-- Die Karte zeigt die Welt, wie sie ist, mit Boden, Mauern und Nebel der Ferne. Eine gezeichnete Karte kommt mit M6, wenn sie den logischen Grundriss liest.
+- Die Karte der Oberfläche zeigt die Welt, wie sie ist, mit Boden, Mauern und Nebel der Ferne. Die gezeichnete Karte aus M6 liest den Grundriss einer erzeugten Ebene.
 - Beutel hatten keinen Tooltip und kein Schimmern wie in 2D. Seit dem Nachtrag unten tragen sie einen Stern und ein Schild mit dem Namen des Items.
 - Tunika und Gugel decken den Körper nur zu. Ein Modell, das Körperteile ersetzt, gibt es noch nicht.
 - Die Sterne des Level-up-Effekts benutzen ein Standardmaterial, weil der Shader des PS1-Looks weder Partikelfarben noch additives Mischen kennt. Ihre Eckpunkte rasten deshalb nicht ein.
@@ -1017,8 +1023,8 @@ Im Gedränge von 18 Gegnern blieben zwischen den sichtbaren Körpern mindestens 
 
 Bewusst offen gelassen:
 
-- Nahkampf sieht nach einem Schlag in die Luft aus, siehe B13.
-- Bei der perspektivischen Kamera ändern sich die Abstände der Beutel auf dem Bildschirm beim Laufen. Schilder können dort zusammenrücken. Beim Umschalten mit F2 richten sie sich neu aus.
+- Nahkampf sah nach einem Schlag in die Luft aus. Erledigt mit B13.
+- Bei der perspektivischen Kamera ändern sich die Abstände der Beutel auf dem Bildschirm beim Laufen. Das gilt weiter: Ein Neuausrichten bei jeder Bewegung der Kamera ließ die Schilder zappeln und ist wieder entfallen, siehe Nachtrag zu M6.
 - Die Taste schaltet beim Drücken. Wer mit Alt+Tab das Fenster wechselt, schaltet die Schilder dabei um.
 - Ob die Schilder an oder aus sind, steht nicht im Spielstand.
 - Der Text eines Schilds ändert sich nicht, wenn ein Stapel Tränke nur zum Teil ins Inventar passt.
@@ -1036,19 +1042,207 @@ Ziel: Held, Gegner und Items bekommen eigene Low-Poly-Modelle aus Blender statt 
 - Die Kollisionsform eines Gegners ist eine Kapsel mit dem Radius des Modells plus 3 cm, Maske 11. Sie ist so hoch, dass ein gerader Teil bleibt, sonst schieben sich Körper verschiedener Größe nach oben und unten weg.
 - Material ist der Shader `Shaders/Ps1/ps1_surface.gdshader`, Texturen sind klein und ungefiltert.
 
-### M6: Prozedurale Level mit handgebauten Räumen (L)
+### M6: Prozedurale Level mit handgebauten Räumen (L, umgesetzt am 29.09.2026 auf `master_ProceduralLevels`)
 
 Ziel: jeder Abstieg sieht anders aus, und eigene Räume lassen sich einstreuen.
 
-- Generator erzeugt einen logischen Grundriss aus Räumen und Gängen, gesteuert über einen Seed.
-- Raumvorlagen sind handgebaute Szenen mit Anschlusspunkten, Spawn-Markern und Gewicht.
-- Regeln pro Vorlage: Häufigkeit, frühestes Level, "muss einmal pro Kreis vorkommen" für Event-Locations.
-- Thema pro Höllenkreis als Resource: Tiles oder Meshes, Licht, Gegnerpool, Musik.
-- Overlay-Karte liest den logischen Grundriss.
-- Feste Szenenpfade durch globale Dienste ersetzen. Behebt A1.
-- Gänge und Tore sind breiter als der größte Körper. Jedes erzeugte Level bringt die Ebene `CombatTextLayer` mit dem Knoten `LootLabels` mit.
+- Erledigt: Generator erzeugt einen logischen Grundriss aus Räumen und Gängen, gesteuert über einen Seed.
+- Erledigt: Raumvorlagen sind handgebaute Szenen mit Anschlusspunkten, Spawn-Markern und Gewicht.
+- Erledigt: Regeln pro Vorlage: Häufigkeit, frühestes Level, Höchstzahl pro Ebene und Pflichtraum für Event-Locations.
+- Erledigt: Thema als Resource mit Räumen, Texturen, Licht, Gegnerpool und Musik. Es gibt ein Testthema, das Thema eines Höllenkreises kommt mit M8.
+- Erledigt: Overlay-Karte liest den logischen Grundriss.
+- Anders gelöst: Feste Szenenpfade sind nicht durch globale Dienste ersetzt. Eine Ebene ist nur noch Inhalt, der in die laufende Szene gebaut wird. Das behebt A1.
+- Erledigt: Gänge und Tore sind breiter als der größte Körper. Die Ebene `CombatTextLayer` mit `LootLabels` bleibt beim Wechsel der Ebene bestehen.
 
-Fertig, wenn derselbe Seed zweimal dasselbe Level ergibt und ein handgebauter Event-Raum garantiert erscheint.
+Fertig, wenn derselbe Seed zweimal dasselbe Level ergibt und ein handgebauter Event-Raum garantiert erscheint. Beides ist geprüft, im Kern und im laufenden Spiel.
+
+Getroffene Designentscheidungen vom 29.09.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| Kamera | Perspektivisch |
+| Grundriss | Handgebaute Räume auf einem Raster, der Generator zieht Gänge dazwischen |
+| Wegführung | Verzweigt mit Schleifen. Mehrere Wege und Rundläufe, der Ausgang muss gesucht werden. |
+| Nahkampf | 40 Pixel für den unbewaffneten Helden, 30 für Blobs, siehe B13 |
+| Mauern | Alle Mauern haben einen Sockel und das restliche Mauerwerk darüber. Steht der Held vor der Mauer, sieht sie aus wie bisher. Steht die Mauer zwischen Held und Kamera, wird der obere Teil durchsichtig, und Spielobjekte dahinter werden klickbar. Der durchsichtige Bereich reicht so weit wie der Lichtradius. |
+| Karte | Deckt sich beim Erkunden auf. Ein Schalter zum Testen zeigt die ganze Karte und führt zurück zum Erkundeten. Der Stand der Erkundung steht im Spielstand. |
+| Einstieg bis M7 | Die Kellertür im Testlevel führt in Ebene 1. Der Ausgang jeder Ebene führt eine Ebene tiefer, mit neuem Seed und Bereichslevel plus 1. Held, Inventar und Oberfläche bleiben bestehen. |
+| Gegner | Räume bringen ihre Spawn-Marker mit. In Gängen stehen vereinzelt kleine Gruppen aus dem Gegnerpool des Themas. |
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Zelle | 4 m. Eine Zelle ist zugleich die Breite eines Gangs. Raumvorlagen sind für dieses Maß gebaut. |
+| Mauern | 0,5 m dick und 2,5 m hoch, davon 0,6 m Sockel. Der Sockel ist dunkler und steht 6 cm vor. Ein Gang ist zwischen den Mauern 3,5 m breit, der größte Körper misst 1,74 m. |
+| Rand der Sicht | Das Mauerwerk schließt sich auf den letzten 1,5 m des Lichtradius mit einem Punktmuster. Beim Schritt durch eine Tür öffnet es sich über 0,5 m. |
+| Oberfläche | Die neun Mauern des Testlevels sind dieselben Mauerstücke mit Sockel. Maße und Orte sind geblieben. |
+| Drehung | Der Generator dreht Räume in Vierteldrehungen. Eine Vorlage kann das mit `CanRotate` abschalten. |
+| Ausgang | Liegt unter 30 gewürfelten Plätzen am weitesten vom Start. Start und Ausgang sind nie direkt verbunden. |
+| Rundwege | Zum kürzesten Baum über alle Räume kommen Verbindungen für 35 % der Räume dazu, gewählt unter den kürzesten |
+| Gänge | Laufen lieber gerade, teilen sich vorhandene Strecken und meiden die Mauern fremder Räume |
+| Größe | Ebene 1 hat 10 Räume, jede weitere einen mehr, höchstens 24 |
+| Gruppen in Gängen | Eine Gruppe je 14 Zellen Gang, nicht näher als 2 Zellen an einer Tür und 3 Zellen am Startraum |
+| Gegnerpool | Blue Blob mit Gewicht 3 in Gruppen von 3 bis 5, Yellow Blob mit Gewicht 2 in Gruppen von 2 bis 4, der Zauberer ab Bereichslevel 3 allein oder zu zweit |
+| Erkunden | Aufgedeckt wird, was vom Standort aus zu Fuß erreichbar ist, ohne den Lichtradius zu verlassen. Hinter einer Mauer bleibt die Karte dunkel. |
+| Schalter der Karte | `F5`, wie die übrigen Tasten zum Testen |
+| Speichern der Karte | Beim Betreten einer Ebene nach einer Sekunde, beim Erkunden nach zehn Sekunden und beim Beenden |
+| Laden | War der Held beim Speichern unter der Erde, startet er am Start derselben Ebene. Gegner stehen wieder da. |
+| Neuer Abstieg | Wer von der Oberfläche hinabsteigt, beginnt einen neuen Abstieg mit neuem Seed. Das Feld `Seed` am Knoten `Descent` legt ihn fest, 0 würfelt. |
+| Benutzen | Die Kellertür öffnet sich erst, wenn der Held bei ihr steht. Aus der Ferne läuft er hin, wie zu einem Beutel. |
+| Räume | Siehe den zweiten Nachtrag unten: Die Mauern eines Raums öffnen sich nur für den, der drin steht |
+| Anzeige | Die Zeile oben links nennt unter der Erde Ebene, Seed des Abstiegs und Bereichslevel |
+
+So entsteht eine Ebene:
+
+1. `RoomPicker` wählt die Vorlagen: einen Start, einen Ausgang, jeden Pflichtraum und dazwischen gewürfelte Räume nach Gewicht, bis die Zahl der Räume erreicht ist.
+2. `LevelGenerator` setzt den Start und legt jeden weiteren Raum neben einen schon gesetzten, mit 2 bis 4 Zellen Abstand.
+3. Aus den Abständen der Räume entsteht der kürzeste Baum über alle Räume, dazu kommen die Verbindungen für die Rundwege.
+4. Für jede Verbindung wählt er das Paar Türen mit dem kürzesten Weg. `CorridorRouter` sucht den Gang von Tür zu Tür.
+5. Ist nicht jeder Raum vom Start aus erreichbar, beginnt ein neuer Versuch mit einem abgeleiteten Seed, höchstens 20.
+6. Zuletzt kommen die Plätze für die Gruppen in den Gängen.
+
+Das Ergebnis ist `LevelLayout`: ein Raster aus Fels, Raum und Gang, dazu Räume, Verbindungen und Türen. Aus ihm folgt, wo Mauern stehen: zum Fels immer, zwischen Raum und Gang überall außer an einer Tür.
+
+So wird daraus Welt:
+
+- `Descent` hängt in der Szene des Spiels und führt den Helden hinab. Er räumt Gegner, Beutel, Wirkungen und die alte Ebene ab und baut die neue unter den Knoten `Environment`.
+- `LevelBuilder` legt Böden, stellt Mauern auf und hängt die Szenen der Räume ein. Aufeinanderfolgende Mauerkanten werden ein Stück, Gänge zerfallen in Rechtecke.
+- `LevelGrid` rechnet Zellen in Meter um. Die Mitte des Startraums liegt im Ursprung der Welt.
+- Danach backt `LevelNavigation` das Navigationsnetz neu, und der `EnemyController` spawnt aus den Markern der Räume und Gänge.
+- Die Zufallsquelle `GameRandom` bekommt den Seed der Ebene. Dadurch stehen bei gleichem Seed auch dieselben Gegner am selben Ort.
+
+So funktionieren Mauern:
+
+- `WallSegment` ist ein gerades Stück Mauer längs seiner X-Achse, der Ursprung liegt am Boden. Es baut Sockel, Mauerwerk und Kollisionsform selbst. Als Tool zeigt es sich auch im Editor.
+- Das Mauerwerk trägt den Shader `Shaders/Ps1/ps1_wall.gdshader`. Er kennt den Ort des Helden, seine Größe und seinen Lichtradius.
+- Der Held steht hinter einem Stück, wenn er und die Kamera auf verschiedenen Seiten seiner Ebene stehen. Nur dann öffnet sich Mauerwerk.
+- `RoomZone` ist die Fläche eines Raums, ein `Area3D` mit einem Quader. Der Aufbau der Ebene legt für jeden Raum eine an, im Testlevel liegt eine über dem Hof.
+- Jedes Stück fragt, welcher Raum kurz vor und kurz hinter seiner Mitte liegt. Der Grundriss teilt eine Mauer dort in zwei Stücke, wo sich ändert, was auf einer ihrer Seiten liegt.
+- `WallOpeningRule` im Kern entscheidet daraus und aus dem Raum des Helden, wie weit sich ein Stück öffnet: ganz, halb oder gar nicht. Neu entschieden wird nur, wenn der Held den Raum wechselt.
+- Wo Mauerwerk den Helden selbst verdeckt, bleibt es nie ganz zu, gleich welche Regel sonst gilt.
+- Halb offen ist ein Schachbrett aus Mauer und Durchblick im Raster der Bildzeilen.
+- Jedes Stück hat einen unsichtbaren Körper, der nur Schatten wirft. Die Mauer steht auch dort, wo ihr Mauerwerk die Sicht freigibt.
+- Dieselbe Rechnung steht im Kern als `WallFadeRule`. `WallFade.IsHidden` entscheidet damit, ob sich ein Gegner, ein Beutel oder die Kellertür anklicken lässt.
+- Die Kollisionsform reicht über die ganze Höhe. Für Bewegung, Projektile und Sichtlinien der Gegner ändert sich nichts.
+- Der Vertex-Teil des PS1-Looks liegt in `Shaders/Ps1/ps1_common.gdshaderinc`, damit Flächen und Mauerwerk denselben benutzen.
+
+So entsteht ein neuer Raum:
+
+1. Eine Szene unter `Scenes/Rooms` anlegen, an der Wurzel das Skript `RoomTemplate`. Der Ursprung ist die Mitte des Raums.
+2. `WidthCells` und `HeightCells` setzen, dazu Rolle, Gewicht, frühestes Bereichslevel, Höchstzahl und Pflichtraum.
+3. Für jede mögliche Tür einen `Marker3D` mit dem Skript `RoomDoor` auf den Rand setzen, in die Mitte einer Zelle.
+4. Spawn-Marker setzen. Ein Marker ohne Gegner bekommt einen aus dem Gegnerpool des Themas.
+5. Einrichtung bauen. Was im Weg stehen soll, ist ein `StaticBody3D` auf der Ebene der Mauern. Ein `WallSegment` ohne Textur übernimmt Textur und Höhen des Themas.
+6. Der Startraum braucht einen `HeroStart`, der Ausgang eine Kellertür.
+7. Die Szene im Thema unter `Rooms` eintragen.
+
+Boden und Außenmauern baut der Aufbau der Ebene. Der Knoten `EditorPreview` zeigt im Editor die Fläche des Raums und wird beim Aufbau entfernt.
+
+| Raum | Größe in Zellen | Rolle |
+|---|---|---|
+| `start_room` | 3 x 3 | Start |
+| `exit_room` | 3 x 3 | Ausgang mit Kellertür und Wachen |
+| `chamber` | 3 x 3 | Kammer |
+| `hall` | 5 x 4 | Halle mit vier Pfeilern, doppeltes Gewicht |
+| `gallery` | 6 x 3 | Galerie mit zwei Sichtblenden |
+| `shrine` | 4 x 4 | Schrein mit Altar und Hüter, Pflichtraum |
+
+Stellschrauben am Knoten `Descent`:
+
+| Feld | Wert | Bedeutung |
+|---|---|---|
+| `Seed` | 0 | Seed des Abstiegs, 0 würfelt bei jedem Abstieg neu |
+| `RoomCount` | 10 | Räume in Ebene 1 |
+| `RoomsMorePerDepth` | 1 | So viele Räume kommen pro Ebene dazu |
+| `MaxRoomCount` | 24 | Obergrenze |
+| `MinGap`, `MaxGap` | 2 und 4 | Freie Zellen zwischen zwei Räumen |
+| `LoopShare` | 0,35 | Zusätzliche Verbindungen als Anteil der Räume |
+| `CellsPerCorridorPack` | 14 | Zellen Gang je Gruppe, 0 lässt die Gänge leer |
+
+<img src="images/ebene_m6_3d.webp" alt="Oben links der Held hinter einer Mauer, deren Mauerwerk die Sicht freigibt, oben rechts vor einer Mauer, unten links der Schrein, unten rechts die ganze Karte einer Ebene" width="860">
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Unit-Tests | 93 neue für Generator, Grundriss, Drehung der Räume, Erkundung, Regeln der Mauern und Abstieg im Spielstand. Insgesamt 692. |
+| Laufendes Spiel, headless, vor dem Nachtrag unten | 435 Schritte: Mauern der Oberfläche, Abstieg über die Kellertür, Abbau der alten Ebene, gleicher Seed, Wege zu allen Räumen, Türen nach der Drehung, freie Sicht und Anklicken, Karte, Spielstand, Ebene 2, zwölf Ebenen in vier Tiefen |
+| Neustart mit Spielstand, vor dem Nachtrag unten | 9 Schritte: dieselbe Ebene, dieselbe Karte |
+| Nachprüfung mit Fenster, nach dem ersten Nachtrag | 41 Schritte mit dem Seed aus dem Spiel des Users: Mauern an drei Türen, Anklicken eines Gegners hinter offenem Mauerwerk, starre Schilder, Hof der Oberfläche |
+| Nachprüfung mit Fenster, nach dem zweiten Nachtrag | 45 Schritte: die vier Lagen aus den Bildern des Users im Hof des Testlevels und in der Ebene mit seinem Seed, dazu Schatten, verborgene Gegner und ihre Wirkungen |
+
+Zwölf Ebenen entstehen samt Aufbau in unter einer Sekunde. Bei 1600 x 900 lief eine Ebene mit 120 Bildern pro Sekunde, mit den Schatten der Mauern aus dem zweiten Nachtrag mit 115. Beide Werte sind von der Bildwiederholrate des Monitors gedeckelt.
+
+Ohne diesen Deckel, gemessen mit 37 Gegnern an der Oberfläche und 83 Gegnern in Ebene 3, davon 13 Elite mit Aura:
+
+| Ort | Nur das Licht des Helden wirft Schatten | Alle 17 Lichter werfen Schatten |
+|---|---|---|
+| Oberfläche bei den Blobs | 259 | 191 |
+| Oberfläche im Hof | 248 | 171 |
+| Ebene 3 am Start | 286 | 233 |
+| Ebene 3 im Schrein | 274 | 208 |
+| Ebene 3 am Ausgang | 378 | 289 |
+
+#### Nachtrag vom 29.09.2026: Rückmeldung aus dem Spielen der Ebenen
+
+Der User hat die erzeugten Ebenen gespielt und zwei Dinge beobachtet.
+
+| Beobachtung | Änderung |
+|---|---|
+| Schilder der Beute zappeln beim Laufen. "Die sollen einfach starr bleiben." | Die Schilder richten sich beim Laufen nicht mehr neu aus. Jedes hält seinen Abstand zum Beutel, wie vor M6. |
+| Die Mauern sind uneinheitlich: Eine Mauer ist noch undurchsichtig, die daneben ist weg. | Der Held stand vor der Tür in der Ostmauer eines Raums. Meine Änderung öffnete beide Mauern, sobald vor ihnen Fels lag. Das war falsch herum und ist mit dem zweiten Nachtrag ersetzt. |
+
+#### Zweiter Nachtrag vom 29.09.2026: Räume bleiben verschlossen
+
+Der User hat vier Bilder geschickt. Das erste zeigt, wie es sein soll: Der Held steht im Hof, die nördlichen Mauern stehen, die südlichen sind durchsichtig.
+
+| Beobachtung | Entscheidung des Users |
+|---|---|
+| Der Held steht außerhalb des Hofs, trotzdem wird dessen südliche Mauer durchsichtig | Südliche Mauern eines Raums werden nur durchsichtig, wenn der Held im Raum ist. Dafür braucht es eine Erkennung. |
+| Der Held steht nördlich des Hofs und kann voll hineinsehen | Das Innere von Räumen muss dunkel und nicht einsehbar sein. Licht darf nicht durch Mauern scheinen, und im Raum darf keine Bewegung zu sehen sein, bis der Held direkten Sichtkontakt bekommt oder drin ist. |
+| Hinter einer Mauer muss man trotzdem mit Objekten umgehen können | Nördliche Mauern haben 50 % Deckkraft, wenn der Held außerhalb und nördlich des Raums steht |
+| Der Held steht hinter einer Mauer, die nächste ist nicht durchsichtig | Auch sie muss sich öffnen, der Held steht auch hinter ihr |
+
+Die Regel seitdem. Sie gilt für Mauerwerk im Lichtradius, und nur, wenn der Held hinter der Mauer steht:
+
+| Lage | Mauerwerk |
+|---|---|
+| Hinter der Mauer liegt ein Raum, in dem der Held nicht steht | Bleibt zu. Das sind die südlichen und östlichen Mauern eines fremden Raums. |
+| Vor der Mauer liegt ein Raum, in dem der Held nicht steht | Halb durchsichtig. Das sind die nördlichen und westlichen Mauern eines fremden Raums. |
+| Sonst | Durchsichtig. Das sind die südlichen Mauern des eigenen Raums, die Mauern der Gänge und Mauern auf freiem Feld. |
+| Das Mauerwerk verdeckt den Helden selbst | Mindestens halb durchsichtig, im Umkreis von 0,9 m um die Sichtlinie |
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Erkennung | Jeder Raum hat eine Fläche. Der Held steht im Raum, wenn er auf ihr steht. Ein Flag an der Tür braucht es nicht. |
+| Halb durchsichtig | Ein Schachbrett im Raster der Bildzeilen statt echter Durchsicht. Es passt zum Punktmuster des PS1-Looks und braucht kein Sortieren. |
+| Schatten | Auf Ansage des Users werfen alle Lichter die Schatten der Mauern, auch im PS1-Look: das Licht des Helden, Mondlicht, Altar, Kellertür, Auren und die Lichter der Skills. Figuren stehen weiter auf dunklen Scheiben. F4 schaltet wie bisher die übrigen Schatten ein. |
+| Sichtkontakt | Der Held sieht, wer mit ihm im selben Raum steht und wen keine Mauer verdeckt. Geprüft wird von 1,5 m Höhe zur Mitte des Körpers und zu seinen beiden Rändern. |
+| Verborgen | Ein Gegner ohne Sichtkontakt zeigt weder Körper noch Aura, Lebensbalken, Namensschild oder Schadenszahlen und lässt sich nicht anklicken. Treffen kann er und kann man ihn trotzdem. |
+| Wirkungen | Projektile und Flächen der Gegner zeigen sich nur mit Sichtkontakt |
+| Takt | Acht Gegner pro Schritt der Physik, reihum. Bei 40 Gegnern vergeht bis zum nächsten Blick ein Zwölftel einer Sekunde. |
+| Beute | Beutel und ihre Schilder bleiben sichtbar, auch in einem Raum, den der Held verlassen hat |
+| Ersetzt | Die Unterscheidung nach Boden und Fels aus dem ersten Nachtrag ist entfallen |
+
+<img src="images/raeume_und_mauern_3d.webp" alt="Oben links der Held im Hof mit durchsichtigen südlichen Mauern, oben rechts vor dem Tor mit verschlossenem Hof, unten links nördlich des Hofs hinter der halb durchsichtigen Mauer, unten rechts an einer Gangecke hinter offenem Mauerwerk" width="860">
+
+Bewusst offen gelassen:
+
+- Der Wechsel beim Betreten eines Raums geschieht in einem Schritt, ohne Überblenden.
+- Das Umgebungslicht bleibt. Der Boden eines verschlossenen Raums ist über die Mauern hinweg schwach zu erkennen, was darin steht, nicht.
+- Starre Schilder können sich bei perspektivischer Kamera überlappen. Rückt eine Gruppe von Beuteln beim Laufen an den oberen Bildrand, schrumpfen ihre Abstände auf dem Bildschirm, die Schilder bleiben gleich groß. `Alt` zweimal richtet sie neu aus.
+- Zwischen Räumen und Gängen ist nichts. Der Fels hat keine Oberseite, man blickt ins Schwarze.
+- Türen sind Lücken in der Mauer, ohne Rahmen und ohne Türblatt.
+- Es gibt keinen Weg zurück nach oben. Treppen, Checkpoints und Town-Portal kommen mit M7.
+- Räume sind Rechtecke. Eine Vorlage mit anderem Umriss gibt es nicht.
+- Das Testthema hat keine Musik. Das Feld am Thema ist da, und `Descent` spielt, was dort steht.
+- F2 schaltet die Kamera weiter um. Seit der Entscheidung für die Perspektive dient das nur noch dem Vergleich.
+- Die Karte zeigt weder Gegner noch Beute.
+- Ein Mauerstück in einer Raumvorlage zeigt im Editor die Textur aus dem Testthema, bis das Thema ihm seine gibt.
+- Mit "einmal pro Kreis" ist vorerst einmal pro Ebene gemeint. Kreise mit mehreren Ebenen kommen mit M7.
 
 ### M7: Hub und Abstieg (M)
 

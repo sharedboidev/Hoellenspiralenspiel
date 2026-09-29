@@ -53,6 +53,9 @@ public abstract partial class BaseUnit : CharacterBody3D
 
     public virtual bool IsTargetable => !IsDead;
 
+    //Was der Held nicht sieht, zeigt sich nicht und lässt sich nicht anklicken. Treffen kann es ihn und er es trotzdem
+    public virtual bool IsSeen => true;
+
     public virtual float CombatTextHeight => 1.6f;
 
     public bool IsDead => LifeCurrent <= 0;

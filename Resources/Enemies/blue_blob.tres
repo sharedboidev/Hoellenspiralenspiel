@@ -14,6 +14,6 @@ ConstitutionPerLevel = 1.0
 Movementspeed = 25.0
 FrostResistance = 75
 DamageType = 4
-AttackRange = 80.0
+AttackRange = 30.0
 AttackWindupSec = 0.5
 AttackRecoverySec = 0.7

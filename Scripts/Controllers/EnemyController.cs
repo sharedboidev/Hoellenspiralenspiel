@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Resources.Enemies;
 using Hoellenspiralenspiel.Resources.MonsterMods;
 using Hoellenspiralenspiel.Scripts.Core.Enemies;
+using Hoellenspiralenspiel.Scripts.Core.Levels;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Core.Spatial;
 using Hoellenspiralenspiel.Scripts.Enemies;
@@ -13,6 +15,7 @@ using Hoellenspiralenspiel.Scripts.Skills;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
 using Hoellenspiralenspiel.Scripts.World;
+using Hoellenspiralenspiel.Scripts.World.Levels;
 
 namespace Hoellenspiralenspiel.Scripts.Controllers;
 
@@ -22,12 +25,17 @@ public readonly record struct SpawnArea(Vector3 Center, float ScatterPx = 0f, fl
 
 public partial class EnemyController : Node
 {
-    private const float SightHeightMeters = 0.5f;
-    private const float ProbeLiftMeters   = 0.1f;
-    private const float AggroMarginPx     = 100f;
+    private const float SightHeightMeters   = 0.5f;
+    private const float ProbeLiftMeters     = 0.1f;
+    private const float AggroMarginPx       = 100f;
+    private const float EyeHeightMeters     = 1.5f;
+    private const int   SightChecksPerFrame = 8;
 
+    private readonly List<Node3D>   effects       = new();
     private readonly List<Enemy>    enemies       = new();
     private readonly List<BaseUnit> unitsNearSpot = new();
+
+    private int sightCursor;
 
     [Export]
     public Hero Hero { get; set; }
@@ -85,11 +93,53 @@ public partial class EnemyController : Node
 
     public override void _Ready()
     {
-        if (SpawnMarkers is null)
+        EnemyContainer.ChildEnteredTree += NoteEffect;
+        EnemyContainer.ChildExitingTree += child => effects.Remove(child as Node3D);
+
+        if (SpawnMarkers is not null)
+            SpawnFrom(SpawnMarkers.GetAllChildren<SpawnMarker>());
+    }
+
+    //Neben den Gegnern hängen hier ihre Wirkungen: Projektile und Flächen
+    private void NoteEffect(Node child)
+    {
+        if (child is not Node3D effect || child is Enemy)
             return;
 
-        foreach (var marker in SpawnMarkers.GetAllChildren<SpawnMarker>())
+        effects.Add(effect);
+
+        Callable.From(() => Show(effect)).CallDeferred();
+    }
+
+    private void Show(Node3D effect)
+    {
+        if (IsInstanceValid(effect) && effect.IsInsideTree())
+            effect.Visible = CanHeroSee(effect.GlobalPosition);
+    }
+
+    public void SpawnFrom(IEnumerable<SpawnMarker> markers)
+    {
+        foreach (var marker in markers)
             SpawnGroupAt(marker);
+    }
+
+    //Räumt die Karte für die nächste Ebene. Niemand stirbt dabei, es gibt weder XP noch Beute
+    public void Clear()
+    {
+        foreach (var enemy in enemies)
+        {
+            enemy.Provoked -= CallGroupToArms;
+            enemy.Died     -= OnEnemyDied;
+        }
+
+        enemies.Clear();
+
+        foreach (var child in EnemyContainer.GetChildren())
+        {
+            EnemyContainer.RemoveChild(child);
+
+            child.QueueFree();
+        }
     }
 
     public override void _PhysicsProcess(double delta)
@@ -107,7 +157,50 @@ public partial class EnemyController : Node
             if (isAwake)
                 enemy.Think(delta);
         }
+
+        LookAround();
     }
+
+    //Reihum, damit viele Gegner nicht in jedem Schritt alle auf einmal geprüft werden
+    private void LookAround()
+    {
+        for (var check = 0; check < Math.Min(SightChecksPerFrame, enemies.Count); check++)
+        {
+            sightCursor = (sightCursor + 1) % enemies.Count;
+
+            enemies[sightCursor].SetSeen(CanHeroSee(enemies[sightCursor]));
+        }
+
+        foreach (var effect in effects)
+            Show(effect);
+    }
+
+    //Der Held sieht, wer mit ihm im selben Raum steht und wen keine Mauer verdeckt. Es reicht, wenn ein Rand des Körpers hervorschaut
+    public bool CanHeroSee(BaseUnit unit)
+    {
+        if (IsInRoomOfHero(unit.GlobalPosition))
+            return true;
+
+        var space  = EnemyContainer.GetWorld3D().DirectSpaceState;
+        var eye    = Hero.GlobalPosition + Vector3.Up * EyeHeightMeters;
+        var center = unit.BodyCenter;
+        var aside  = WorldScale.OnGround(center - eye).Normalized().Cross(Vector3.Up) * unit.BodyRadius;
+
+        return IsInSight(space, eye, center) || IsInSight(space, eye, center + aside) || IsInSight(space, eye, center - aside);
+    }
+
+    public bool CanHeroSee(Vector3 point)
+        => IsInRoomOfHero(point) || IsInSight(EnemyContainer.GetWorld3D().DirectSpaceState, Hero.GlobalPosition + Vector3.Up * EyeHeightMeters, point + Vector3.Up * SightHeightMeters);
+
+    private bool IsInRoomOfHero(Vector3 point)
+    {
+        var room = RoomZone.GetIdAt(Hero.GlobalPosition);
+
+        return room != WallOpeningRule.NoRoom && RoomZone.GetIdAt(point) == room;
+    }
+
+    private static bool IsInSight(PhysicsDirectSpaceState3D space, Vector3 eye, Vector3 point)
+        => space.IntersectRay(PhysicsRayQueryParameters3D.Create(eye, point, CollisionLayers.Walls)).Count == 0;
 
     private void SpawnGroupAt(SpawnMarker marker)
     {
@@ -161,6 +254,8 @@ public partial class EnemyController : Node
 
         enemies.Add(enemy);
         EnemyContainer.AddChild(enemy);
+
+        enemy.SetSeen(CanHeroSee(enemy));
 
         return enemy;
     }

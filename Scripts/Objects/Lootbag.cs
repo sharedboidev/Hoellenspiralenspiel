@@ -9,9 +9,10 @@ using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.Objects;
 
-public partial class Lootbag : Area3D
+public partial class Lootbag
+        : Area3D,
+          IUsable
 {
-    private const float PickRayMeters   = 300f;
     private const float BounceMeters    = 0.5f;
     private const float HoverBrightness = 1.5f;
     private const float HoverGlow       = 3f;
@@ -146,25 +147,13 @@ public partial class Lootbag : Area3D
         => FindAt(asker, asker.GetViewport().GetMousePosition());
 
     public static Lootbag FindAt(Node3D asker, Vector2 screenPoint)
-    {
-        var camera = asker.GetViewport().GetCamera3D();
-
-        if (camera is null)
-            return null;
-
-        var origin = camera.ProjectRayOrigin(screenPoint);
-        var query  = PhysicsRayQueryParameters3D.Create(origin, origin + camera.ProjectRayNormal(screenPoint) * PickRayMeters, CollisionLayers.Interactive);
-
-        query.CollideWithAreas  = true;
-        query.CollideWithBodies = false;
-
-        var hit = asker.GetWorld3D().DirectSpaceState.IntersectRay(query);
-
-        return hit.Count == 0 ? null : hit["collider"].AsGodotObject() as Lootbag;
-    }
+        => Usables.FindAt(asker, screenPoint) as Lootbag;
 
     public bool IsInReachOf(BaseUnit unit)
         => unit.DistancePxTo(GlobalPosition) <= PickupRadius;
+
+    public void Use()
+        => Collect();
 
     public void Collect()
     {

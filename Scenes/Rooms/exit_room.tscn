@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/World/Levels/RoomTemplate.cs" id="room"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/RoomDoor.cs" id="door"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/cellar_door.tscn" id="cellar"]
+[ext_resource type="Script" path="res://Scripts/World/SpawnMarker.cs" id="marker"]
+
+[sub_resource type="PlaneMesh" id="Mesh_preview"]
+size = Vector2(12, 12)
+
+[node name="ExitRoom" type="Node3D"]
+script = ExtResource("room")
+WidthCells = 3
+HeightCells = 3
+Role = 2
+
+[node name="EditorPreview" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh_preview")
+
+[node name="Doors" type="Node3D" parent="."]
+
+[node name="North1" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+script = ExtResource("door")
+
+[node name="East1" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
+script = ExtResource("door")
+
+[node name="South1" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6)
+script = ExtResource("door")
+
+[node name="West1" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
+script = ExtResource("door")
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="Guards" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.5)
+script = ExtResource("marker")
+AmountToSpawn = 3
+ScatterRadius = 300.0
+
+[node name="CellarDoor" parent="." instance=ExtResource("cellar")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)

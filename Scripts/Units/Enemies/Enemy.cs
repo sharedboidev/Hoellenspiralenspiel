@@ -58,6 +58,7 @@ public partial class Enemy : BaseUnit
     private HealthBar                         healthbar;
     private Vector3                           homePoint;
     private bool                              isAwake = true;
+    private bool                              isSeen  = true;
     private EnemyRarityLook                   look    = EnemyRarityLook.Normal;
     private MonsterModRuntime                 modRuntime;
     private IReadOnlyList<MonsterModResource> mods = [];
@@ -112,6 +113,7 @@ public partial class Enemy : BaseUnit
 
     public override Faction Faction      => Faction.Monster;
     public override bool    IsTargetable => !IsDead && !IsDying;
+    public override bool    IsSeen       => isSeen;
     public override bool    IsSolid      => !IsDying;
 
     public override WeaponProfile Weapon => weapon;
@@ -312,8 +314,25 @@ public partial class Enemy : BaseUnit
         if (!awake)
             Velocity = Vector3.Zero;
 
+        ShowNameTag();
+    }
+
+    //Wer hinter einer Mauer steht, bleibt verborgen, samt Aura, Lebensbalken und Namensschild
+    public void SetSeen(bool seen)
+    {
+        if (isSeen == seen || IsDying)
+            return;
+
+        isSeen  = seen;
+        Visible = seen;
+
+        ShowNameTag();
+    }
+
+    private void ShowNameTag()
+    {
         if (nameTag is not null)
-            nameTag.IsShown = awake;
+            nameTag.IsShown = isAwake && isSeen;
     }
 
     //Der Tod wird genau einmal ausgelöst: XP und Loot sofort, entfernt wird der Gegner erst nach dem Zusammensinken

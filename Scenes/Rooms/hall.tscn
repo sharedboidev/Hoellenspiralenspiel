@@ -1,0 +1,90 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/World/Levels/RoomTemplate.cs" id="room"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/RoomDoor.cs" id="door"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/WallSegment.cs" id="wall"]
+[ext_resource type="Script" path="res://Scripts/World/SpawnMarker.cs" id="marker"]
+
+[sub_resource type="PlaneMesh" id="Mesh_preview"]
+size = Vector2(20, 16)
+
+[node name="Hall" type="Node3D"]
+script = ExtResource("room")
+WidthCells = 5
+HeightCells = 4
+Weight = 2.0
+
+[node name="EditorPreview" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh_preview")
+
+[node name="Doors" type="Node3D" parent="."]
+
+[node name="North1" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -8)
+script = ExtResource("door")
+
+[node name="North3" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -8)
+script = ExtResource("door")
+
+[node name="South1" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 8)
+script = ExtResource("door")
+
+[node name="South3" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 8)
+script = ExtResource("door")
+
+[node name="West2" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 2)
+script = ExtResource("door")
+
+[node name="East1" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -2)
+script = ExtResource("door")
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="PackWest" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
+script = ExtResource("marker")
+AmountToSpawn = 4
+
+[node name="PackEast" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
+script = ExtResource("marker")
+AmountToSpawn = 4
+
+[node name="Furniture" type="Node3D" parent="."]
+
+[node name="Pillar1" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -3)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("wall")
+Length = 1.2
+Thickness = 1.2
+
+[node name="Pillar2" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -3)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("wall")
+Length = 1.2
+Thickness = 1.2
+
+[node name="Pillar3" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 3)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("wall")
+Length = 1.2
+Thickness = 1.2
+
+[node name="Pillar4" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 3)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("wall")
+Length = 1.2
+Thickness = 1.2

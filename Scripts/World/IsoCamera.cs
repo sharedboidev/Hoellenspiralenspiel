@@ -14,7 +14,7 @@ public partial class IsoCamera : Camera3D
     public float Distance { get; set; } = 40f;
 
     [Export]
-    public bool UsePerspective { get; set; }
+    public bool UsePerspective { get; set; } = true;
 
     [Export]
     public float PerspectiveFov { get; set; } = 35f;

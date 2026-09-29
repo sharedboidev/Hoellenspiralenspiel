@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Hoellenspiralenspiel.Scripts.World.Levels;
 
 namespace Hoellenspiralenspiel.Scripts.World;
 
@@ -160,7 +161,9 @@ public partial class Ps1Look : Node
                 if (!shadowOfLight.TryGetValue(light, out var hadShadow))
                     shadowOfLight[light] = hadShadow = light.ShadowEnabled;
 
-                light.ShadowEnabled = hadShadow && (!Enabled || RealShadows);
+                //Kein Licht scheint durch Mauern. Die Schatten von allem anderen wirft ein Licht nur, wenn es das von sich aus tut und der Look sie zulässt
+                light.ShadowEnabled    = true;
+                light.ShadowCasterMask = hadShadow && (!Enabled || RealShadows) ? uint.MaxValue : WallSegment.ShadowLayer;
 
                 break;
         }
@@ -168,7 +171,7 @@ public partial class Ps1Look : Node
 
     private void Tune(Material material, Vector2 resolution)
     {
-        if (material is not ShaderMaterial surface || surface.Shader != SurfaceShader)
+        if (material is not ShaderMaterial surface || (surface.Shader != SurfaceShader && surface.Shader != WallFade.MasonryShader))
             return;
 
         surface.SetShaderParameter(Snap, Enabled && SnapVertices ? 1f : 0f);

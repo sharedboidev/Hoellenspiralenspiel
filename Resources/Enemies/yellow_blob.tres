@@ -18,6 +18,6 @@ LightningResistance = 75
 DamageMin = 2.0
 DamageMax = 4.0
 DamageType = 5
-AttackRange = 80.0
+AttackRange = 30.0
 AttackWindupSec = 0.5
 AttackRecoverySec = 0.7

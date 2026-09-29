@@ -1,14 +1,79 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://jijd2qmg0xiu"]
 
-[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="ps1"]
-[ext_resource type="Texture2D" path="res://Textures/World/cloth_weave.png" id="cloth"]
-[ext_resource type="Script" path="res://Scripts/Units/Hero.cs" id="hero"]
-[ext_resource type="AudioStream" path="res://Audio/no mana.mp3" id="no_mana"]
+[ext_resource type="Texture2D" uid="uid://dt1q5gub7csdj" path="res://Textures/World/cloth_weave.png" id="cloth"]
+[ext_resource type="Script" uid="uid://b6vkaowkmc3ie" path="res://Scripts/Units/Hero.cs" id="hero"]
 [ext_resource type="PackedScene" path="res://Scenes/Units/level_up_effect.tscn" id="level_up"]
+[ext_resource type="AudioStream" uid="uid://sri6stb07ual" path="res://Audio/no mana.mp3" id="no_mana"]
+[ext_resource type="Shader" uid="uid://c2lknp40isk5w" path="res://Shaders/Ps1/ps1_surface.gdshader" id="ps1"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.3
 height = 1.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_6"]
+size = Vector3(0.46, 0.62, 0.26)
+
+[sub_resource type="ShaderMaterial" id="Mat_1"]
+render_priority = 0
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.78, 0.76, 0.7, 1)
+shader_parameter/albedo_texture = ExtResource("cloth")
+shader_parameter/uv_scale = Vector2(3, 3)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
+shader_parameter/emission = Color(0, 0, 0, 1)
+shader_parameter/emission_energy = 0.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(426, 240)
+shader_parameter/affine = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_7"]
+size = Vector3(0.42, 0.2, 0.24)
+
+[sub_resource type="ShaderMaterial" id="Mat_2"]
+render_priority = 0
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.3, 0.27, 0.25, 1)
+shader_parameter/albedo_texture = ExtResource("cloth")
+shader_parameter/uv_scale = Vector2(3, 3)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
+shader_parameter/emission = Color(0, 0, 0, 1)
+shader_parameter/emission_energy = 0.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(426, 240)
+shader_parameter/affine = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_5"]
+size = Vector3(0.17, 0.62, 0.19)
+
+[sub_resource type="SphereMesh" id="SphereMesh_8"]
+radius = 0.16
+height = 0.32
+radial_segments = 8
+rings = 4
+
+[sub_resource type="ShaderMaterial" id="Mat_3"]
+render_priority = 0
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.85, 0.66, 0.55, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
+shader_parameter/emission = Color(0, 0, 0, 1)
+shader_parameter/emission_energy = 0.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(426, 240)
+shader_parameter/affine = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_9"]
+size = Vector3(0.06, 0.06, 0.09)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3"]
+size = Vector3(0.13, 0.6, 0.13)
+
+[sub_resource type="BoxMesh" id="BoxMesh_4"]
+size = Vector3(0.12, 0.13, 0.12)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_2"]
 top_radius = 0.4
@@ -22,173 +87,132 @@ transparency = 1
 shading_mode = 0
 albedo_color = Color(0, 0, 0, 0.5)
 
-[sub_resource type="BoxMesh" id="BoxMesh_3"]
-size = Vector3(0.13, 0.6, 0.13)
-
-[sub_resource type="BoxMesh" id="BoxMesh_4"]
-size = Vector3(0.12, 0.13, 0.12)
-
-[sub_resource type="BoxMesh" id="BoxMesh_5"]
-size = Vector3(0.17, 0.62, 0.19)
-
-[sub_resource type="BoxMesh" id="BoxMesh_6"]
-size = Vector3(0.46, 0.62, 0.26)
-
-[sub_resource type="ShaderMaterial" id="Mat_1"]
-shader = ExtResource("ps1")
-shader_parameter/albedo = Color(0.78, 0.76, 0.7, 1)
-shader_parameter/albedo_texture = ExtResource("cloth")
-shader_parameter/uv_scale = Vector2(3, 3)
-
-[sub_resource type="BoxMesh" id="BoxMesh_7"]
-size = Vector3(0.42, 0.2, 0.24)
-
-[sub_resource type="ShaderMaterial" id="Mat_2"]
-shader = ExtResource("ps1")
-shader_parameter/albedo = Color(0.3, 0.27, 0.25, 1)
-shader_parameter/albedo_texture = ExtResource("cloth")
-shader_parameter/uv_scale = Vector2(3, 3)
-
-[sub_resource type="SphereMesh" id="SphereMesh_8"]
-radius = 0.16
-height = 0.32
-radial_segments = 8
-rings = 4
-
-[sub_resource type="ShaderMaterial" id="Mat_3"]
-shader = ExtResource("ps1")
-shader_parameter/albedo = Color(0.85, 0.66, 0.55, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_9"]
-size = Vector3(0.06, 0.06, 0.09)
-
-[node name="Hero" type="CharacterBody3D" node_paths=PackedStringArray("NoManaSound")]
+[node name="Hero" type="CharacterBody3D" unique_id=1933913043 node_paths=PackedStringArray("NoManaSound")]
 collision_mask = 10
 motion_mode = 1
 script = ExtResource("hero")
 NoManaSound = NodePath("NoManaSound")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1362585626]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_1")
 
-[node name="Visual" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="Visual" type="Node3D" parent="." unique_id=634971844]
 
-[node name="Body" type="MeshInstance3D" parent="Visual"]
+[node name="Body" type="MeshInstance3D" parent="Visual" unique_id=159873709]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.11, 0)
 mesh = SubResource("BoxMesh_6")
 surface_material_override/0 = SubResource("Mat_1")
 
-[node name="Hips" type="MeshInstance3D" parent="Visual"]
+[node name="Hips" type="MeshInstance3D" parent="Visual" unique_id=787105689]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
 mesh = SubResource("BoxMesh_7")
 surface_material_override/0 = SubResource("Mat_2")
 
-[node name="LegLeft" type="MeshInstance3D" parent="Visual"]
+[node name="LegLeft" type="MeshInstance3D" parent="Visual" unique_id=681963625]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.31, 0)
 mesh = SubResource("BoxMesh_5")
 surface_material_override/0 = SubResource("Mat_2")
 
-[node name="LegRight" type="MeshInstance3D" parent="Visual"]
+[node name="LegRight" type="MeshInstance3D" parent="Visual" unique_id=943283081]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.31, 0)
 mesh = SubResource("BoxMesh_5")
 surface_material_override/0 = SubResource("Mat_2")
 
-[node name="Head" type="MeshInstance3D" parent="Visual"]
+[node name="Head" type="MeshInstance3D" parent="Visual" unique_id=7595964]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 mesh = SubResource("SphereMesh_8")
 surface_material_override/0 = SubResource("Mat_3")
 
-[node name="Nose" type="MeshInstance3D" parent="Visual"]
+[node name="Nose" type="MeshInstance3D" parent="Visual" unique_id=1176475799]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.58, -0.17)
 mesh = SubResource("BoxMesh_9")
 surface_material_override/0 = SubResource("Mat_3")
 
-[node name="WeaponPivot" type="Node3D" parent="Visual"]
+[node name="WeaponPivot" type="Node3D" parent="Visual" unique_id=688363770]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.31, 1.36, 0)
 
-[node name="ArmRight" type="MeshInstance3D" parent="Visual/WeaponPivot"]
+[node name="ArmRight" type="MeshInstance3D" parent="Visual/WeaponPivot" unique_id=119784688]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
 mesh = SubResource("BoxMesh_3")
 surface_material_override/0 = SubResource("Mat_1")
 
-[node name="HandRight" type="MeshInstance3D" parent="Visual/WeaponPivot"]
+[node name="HandRight" type="MeshInstance3D" parent="Visual/WeaponPivot" unique_id=343935292]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66, 0)
 mesh = SubResource("BoxMesh_4")
 surface_material_override/0 = SubResource("Mat_3")
 
-[node name="AttachPhysicalWeapon" type="Marker3D" parent="Visual/WeaponPivot"]
+[node name="AttachPhysicalWeapon" type="Marker3D" parent="Visual/WeaponPivot" unique_id=1570284336]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66, -0.06)
 
-[node name="AttachHandsRight" type="Marker3D" parent="Visual/WeaponPivot"]
+[node name="AttachHandsRight" type="Marker3D" parent="Visual/WeaponPivot" unique_id=1079124152]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66, 0)
 
-[node name="AttachWristsRight" type="Marker3D" parent="Visual/WeaponPivot"]
+[node name="AttachWristsRight" type="Marker3D" parent="Visual/WeaponPivot" unique_id=1851464498]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
-[node name="ArmLeftPivot" type="Node3D" parent="Visual"]
+[node name="ArmLeftPivot" type="Node3D" parent="Visual" unique_id=951342708]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.31, 1.36, 0)
 
-[node name="ArmLeft" type="MeshInstance3D" parent="Visual/ArmLeftPivot"]
+[node name="ArmLeft" type="MeshInstance3D" parent="Visual/ArmLeftPivot" unique_id=906511556]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
 mesh = SubResource("BoxMesh_3")
 surface_material_override/0 = SubResource("Mat_1")
 
-[node name="HandLeft" type="MeshInstance3D" parent="Visual/ArmLeftPivot"]
+[node name="HandLeft" type="MeshInstance3D" parent="Visual/ArmLeftPivot" unique_id=1240773585]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66, 0)
 mesh = SubResource("BoxMesh_4")
 surface_material_override/0 = SubResource("Mat_3")
 
-[node name="AttachOffhand" type="Marker3D" parent="Visual/ArmLeftPivot"]
+[node name="AttachOffhand" type="Marker3D" parent="Visual/ArmLeftPivot" unique_id=1447441739]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66, -0.06)
 
-[node name="AttachHandsLeft" type="Marker3D" parent="Visual/ArmLeftPivot"]
+[node name="AttachHandsLeft" type="Marker3D" parent="Visual/ArmLeftPivot" unique_id=82591516]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66, 0)
 
-[node name="AttachWristsLeft" type="Marker3D" parent="Visual/ArmLeftPivot"]
+[node name="AttachWristsLeft" type="Marker3D" parent="Visual/ArmLeftPivot" unique_id=634294682]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
-[node name="AttachHelmet" type="Marker3D" parent="Visual"]
+[node name="AttachHelmet" type="Marker3D" parent="Visual" unique_id=892229969]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 
-[node name="AttachNeck" type="Marker3D" parent="Visual"]
+[node name="AttachNeck" type="Marker3D" parent="Visual" unique_id=1895594616]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.44, 0)
 
-[node name="AttachShoulders" type="Marker3D" parent="Visual"]
+[node name="AttachShoulders" type="Marker3D" parent="Visual" unique_id=818314631]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
 
-[node name="AttachTorso" type="Marker3D" parent="Visual"]
+[node name="AttachTorso" type="Marker3D" parent="Visual" unique_id=1545961989]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.11, 0)
 
-[node name="AttachBack" type="Marker3D" parent="Visual"]
+[node name="AttachBack" type="Marker3D" parent="Visual" unique_id=581144592]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0.15)
 
-[node name="AttachBelt" type="Marker3D" parent="Visual"]
+[node name="AttachBelt" type="Marker3D" parent="Visual" unique_id=1488186919]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 
-[node name="AttachLegs" type="Marker3D" parent="Visual"]
+[node name="AttachLegs" type="Marker3D" parent="Visual" unique_id=1372453748]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 
-[node name="AttachFeet" type="Marker3D" parent="Visual"]
+[node name="AttachFeet" type="Marker3D" parent="Visual" unique_id=1015573040]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
 
-[node name="BlobShadow" type="MeshInstance3D" parent="." groups=["blob_shadows"]]
+[node name="BlobShadow" type="MeshInstance3D" parent="." unique_id=408279629 groups=["blob_shadows"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
 cast_shadow = 0
 mesh = SubResource("CylinderMesh_2")
 surface_material_override/0 = SubResource("Mat_blob_shadow")
 
-[node name="LevelUpEffect" parent="." instance=ExtResource("level_up")]
+[node name="LevelUpEffect" parent="." unique_id=454393998 instance=ExtResource("level_up")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
-[node name="NoManaSound" type="AudioStreamPlayer" parent="."]
+[node name="NoManaSound" type="AudioStreamPlayer" parent="." unique_id=377379938]
 stream = ExtResource("no_mana")
 volume_db = -20.0
 
-[node name="Light" type="OmniLight3D" parent="."]
+[node name="Light" type="OmniLight3D" parent="." unique_id=1935674331]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
 light_color = Color(1, 0.85, 0.65, 1)
 light_energy = 4.5
 shadow_enabled = true
-omni_range = 12.0
+omni_range = 8.0

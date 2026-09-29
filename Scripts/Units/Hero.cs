@@ -18,6 +18,7 @@ using Hoellenspiralenspiel.Scripts.Skills;
 using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.Utils;
 using Hoellenspiralenspiel.Scripts.World;
+using Hoellenspiralenspiel.Scripts.World.Levels;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
@@ -48,12 +49,11 @@ public partial class Hero
     private          ItemInstance  equippedWeapon;
     private          bool          hasDied;
     private          int           heldSlot = NoSlot;
-    private          Lootbag       hoveredLootbag;
+    private          IUsable       hoveredUsable;
     private          double        invulnerableTimeLeftSec;
     private          LevelUpEffect levelUpEffect;
     private          OmniLight3D   light;
     private          float         lightBaseRange;
-    private          Lootbag       lootTarget;
     private          float         manaCurrent;
     private          SkillResource orderedSkill;
     private readonly HeroProgress  progress = new();
@@ -61,6 +61,7 @@ public partial class Hero
     private          bool          swingFailed;
     private          Tween         swingLook;
     private          SkillResource swingSkill;
+    private          IUsable       useTarget;
     private          WeaponProfile weapon = WeaponProfile.Unarmed;
     private          Node3D        weaponPivot;
     private          WornItems     wornItems;
@@ -138,6 +139,8 @@ public partial class Hero
     public override float AvailableMana => ManaCurrent;
 
     public override float CombatTextHeight => 2.1f;
+
+    public float LightRadiusMeters => light?.OmniRange ?? 0f;
 
     public float ManaMaximum => Stats.GetFinalWhole(CombatStat.Mana);
 
@@ -220,6 +223,22 @@ public partial class Hero
             light.OmniRange = lightBaseRange * Stats.GetFinal(CombatStat.LightRadius) / 100f;
     }
 
+    public override void _Process(double delta)
+        => WallFade.Update(GlobalPosition, PickHeight, LightRadiusMeters, GetViewport().GetCamera3D()?.GlobalPosition ?? GlobalPosition);
+
+    //Hier steht der Held nach dem Betreten einer Ebene und nach dem Tod
+    public void MoveToLevelStart(Vector3 position)
+    {
+        CancelAttack();
+
+        heldSlot       = NoSlot;
+        Velocity       = Vector3.Zero;
+        GlobalPosition = position;
+        spawnPosition  = position;
+
+        approachPath.Reset();
+    }
+
     private void OnLifeChanged(BaseUnit unit)
     {
         if (IsDead && !hasDied)
@@ -258,7 +277,7 @@ public partial class Hero
         invulnerableTimeLeftSec = Math.Max(0, invulnerableTimeLeftSec - delta);
 
         RegenerateMana(delta);
-        UpdateHoveredLootbag();
+        UpdateHoveredUsable();
         RepeatHeldSkill();
         AdvanceAttack(delta);
         Move(GetWantedDirection(delta), delta);
@@ -312,12 +331,12 @@ public partial class Hero
 
         foreach (var unit in UnitsNearPoint)
         {
-            if (!IsHostileTo(unit) || !unit.IsTargetable)
+            if (!IsHostileTo(unit) || !unit.IsTargetable || !unit.IsSeen)
                 continue;
 
             var depth = unit.GetPickDepth(rayOrigin, rayNormal);
 
-            if (depth < 0f || depth >= nearestDepth)
+            if (depth < 0f || depth >= nearestDepth || WallFade.IsHidden(this, rayOrigin, rayOrigin + rayNormal * depth))
                 continue;
 
             nearestUnit  = unit;
@@ -336,7 +355,7 @@ public partial class Hero
         if (IsDead)
             return;
 
-        if (!LootLabels.AreShown && @event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } && OrderPickUp(Lootbag.FindUnderMouse(this)))
+        if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } && OrderUse(FindUsableUnderMouse()))
         {
             GetViewport().SetInputAsHandled();
 
@@ -409,7 +428,7 @@ public partial class Hero
 
         var previousTarget = attackTarget;
 
-        lootTarget       = null;
+        useTarget        = null;
         orderedSkill     = skill;
         attackTarget     = aim.HasTarget ? aim.Target : null;
         attackAimPoint   = aim.Point;
@@ -473,8 +492,8 @@ public partial class Hero
             return inputDirection;
         }
 
-        if (lootTarget is not null)
-            return ApproachLoot(delta);
+        if (useTarget is not null)
+            return ApproachUsable(delta);
 
         if (orderedSkill is null || !attackCycle.IsReady)
             return Vector3.Zero;
@@ -537,7 +556,7 @@ public partial class Hero
 
     private void GiveUpTargetWhenStuck(Vector3 direction, double delta)
     {
-        var isApproaching = (attackTarget is not null || lootTarget is not null) && direction != Vector3.Zero;
+        var isApproaching = (attackTarget is not null || useTarget is not null) && direction != Vector3.Zero;
 
         if (!isApproaching || GetRealVelocity().Length() > WorldScale.ToMeters(MovementspeedPx) * StuckSpeedFraction)
         {
@@ -553,7 +572,7 @@ public partial class Hero
 
         ClearOrder();
 
-        lootTarget       = null;
+        useTarget        = null;
         heldSlot         = NoSlot;
         approachStuckSec = 0;
     }
@@ -631,7 +650,7 @@ public partial class Hero
     {
         ClearOrder();
 
-        lootTarget = null;
+        useTarget = null;
         swingSkill = null;
 
         if (GetSkill(heldSlot)?.Kind == SkillKind.Attack)
@@ -761,22 +780,25 @@ public partial class Hero
         }
     }
 
-    //Ein Beutel in Reichweite wandert sofort ins Inventar, zu einem entfernten läuft der Held erst hin
     public bool OrderPickUp(Lootbag lootbag)
+        => OrderUse(lootbag);
+
+    //Was in Reichweite liegt, benutzt der Held sofort, zu allem anderen läuft er erst hin
+    public bool OrderUse(IUsable usable)
     {
-        if (IsDead || !IsInstanceValid(lootbag))
+        if (IsDead || !IsStillThere(usable))
             return false;
 
         CancelAttack();
 
-        if (lootbag.IsInReachOf(this))
+        if (usable.IsInReachOf(this))
         {
-            lootbag.Collect();
+            usable.Use();
 
             return true;
         }
 
-        lootTarget       = lootbag;
+        useTarget        = usable;
         approachStuckSec = 0;
 
         approachPath.Reset();
@@ -784,36 +806,44 @@ public partial class Hero
         return true;
     }
 
-    //Sind die Schilder zu sehen, hellen sie ihren Beutel selbst auf
-    private void UpdateHoveredLootbag()
-    {
-        var lootbagUnderMouse = LootLabels.AreShown ? null : Lootbag.FindUnderMouse(this);
+    private static bool IsStillThere(IUsable usable)
+        => usable is Node node && IsInstanceValid(node) && !node.IsQueuedForDeletion();
 
-        if (lootbagUnderMouse == hoveredLootbag)
+    //Sind die Schilder zu sehen, hebt man Beutel nur über ihr Schild auf, und das Schild hellt den Beutel selbst auf
+    private IUsable FindUsableUnderMouse()
+        => Usables.FindUnderMouse(this, LootLabels.AreShown);
+
+    private void UpdateHoveredUsable()
+    {
+        var usableUnderMouse = FindUsableUnderMouse();
+
+        if (usableUnderMouse == hoveredUsable)
             return;
 
-        if (IsInstanceValid(hoveredLootbag))
-            hoveredLootbag.SetHighlight(false);
+        if (IsStillThere(hoveredUsable))
+            hoveredUsable.SetHighlight(false);
 
-        hoveredLootbag = lootbagUnderMouse;
-        hoveredLootbag?.SetHighlight(true);
+        hoveredUsable = usableUnderMouse;
+        hoveredUsable?.SetHighlight(true);
     }
 
-    private Vector3 ApproachLoot(double delta)
+    private Vector3 ApproachUsable(double delta)
     {
-        if (!IsInstanceValid(lootTarget) || lootTarget.IsQueuedForDeletion())
+        if (!IsStillThere(useTarget))
         {
-            lootTarget = null;
+            useTarget = null;
 
             return Vector3.Zero;
         }
 
-        if (!lootTarget.IsInReachOf(this))
-            return approachPath.GetDirectionTo(lootTarget.GlobalPosition, delta);
+        if (!useTarget.IsInReachOf(this))
+            return approachPath.GetDirectionTo(useTarget.GlobalPosition, delta);
 
-        lootTarget.Collect();
+        var reached = useTarget;
 
-        lootTarget = null;
+        useTarget = null;
+
+        reached.Use();
 
         return Vector3.Zero;
     }

@@ -9,7 +9,7 @@ using Hoellenspiralenspiel.Scripts.Utils;
 namespace Hoellenspiralenspiel.Scripts.UI;
 
 //Die Schilder der Beutel. Ein Schild weicht beim Anlegen anderen nach oben aus und behält danach seinen Platz,
-//auch wenn ein Nachbar aufgehoben wird. Neu ausgerichtet wird nur beim Einschalten
+//auch wenn ein Nachbar aufgehoben wird. Neu ausgerichtet wird nur beim Einschalten, beim Laufen bleiben die Schilder starr
 public partial class LootLabels : Control
 {
     private const float GapPx      = 4f;
@@ -94,7 +94,7 @@ public partial class LootLabels : Control
         AreShown = !AreShown;
 
         foreach (var label in labels.Values)
-            label.MouseFilter = GetMouseFilter();
+            label.MouseFilter = GetLabelFilter();
 
         if (AreShown)
         {
@@ -112,7 +112,7 @@ public partial class LootLabels : Control
     }
 
     //Sind die Schilder aus, hebt man über den Beutel auf. Ein Schild, das die Maus abfängt, stünde dabei im Weg
-    private static MouseFilterEnum GetMouseFilter()
+    private static MouseFilterEnum GetLabelFilter()
         => AreShown ? MouseFilterEnum.Stop : MouseFilterEnum.Ignore;
 
     private static bool IsBagHovered(LootLabel label)
@@ -158,7 +158,7 @@ public partial class LootLabels : Control
         var label = LootLabel.Create(lootbag);
 
         label.Visible     =  false;
-        label.MouseFilter =  GetMouseFilter();
+        label.MouseFilter =  GetLabelFilter();
         label.Clicked     += OnClicked;
 
         labels[lootbag] = label;

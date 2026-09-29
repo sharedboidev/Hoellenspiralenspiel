@@ -56,5 +56,5 @@ public class ProjectileSettingsTests
 
     [Test]
     public void Reichweite_DerWaffe_HatEtwasSpielraum()
-        => Assert.That(WeaponProfile.Unarmed.Reach, Is.EqualTo(WeaponProfile.DefaultMeleeRange * WeaponProfile.RangeTolerance));
+        => Assert.That(WeaponProfile.Unarmed.Reach, Is.EqualTo(WeaponProfile.UnarmedRange * WeaponProfile.RangeTolerance));
 }

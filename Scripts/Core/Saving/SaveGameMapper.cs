@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hoellenspiralenspiel.Scripts.Core.Items;
+using Hoellenspiralenspiel.Scripts.Core.Levels;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Saving;
@@ -118,5 +119,37 @@ public static class SaveGameMapper
 
         for (var slot = 0; slot < loadout.SlotCount; slot++)
             loadout.Assign(slot, slot < savedSlots.Count ? savedSlots[slot] : null);
+    }
+
+    public static void CaptureDescent(DescentState descent, SaveGame save)
+    {
+        ArgumentNullException.ThrowIfNull(descent);
+        ArgumentNullException.ThrowIfNull(save);
+
+        save.Descent = new DescentSave
+        {
+            Seed  = descent.Seed,
+            Depth = descent.Depth,
+            Levels = descent.RevealedByDepth
+                            .OrderBy(level => level.Key)
+                            .Select(level => new ExploredLevelSave { Depth = level.Key, Revealed = level.Value })
+                            .ToList()
+        };
+    }
+
+    //Ein Spielstand aus der Zeit vor dem Abstieg hat keinen, der Held steht dann an der Oberfläche
+    public static bool RestoreDescent(SaveGame save, DescentState descent)
+    {
+        ArgumentNullException.ThrowIfNull(save);
+        ArgumentNullException.ThrowIfNull(descent);
+
+        if (save.Descent is null)
+            return false;
+
+        descent.Restore(save.Descent.Seed,
+                        save.Descent.Depth,
+                        (save.Descent.Levels ?? []).Select(level => new KeyValuePair<int, string>(level.Depth, level.Revealed)));
+
+        return true;
     }
 }

@@ -14,6 +14,20 @@ public sealed class SaveGame
     public List<PlacedItemSave>   Inventory { get; set; } = new();
     public List<EquippedItemSave> Equipment { get; set; } = new();
     public List<ItemSave>         Unplaced  { get; set; } = new();
+    public DescentSave            Descent   { get; set; }
+}
+
+public sealed class DescentSave
+{
+    public int                     Seed   { get; set; }
+    public int                     Depth  { get; set; }
+    public List<ExploredLevelSave> Levels { get; set; } = new();
+}
+
+public sealed class ExploredLevelSave
+{
+    public int    Depth    { get; set; }
+    public string Revealed { get; set; } = string.Empty;
 }
 
 public sealed class CharacterSave

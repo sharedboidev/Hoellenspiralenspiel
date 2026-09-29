@@ -1,42 +1,48 @@
+using System;
 using Godot;
+using Hoellenspiralenspiel.Scripts.Objects;
+using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.Environment;
 
-public partial class CellarDoor : Area3D
+public partial class CellarDoor
+        : Area3D,
+          IUsable
 {
     [Export]
     public Node3D Glow { get; set; }
+
+    //In Pixeln wie alle Reichweiten. Wer weiter entfernt steht, muss erst hinlaufen
+    [Export]
+    public float UseRadius { get; set; } = 150f;
 
     public bool IsHovered { get; private set; }
 
     public int TimesOpened { get; private set; }
 
+    public event Action<CellarDoor> Opened;
+
     public override void _Ready()
-    {
-        MouseEntered += () => SetHovered(true);
-        MouseExited  += () => SetHovered(false);
+        => SetHighlight(false);
 
-        SetHovered(false);
-    }
+    public bool IsInReachOf(BaseUnit unit)
+        => unit.DistancePxTo(GlobalPosition) <= UseRadius;
 
-    public override void _InputEvent(Camera3D camera, InputEvent @event, Vector3 eventPosition, Vector3 normal, int shapeIdx)
-    {
-        if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
-            Open();
-    }
+    public void Use()
+        => Open();
 
     public void Open()
     {
         TimesOpened++;
 
-        GD.Print("Init Scene Transition!!");
+        Opened?.Invoke(this);
     }
 
-    public void SetHovered(bool hovered)
+    public void SetHighlight(bool active)
     {
-        IsHovered = hovered;
+        IsHovered = active;
 
         if (Glow is not null)
-            Glow.Visible = hovered;
+            Glow.Visible = active;
     }
 }
