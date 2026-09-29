@@ -32,7 +32,7 @@ Gegner erschlagen, Beute sammeln, Charakter ausbauen.
 | Spielstruktur | Stadt als Hub, von dort Abstieg in einen Höllenkreis mit mehreren Ebenen |
 | Level | Überwiegend prozedural, dazu handgebaute Räume und Event-Orte |
 | Mehrspieler | Erst allein, Koop soll später nachrüstbar bleiben |
-| 2D oder 3D | Noch offen, die Spiellogik ist davon unabhängig gebaut |
+| 2D oder 3D | 3D im Look der PlayStation 1. Die Umstellung steht an, spielbar ist bisher die 2D-Fassung |
 
 ---
 
@@ -342,7 +342,7 @@ flowchart LR
 | ✅ | **M3** Skills | Attacks und Spells als Daten, frei belegbare Leiste, Skills unabhängig vom Wirkenden | mittel |
 | ✅ | **M4** Items und Speichern | Items als Daten, Inventar-Modell, Schild mit Block, Speichern und Laden | mittel |
 | ✅ | **M5** Gegner-KI | Gegner als Daten, Zustandsmaschine, Wegfindung, Level, Elite mit Mods | mittel |
-| ⏭️ | **Entscheidung** | 2D oder 3D, per kurzem Vergleichsprototyp | klein |
+| ✅ | **Entscheidung** | 3D im Look der PlayStation 1, entschieden nach dem [Vergleich](docs/VERGLEICH_2D_3D.md) | klein |
 | ⬜ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
 | ⬜ | **M7** Hub | Stadt, Abstieg, Menüs, Truhe, Händler, Einstellungen | mittel |
 | ⬜ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |

@@ -1,7 +1,7 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
-Stand: 28.09.2026. M0 bis M4 liegen auf `master`, dazu die Nachträge zu M2 und M3: Bleed stapelt, Schadenswerte im Tooltip und ausgedünnte Kommentare.
-M5 ist auf dem Branch `master_EnemyAiAndScaling` umgesetzt.
+Stand: 29.09.2026. M0 bis M5 liegen auf `master`, dazu die Nachträge zu M2 und M3: Bleed stapelt, Schadenswerte im Tooltip und ausgedünnte Kommentare.
+Der Vergleich von 2D und 3D ist auf dem Branch `master_Compare3D` gebaut. Die Entscheidung ist gefallen: 3D im Look der PlayStation 1.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code (rund 5.500 Zeilen) plus Szenen.
 Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 bis M5 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
@@ -10,7 +10,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 
 | Frage | Entscheidung |
 |---|---|
-| 2D oder 3D | Noch offen. Spiellogik wird zuerst von der Darstellung getrennt. |
+| 2D oder 3D | 3D im Look der PlayStation 1, Vorbild Silent Hill. Entschieden am 29.09.2026 nach dem Vergleich. |
 | Spielstruktur | Hub (Stadt) plus Abstieg in einen Höllenkreis mit mehreren Ebenen |
 | Leveldesign | Etwa 90 % prozedural, dazu handgebaute Räume und Event-Locations, die gezielt eingestreut werden |
 | Multiplayer | Singleplayer zuerst, Koop soll später nachrüstbar bleiben |
@@ -37,7 +37,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler. Seit M5 sind sie Resources mit Level, Ausrüstung und Verhalten, dazu Elite und Rare Elite mit Mods aus Bausteinen | Nur Blobs und ein Testgegner |
 | Wegfindung | Seit M5: Navigationsnetz pro Level, zur Laufzeit gebacken. Gegner und Held laufen um Wände herum | Nicht im PDF |
 | Atmosphäre | Punktlichter mit Schatten, abgedunkelte Szene, Overlay-Karte | Passt zum düsteren Vibe |
-| 3D | Ein Prototyp, der nur Bewegung kann | Offene Frage aus dem PDF |
+| 3D | Seit dem 29.09.2026: Held, drei Gegner, Feuerball und Wegfindung auf dem Kern, dazu der PS1-Look. Der alte Prototyp kann nur Bewegung. | Offene Frage aus dem PDF, entschieden für 3D |
 
 ## 2. Was an kritischen Systemen fehlt
 
@@ -765,10 +765,29 @@ Bewusst offen gelassen:
 - Der `EnemyController` sucht Held und Gegner-Container weiter über feste Namen in der Szene. Das gehört zu A1.
 - Die Szenen `lightning_strike.tscn` und `thunderbolt.tscn` verweisen auf veraltete UIDs und melden beim Laden je eine Warnung. Das war vor M5 auch so.
 
-### Entscheidungspunkt: 2D oder 3D
+### Entscheidungspunkt: 2D oder 3D (entschieden am 29.09.2026)
 
-Spätestens hier muss die Entscheidung fallen, weil M6 Levelgrafik erzeugt.
-Vorschlag: ein zeitlich begrenzter Vergleich. Spieler, ein Gegner und ein Zauber laufen einmal in 3D auf demselben Logik-Kern. Danach wird der Aufwand pro neuem Gegner in beiden Varianten verglichen.
+Die Entscheidung musste spätestens hier fallen, weil M6 Levelgrafik erzeugt.
+
+Der Vergleich ist am 29.09.2026 auf dem Branch `master_Compare3D` gebaut. Held, drei Gegner und der Feuerball laufen in 3D auf demselben Logik-Kern, mit Grundkörpern als Platzhalter. Messwerte, Aufwand und Empfehlung stehen in [VERGLEICH_2D_3D.md](VERGLEICH_2D_3D.md).
+
+| Frage | Befund |
+|---|---|
+| Kern und Daten | Laufen in 3D unverändert |
+| Neu geschrieben | 2.204 Zeilen Hüllen unter `Scripts/Spike3D` |
+| Rechenzeit | Kein Unterschied von Belang |
+| Bildrate mit 200 Gegnern | 3D 63, 2D 107. Ohne Schatten liegt 3D gleichauf. |
+| Aufwand pro Gegner | In 3D kleiner, sobald ein Modell da ist |
+
+Entscheidung vom 29.09.2026: 3D im Look der PlayStation 1, Vorbild Silent Hill.
+
+| Punkt | Festlegung |
+|---|---|
+| Grund | Der 2D-Stil gefällt, die Sprites machen aber zu viel Arbeit. Low-Poly-Modelle lassen sich selbst bauen. |
+| Look | Wackelnde Eckpunkte, verzogene Texturen, 240 Bildzeilen, 15 Bit Farbtiefe mit Punktmuster, kleine ungefilterte Texturen, Dunkelheit |
+| Vorlage | `Scripts/Spike3D`, `Scenes/Spike3D` und `Shaders/Spike3D` |
+
+Noch offen: orthogonale oder perspektivische Kamera. Beide lassen sich im Level mit F2 umschalten.
 
 ### M6: Prozedurale Level mit handgebauten Räumen (L)
 

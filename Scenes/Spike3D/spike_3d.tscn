@@ -1,0 +1,338 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Spike3D/Spike3DLevel.cs" id="1_level"]
+[ext_resource type="Script" path="res://Scripts/Spike3D/LevelNavigation3D.cs" id="2_navigation"]
+[ext_resource type="Script" path="res://Scripts/Spike3D/IsoCamera3D.cs" id="3_camera"]
+[ext_resource type="Script" path="res://Scripts/Spike3D/SpawnMarker3D.cs" id="4_marker"]
+[ext_resource type="PackedScene" path="res://Scenes/Spike3D/hero_3d.tscn" id="5_hero"]
+[ext_resource type="PackedScene" path="res://Scenes/Spike3D/Enemies/blue_blob_3d.tscn" id="6_blue_scene"]
+[ext_resource type="PackedScene" path="res://Scenes/Spike3D/Enemies/yellow_blob_3d.tscn" id="7_yellow_scene"]
+[ext_resource type="PackedScene" path="res://Scenes/Spike3D/Enemies/test_enemy_3d.tscn" id="8_test_scene"]
+[ext_resource type="Resource" path="res://Resources/Enemies/blue_blob.tres" id="9_blue"]
+[ext_resource type="Resource" path="res://Resources/Enemies/yellow_blob.tres" id="10_yellow"]
+[ext_resource type="Resource" path="res://Resources/Enemies/test_enemy.tres" id="11_test"]
+[ext_resource type="Script" path="res://Scripts/Spike3D/Ps1Look.cs" id="12_look"]
+[ext_resource type="Shader" path="res://Shaders/Spike3D/ps1_surface.gdshader" id="13_surface"]
+[ext_resource type="Shader" path="res://Shaders/Spike3D/ps1_screen.gdshader" id="14_screen"]
+[ext_resource type="Texture2D" path="res://Textures/Spike3D/floor_stone.png" id="15_floor"]
+[ext_resource type="Texture2D" path="res://Textures/Spike3D/wall_brick.png" id="16_wall"]
+
+[sub_resource type="Environment" id="Env_level"]
+background_mode = 1
+background_color = Color(0.02, 0.012, 0.012, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.6, 0.45, 0.4, 1)
+ambient_light_energy = 0.22
+tonemap_mode = 0
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.05, 0.025, 0.02, 1)
+fog_light_energy = 1.0
+fog_sun_scatter = 0.0
+fog_sky_affect = 0.0
+fog_depth_begin = 38.0
+fog_depth_end = 62.0
+
+[sub_resource type="ShaderMaterial" id="Mat_floor"]
+shader = ExtResource("13_surface")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/albedo_texture = ExtResource("15_floor")
+shader_parameter/world_uv_scale = 0.25
+
+[sub_resource type="ShaderMaterial" id="Mat_wall"]
+shader = ExtResource("13_surface")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/albedo_texture = ExtResource("16_wall")
+shader_parameter/world_uv_scale = 0.25
+
+[sub_resource type="ShaderMaterial" id="Mat_screen"]
+shader = ExtResource("14_screen")
+
+[sub_resource type="BoxShape3D" id="Shape_floor"]
+size = Vector3(60, 1, 60)
+
+[sub_resource type="PlaneMesh" id="Mesh_floor"]
+size = Vector2(60, 60)
+subdivide_width = 29
+subdivide_depth = 29
+
+[sub_resource type="BoxShape3D" id="Shape_border_x"]
+size = Vector3(60.5, 1, 0.5)
+
+[sub_resource type="BoxMesh" id="Mesh_border_x"]
+size = Vector3(60.5, 1, 0.5)
+subdivide_width = 29
+
+[sub_resource type="BoxShape3D" id="Shape_border_z"]
+size = Vector3(0.5, 1, 60.5)
+
+[sub_resource type="BoxMesh" id="Mesh_border_z"]
+size = Vector3(0.5, 1, 60.5)
+subdivide_depth = 29
+
+[sub_resource type="BoxShape3D" id="Shape_yard_long_z"]
+size = Vector3(0.5, 2.5, 8.5)
+
+[sub_resource type="BoxMesh" id="Mesh_yard_long_z"]
+size = Vector3(0.5, 2.5, 8.5)
+subdivide_height = 1
+subdivide_depth = 5
+
+[sub_resource type="BoxShape3D" id="Shape_yard_long_x"]
+size = Vector3(8.5, 2.5, 0.5)
+
+[sub_resource type="BoxMesh" id="Mesh_yard_long_x"]
+size = Vector3(8.5, 2.5, 0.5)
+subdivide_width = 5
+subdivide_height = 1
+
+[sub_resource type="BoxShape3D" id="Shape_yard_gate"]
+size = Vector3(0.5, 2.5, 3)
+
+[sub_resource type="BoxMesh" id="Mesh_yard_gate"]
+size = Vector3(0.5, 2.5, 3)
+subdivide_height = 1
+subdivide_depth = 2
+
+[node name="Spike3D" type="Node3D" node_paths=PackedStringArray("Hero", "EnemyContainer", "LifeBar", "ManaBar", "Status", "Look")]
+script = ExtResource("1_level")
+Hero = NodePath("Hero3D")
+EnemyContainer = NodePath("Enemies")
+LifeBar = NodePath("Hud/Margin/Rows/LifeBar")
+ManaBar = NodePath("Hud/Margin/Rows/ManaBar")
+Status = NodePath("Hud/Margin/Rows/Status")
+Look = NodePath("Ps1Look")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_level")
+
+[node name="Moonlight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8660254, -0.35355338, 0.35355338, 0, 0.70710677, 0.70710677, -0.5, -0.61237246, 0.61237246, 0, 10, 0)
+light_color = Color(0.75, 0.5, 0.45, 1)
+light_energy = 0.12
+shadow_enabled = true
+directional_shadow_max_distance = 90.0
+
+[node name="Environment" type="Node3D" parent="."]
+
+[node name="Floor" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 16
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Floor"]
+shape = SubResource("Shape_floor")
+
+[node name="Mesh" type="MeshInstance3D" parent="Environment/Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("Mesh_floor")
+surface_material_override/0 = SubResource("Mat_floor")
+
+[node name="BorderNorth" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -30)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/BorderNorth"]
+shape = SubResource("Shape_border_x")
+
+[node name="Mesh" type="MeshInstance3D" parent="Environment/BorderNorth"]
+mesh = SubResource("Mesh_border_x")
+surface_material_override/0 = SubResource("Mat_wall")
+
+[node name="BorderSouth" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 30)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/BorderSouth"]
+shape = SubResource("Shape_border_x")
+
+[node name="Mesh" type="MeshInstance3D" parent="Environment/BorderSouth"]
+mesh = SubResource("Mesh_border_x")
+surface_material_override/0 = SubResource("Mat_wall")
+
+[node name="BorderWest" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0.5, 0)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/BorderWest"]
+shape = SubResource("Shape_border_z")
+
+[node name="Mesh" type="MeshInstance3D" parent="Environment/BorderWest"]
+mesh = SubResource("Mesh_border_z")
+surface_material_override/0 = SubResource("Mat_wall")
+
+[node name="BorderEast" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0.5, 0)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/BorderEast"]
+shape = SubResource("Shape_border_z")
+
+[node name="Mesh" type="MeshInstance3D" parent="Environment/BorderEast"]
+mesh = SubResource("Mesh_border_z")
+surface_material_override/0 = SubResource("Mat_wall")
+
+[node name="YardWest" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.25, 0)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/YardWest"]
+shape = SubResource("Shape_yard_long_z")
+
+[node name="Mesh" type="MeshInstance3D" parent="Environment/YardWest"]
+mesh = SubResource("Mesh_yard_long_z")
+surface_material_override/0 = SubResource("Mat_wall")
+
+[node name="YardNorth" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 1.25, -4)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/YardNorth"]
+shape = SubResource("Shape_yard_long_x")
+
+[node name="Mesh" type="MeshInstance3D" parent="Environment/YardNorth"]
+mesh = SubResource("Mesh_yard_long_x")
+surface_material_override/0 = SubResource("Mat_wall")
+
+[node name="YardSouth" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 1.25, 4)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/YardSouth"]
+shape = SubResource("Shape_yard_long_x")
+
+[node name="Mesh" type="MeshInstance3D" parent="Environment/YardSouth"]
+mesh = SubResource("Mesh_yard_long_x")
+surface_material_override/0 = SubResource("Mat_wall")
+
+[node name="YardGateNorth" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1.25, -2.75)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/YardGateNorth"]
+shape = SubResource("Shape_yard_gate")
+
+[node name="Mesh" type="MeshInstance3D" parent="Environment/YardGateNorth"]
+mesh = SubResource("Mesh_yard_gate")
+surface_material_override/0 = SubResource("Mat_wall")
+
+[node name="YardGateSouth" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1.25, 2.75)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/YardGateSouth"]
+shape = SubResource("Shape_yard_gate")
+
+[node name="Mesh" type="MeshInstance3D" parent="Environment/YardGateSouth"]
+mesh = SubResource("Mesh_yard_gate")
+surface_material_override/0 = SubResource("Mat_wall")
+
+[node name="LevelNavigation" type="NavigationRegion3D" parent="." node_paths=PackedStringArray("SourceRoot")]
+script = ExtResource("2_navigation")
+SourceRoot = NodePath("../Environment")
+
+[node name="Hero3D" parent="." instance=ExtResource("5_hero")]
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="SpawnMarkers" type="Node3D" parent="."]
+
+[node name="BlueBlobs" type="Marker3D" parent="SpawnMarkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, -7)
+script = ExtResource("4_marker")
+Enemy = ExtResource("9_blue")
+Scene = ExtResource("6_blue_scene")
+AmountToSpawn = 4
+
+[node name="YellowBlobs" type="Marker3D" parent="SpawnMarkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, 7)
+script = ExtResource("4_marker")
+Enemy = ExtResource("10_yellow")
+Scene = ExtResource("7_yellow_scene")
+AmountToSpawn = 3
+
+[node name="Courtyard" type="Marker3D" parent="SpawnMarkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5, 0, -2.5)
+script = ExtResource("4_marker")
+Enemy = ExtResource("10_yellow")
+Scene = ExtResource("7_yellow_scene")
+
+[node name="Caster" type="Marker3D" parent="SpawnMarkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -13)
+script = ExtResource("4_marker")
+Enemy = ExtResource("11_test")
+Scene = ExtResource("8_test_scene")
+
+[node name="Camera" type="Camera3D" parent="." node_paths=PackedStringArray("Target")]
+transform = Transform3D(0.70710677, -0.35355338, 0.61237246, 0, 0.8660254, 0.5, -0.70710677, -0.35355338, 0.61237246, 24.5, 20, 24.5)
+projection = 1
+current = true
+size = 18.0
+near = 0.1
+far = 150.0
+script = ExtResource("3_camera")
+Target = NodePath("../Hero3D")
+
+[node name="Ps1Look" type="Node" parent="." node_paths=PackedStringArray("Screen", "World")]
+script = ExtResource("12_look")
+SurfaceShader = ExtResource("13_surface")
+Screen = NodePath("../Ps1Screen/Picture")
+World = NodePath("..")
+
+[node name="Ps1Screen" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="Picture" type="ColorRect" parent="Ps1Screen"]
+material = SubResource("Mat_screen")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Hud" type="CanvasLayer" parent="."]
+
+[node name="Margin" type="MarginContainer" parent="Hud"]
+offset_right = 560.0
+offset_bottom = 300.0
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+
+[node name="Rows" type="VBoxContainer" parent="Hud/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Status" type="Label" parent="Hud/Margin/Rows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "FPS"
+
+[node name="LifeBar" type="ProgressBar" parent="Hud/Margin/Rows"]
+modulate = Color(1, 0.25, 0.25, 1)
+custom_minimum_size = Vector2(480, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+show_percentage = false
+
+[node name="ManaBar" type="ProgressBar" parent="Hud/Margin/Rows"]
+modulate = Color(0.35, 0.55, 1, 1)
+custom_minimum_size = Vector2(480, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+show_percentage = false
+
+[node name="Controls" type="Label" parent="Hud/Margin/Rows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "WASD laufen · Linke Maustaste auf Gegner: Angriff · Rechte Maustaste: Feuerball
+F1 PS1-Look · F2 Kamera · F3 Bildzeilen · F4 Schatten"

@@ -1,0 +1,77 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Spike3D/Enemy3D.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Spike3D/ps1_surface.gdshader" id="90_ps1"]
+[ext_resource type="Texture2D" path="res://Textures/Spike3D/skin_speckled.png" id="91_skin"]
+
+[sub_resource type="CapsuleShape3D" id="Shape_body"]
+radius = 0.2
+height = 1.0
+
+[sub_resource type="SphereMesh" id="Mesh_body"]
+radial_segments = 10
+rings = 5
+radius = 0.55
+height = 0.9
+
+[sub_resource type="ShaderMaterial" id="Mat_body"]
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0.95, 0.8, 0.15, 1)
+shader_parameter/albedo_texture = ExtResource("91_skin")
+shader_parameter/uv_scale = Vector2(4, 2)
+
+[sub_resource type="SphereMesh" id="Mesh_eye"]
+radial_segments = 6
+rings = 3
+radius = 0.08
+height = 0.16
+
+[sub_resource type="ShaderMaterial" id="Mat_eye"]
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0.03, 0.03, 0.03, 1)
+
+[sub_resource type="CylinderMesh" id="Mesh_blob_shadow"]
+top_radius = 0.55
+bottom_radius = 0.55
+height = 0.01
+radial_segments = 10
+rings = 0
+
+[sub_resource type="StandardMaterial3D" id="Mat_blob_shadow"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0, 0, 0, 0.5)
+
+[node name="YellowBlob3D" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 9
+motion_mode = 1
+script = ExtResource("1_script")
+HealthbarHeight = 1.2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("Shape_body")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Body" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+mesh = SubResource("Mesh_body")
+surface_material_override/0 = SubResource("Mat_body")
+
+[node name="EyeLeft" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.18, 0.58, -0.46)
+mesh = SubResource("Mesh_eye")
+surface_material_override/0 = SubResource("Mat_eye")
+
+[node name="EyeRight" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 0.58, -0.46)
+mesh = SubResource("Mesh_eye")
+surface_material_override/0 = SubResource("Mat_eye")
+
+[node name="BlobShadow" type="MeshInstance3D" parent="." groups=["blob_shadows"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_blob_shadow")
+surface_material_override/0 = SubResource("Mat_blob_shadow")
