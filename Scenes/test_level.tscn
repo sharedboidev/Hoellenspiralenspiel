@@ -43,6 +43,7 @@
 [ext_resource type="Script" path="res://Scripts/World/Levels/WallSegment.cs" id="35_wall_segment"]
 [ext_resource type="Script" path="res://Scripts/World/Levels/RoomZone.cs" id="36_room_zone"]
 [ext_resource type="Resource" path="res://Resources/Enemies/skeleton.tres" id="37_skeleton"]
+[ext_resource type="Shader" uid="uid://b6satrjmt6gq" path="res://Shaders/Ps1/ps1_cutout.gdshader" id="38_cutout"]
 
 [sub_resource type="BoxShape3D" id="Shape_yard_zone"]
 size = Vector3(8, 2.5, 8)
@@ -277,6 +278,7 @@ Target = NodePath("../Hero")
 [node name="Ps1Look" type="Node" parent="." unique_id=948654486 node_paths=PackedStringArray("Screen", "World")]
 script = ExtResource("12_look")
 SurfaceShader = ExtResource("13_surface")
+CutoutShader = ExtResource("38_cutout")
 Screen = NodePath("../Ps1Screen/Picture")
 World = NodePath("..")
 

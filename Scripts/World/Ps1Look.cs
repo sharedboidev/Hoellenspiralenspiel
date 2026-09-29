@@ -49,6 +49,9 @@ public partial class Ps1Look : Node
     public Shader SurfaceShader { get; set; }
 
     [Export]
+    public Shader CutoutShader { get; set; }
+
+    [Export]
     public ColorRect Screen { get; set; }
 
     [Export]
@@ -171,7 +174,7 @@ public partial class Ps1Look : Node
 
     private void Tune(Material material, Vector2 resolution)
     {
-        if (material is not ShaderMaterial surface || (surface.Shader != SurfaceShader && surface.Shader != WallFade.MasonryShader))
+        if (material is not ShaderMaterial surface || (surface.Shader != SurfaceShader && surface.Shader != CutoutShader && surface.Shader != WallFade.MasonryShader))
             return;
 
         surface.SetShaderParameter(Snap, Enabled && SnapVertices ? 1f : 0f);
