@@ -5,6 +5,7 @@
 [ext_resource type="Resource" path="res://Resources/Enemies/blue_blob.tres" id="3_blue"]
 [ext_resource type="Resource" path="res://Resources/Enemies/yellow_blob.tres" id="4_yellow"]
 [ext_resource type="Resource" path="res://Resources/Enemies/test_enemy.tres" id="5_caster"]
+[ext_resource type="Resource" path="res://Resources/Enemies/skeleton.tres" id="6_skeleton"]
 [ext_resource type="PackedScene" path="res://Scenes/Rooms/start_room.tscn" id="10_start"]
 [ext_resource type="PackedScene" path="res://Scenes/Rooms/exit_room.tscn" id="11_exit"]
 [ext_resource type="PackedScene" path="res://Scenes/Rooms/chamber.tscn" id="12_chamber"]
@@ -33,11 +34,16 @@ MinAreaLevel = 3
 MinGroupSize = 1
 MaxGroupSize = 2
 
+[sub_resource type="Resource" id="Pool_skeleton"]
+script = ExtResource("2_entry")
+Enemy = ExtResource("6_skeleton")
+Weight = 2.0
+
 [resource]
 script = ExtResource("1_theme")
 Id = "test_circle"
 DisplayName = "Testkreis"
 Rooms = Array[PackedScene]([ExtResource("10_start"), ExtResource("11_exit"), ExtResource("12_chamber"), ExtResource("13_hall"), ExtResource("14_gallery"), ExtResource("15_shrine")])
-Enemies = Array[ExtResource("2_entry")]([SubResource("Pool_blue"), SubResource("Pool_yellow"), SubResource("Pool_caster")])
+Enemies = Array[ExtResource("2_entry")]([SubResource("Pool_blue"), SubResource("Pool_yellow"), SubResource("Pool_caster"), SubResource("Pool_skeleton")])
 FloorTexture = ExtResource("20_floor")
 WallTexture = ExtResource("21_wall")

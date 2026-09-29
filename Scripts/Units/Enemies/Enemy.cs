@@ -35,6 +35,7 @@ public partial class Enemy : BaseUnit
     private const double SightCheckIntervalSec = 0.2;
     private const float  LungeMeters           = 0.3f;
     private const double DeathLookSec          = 0.4;
+    private const double CorpseSec             = 0.5;
     private const float  NameTagLiftMeters     = 0.15f;
     private const float  EliteGlowEnergy       = 0.35f;
     private const float  AuraRadiusFactor      = 1.3f;
@@ -51,6 +52,7 @@ public partial class Enemy : BaseUnit
     private float                             closestToHomePx;
     private EliteAura                         aura;
     private Tween                             attackLook;
+    private double                            attackRecoverySec;
     private SkillResource                     attackSkill;
     private ShaderMaterial                    bodyMaterial;
     private EnemyBrain                        brain = new(new EnemyBehaviour());
@@ -204,7 +206,7 @@ public partial class Enemy : BaseUnit
     //Jede Instanz bekommt ihr eigenes Material, sonst färbte das Ausholen alle Gegner dieser Szene
     private void OwnBodyMaterial()
     {
-        var body = Visual?.GetNodeOrNull<MeshInstance3D>("Body");
+        var body = FindBody();
 
         if (body?.GetActiveMaterial(0) is not ShaderMaterial material)
             return;
@@ -315,6 +317,7 @@ public partial class Enemy : BaseUnit
             Velocity = Vector3.Zero;
 
         ShowNameTag();
+        Animations?.SetRunning(isAwake && isSeen);
     }
 
     //Wer hinter einer Mauer steht, bleibt verborgen, samt Aura, Lebensbalken und Namensschild
@@ -327,6 +330,7 @@ public partial class Enemy : BaseUnit
         Visible = seen;
 
         ShowNameTag();
+        Animations?.SetRunning(isAwake && isSeen);
     }
 
     private void ShowNameTag()
@@ -366,6 +370,16 @@ public partial class Enemy : BaseUnit
         if (Visual is null)
         {
             QueueFree();
+
+            return;
+        }
+
+        if (Animations?.CanDie == true)
+        {
+            var dying = CreateTween();
+
+            dying.TweenInterval(Animations.Die() + CorpseSec);
+            dying.TweenCallback(Callable.From(QueueFree));
 
             return;
         }
@@ -534,6 +548,8 @@ public partial class Enemy : BaseUnit
     {
         SetTint(Vector3.One);
 
+        Animations?.BeginRecovery(attackRecoverySec);
+
         if (attackFailed)
             CombatText.Show(this, "Failed", Colors.Yellow, 28);
         else if (attackSkill is not null && IsInstanceValid(Target))
@@ -556,7 +572,7 @@ public partial class Enemy : BaseUnit
 
                 break;
             default:
-                Velocity = Vector3.Zero;
+                StandStill();
 
                 break;
         }
@@ -572,6 +588,15 @@ public partial class Enemy : BaseUnit
     {
         Face(toTarget);
         SetTint(WindupTint);
+
+        if (Animations?.CanAttack == true)
+        {
+            attackRecoverySec = recoverySec;
+
+            Animations.BeginWindup(windupSec);
+
+            return;
+        }
 
         if (Visual is null || windupSec <= 0)
             return;
@@ -590,6 +615,7 @@ public partial class Enemy : BaseUnit
     {
         SetTint(Vector3.One);
 
+        Animations?.EndAttack();
         attackLook?.Kill();
 
         attackLook = null;

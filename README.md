@@ -185,7 +185,7 @@ Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
 
 | Feature | Beschreibung |
 |---|---|
-| Drei Gegnertypen | Blue Blob mit Frost, Yellow Blob mit Blitz und ein Testgegner, der Feuer spuckt |
+| Vier Gegnertypen | Blue Blob mit Frost, Yellow Blob mit Blitz, ein Testgegner, der Feuer spuckt, und ein Skelett mit Klauen |
 | Gegner als Daten | Jeder Gegner ist eine Resource mit Attributen, Ausrüstung, Skills, Beute und Verhalten. Ein neuer Gegner braucht keinen Code |
 | Level | Jede Karte hat ein Bereichslevel. Attribute wachsen mit dem Level, die Beute trägt das Level des Monsters |
 | Spawn-Marker | Gegner erscheinen in Gruppen, locker verstreut um festgelegte Orte. Zwischen zwei Körpern bleibt mindestens 1 m Luft, und keine Gruppe startet in Aggro-Reichweite des Helden |
@@ -198,6 +198,11 @@ Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
 | Angriffe | Ausholen, Treffer, Erholen. Beim Ausholen färbt sich der Gegner |
 | Skills | Mehrere Skills pro Gegner mit Abklingzeiten, ohne Angabe schlägt er im Nahkampf zu |
 | Tod | Erfahrung und Beute sofort, danach läuft die Todesanimation |
+| Animationen mit Skelett | Das Skelett steht, läuft, holt aus, schlägt zu und fällt um. Der Treffer fällt genau auf das Ende des Ausholens, auch bei höherem Angriffstempo. Die Schritte passen zum Lauftempo |
+
+<div align="center">
+<img src="docs/images/skelett_3d.webp" alt="Das Skelett im PS1-Look: oben links beim Laufen, oben rechts rot gefärbt beim Ausholen mit dem Arm hinter dem Kopf, unten links beim Schlag nach vorn, unten rechts am Boden neben einem Beutel" width="720">
+</div>
 
 <details>
 <summary>Die Mods im Überblick</summary>
@@ -338,7 +343,7 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 | Sichtbare Ausrüstung | Angelegte Waffen, Schilde und Rüstung erscheinen am Helden. Sichtbar sind alle Plätze außer den Ringen. |
 | Skills | Projektile fliegen, Flächen liegen als Kreis auf dem Boden |
 | Level-up | Ein Sternenregen aus Partikeln |
-| Platzhalter | Alle Modelle bestehen aus Grundkörpern, die Texturen sind erzeugt. Eigene Modelle folgen. |
+| Modelle | Das Skelett ist das erste echte Modell, mit Knochen und Animationen aus Blender. Held, Blobs und Testgegner sind noch Platzhalter aus Grundkörpern mit erzeugten Texturen. |
 
 <div align="center">
 <img src="docs/images/ausruestung_3d_varianten.webp" alt="Der 3D-Held ohne Ausrüstung, mit Schwert und Schild, mit Stab und beim Schuss mit dem Bogen" width="720">
@@ -369,7 +374,7 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 
 - Hub, Weg zurück nach oben und Menüs, damit auch mehrere Charaktere
 - Ein Höllenkreis mit eigenem Thema, bisher gibt es nur das Testthema
-- Eigene Modelle statt der Platzhalter aus Grundkörpern
+- Eigene Modelle für den Held und die übrigen Gegner, bisher hat nur das Skelett eins
 - Item-Basen für die übrigen zwölf Ausrüstungsplätze
 - Tasten im Spiel umbelegen
 - Klassen und Erwerb von Skills, der Held kennt vorerst alle
@@ -498,7 +503,7 @@ Hoellenspiralenspiel
 │   │   ├── Saving      Format des Spielstands, Lesen und Schreiben als JSON
 │   │   ├── Rng         Zufallsquelle mit Seed
 │   │   └── Progression XP-Tabelle, Level und Attributspunkte, XP-Verlust beim Tod
-│   ├── Units           Held, Gegner, Pfadfolger, sichtbare Ausrüstung
+│   ├── Units           Held, Gegner, Pfadfolger, sichtbare Ausrüstung, Animationen mit Skelett
 │   ├── Skills          Ausführung der Skills, Projektil und Fläche
 │   ├── Items           Bibliothek aller Item-Basen
 │   ├── Enemies         Bibliothek aller Monster-Mods
@@ -510,6 +515,7 @@ Hoellenspiralenspiel
 │   ├── Controllers     Gegnersteuerung, Beute, Spielablauf, Speichern
 │   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder, Schilder der Beute, Karte der Ebene
 ├── Scenes              Szenen für Level, Räume, Einheiten, Items, Skills, Objekte und Oberfläche
+├── Models              Modelle als .glb, unter Source die Dateien aus Blender. Godot übergeht Source
 ├── Shaders             Shader, unter Ps1 die für den PS1-Look und der Stern der Beutel, unter Archive2D die Effekte der 2D-Fassung
 ├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Gegner, Monster-Mods, Themen der Ebenen, Themes
 ├── Interfaces          Schnittstellen, darunter IHero zwischen Held und Oberfläche
@@ -540,6 +546,7 @@ Hängt dort eine Datei von Godot ab, schlägt der Test-Build fehl.
 | Kenney Dungeon Tiles | Tiles und Figuren für das Testlevel |
 | DropShadowCaster2D von csocraman | Addon für Schlagschatten |
 | TexturePacker Importer von CodeAndWeb | Addon für Sprite-Sheets |
+| [Retro Lowpoly PSX Skeleton](https://blendswap.com/blend/31808) von LonesomeDucky, Lizenz CC-BY | Netz, Knochen und Textur des Skeletts. Geändert: eigener Wurzelknochen, eigene Animationen, Export als `.glb`. Das Modell ist nach dem [Anatomically Correct Skeleton](https://sketchfab.com/3d-models/anatomically-correct-skeleton-3247ca2f8a6346d78142f193eeb59c88) von xandizandi entstanden |
 
 Die Datei `LICENSE` im Wurzelordner gehört zum TexturePacker Importer.
 Für das Spiel selbst ist noch keine Lizenz festgelegt.

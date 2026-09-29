@@ -51,8 +51,10 @@ void vertex() {
 	affine_uv = vec3(uv * depth, depth);
 }
 
-vec3 sample_surface(vec3 uv) {
-	vec4 texel = texture(albedo_texture, uv.xy / uv.z);
+vec4 sample_texel(vec3 uv) {
+	return texture(albedo_texture, uv.xy / uv.z);
+}
 
-	return albedo.rgb * texel.rgb * tint;
+vec3 sample_surface(vec3 uv) {
+	return albedo.rgb * sample_texel(uv).rgb * tint;
 }

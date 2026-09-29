@@ -94,7 +94,13 @@ public abstract partial class BaseUnit : CharacterBody3D
         }
     }
 
+    //In Metern pro Sekunde: So schnell muss die Einheit laufen, damit die Füße der Laufanimation nicht rutschen
+    [Export]
+    public float WalkCycleSpeed { get; set; } = 1f;
+
     protected Node3D Visual { get; private set; }
+
+    protected UnitAnimations Animations { get; private set; }
 
     public event DamageTakenEventHandler DamageTaken;
     public event DiedEventHandler        Died;
@@ -114,8 +120,9 @@ public abstract partial class BaseUnit : CharacterBody3D
         //Godot hält einen Körper an, der fast senkrecht auf eine Mauer läuft. Große Körper blieben so an jeder Ecke hängen
         WallMinSlideAngle = 0f;
 
-        bodyShape = GetNodeOrNull<CollisionShape3D>(nameof(CollisionShape3D));
-        Visual    = GetNodeOrNull<Node3D>(nameof(Visual));
+        bodyShape  = GetNodeOrNull<CollisionShape3D>(nameof(CollisionShape3D));
+        Visual     = GetNodeOrNull<Node3D>(nameof(Visual));
+        Animations = UnitAnimations.Find(Visual);
 
         MeasurePickVolume();
         MeasureBody();
@@ -146,15 +153,19 @@ public abstract partial class BaseUnit : CharacterBody3D
 
     protected abstract void ApplyBaseValues(StatSheet sheet);
 
+    //Bei einem Modell mit Skelett liegt das Netz nicht direkt unter Visual, sondern im importierten Modell
+    protected MeshInstance3D FindBody()
+        => Visual?.FindChild("Body", true, false) as MeshInstance3D;
+
     //Angeklickt wird das sichtbare Modell, die Kollisionsform ist viel kleiner
     private void MeasurePickVolume()
     {
-        var body = Visual?.GetNodeOrNull<MeshInstance3D>("Body");
+        var body = FindBody();
 
         if (body?.Mesh is null)
             return;
 
-        var bounds = body.Transform * body.GetAabb();
+        var bounds = Visual.GlobalTransform.AffineInverse() * body.GlobalTransform * body.GetAabb();
 
         PickHeight = Math.Max(MinPickRadius, bounds.End.Y);
         PickRadius = Math.Max(MinPickRadius, Math.Max(bounds.Size.X, bounds.Size.Z) / 2f);
@@ -258,6 +269,17 @@ public abstract partial class BaseUnit : CharacterBody3D
         Velocity = WorldScale.OnGround(direction) * WorldScale.ToMeters(speedPx);
 
         MoveAndSlide();
+
+        //Ein größerer Körper macht größere Schritte. Wer an einer Wand hängt, läuft nicht auf der Stelle
+        if (Animations is not null)
+            Animations.ShowMovement(WorldScale.OnGround(GetRealVelocity()).Length() / (WalkCycleSpeed * Visual.Scale.X));
+    }
+
+    protected void StandStill()
+    {
+        Velocity = Vector3.Zero;
+
+        Animations?.ShowMovement(0f);
     }
 
     //Ein Modell deckt alle Richtungen ab, gedreht wird nur die Darstellung

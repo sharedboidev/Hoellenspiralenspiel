@@ -42,6 +42,7 @@
 [ext_resource type="Script" path="res://Scripts/UI/LevelMap.cs" id="34_level_map"]
 [ext_resource type="Script" path="res://Scripts/World/Levels/WallSegment.cs" id="35_wall_segment"]
 [ext_resource type="Script" path="res://Scripts/World/Levels/RoomZone.cs" id="36_room_zone"]
+[ext_resource type="Resource" path="res://Resources/Enemies/skeleton.tres" id="37_skeleton"]
 
 [sub_resource type="BoxShape3D" id="Shape_yard_zone"]
 size = Vector3(8, 2.5, 8)
@@ -252,6 +253,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -13)
 script = ExtResource("4_marker")
 Enemy = ExtResource("11_test")
 AmountToSpawn = 4
+
+[node name="Skeletons" type="Marker3D" parent="SpawnMarkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -6)
+script = ExtResource("4_marker")
+Enemy = ExtResource("37_skeleton")
+AmountToSpawn = 3
+ScatterRadius = 250.0
 
 [node name="CellarDoor" parent="." unique_id=1101918096 instance=ExtResource("27_door")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 5)
