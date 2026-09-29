@@ -1,6 +1,6 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
-Stand: 29.09.2026. M0 bis M5.5 liegen auf `master`, dazu die Nachträge zu M2, M3 und M5.5: Bleed stapelt, Schadenswerte im Tooltip, ausgedünnte Kommentare und die Rückmeldungen aus dem ersten Spielen. M6 ist auf dem Branch `master_ProceduralLevels` umgesetzt.
+Stand: 29.09.2026. M0 bis M6 liegen auf `master`, dazu die Nachträge zu M2, M3, M5.5 und M6: Bleed stapelt, Schadenswerte im Tooltip, ausgedünnte Kommentare, die Rückmeldungen aus dem ersten Spielen und die Rückmeldungen zu Mauern und Räumen.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen, die Hauptszene ist das 3D-Testlevel.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
