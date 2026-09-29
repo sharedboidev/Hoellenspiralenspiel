@@ -1,0 +1,53 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://Shaders/Spike3D/ps1_surface.gdshader" id="ps1"]
+[ext_resource type="Texture2D" path="res://Textures/Spike3D/cloth_weave.png" id="cloth"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1"]
+top_radius = 0.33
+bottom_radius = 0.33
+height = 0.05
+radial_segments = 10
+rings = 1
+
+[sub_resource type="ShaderMaterial" id="Mat_1"]
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.5, 0.34, 0.2, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2"]
+top_radius = 0.35
+bottom_radius = 0.35
+height = 0.03
+radial_segments = 10
+rings = 1
+
+[sub_resource type="ShaderMaterial" id="Mat_2"]
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.32, 0.21, 0.13, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_3"]
+radius = 0.08
+height = 0.16
+radial_segments = 6
+rings = 3
+
+[sub_resource type="ShaderMaterial" id="Mat_3"]
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.75, 0.77, 0.82, 1)
+
+[node name="WoodenShield" type="Node3D"]
+
+[node name="Board" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.12, -0.14)
+mesh = SubResource("CylinderMesh_1")
+surface_material_override/0 = SubResource("Mat_1")
+
+[node name="Rim" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.12, -0.13)
+mesh = SubResource("CylinderMesh_2")
+surface_material_override/0 = SubResource("Mat_2")
+
+[node name="Boss" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, -0.18)
+mesh = SubResource("SphereMesh_3")
+surface_material_override/0 = SubResource("Mat_3")

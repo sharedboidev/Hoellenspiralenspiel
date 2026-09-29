@@ -1,7 +1,7 @@
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
-using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Scripts.Core.Stats;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
@@ -43,64 +43,64 @@ public partial class Statdisplay : PanelContainer
         FindUtilities();
     }
 
-    public void Render(Player2D player)
+    public void Render(StatSheet stats)
     {
-        RenderAttributes(player);
-        RenderRessources(player);
-        RenderDefences(player);
-        RenderOffences(player);
-        RenderUtilities(player);
+        RenderAttributes(stats);
+        RenderRessources(stats);
+        RenderDefences(stats);
+        RenderOffences(stats);
+        RenderUtilities(stats);
     }
 
-    private static string AsBonusPercent(Player2D player, CombatStat stat)
-        => "+" + ((player.Stats.GetTotalMultiplier(stat) - 1) * 100).ToString("0.##") + "%";
+    private static string AsBonusPercent(StatSheet stats, CombatStat stat)
+        => "+" + ((stats.GetTotalMultiplier(stat) - 1) * 100).ToString("0.##") + "%";
 
-    private static string AsChance(Player2D player, CombatStat stat)
-        => CombatFormulas.ClampChance(player.Stats.GetFinal(stat)).ToString("0.##") + "%";
+    private static string AsChance(StatSheet stats, CombatStat stat)
+        => CombatFormulas.ClampChance(stats.GetFinal(stat)).ToString("0.##") + "%";
 
-    private void RenderUtilities(Player2D player)
+    private void RenderUtilities(StatSheet stats)
     {
-        movementspeedLabel.Text = player.MovementspeedFinal.ToString("N0");
-        areaLabel.Text          = AsBonusPercent(player, CombatStat.AreaOfEffect);
-        lightRadiusLabel.Text   = player.LightRadiusFinal.ToString("N0") + "%";
+        movementspeedLabel.Text = stats.GetFinal(CombatStat.Movementspeed).ToString("N0");
+        areaLabel.Text          = AsBonusPercent(stats, CombatStat.AreaOfEffect);
+        lightRadiusLabel.Text   = stats.GetFinal(CombatStat.LightRadius).ToString("N0") + "%";
     }
 
-    private void RenderOffences(Player2D player)
+    private void RenderOffences(StatSheet stats)
     {
-        meleeCritChanceLabel.Text = player.Stats.GetFinal(CombatStat.CriticalHitChance).ToString("0.##") + "%";
-        critDamageLabel.Text      = "+" + player.Stats.GetFinal(CombatStat.CriticalDamage).ToString("N0") + "%";
-        attackspeedLabel.Text     = player.AttacksPerSecondFinal.ToString("0.##") + "/s";
-        spellDamageLabel.Text     = AsBonusPercent(player, CombatStat.SpellDamage);
+        meleeCritChanceLabel.Text = stats.GetFinal(CombatStat.CriticalHitChance).ToString("0.##") + "%";
+        critDamageLabel.Text      = "+" + stats.GetFinal(CombatStat.CriticalDamage).ToString("N0") + "%";
+        attackspeedLabel.Text     = stats.GetFinal(CombatStat.Attackspeed).ToString("0.##") + "/s";
+        spellDamageLabel.Text     = AsBonusPercent(stats, CombatStat.SpellDamage);
     }
 
-    private void RenderDefences(Player2D player)
+    private void RenderDefences(StatSheet stats)
     {
-        armorLabel.Text         = player.ArmorFinal.ToString("N0");
-        dodgeLabel.Text         = player.DodgeFinal.ToString("0.##") + "%";
-        meleeBlockLabel.Text    = AsChance(player, CombatStat.MeleeBlock);
-        spellBlockLabel.Text    = AsChance(player, CombatStat.SpellBlock);
-        meleeParryLabel.Text    = AsChance(player, CombatStat.MeleeParry);
-        spellParryLabel.Text    = AsChance(player, CombatStat.SpellParry);
-        fireResiLabel.Text      = player.FireResiFinal.ToString("N0") + "%";
-        frostResistance.Text    = player.FrostResiFinal.ToString("N0") + "%";
-        lightningResiLabel.Text = player.LightningResiFinal.ToString("N0") + "%";
+        armorLabel.Text         = stats.GetFinalWhole(CombatStat.Armor).ToString("N0");
+        dodgeLabel.Text         = stats.GetFinalWhole(CombatStat.Dodge).ToString("0.##") + "%";
+        meleeBlockLabel.Text    = AsChance(stats, CombatStat.MeleeBlock);
+        spellBlockLabel.Text    = AsChance(stats, CombatStat.SpellBlock);
+        meleeParryLabel.Text    = AsChance(stats, CombatStat.MeleeParry);
+        spellParryLabel.Text    = AsChance(stats, CombatStat.SpellParry);
+        fireResiLabel.Text      = stats.GetFinalWhole(CombatStat.FireResistance).ToString("N0") + "%";
+        frostResistance.Text    = stats.GetFinalWhole(CombatStat.FrostResistance).ToString("N0") + "%";
+        lightningResiLabel.Text = stats.GetFinalWhole(CombatStat.LightningResistance).ToString("N0") + "%";
     }
 
-    private void RenderRessources(Player2D player)
+    private void RenderRessources(StatSheet stats)
     {
-        lifeLabel.Text             = player.LifeMaximum.ToString("N0");
-        liferegenerationLabel.Text = player.LiferegenerationFinal.ToString("N0");
-        manaLabel.Text             = player.ManaMaximum.ToString("N0");
-        manaregenerationLabel.Text = player.ManaregenerationFinal.ToString("0.##");
+        lifeLabel.Text             = stats.GetFinalWhole(CombatStat.Life).ToString("N0");
+        liferegenerationLabel.Text = stats.GetFinalWhole(CombatStat.Liferegeneration).ToString("N0");
+        manaLabel.Text             = stats.GetFinalWhole(CombatStat.Mana).ToString("N0");
+        manaregenerationLabel.Text = stats.GetFinal(CombatStat.Manaregeneration).ToString("0.##");
 
     }
-    private void RenderAttributes(Player2D player)
+    private void RenderAttributes(StatSheet stats)
     {
-        strengthLabel.Text  = player.StrengthFinal.ToString("N0");
-        dexLabel.Text       = player.DexterityFinal.ToString("N0");
-        intLabel.Text       = player.IntelligenceFinal.ToString("N0");
-        constiLabel.Text    = player.ConstitutionFinal.ToString("N0");
-        awarenessLabel.Text = player.AwarenessFinal.ToString("N0");
+        strengthLabel.Text  = stats.GetFinalWhole(CombatStat.Strength).ToString("N0");
+        dexLabel.Text       = stats.GetFinalWhole(CombatStat.Dexterity).ToString("N0");
+        intLabel.Text       = stats.GetFinalWhole(CombatStat.Intelligence).ToString("N0");
+        constiLabel.Text    = stats.GetFinalWhole(CombatStat.Constitution).ToString("N0");
+        awarenessLabel.Text = stats.GetFinalWhole(CombatStat.Awareness).ToString("N0");
     }
 
     private void FindUtilities()

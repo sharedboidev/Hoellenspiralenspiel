@@ -1,6 +1,6 @@
 using Godot;
+using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Scripts.UI.Buttons;
-using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
@@ -8,15 +8,25 @@ namespace Hoellenspiralenspiel.Scripts.UI.Character;
 public partial class CharacterSheet : Control
 {
     [Export] private EquipmentPanel equipmentPanel;
+    private          IHero          hero;
     [Export] private Inventory      inventory;
     private          LevelDisplay   levelDisplay;
-    [Export] private Player2D       player;
+    [Export] private Node           player;
     private          Statdisplay    statdisplay;
     [Export] private int            viewportMarginHeightPx;
     [Export] private int            viewportMarginWidthPx;
 
     public override void _Ready()
     {
+        hero = player as IHero;
+
+        if (hero is null)
+        {
+            GD.PushError($"Der Charakterbogen braucht einen Helden, {player?.Name} ist keiner.");
+
+            return;
+        }
+
         SetPositionRelativeToViewport();
         ConfigureStatDisplay();
         BindItems();
@@ -28,51 +38,46 @@ public partial class CharacterSheet : Control
     private void ConfigureStatDisplay()
     {
         statdisplay = GetNode<Statdisplay>(nameof(Statdisplay));
-        statdisplay.Render(player);
+        statdisplay.Render(hero.Stats);
 
         //Hält die Anzeige aktuell, wenn sich Attribute ändern, z.B. beim Verteilen von Punkten nach einem Level-up
-        player.StatsChanged += RerenderStatdisplay;
+        hero.SheetChanged += ShowCurrentValues;
 
         GetNode<StatdisplayButton>(nameof(StatdisplayButton)).Pressed += OnPressed;
     }
 
     public override void _ExitTree()
     {
-        if (player is null)
-            return;
-
-        player.StatsChanged     -= RerenderStatdisplay;
-        player.LeveledUp        -= PlayerOnLeveledUp;
-        player.ProgressRestored -= SetDisplayedLevel;
+        if (hero is not null)
+            hero.SheetChanged -= ShowCurrentValues;
     }
 
     private void BindItems()
     {
-        inventory.Bind(player);
-        equipmentPanel.Bind(player);
+        inventory.Bind(hero);
+        equipmentPanel.Bind(hero.Items);
     }
 
     private void ConfigureLevelDisplay()
     {
         levelDisplay = GetNode<LevelDisplay>("%" + nameof(LevelDisplay));
         SetDisplayedLevel();
-
-        player.LeveledUp        += PlayerOnLeveledUp;
-        player.ProgressRestored += SetDisplayedLevel;
     }
 
-    private void SetDisplayedLevel() => levelDisplay.SetDisplayedValue(player.Level);
-
-    private void PlayerOnLeveledUp(Player2D player2D) => SetDisplayedLevel();
+    private void SetDisplayedLevel() => levelDisplay?.SetDisplayedValue(hero.Level);
 
     private void OnPressed(bool isToggledOpen)
     {
-        statdisplay.Render(player);
+        statdisplay.Render(hero.Stats);
         statdisplay.Visible = isToggledOpen;
     }
 
-    private void RerenderStatdisplay()
-        => statdisplay.Render(player);
+    private void ShowCurrentValues()
+    {
+        statdisplay.Render(hero.Stats);
+
+        SetDisplayedLevel();
+    }
 
     private void SetPositionRelativeToViewport()
     {
@@ -85,7 +90,7 @@ public partial class CharacterSheet : Control
 
     public override void _Process(double delta)
     {
-        if (Input.IsActionJustPressed(InputActions.ToggleCharacterSheet))
+        if (hero is not null && Input.IsActionJustPressed(InputActions.ToggleCharacterSheet))
             ToggleVisibility();
     }
 
@@ -94,7 +99,7 @@ public partial class CharacterSheet : Control
         Visible = !Visible;
 
         if(Visible)
-            statdisplay.Render(player);
+            statdisplay.Render(hero.Stats);
     }
 
     private void ModifyVisibilityThroughSelfModulate(Control control)

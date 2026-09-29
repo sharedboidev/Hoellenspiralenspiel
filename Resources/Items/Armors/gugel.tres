@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://Resources/Items/ArmorBaseResource.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://dmh4d2m36bb1c" path="res://Textures/Items/Armor/Helmets/gugel.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://Scenes/Spike3D/Items/gugel_3d.tscn" id="9_worn"]
 
 [resource]
 script = ExtResource("1_script")
@@ -15,3 +16,4 @@ Requirements = Dictionary[int, int]({
 })
 Slot = 4
 Armor = 10
+WornModel = ExtResource("9_worn")

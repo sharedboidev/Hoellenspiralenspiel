@@ -39,6 +39,7 @@ Gegner erschlagen, Beute sammeln, Charakter ausbauen.
 ## ✨ Feature-Umfang
 
 Das ist der Stand, der heute im Spiel steckt. Gespielt wird in einem Testlevel.
+Die Abschnitte beschreiben das 2D-Spiel, die 3D-Fassung hat einen [eigenen Abschnitt](#-3d-fassung-im-aufbau).
 
 ### 🧙 Charakter
 
@@ -284,6 +285,48 @@ Der Held startet am Startpunkt mit vollem Leben und Mana.
 | Erfahrungsbalken | Unterteilt, mit Anzeige beim Überfahren |
 | Overlay-Karte | Lässt sich ein- und ausblenden |
 
+### 🧊 3D-Fassung im Aufbau
+
+Seit dem 29.09.2026 steht fest: Das Spiel wird 3D, im Look der PlayStation 1.
+Die 3D-Fassung läuft in einem eigenen Testlevel neben dem 2D-Spiel und benutzt dieselbe Spiellogik und dieselben Daten.
+
+<div align="center">
+<img src="docs/images/vergleich_3d_ps1_perspektive.webp" alt="3D-Testlevel im PS1-Look mit Held, Gegnern und Feuerball" width="720">
+</div>
+
+| Feature | Beschreibung |
+|---|---|
+| Held und Gegner | Laufen, Nahkampf, Fernkampf, Feuerball, Verfolgen, Aufgeben, Tod und Respawn |
+| Wegfindung | Navigationsnetz aus den Wänden, zur Laufzeit gebacken |
+| PS1-Look | Wackelnde Eckpunkte, verzogene Texturen, 240 Bildzeilen, 15 Bit Farbtiefe mit Punktmuster |
+| Sichtbare Ausrüstung | Angelegte Waffen, Schilde und Rüstung erscheinen am Helden |
+| Inventar und Charakterbogen | Dieselbe Oberfläche wie im 2D-Spiel |
+| Platzhalter | Alle Modelle bestehen aus Grundkörpern, die Texturen sind erzeugt |
+
+<div align="center">
+<img src="docs/images/ausruestung_3d_varianten.webp" alt="Der 3D-Held ohne Ausrüstung, mit Schwert und Schild, mit Stab und beim Schuss mit dem Bogen" width="720">
+</div>
+
+Es fehlen noch Skill-Leiste, Flächenzauber, Monster-Mods, Beute, XP und Speichern. Der Plan steht in der [Roadmap](docs/ROADMAP.md) unter M5.5.
+
+<details>
+<summary>So startest du das 3D-Testlevel</summary>
+
+Im Godot-Editor die Szene `Scenes/Spike3D/spike_3d.tscn` öffnen und mit `F6` starten.
+
+| Taste | Aktion |
+|---|---|
+| `W` `A` `S` `D` | Bewegen |
+| Linke Maustaste | Attack mit der angelegten Waffe |
+| Rechte Maustaste | Fireball |
+| `B` | Charakterbogen und Inventar, der Held hat alle neun Items dabei |
+| `F1` | PS1-Look an und aus |
+| `F2` | Kamera orthogonal oder perspektivisch |
+| `F3` | 240, 360 oder 480 Bildzeilen |
+| `F4` | Schatten aus Lichtern statt dunkler Scheiben |
+
+</details>
+
 ### 🚧 Noch nicht enthalten
 
 - Hub, Levelwechsel und Menüs, damit auch mehrere Charaktere
@@ -323,8 +366,8 @@ flowchart LR
     M0(["M0 Aufräumen"]):::done --> M1(["M1 Stat-Kern"]):::done --> M2(["M2 Kampf"]):::done
     M2 --> M3(["M3 Skills"]):::done
     M2 --> M4(["M4 Items und Speichern"]):::done
-    M4 --> M5(["M5 Gegner-KI"]):::done --> D{"2D oder 3D"}:::decision
-    D --> M6(["M6 Level"]):::open --> M7(["M7 Hub"]):::open --> M8(["M8 Höllenkreis"]):::open
+    M4 --> M5(["M5 Gegner-KI"]):::done --> D{"3D im PS1-Look"}:::done
+    D --> U(["M5.5 Umstellung auf 3D"]):::next --> M6(["M6 Level"]):::open --> M7(["M7 Hub"]):::open --> M8(["M8 Höllenkreis"]):::open
     M8 --> M9(["M9 Inhalt"]):::open --> M10(["M10 Koop"]):::optional
 
     classDef done fill:#2e7d32,color:#ffffff,stroke:#1b5e20
@@ -343,6 +386,7 @@ flowchart LR
 | ✅ | **M4** Items und Speichern | Items als Daten, Inventar-Modell, Schild mit Block, Speichern und Laden | mittel |
 | ✅ | **M5** Gegner-KI | Gegner als Daten, Zustandsmaschine, Wegfindung, Level, Elite mit Mods | mittel |
 | ✅ | **Entscheidung** | 3D im Look der PlayStation 1, entschieden nach dem [Vergleich](docs/VERGLEICH_2D_3D.md) | klein |
+| ⏭️ | **M5.5** Umstellung auf 3D | Die 3D-Fassung lernt alles, was die 2D-Fassung kann. Held, Gegner, Wegfindung, PS1-Look und sichtbare Ausrüstung stehen | mittel |
 | ⬜ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
 | ⬜ | **M7** Hub | Stadt, Abstieg, Menüs, Truhe, Händler, Einstellungen | mittel |
 | ⬜ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
@@ -385,7 +429,8 @@ git clone https://github.com/sharedboidev/Hoellenspiralenspiel.git
 ```
 
 Danach den Ordner in Godot als Projekt importieren und mit `F5` starten.
-Die Hauptszene ist `Scenes/test_plane.tscn`.
+Die Hauptszene ist `Scenes/test_plane.tscn`, das 2D-Spiel.
+Das 3D-Testlevel ist `Scenes/Spike3D/spike_3d.tscn` und startet aus dem Editor mit `F6`.
 
 **Tests ausführen**
 
@@ -411,6 +456,7 @@ Hoellenspiralenspiel
 │   │   ├── Saving      Format des Spielstands, Lesen und Schreiben als JSON
 │   │   ├── Rng         Zufallsquelle mit Seed
 │   │   └── Progression XP-Verlust beim Tod
+│   ├── Spike3D         Die 3D-Fassung: Held, Gegner, Projektil, Wegfindung, PS1-Look, sichtbare Ausrüstung
 │   ├── Units           Spieler, Gegner, Pfadfolger
 │   ├── Skills          Ausführung der Skills, Projektil und Fläche
 │   ├── Items           Bibliothek aller Item-Basen
@@ -419,18 +465,20 @@ Hoellenspiralenspiel
 │   ├── Saving          Datei des Spielstands
 │   ├── Controllers     Gegnersteuerung, Beute, Spielablauf, Speichern
 │   └── UI              Charakterbogen, Inventar, Orbs, Tooltips
-├── Scenes              Szenen für Level, Einheiten, Zauber, Oberfläche
+├── Scenes              Szenen für Level, Einheiten, Zauber, Oberfläche, unter Spike3D die 3D-Fassung
+├── Shaders             Shader, unter Spike3D die beiden für den PS1-Look
 ├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Gegner, Monster-Mods, Themes
+├── Interfaces          Schnittstellen, darunter IHero zwischen Held und Oberfläche
 ├── Enums               Gemeinsame Aufzählungen
 ├── Hoellenspiralenspiel.Tests   Unit-Tests mit NUnit
-└── docs                Roadmap und Analyse
+└── docs                Roadmap, Analyse und der Vergleich von 2D und 3D
 ```
 
 ### Leitlinien
 
 | Leitlinie | Warum |
 |---|---|
-| Logik getrennt von Darstellung | Hält die Entscheidung für 2D oder 3D offen und macht Logik testbar |
+| Logik getrennt von Darstellung | Macht Logik testbar und hat den Wechsel auf 3D möglich gemacht, ohne den Kern zu ändern |
 | Inhalte als Daten | Neue Gegner, Skills und Items ohne Änderung am Code |
 | Ein Zufallsgenerator mit Seed | Gleicher Seed ergibt gleiches Level, Voraussetzung für Koop |
 | Sparsame Kommentare | Namen sprechen für sich, Aufbau und Regeln erklärt die Roadmap |

@@ -1,7 +1,7 @@
 # Vergleich 2D und 3D
 
 Stand: 29.09.2026, Branch `master_Compare3D`.
-Das Dokument gehört zum Entscheidungspunkt in der [Roadmap](ROADMAP.md).
+Das Dokument gehört zum Entscheidungspunkt in der [Roadmap](ROADMAP.md). Es hält den Vergleich fest, wie er zur Entscheidung vorlag. Was seitdem in 3D dazukam, steht in der Roadmap unter M5.5.
 Held, Gegner und ein Zauber laufen einmal in 3D auf demselben Logik-Kern wie das 2D-Spiel. Alle Modelle sind Platzhalter aus Grundkörpern.
 
 ## Ergebnis in Kürze
@@ -32,6 +32,7 @@ Entscheidung vom 29.09.2026: 3D im [PS1-Look](#nachtrag-ps1-look). Die Abwägung
 | F2 | Kamera orthogonal oder perspektivisch |
 | F3 | 240, 360 oder 480 Bildzeilen |
 | F4 | Schatten aus Lichtern statt dunkler Scheiben |
+| B | Charakterbogen und Inventar, seit M5.5 |
 
 Links oben stehen Bildrate, Zahl der Gegner, Leben und Mana. Nach dem Tod steht der Held nach 2 Sekunden wieder am Startpunkt.
 
@@ -58,7 +59,7 @@ Seit dem [Nachtrag](#nachtrag-ps1-look) startet das Level mit dem PS1-Look. Die 
 
 Die Kamera blickt orthogonal im Winkel von 30 Grad auf den Boden. Das ergibt dasselbe Seitenverhältnis 2:1 wie die isometrischen Tiles, und der Bildausschnitt ist so groß wie im 2D-Spiel.
 
-Nicht Teil des Vergleichs: Flächenzauber, Monster-Mods, Elite, Beute, Items am Helden, XP, Speichern, Skill-Leiste und Charakterbogen.
+Nicht Teil des Vergleichs: Flächenzauber, Monster-Mods, Elite, Beute, Items am Helden, XP, Speichern, Skill-Leiste und Charakterbogen. Items am Helden und der Charakterbogen sind mit M5.5 dazugekommen.
 
 ## Was unverändert weiterläuft
 

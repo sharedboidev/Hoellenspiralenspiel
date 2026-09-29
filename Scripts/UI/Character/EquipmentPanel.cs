@@ -2,7 +2,6 @@ using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.UI.Tooltips;
-using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
@@ -15,9 +14,9 @@ public partial class EquipmentPanel : PanelContainer
 
     private BaseTooltip Tooltip => tooltip ??= GetTree().CurrentScene.GetNodeOrNull<ItemTooltip>("%" + nameof(ItemTooltip));
 
-    public void Bind(Player2D owner)
+    public void Bind(CharacterItems owner)
     {
-        items          = owner.Items;
+        items          = owner;
         equipmentSlots = this.GetAllChildren<EquipmentSlot>();
 
         foreach (var equipmentSlot in equipmentSlots)

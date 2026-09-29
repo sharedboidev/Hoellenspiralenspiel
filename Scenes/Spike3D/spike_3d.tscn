@@ -16,6 +16,18 @@
 [ext_resource type="Shader" path="res://Shaders/Spike3D/ps1_screen.gdshader" id="14_screen"]
 [ext_resource type="Texture2D" path="res://Textures/Spike3D/floor_stone.png" id="15_floor"]
 [ext_resource type="Texture2D" path="res://Textures/Spike3D/wall_brick.png" id="16_wall"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/character_sheet.tscn" id="20_sheet"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/item_tooltip.tscn" id="21_tooltip"]
+[ext_resource type="Script" path="res://Resources/Items/ItemBaseResource.cs" id="22_item_base"]
+[ext_resource type="Resource" path="res://Resources/Items/Weapons/training_sword.tres" id="item_training_sword"]
+[ext_resource type="Resource" path="res://Resources/Items/Weapons/wooden_staff.tres" id="item_wooden_staff"]
+[ext_resource type="Resource" path="res://Resources/Items/Weapons/short_bow.tres" id="item_short_bow"]
+[ext_resource type="Resource" path="res://Resources/Items/Armors/wooden_shield.tres" id="item_wooden_shield"]
+[ext_resource type="Resource" path="res://Resources/Items/Armors/gugel.tres" id="item_gugel"]
+[ext_resource type="Resource" path="res://Resources/Items/Armors/peasant_tunic.tres" id="item_peasant_tunic"]
+[ext_resource type="Resource" path="res://Resources/Items/Armors/wool_gloves.tres" id="item_wool_gloves"]
+[ext_resource type="Resource" path="res://Resources/Items/Consumables/health_potion.tres" id="item_health_potion"]
+[ext_resource type="Resource" path="res://Resources/Items/Consumables/mana_potion.tres" id="item_mana_potion"]
 
 [sub_resource type="Environment" id="Env_level"]
 background_mode = 1
@@ -241,6 +253,9 @@ script = ExtResource("2_navigation")
 SourceRoot = NodePath("../Environment")
 
 [node name="Hero3D" parent="." instance=ExtResource("5_hero")]
+Strength = 2
+Dexterity = 2
+StartingItems = Array[ExtResource("22_item_base")]([ExtResource("item_training_sword"), ExtResource("item_wooden_staff"), ExtResource("item_short_bow"), ExtResource("item_wooden_shield"), ExtResource("item_gugel"), ExtResource("item_peasant_tunic"), ExtResource("item_wool_gloves"), ExtResource("item_health_potion"), ExtResource("item_mana_potion")])
 
 [node name="Enemies" type="Node3D" parent="."]
 
@@ -304,7 +319,8 @@ mouse_filter = 2
 
 [node name="Margin" type="MarginContainer" parent="Hud"]
 offset_right = 560.0
-offset_bottom = 300.0
+offset_bottom = 330.0
+mouse_filter = 2
 theme_override_constants/margin_left = 32
 theme_override_constants/margin_top = 32
 
@@ -335,4 +351,17 @@ show_percentage = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "WASD laufen · Linke Maustaste auf Gegner: Angriff · Rechte Maustaste: Feuerball
+B Inventar und Ausrüstung · Rechtsklick auf ein Item legt es an
 F1 PS1-Look · F2 Kamera · F3 Bildzeilen · F4 Schatten"
+
+[node name="ItemTooltip" parent="Hud" instance=ExtResource("21_tooltip")]
+unique_name_in_owner = true
+visible = false
+offset_left = 1000.0
+offset_top = 1000.0
+offset_right = 1500.0
+offset_bottom = 1268.0
+
+[node name="CharacterSheet" parent="Hud" node_paths=PackedStringArray("player") instance=ExtResource("20_sheet")]
+visible = false
+player = NodePath("../../Hero3D")

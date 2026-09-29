@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.UI.Tooltips;
-using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
@@ -16,7 +16,7 @@ public partial class Inventory : PanelContainer
     private          CharacterItems                          items;
     private          MouseObject                             mouseObject;
     private          Control                                 overlay;
-    private          Player2D                                player;
+    private          IHero                                   player;
     private          Vector2                                 slotSize;
     private          BaseTooltip                             tooltip;
 
@@ -25,7 +25,7 @@ public partial class Inventory : PanelContainer
 
     private BaseTooltip Tooltip => tooltip ??= GetTree().CurrentScene.GetNode<ItemTooltip>("%" + nameof(ItemTooltip));
 
-    public void Bind(Player2D owner)
+    public void Bind(IHero owner)
     {
         player      = owner;
         items       = owner.Items;

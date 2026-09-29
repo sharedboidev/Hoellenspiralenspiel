@@ -2,6 +2,7 @@
 
 Stand: 29.09.2026. M0 bis M5 liegen auf `master`, dazu die Nachträge zu M2 und M3: Bleed stapelt, Schadenswerte im Tooltip und ausgedünnte Kommentare.
 Der Vergleich von 2D und 3D ist auf dem Branch `master_Compare3D` gebaut. Die Entscheidung ist gefallen: 3D im Look der PlayStation 1.
+Die Umstellung M5.5 hat auf demselben Branch begonnen: Der 3D-Held trägt Items, und angelegte Ausrüstung ist zu sehen.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code (rund 5.500 Zeilen) plus Szenen.
 Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 bis M5 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
@@ -11,6 +12,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Frage | Entscheidung |
 |---|---|
 | 2D oder 3D | 3D im Look der PlayStation 1, Vorbild Silent Hill. Entschieden am 29.09.2026 nach dem Vergleich. |
+| Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen. Entschieden am 29.09.2026. |
 | Spielstruktur | Hub (Stadt) plus Abstieg in einen Höllenkreis mit mehreren Ebenen |
 | Leveldesign | Etwa 90 % prozedural, dazu handgebaute Räume und Event-Locations, die gezielt eingestreut werden |
 | Multiplayer | Singleplayer zuerst, Koop soll später nachrüstbar bleiben |
@@ -27,8 +29,8 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Rüstung | Helm, Torso, Handschuhe und Schild mit Rüstungswert | 4 von 16 Slots haben Item-Basen |
 | Affixe | 17 Affixe mit Tiers, Gewichten, Itemlevel-Grenze, Prefix/Suffix, lokale und globale Mods | Slot-Tabelle aus dem PDF nur teilweise abgedeckt |
 | Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle. Seit M5 bestimmt das Monsterlevel das Itemlevel. |
-| Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. |
-| Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. |
+| Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. Seit M5.5 hängt sie an der Schnittstelle `IHero` und läuft auch in 3D. |
+| Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. Seit M5.5 ist sie in 3D am Helden zu sehen. |
 | Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch | Nicht im PDF |
 | Leveling | XP-Tabelle bis Level 100, Level-up-Effekt, Attributspunkte, XP-Balken | Nicht im PDF, funktioniert |
 | Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen, Tooltip mit DPS | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
@@ -169,7 +171,7 @@ Ziel: stabile Basis, bevor umgebaut wird.
 Bewusst nicht angefasst:
 
 - `Scripts/Skills` ist der begonnene Umbau der Skills und bleibt für M3.
-- `Player.cs` und `test_plane_3d.tscn` sind der 3D-Prototyp und bleiben bis zur Entscheidung 2D oder 3D.
+- `Player.cs` und `test_plane_3d.tscn` sind der 3D-Prototyp und bleiben bis zur Entscheidung 2D oder 3D. Seit der Entscheidung für 3D steht ihr Entfernen unter M5.5 beim Aufräumen.
 - `Scenes/Spells/thunder_shader.tres` wird von keiner Szene benutzt. Dasselbe gilt für ungenutzten Code im `EnemyController` rund um den Spawn-Timer.
 
 Fertig, wenn das Testlevel ohne die genannten Fehler läuft und der Wurzelordner nur noch Projektdateien enthält.
@@ -789,6 +791,101 @@ Entscheidung vom 29.09.2026: 3D im Look der PlayStation 1, Vorbild Silent Hill.
 
 Noch offen: orthogonale oder perspektivische Kamera. Beide lassen sich im Level mit F2 umschalten.
 
+### M5.5: Umstellung auf 3D (M, begonnen am 29.09.2026 auf `master_Compare3D`)
+
+Ziel: Die 3D-Fassung kann alles, was die 2D-Fassung kann. Danach entfällt die 2D-Schicht.
+
+- Erledigt mit dem Vergleich: Einheit, Held, Gegner, Projektil, Wegfindung, Schadenszahlen, Kamera.
+- Erledigt: PS1-Look mit zwei Shadern, im Level umschaltbar.
+- Erledigt: Der Held trägt Items. Waffe, Schild und Rüstung wirken über den Kern wie in 2D.
+- Erledigt: Angelegte Ausrüstung ist am Helden zu sehen.
+- Erledigt: Fernkampfwaffen schießen, auch ohne Gegner unter dem Mauszeiger.
+- Erledigt: Inventar, Ausrüstung und Werteliste laufen im 3D-Level. Sie hängen an der Schnittstelle `IHero` statt am 2D-Helden.
+- Offen: Skill-Leiste, Orbs, XP-Balken, Level-up-Dialog und Todesbildschirm am 3D-Helden.
+- Offen: Flächen als Wirkung, damit Frost Nova, Thunderbolt, Meteor, Death Blast und Frost Pulse laufen. Dazu Lightning Strike.
+- Offen: Monster-Mods, Elite und Rare Elite, Namensschild.
+- Offen: Beutel am Boden und Beute von Gegnern.
+- Offen: XP, Level-up und XP-Verlust beim Tod.
+- Offen: Speichern und Laden.
+- Offen: Overlay-Karte und Kellertür.
+- Offen: eigene Modelle für Held, Gegner und Items statt der Grundkörper.
+- Offen: Aufräumen. Die 2D-Schicht und der alte 3D-Prototyp entfallen, `Spike3D` bekommt seinen endgültigen Namen, `AreaSettings.GroundYScale` wird 1.
+
+Fertig, wenn die Hauptszene in 3D läuft und die Laufzeitprüfungen aus M2 bis M5 dort bestehen.
+
+Getroffene Designentscheidungen vom 29.09.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| 2D oder 3D | 3D im Look der PlayStation 1 |
+| Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen |
+
+Von mir festgelegt, weil es sich aus dem Umbau ergab. Alles lässt sich in den Szenen ändern:
+
+| Punkt | Festlegung |
+|---|---|
+| Sichtbare Plätze | 11 von 16: Waffe, Nebenhand, Helm, Schultern, Torso, Rücken, Gürtel, Handgelenke, Hände, Beine, Füße. Amulett und die vier Ringe bleiben unsichtbar. |
+| Paarige Plätze | Hände und Handgelenke haben links und rechts je einen Befestigungspunkt und bekommen das Modell an beiden |
+| Hieb | Der rechte Arm hebt sich um 40 Grad und schwingt 140 Grad quer |
+| Schuss | Der rechte Arm hebt sich um 80 Grad, der Bogen steht dabei senkrecht |
+| Items im Testlevel | Der Held startet mit je einem Stück aller neun Item-Basen im Inventar |
+| Attribute im Testlevel | Stärke 2 und Geschick 2, sonst ließen sich Schwert, Schild und Bogen nicht anlegen. Der Held hat dadurch 61 Leben statt 60. |
+| Fallengelassene Items | Kehren ins Inventar zurück, bis es Beutel in 3D gibt |
+| Level des Helden | Bleibt 1, bis XP umgestellt ist |
+
+So funktioniert sichtbare Ausrüstung:
+
+- Jede anlegbare Item-Basis hat das Feld `WornModel`. Es zeigt auf eine Szene mit dem Modell. Ohne Modell bleibt das Item unsichtbar.
+- Das Modell des Helden hat Befestigungspunkte. Ein Punkt heißt `Attach` plus Platz, etwa `AttachHelmet` oder `AttachPhysicalWeapon`.
+- Ein Platz ist sichtbar, wenn es einen solchen Punkt gibt. Es gibt dafür keine Liste im Code.
+- `WornItems3D` hört auf das Anlegen und Ablegen im Kern. Beim Anlegen hängt es das Modell an jeden passenden Punkt, beim Ablegen entfernt es das Modell.
+- Die Punkte für Waffe und rechte Hand hängen am Arm. Sie schwingen beim Hieb mit.
+- Der Ursprung eines Modells ist der Befestigungspunkt. Ein Schwert hat seinen Griff im Ursprung, ein Helm die Mitte des Kopfes.
+- Gezeichnet werden die Modelle mit dem Material des PS1-Looks. `Ps1Look` stellt neue Modelle von selbst ein.
+- Das 2D-Spiel lädt dieselben Item-Basen und beachtet das Feld nicht.
+
+Ein Item sichtbar machen in zwei Schritten:
+
+1. Szene mit dem Modell unter `Scenes/Spike3D/Items` anlegen, Wurzelknoten `Node3D`.
+2. Die Szene im Feld `WornModel` der Item-Basis eintragen.
+
+Einen Platz sichtbar machen: im Modell des Helden einen `Marker3D` mit dem Namen `Attach` plus Platz anlegen.
+
+Die Platzhalter, alle in [Scenes/Spike3D/Items](../Scenes/Spike3D/Items):
+
+| Item | Platz | Modell |
+|---|---|---|
+| Training Sword | Waffe | Klinge, Parierstange und Griff aus drei Quadern |
+| Wooden Staff | Waffe | Stange mit Knauf |
+| Short Bow | Waffe | Griff, zwei Wurfarme und Sehne |
+| Wooden Shield | Nebenhand | Runde Scheibe mit Rand und Buckel |
+| Gugel | Helm | Kegel als Kapuze, darunter ein Kragen |
+| Peasant Tunic | Torso | Hemd mit Schoß und Gürtel |
+| Wool Gloves | Hände | Ein Quader pro Hand |
+
+<img src="images/ausruestung_3d_varianten.webp" alt="Der 3D-Held ohne Ausrüstung, mit Schwert und Schild, mit Stab und beim Schuss mit dem Bogen" width="860">
+
+Geprüft: Eine Laufzeitprüfung mit 70 Schritten im 3D-Level lief fünfmal hintereinander fehlerfrei. Sie deckt Anforderungen, Anlegen und Ablegen, die Regel für Zweihandwaffen, Werte aus dem Kern, Modelle an den Befestigungspunkten, Hieb, Schuss, Trank und Charakterbogen ab, dazu die Kampfabläufe aus dem Vergleich. Eine zweite Prüfung mit 14 Schritten lief dreimal fehlerfrei im 2D-Testlevel und deckt Charakterbogen, Inventar, Werteliste und Level-up ab. Die 547 Unit-Tests sind grün, dazu kam eine Sichtprüfung mit Bildschirmfotos.
+
+Offene Fragen, Stand 29.09.2026. Sie warten auf eine Entscheidung und sind der Einstieg in die nächste Sitzung:
+
+| Nr. | Frage | Mein Vorschlag |
+|---|---|---|
+| 1 | Bekommen die eigenen Modelle starre Teile oder ein Skelett? | Starre Teile: Kopf, Torso, Arme und Beine sind einzelne Netze ohne Gewichte. Das ist einfacher zu bauen und passt zum PS1-Look. |
+| 2 | Passen die 11 sichtbaren Plätze? | So lassen. Amulett und Ringe sind am Modell zu klein. |
+| 3 | Kamera orthogonal oder perspektivisch? | Kein Vorschlag. Beide lassen sich im Level mit F2 vergleichen. Verzogene Texturen gibt es nur perspektivisch. |
+| 4 | Sollen auch Gegner ihre Ausrüstung zeigen? | Ja, sobald es Gegner mit Armen gibt. `WornItems3D` ist nicht an den Helden gebunden. |
+
+Nächster Schritt: Skill-Leiste, Orbs und XP-Balken an `IHero` binden, danach Flächen als Wirkung. Die Frage nach starren Teilen oder Skelett sollte vor den ersten eigenen Modellen beantwortet sein.
+
+Bewusst offen gelassen:
+
+- Der Held ist aus starren Teilen gebaut, ohne Skelett. Ob die späteren Modelle starre Teile oder ein Skelett bekommen, ist offen. Die Befestigungspunkte tragen beides.
+- Gegner zeigen ihre Ausrüstung noch nicht.
+- Die Skill-Leiste fehlt in 3D. Angriff und Feuerball liegen fest auf linker und rechter Maustaste.
+- 3D-Szenen für Projektile stehen in `EffectScenes3D` unter der Id von Skill oder Waffe, solange die Resources auf 2D-Szenen zeigen.
+- Tunika und Gugel decken den Körper nur zu. Ein Modell, das Körperteile ersetzt, gibt es noch nicht.
+
 ### M6: Prozedurale Level mit handgebauten Räumen (L)
 
 Ziel: jeder Abstieg sieht anders aus, und eigene Räume lassen sich einstreuen.
@@ -843,7 +940,7 @@ Fertig, wenn ein Durchlauf des Kreises 30 bis 60 Minuten dauert und Spaß macht.
 ```
 M0 -> M1 -> M2 -> M3
              |
-             +-> M4 -> M5 -> [2D/3D] -> M6 -> M7 -> M8 -> M9 -> M10
+             +-> M4 -> M5 -> [2D/3D] -> M5.5 -> M6 -> M7 -> M8 -> M9 -> M10
 ```
 
 M3 und M4 sind voneinander unabhängig und können getauscht werden.

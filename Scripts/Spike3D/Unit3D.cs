@@ -43,6 +43,8 @@ public abstract partial class Unit3D : CharacterBody3D
 
     public virtual WeaponProfile Weapon => WeaponProfile.Unarmed;
 
+    public virtual PackedScene WeaponProjectileScene => null;
+
     public virtual float AvailableMana => SkillGate.UnlimitedMana;
 
     public virtual bool IsTargetable => !IsDead;

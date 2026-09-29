@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Godot;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Items;
@@ -20,7 +21,9 @@ using ResourceOrb = Hoellenspiralenspiel.Scripts.UI.Character.ResourceOrb;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
 
-public partial class Player2D : BaseUnit
+public partial class Player2D
+        : BaseUnit,
+          IHero
 {
     public delegate void EquipmentChangedEventHandler();
 
@@ -162,6 +165,7 @@ public partial class Player2D : BaseUnit
     public event LeveledUpEventHandler        LeveledUp;
     public event ProgressRestoredEventHandler ProgressRestored;
     public event RespawnedEventHandler        Respawned;
+    public event Action                       SheetChanged;
 
     public override void _Ready()
     {
@@ -196,6 +200,8 @@ public partial class Player2D : BaseUnit
         ApplyLightRadius();
 
         OnPropertyChanged(nameof(ManaMaximum));
+
+        SheetChanged?.Invoke();
     }
 
     private void LoadLights()
@@ -250,6 +256,7 @@ public partial class Player2D : BaseUnit
         levelUpEffect.Emit();
 
         LeveledUp?.Invoke(this);
+        SheetChanged?.Invoke();
     }
 
     public int GetRequiredAttributevalue(Requirement requirement)
@@ -849,6 +856,7 @@ public partial class Player2D : BaseUnit
         isRestoringProgress = false;
 
         ProgressRestored?.Invoke();
+        SheetChanged?.Invoke();
     }
 
     public void RefillResources()

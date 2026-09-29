@@ -16,7 +16,11 @@ public static class SkillExecutor3D
 
         switch (definition.Delivery)
         {
-            case SkillDelivery.Weapon when !caster.Weapon.IsRanged:
+            case SkillDelivery.Weapon when caster.Weapon.IsRanged:
+                LaunchProjectile(caster, cast, caster.WeaponProjectileScene, caster.Weapon.GetProjectile(), aim);
+
+                break;
+            case SkillDelivery.Weapon:
                 StrikeInMelee(caster, cast, aim);
 
                 break;
@@ -25,7 +29,7 @@ public static class SkillExecutor3D
 
                 break;
             default:
-                GD.PushWarning($"Der Vergleich kennt nur Nahkampf und Projektile, {skill.NameOrId} bleibt ohne Wirkung.");
+                GD.PushWarning($"Flächen gibt es in 3D noch nicht, {skill.NameOrId} bleibt ohne Wirkung.");
 
                 break;
         }

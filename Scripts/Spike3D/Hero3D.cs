@@ -3,17 +3,25 @@ using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Interfaces;
+using Hoellenspiralenspiel.Resources.Items;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Stats;
 using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.Spike3D;
 
-public partial class Hero3D : Unit3D
+public partial class Hero3D
+        : Unit3D,
+          IHero
 {
     public delegate void ManaChangedEventHandler();
+
+    public const int InventoryWidth  = 14;
+    public const int InventoryHeight = 5;
 
     private const float  ImpactFraction     = 0.5f;
     private const float  EngageFraction     = 0.9f;
@@ -22,6 +30,8 @@ public partial class Hero3D : Unit3D
     private const float  StuckSpeedFraction = 0.1f;
     private const float  PickSearchPx       = 600f;
     private const float  SwingArcDegrees    = 70f;
+    private const float  SwingRaiseDegrees  = 40f;
+    private const float  AimRaiseDegrees    = 80f;
 
     private static readonly List<Unit3D> UnitsNearPoint = new();
 
@@ -30,6 +40,7 @@ public partial class Hero3D : Unit3D
     private          double         approachStuckSec;
     private          Vector3        attackAimPoint;
     private          Unit3D         attackTarget;
+    private          ItemInstance   equippedWeapon;
     private          bool           hasDied;
     private          int            heldSlot = NoSlot;
     private          Unit3D         hoveredUnit;
@@ -42,10 +53,31 @@ public partial class Hero3D : Unit3D
     private          bool           swingFailed;
     private          Tween          swingLook;
     private          SkillResource  swingSkill;
+    private          WeaponProfile  weapon = WeaponProfile.Unarmed;
     private          Node3D         weaponPivot;
+    private          WornItems3D    wornItems;
 
     public Hero3D()
-        => Weapon.ApplyTo(Stats);
+    {
+        weapon.ApplyTo(Stats);
+
+        Items = new CharacterItems(InventoryWidth, InventoryHeight, GetRequiredValue);
+
+        Items.Equipment.Equipped   += OnItemEquipped;
+        Items.Equipment.Unequipped += OnItemUnequipped;
+        Items.Dropped              += OnItemDropped;
+    }
+
+    public CharacterItems Items { get; }
+
+    //Level und XP folgen mit der Umstellung, bis dahin bleibt der 3D-Held auf Level 1
+    public int Level => 1;
+
+    public WornItems3D WornItems => wornItems;
+
+    //Landen beim Start im Inventar, damit sich Ausrüstung im Testlevel ausprobieren lässt
+    [Export]
+    public Array<ItemBaseResource> StartingItems { get; set; } = new();
 
     //Der Platz in der Liste ist der Platz der Skill-Leiste: linke Maustaste, rechte Maustaste, Q, E, R, F, 1 bis 4
     [Export]
@@ -60,7 +92,27 @@ public partial class Hero3D : Unit3D
     [Export]
     public float RespawnInvulnerabilitySec { get; set; } = 2f;
 
+    [ExportGroup("Attributes")]
+    [Export]
+    public int Strength { get; set; } = 1;
+
+    [Export]
+    public int Dexterity { get; set; } = 1;
+
+    [Export]
+    public int Intelligence { get; set; } = 1;
+
+    [Export]
+    public int Constitution { get; set; } = 1;
+
+    [Export]
+    public int Awareness { get; set; } = 1;
+
     public override Faction Faction => Faction.Player;
+
+    public override WeaponProfile Weapon => weapon;
+
+    public override PackedScene WeaponProjectileScene => EffectScenes3D.Find(equippedWeapon?.Definition.Id);
 
     public override float AvailableMana => ManaCurrent;
 
@@ -85,6 +137,7 @@ public partial class Hero3D : Unit3D
     }
 
     public event ManaChangedEventHandler ManaChanged;
+    public event Action                  SheetChanged;
 
     public override void _Ready()
     {
@@ -101,16 +154,29 @@ public partial class Hero3D : Unit3D
 
         ApplyLightRadius();
 
+        if (Visual is not null)
+        {
+            wornItems = new WornItems3D(Visual);
+
+            wornItems.ShowAll(Items.Equipment);
+        }
+
+        foreach (var item in StartingItems)
+        {
+            if (item is not null)
+                Items.PickUp(new ItemInstance(item.Definition));
+        }
+
         LifeChanged += OnLifeChanged;
     }
 
     protected override void ApplyBaseValues(StatSheet sheet)
     {
-        sheet.SetBase(CombatStat.Strength, 1);
-        sheet.SetBase(CombatStat.Dexterity, 1);
-        sheet.SetBase(CombatStat.Intelligence, 1);
-        sheet.SetBase(CombatStat.Constitution, 1);
-        sheet.SetBase(CombatStat.Awareness, 1);
+        sheet.SetBase(CombatStat.Strength, Strength);
+        sheet.SetBase(CombatStat.Dexterity, Dexterity);
+        sheet.SetBase(CombatStat.Intelligence, Intelligence);
+        sheet.SetBase(CombatStat.Constitution, Constitution);
+        sheet.SetBase(CombatStat.Awareness, Awareness);
         sheet.SetBase(CombatStat.Dodge, 6);
         sheet.SetBase(CombatStat.Life, LifeBonus);
         sheet.SetBase(CombatStat.Movementspeed, Movementspeed);
@@ -124,6 +190,8 @@ public partial class Hero3D : Unit3D
             ManaCurrent = ManaMaximum;
 
         ApplyLightRadius();
+
+        SheetChanged?.Invoke();
     }
 
     private void ApplyLightRadius()
@@ -295,7 +363,10 @@ public partial class Hero3D : Unit3D
 
     private bool OrderAttack(SkillResource skill, Aim3D aim)
     {
-        if (!aim.HasTarget || !IsHostileTo(aim.Target))
+        if (!aim.HasTarget && IsMelee(skill))
+            return false;
+
+        if (aim.HasTarget && !IsHostileTo(aim.Target))
             return false;
 
         if (SkillGate.Check(skill.Definition, SkillCooldowns, AvailableMana) != SkillUseCheck.Ready)
@@ -304,7 +375,7 @@ public partial class Hero3D : Unit3D
         var previousTarget = attackTarget;
 
         orderedSkill     = skill;
-        attackTarget     = aim.Target;
+        attackTarget     = aim.HasTarget ? aim.Target : null;
         attackAimPoint   = aim.Point;
         approachStuckSec = 0;
 
@@ -313,6 +384,9 @@ public partial class Hero3D : Unit3D
 
         return true;
     }
+
+    private bool IsMelee(SkillResource skill)
+        => skill.Delivery == SkillDelivery.Weapon && !Weapon.IsRanged;
 
     private void RepeatHeldSkill()
     {
@@ -356,6 +430,13 @@ public partial class Hero3D : Unit3D
 
         if (orderedSkill is null || !attackCycle.IsReady)
             return Vector3.Zero;
+
+        if (attackTarget is null)
+        {
+            StartSwing(attackAimPoint - GlobalPosition);
+
+            return Vector3.Zero;
+        }
 
         if (!IsValidTarget(attackTarget))
         {
@@ -484,7 +565,7 @@ public partial class Hero3D : Unit3D
 
         var target = FindHostileUnitUnderMouse();
 
-        if (target is null && IsValidTarget(previousTarget))
+        if (target is null && IsMelee(skill) && IsValidTarget(previousTarget))
             target = previousTarget;
 
         OrderAttack(skill, new Aim3D(GetMouseGroundPoint(), target));
@@ -520,11 +601,19 @@ public partial class Hero3D : Unit3D
 
         swingLook?.Kill();
 
-        weaponPivot.RotationDegrees = new Vector3(0, -SwingArcDegrees, 0);
-
         swingLook = CreateTween();
 
-        swingLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(0, SwingArcDegrees, 0), swingSec * ImpactFraction);
+        if (Weapon.IsRanged)
+        {
+            swingLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(AimRaiseDegrees, 0, 0), swingSec * ImpactFraction);
+        }
+        else
+        {
+            weaponPivot.RotationDegrees = new Vector3(SwingRaiseDegrees, -SwingArcDegrees, 0);
+
+            swingLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(SwingRaiseDegrees, SwingArcDegrees, 0), swingSec * ImpactFraction);
+        }
+
         swingLook.TweenProperty(weaponPivot, "rotation_degrees", Vector3.Zero, swingSec * (1 - ImpactFraction));
     }
 
@@ -537,6 +626,84 @@ public partial class Hero3D : Unit3D
         if (weaponPivot is not null)
             weaponPivot.RotationDegrees = Vector3.Zero;
     }
+
+    #endregion
+
+    #region Items
+
+    public int GetRequiredValue(Requirement requirement)
+        => requirement switch
+        {
+            Requirement.Strength       => Stats.GetFinalWhole(CombatStat.Strength),
+            Requirement.Dexterity      => Stats.GetFinalWhole(CombatStat.Dexterity),
+            Requirement.Intelligence   => Stats.GetFinalWhole(CombatStat.Intelligence),
+            Requirement.Constitution   => Stats.GetFinalWhole(CombatStat.Constitution),
+            Requirement.Awareness      => Stats.GetFinalWhole(CombatStat.Awareness),
+            Requirement.CharacterLevel => Level,
+            _                          => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null)
+        };
+
+    public void Consume(ItemInstance item)
+    {
+        if (IsDead)
+            return;
+
+        var effect = Items.Consume(item);
+
+        switch (effect?.Kind)
+        {
+            case ConsumableEffectKind.RestoreLife:
+                var healedAmount = (int)(LifeMaximum * effect.Percent / 100f);
+
+                LifeCurrent += healedAmount;
+
+                CombatText3D.Show(this, healedAmount.ToString("N0"), Colors.LimeGreen, 36);
+
+                break;
+            case ConsumableEffectKind.RestoreMana:
+                ManaCurrent += ManaMaximum * effect.Percent / 100f;
+
+                break;
+        }
+    }
+
+    private void OnItemEquipped(ItemInstance item)
+    {
+        Stats.Update(sheet =>
+        {
+            sheet.AddModifiers(item.GetEquipModifiers());
+
+            if (item.Definition.Kind == ItemKind.Weapon)
+                WieldWeapon(item);
+        });
+
+        wornItems?.Show(item);
+    }
+
+    private void OnItemUnequipped(ItemInstance item)
+    {
+        Stats.Update(sheet =>
+        {
+            sheet.RemoveModifiersOf(item.InstanceId);
+
+            if (item == equippedWeapon)
+                WieldWeapon(null);
+        });
+
+        wornItems?.Hide(item);
+    }
+
+    private void WieldWeapon(ItemInstance newWeapon)
+    {
+        equippedWeapon = newWeapon;
+        weapon         = newWeapon?.ToWeaponProfile() ?? WeaponProfile.Unarmed;
+
+        weapon.ApplyTo(Stats);
+    }
+
+    //Beutel am Boden gibt es in 3D noch nicht, das Item kehrt deshalb ins Inventar zurück
+    private void OnItemDropped(ItemInstance item)
+        => Items.PickUp(item);
 
     #endregion
 

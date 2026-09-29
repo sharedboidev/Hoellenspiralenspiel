@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://Shaders/Spike3D/ps1_surface.gdshader" id="ps1"]
+[ext_resource type="Texture2D" path="res://Textures/Spike3D/cloth_weave.png" id="cloth"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1"]
+top_radius = 0.025
+bottom_radius = 0.03
+height = 1.7
+radial_segments = 6
+rings = 1
+
+[sub_resource type="ShaderMaterial" id="Mat_1"]
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.5, 0.34, 0.2, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_2"]
+radius = 0.07
+height = 0.14
+radial_segments = 6
+rings = 3
+
+[sub_resource type="ShaderMaterial" id="Mat_2"]
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.32, 0.21, 0.13, 1)
+
+[node name="WoodenStaff" type="Node3D"]
+
+[node name="Pole" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+mesh = SubResource("CylinderMesh_1")
+surface_material_override/0 = SubResource("Mat_1")
+
+[node name="Knob" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.08, 0)
+mesh = SubResource("SphereMesh_2")
+surface_material_override/0 = SubResource("Mat_2")
