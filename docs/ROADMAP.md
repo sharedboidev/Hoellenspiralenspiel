@@ -13,7 +13,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 |---|---|
 | 2D oder 3D | 3D im Look der PlayStation 1, Vorbild Silent Hill. Entschieden am 29.09.2026 nach dem Vergleich. |
 | Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen, auch das Amulett. Nur die Ringe bleiben unsichtbar. Gegner zeigen ihre Ausrüstung, sobald es Gegner mit Armen gibt. Entschieden am 29.09.2026. |
-| Modelle | Starre Teile ohne Skelett. Entschieden am 29.09.2026. |
+| Modelle | Held und humanoide Gegner bekommen ein Skelett mit starrer Gewichtung, in Godot `Skeleton3D`. Blobs und einfache Gegner bleiben bei Knoten und Tweens. Entschieden am 29.09.2026, löst "Starre Teile ohne Skelett" vom selben Tag ab. |
 | Spielstruktur | Hub (Stadt) plus Abstieg in einen Höllenkreis mit mehreren Ebenen |
 | Leveldesign | Etwa 90 % prozedural, dazu handgebaute Räume und Event-Locations, die gezielt eingestreut werden |
 | Multiplayer | Singleplayer zuerst, Koop soll später nachrüstbar bleiben |
@@ -827,7 +827,7 @@ Getroffene Designentscheidungen vom 29.09.2026:
 |---|---|
 | 2D oder 3D | 3D im Look der PlayStation 1 |
 | Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen |
-| Modelle | Starre Teile: Kopf, Torso, Arme und Beine sind einzelne Netze ohne Gewichte. Kein Skelett. |
+| Modelle | In M5.5: starre Teile, also Kopf, Torso, Arme und Beine als einzelne Netze ohne Gewichte und ohne Skelett. Danach abgelöst: Held und humanoide Gegner bekommen ein Skelett, siehe "Eigene Modelle". |
 | Sichtbare Plätze | 12 von 16: Waffe, Nebenhand, Helm, Amulett, Schultern, Torso, Rücken, Gürtel, Handgelenke, Hände, Beine, Füße. Nur die vier Ringe bleiben unsichtbar. |
 | Ausrüstung an Gegnern | Ja, sobald es Gegner mit Armen gibt |
 | Kamera | In M5.5 vertagt, vor M6 entschieden: perspektivisch. F2 schaltet zum Vergleich weiter um. |
@@ -1034,13 +1034,128 @@ Bewusst offen gelassen:
 
 ### Eigene Modelle (läuft neben den Meilensteinen)
 
-Ziel: Held, Gegner und Items bekommen eigene Low-Poly-Modelle aus Blender statt der Grundkörper.
+Ziel: Held, Gegner und Items bekommen eigene Low-Poly-Modelle aus Blender statt der Grundkörper. Held und Gegner sollen sich richtig bewegen, also laufen, ausholen und zuschlagen.
 
-- Die Modelle bestehen aus starren Teilen ohne Skelett.
-- Der Held braucht die Knoten `Visual`, `Visual/Body`, `Visual/WeaponPivot` und die Befestigungspunkte mit dem Namen `Attach` plus Platz.
-- Ein Gegner braucht `Visual` und `Visual/Body`. An `Body` hängen Klickfläche und das Färben beim Ausholen.
-- Die Kollisionsform eines Gegners ist eine Kapsel mit dem Radius des Modells plus 3 cm, Maske 11. Sie ist so hoch, dass ein gerader Teil bleibt, sonst schieben sich Körper verschiedener Größe nach oben und unten weg.
+Noch ist nichts davon gebaut. Dieser Abschnitt hält die Entscheidung, die Vorgaben und den ersten Kandidaten fest.
+
+#### Entscheidung vom 29.09.2026: Skelett für Held und humanoide Gegner
+
+| Frage | Entscheidung |
+|---|---|
+| Held und humanoide Gegner | Ein Netz mit Skelett, in Godot `Skeleton3D` mit `AnimationPlayer` |
+| Gewichtung | Starr: Jeder Punkt hängt an genau einem Knochen. Das Modell bewegt sich dadurch wie starre Teile. |
+| Blobs und einfache Gegner | Bleiben bei Knoten und Tweens. Beides läuft im selben Spiel nebeneinander. |
+| Ausrüstung | Hängt an einem `BoneAttachment3D` mit dem Namen `Attach` plus Platz |
+| Platzhalter aus Grundkörpern | Bleiben, bis ein Modell aus Blender sie ersetzt |
+
+Die Entscheidung löst "Starre Teile ohne Skelett" aus M5.5 ab. Einen Grund für die alte Entscheidung hält die Roadmap nicht fest. Anlass für die neue war das erste fremde Modell, ein Skelett-Gegner mit fertigem Rig.
+
+Starre Teile lassen sich auch ohne Skelett animieren. In Godot dreht der `AnimationPlayer` dann Knoten, und jedes Gelenk braucht einen eigenen Drehpunkt wie `WeaponPivot`. In Blender hängen die Teile als Objekte aneinander. Das ist ein Skelett von Hand, nur aus Knoten statt Knochen. Dem Helden aus Grundkörpern fehlen dafür die Drehpunkte der Beine, Knie hat er keine.
+
+| Punkt | Starre Teile als Knoten | `Skeleton3D` |
+|---|---|---|
+| Fertige Animationen aus Mixamo oder freien Paketen | Nicht nutzbar, das sind Knochenanimationen | Nutzbar |
+| Animation zwischen Figuren teilen | Nur bei gleichen Knotennamen und gleichem Aufbau | Per Retargeting |
+| Netze pro Figur | Eines pro Körperteil, bei einem Humanoiden rund 15 | Eines |
+| Arbeit in Blender | Teile anordnen und verketten | Zusätzlich Knochen anlegen und jedes Teil einem Knochen zuweisen |
+| PS1-Look | Ja | Ja, bei starrer Gewichtung |
+
+Nach dem [Vergleich](VERGLEICH_2D_3D.md) zählt für die Bildrate nach den Schatten die Zahl der Netze. Was das Skinning kostet, ist nicht gemessen.
+
+#### Vorgaben für ein Modell
+
+Für alle Modelle:
+
 - Material ist der Shader `Shaders/Ps1/ps1_surface.gdshader`, Texturen sind klein und ungefiltert.
+- Die Kollisionsform eines Gegners ist eine Kapsel mit dem Radius des Modells plus 3 cm, Maske 11. Sie ist so hoch, dass ein gerader Teil bleibt, sonst schieben sich Körper verschiedener Größe nach oben und unten weg.
+- Jede Einheit braucht den Knoten `Visual`. Er dreht sich in Blickrichtung.
+
+Für Modelle mit Skelett:
+
+- Ein Netz und eine Armature. Jeder Punkt hängt mit Gewicht 1 an genau einem Knochen.
+- Ein einziger Wurzelknochen an der Hüfte. Oberkörper und beide Beine hängen daran.
+- Knochen einer Seite enden auf `.L` und `.R`. Nur dann spiegelt Blender eine Pose auf die andere Seite.
+- Die Laufanimation spielt auf der Stelle, den Körper bewegt der Code. Ihr Name endet auf `-loop`, dann stellt Godot sie beim Import auf Schleife.
+- Die Angriffsanimation besteht aus Ausholen, Treffer und Zurückholen. Der Zeitpunkt des Treffers liegt fest, siehe unten.
+- Jede Action bekommt in Blender einen "Fake User". Sonst verwirft Blender beim Speichern die Actions, die gerade nicht zugewiesen sind.
+- Ins Repo kommt die exportierte `.glb` mit Animationen. Eine `.blend` im Projekt verlangt Blender bei jedem, der das Projekt öffnet.
+- Befestigungspunkte sind `BoneAttachment3D` mit dem Namen `Attach` plus Platz, etwa `AttachHelmet` am Kopf. Paarige Plätze enden wie bisher auf `Left` und `Right`.
+
+Für Modelle ohne Skelett, also Blobs und einfache Gegner:
+
+- Ein Gegner braucht `Visual` und `Visual/Body`. An `Body` hängen Klickfläche und das Färben beim Ausholen.
+
+#### Umbau im Code
+
+| Stelle | Heute | Mit Skelett |
+|---|---|---|
+| `MeasurePickVolume` in [BaseUnit.cs](../Scripts/Units/BaseUnit.cs) | Sucht `Visual/Body` als `MeshInstance3D` und misst daran die Klickfläche | Das Netz liegt unter dem `Skeleton3D`. Die Suche muss es dort finden. |
+| `OwnBodyMaterial` in [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs) | Sucht `Visual/Body` und gibt ihm ein eigenes Material für das Färben beim Ausholen | Wie oben |
+| `BeginAttackLook` in [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs) | Vorstoß um 0,3 m per Tween | Angriffsanimation. Der Tween entfällt für diese Gegner, sonst überlagern sich beide. |
+| `BeginDeath` in [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs) | Zusammensacken per Tween | Eigene Animation, sobald es eine gibt |
+| `PlaySwingLook` in [Hero.cs](../Scripts/Units/Hero.cs) | Dreht `WeaponPivot` per Tween, getrennt nach Hieb und Schuss | Je eine Animation für Hieb und Schuss |
+| `Die` in [Hero.cs](../Scripts/Units/Hero.cs) | Legt `Visual` um 90 Grad um | Eigene Animation, sobald es eine gibt |
+| Laufen | Keine Bewegung am Körper | Laufanimation, solange sich die Einheit bewegt |
+| [WornItems.cs](../Scripts/Units/WornItems.cs) | Sucht unter `Visual` alle `Node3D`, deren Name mit `Attach` plus Platz beginnt | Bleibt. Ein `BoneAttachment3D` ist ein `Node3D`. |
+
+Zum Zeitpunkt des Treffers:
+
+- Beim Gegner fällt der Treffer ans Ende des Ausholens. Die Dauer steht als `AttackWindupSec` und `AttackRecoverySec` an der `EnemyResource`, bei den Blobs 0,5 s und 0,7 s, beim Testgegner 0,6 s und 1,0 s.
+- Beim Helden fällt er nach dem Anteil `ImpactFraction` der Schwungzeit, heute nach der Hälfte.
+- Beide Dauern hängen vom Angriffstempo ab. Der Code muss die Abspielgeschwindigkeit der Animation so setzen, dass ihr Treffer auf den Treffer der Regel fällt.
+
+#### Erster Kandidat: Skelett-Gegner
+
+Die Datei `Retro Lowpoly PSX Skeleton.blend` liegt noch nicht im Repo. Die Befunde stammen aus dem Auslesen der Datei ohne Blender, im Spiel war das Modell noch nicht.
+
+| Punkt | Befund |
+|---|---|
+| Version | Blender 4.3 |
+| Netz | 585 Punkte, 882 Flächen, 1,73 m hoch, Arme hängen seitlich herab |
+| Rig | Armature mit 19 Knochen, dazu 19 Vertex-Gruppen mit denselben Namen |
+| Gewichte | 570 Punkte hängen an genau einem Knochen, 15 an zweien |
+| Animationen | Keine, die Datei enthält keine Action |
+| Textur | `albedo_indexed.webp`, in die Datei eingepackt |
+| Wurzelknochen | Drei: `Torso`, `Hip.L`, `Hip.R`. Ein gemeinsamer Hüftknochen fehlt. |
+
+Aufbau der Knochen:
+
+```
+Torso
+  Neck -> Head
+  Shoulder.L -> UpperArm.L -> LowerArm.L -> Hand.L
+  Shoulder.R -> UpperArm.R -> LowerArm.R -> Hand.R
+Hip.L -> UpperLeg.L -> LowerLeg.L -> Foot.L
+Hip.R -> UpperLeg.R -> LowerLeg.R -> Foot.R
+```
+
+#### Wege zu den Animationen
+
+| Weg | Aufwand | Haken |
+|---|---|---|
+| Selbst in Blender animieren | Ein bis zwei Abende für Laufen und Angriff | Die Grundlagen von Pose Mode und Keyframes sind zu lernen |
+| Mixamo | Unter einer Stunde | Mixamo ersetzt das Rig durch ein eigenes mit weichen Gewichten. Die Rohdateien gehören nicht in ein öffentliches Repo. |
+| Fertige Animationen in Godot umlenken (Retargeting) | Mittel | Braucht einen Hüftknochen und eine T-Pose, beides fehlt dem Modell |
+
+Die Angaben zum Aufwand sind Schätzungen. Empfohlen ist der erste Weg: Bei 19 Knochen und PS1-Look reichen wenige Posen, und das vorhandene Rig bleibt erhalten.
+
+Schritte für den Skelett-Gegner:
+
+1. Blender 4.3 oder neuer installieren.
+2. Im Edit Mode einen Knochen `Root` an der Hüfte anlegen und `Torso`, `Hip.L` und `Hip.R` daran hängen.
+3. Action `Walk-loop` anlegen, 24 Bilder lang, auf der Stelle. Vier Posen reichen: Schritt links, Durchgang, Schritt rechts, Durchgang. Die gespiegelten Posen liefert "Paste Flipped".
+4. Action `Attack` anlegen, mit Ausholen, Treffer und Zurückholen.
+5. Bei beiden Actions "Fake User" einschalten.
+6. Als `.glb` mit Animationen exportieren und ins Projekt legen.
+7. Szene des Gegners bauen und den Code nach der Tabelle oben umbauen.
+
+Fertig, wenn der Skelett-Gegner im Spiel läuft und zuschlägt, sein Treffer auf den Treffer der Regel fällt und die Laufzeitprüfungen weiter bestehen.
+
+Offen:
+
+- Die Lizenz des Modells ist nicht geprüft. Vorher kommt es nicht ins Repo.
+- Was 200 Gegner mit Skelett an Bildrate kosten, ist nicht gemessen.
+- Ob die 15 Punkte mit zwei Gewichten bleiben oder starr werden.
 
 ### M6: Prozedurale Level mit handgebauten Räumen (L, umgesetzt am 29.09.2026 auf `master_ProceduralLevels`)
 
