@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
 using Hoellenspiralenspiel.Resources.Levels;
@@ -207,13 +208,23 @@ public partial class Descent : Node
     public void ShowHub()
         => Show(Hub, Arrival.AtStart);
 
-    //Wer eine Tür benutzt, steckt mitten in der Physik. Abgebaut und gebaut wird deshalb erst danach
-    public void Show(PackedScene place, Arrival arrival)
+    public void Show(PackedScene scene, Arrival arrival)
     {
-        if (place is null || !StartTravelling())
+        if (scene is null || IsTravelling)
             return;
 
-        Callable.From(() => BuildPlace(place, arrival)).CallDeferred();
+        var node = scene.Instantiate();
+
+        if (node is not Place place)
+        {
+            GD.PushError($"Die Szene {scene.ResourcePath} ist kein Ort, an ihrer Wurzel fehlt das Skript {nameof(Place)}.");
+
+            node.Free();
+
+            return;
+        }
+
+        Travel(place.DisplayName, string.Empty, () => BuildPlace(place, arrival));
     }
 
     public void EnterCircle(LevelThemeResource circle, int depth)
@@ -221,10 +232,10 @@ public partial class Descent : Node
 
     public void EnterCircle(LevelThemeResource circle, int depth, Arrival arrival)
     {
-        if (circle is null || !StartTravelling())
+        if (circle is null || IsTravelling)
             return;
 
-        Callable.From(() => BuildLevel(circle, depth, arrival)).CallDeferred();
+        Travel(circle.DisplayName, $"Level {ClampDepth(circle, depth)} of {circle.LevelCount}", () => BuildLevel(circle, depth, arrival));
     }
 
     //Würfelt die Ebenen des Kreises neu. Die Checkpoints bleiben
@@ -263,26 +274,55 @@ public partial class Descent : Node
         return true;
     }
 
-    private bool StartTravelling()
+    //Solange der Held reist, steht die Welt still und nimmt keine Eingaben an.
+    //Wer eine Tür benutzt, steckt mitten in der Physik. Abgebaut und gebaut wird deshalb erst hinter dem Vorhang
+    private async void Travel(string title, string detail, Action build)
     {
-        if (IsTravelling)
-            return false;
-
         IsTravelling = true;
 
-        Curtain?.Drop();
+        Hold(true);
 
-        return true;
+        if (Curtain is null)
+        {
+            await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        }
+        else
+        {
+            Curtain.Drop(title, detail);
+
+            await Curtain.WaitUntilShown();
+        }
+
+        build();
+    }
+
+    private void Hold(bool isHeld)
+    {
+        if (IsInsideTree())
+            GetTree().Paused = isHeld;
+    }
+
+    //Die Welt bleibt angehalten, nur die Physik tut einen Schritt
+    private async Task StepPhysics()
+    {
+        PhysicsServer3D.SetActive(true);
+
+        await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+        await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+
+        PhysicsServer3D.SetActive(!GetTree().Paused);
     }
 
     private int RollSeed()
         => Seed != 0 ? Seed : (int)GD.Randi();
 
-    private void BuildPlace(PackedScene scene, Arrival arrival)
+    private void BuildPlace(Place place, Arrival arrival)
     {
-        if (LevelRoot is null || scene.Instantiate() is not Place place)
+        if (LevelRoot is null)
         {
-            GD.PushError($"Die Szene {scene.ResourcePath} ist kein Ort, an ihrer Wurzel fehlt das Skript {nameof(Place)}.");
+            GD.PushError("Dem Abstieg fehlt der Knoten für den Ort.");
+
+            place.Free();
 
             Arrive();
 
@@ -339,7 +379,7 @@ public partial class Descent : Node
         if (!state.HasBegun)
             Journey.BeginAnew(circle.Id, RollSeed());
 
-        var depth    = Math.Clamp(wantedDepth, 1, Math.Max(1, circle.LevelCount));
+        var depth    = ClampDepth(circle, wantedDepth);
         var rooms    = new RoomLibrary(circle.Rooms);
         var seed     = state.GetSeedOf(depth);
         var settings = GetSettings(circle, depth);
@@ -381,6 +421,9 @@ public partial class Descent : Node
 
         Populate(Level, arrival);
     }
+
+    private static int ClampDepth(LevelThemeResource circle, int depth)
+        => Math.Clamp(depth, 1, Math.Max(1, circle.LevelCount));
 
     //Die letzte Ebene hat keinen Weg hinab
     private void ConnectStairs(BuiltLevel level, LevelThemeResource circle, int depth)
@@ -461,7 +504,7 @@ public partial class Descent : Node
     //Der Held steht beim Spawnen immer am Start, sonst stünden dieselben Gegner bei jeder Ankunft woanders
     private async void Populate(BuiltLevel level, Arrival arrival)
     {
-        await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+        await StepPhysics();
 
         if (level != Level || !IsInstanceValid(level.Root))
             return;
@@ -496,7 +539,7 @@ public partial class Descent : Node
 
     private async void Populate(Place place, Arrival arrival)
     {
-        await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+        await StepPhysics();
 
         if (place != Place || !IsInstanceValid(place))
             return;
@@ -508,8 +551,14 @@ public partial class Descent : Node
         Arrive();
     }
 
-    private void Arrive()
+    //Der Vorhang bleibt, bis man den Tipp lesen konnte. Erst dann läuft die Welt weiter
+    private async void Arrive()
     {
+        if (Curtain is not null)
+            await Curtain.WaitForMinimum();
+
+        Hold(false);
+
         IsTravelling = false;
 
         Curtain?.Lift();
@@ -663,7 +712,8 @@ public partial class Descent : Node
             return;
         }
 
-        if (music?.Stream == stream && music.Playing)
+        //Während der Reise ist dieselbe Musik nur angehalten. Sie spielt nach der Ankunft an derselben Stelle weiter
+        if (music?.Stream == stream && (music.Playing || music.StreamPaused))
             return;
 
         if (music is null)

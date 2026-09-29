@@ -7,8 +7,15 @@ namespace Hoellenspiralenspiel.Scripts.UI;
 
 public partial class MainMenu : Control
 {
+    private const string LoadingText = "Loading...";
+
+    private bool isStarting;
+
     [Export(PropertyHint.File, "*.tscn")]
     public string GameScenePath { get; set; } = "res://Scenes/game.tscn";
+
+    [Export]
+    public Curtain Curtain { get; set; }
 
     public CharacterSlotView[] Slots { get; private set; } = [];
 
@@ -30,9 +37,24 @@ public partial class MainMenu : Control
         GetNode<Button>("%QuitButton").Pressed += () => GetTree().Quit();
     }
 
-    public void Play(int slot, string newName)
+    //Das Laden der Spielszene hält das Bild an. Der Vorhang muss deshalb vorher einmal gezeichnet sein
+    public async void Play(int slot, string newName)
     {
+        if (isStarting)
+            return;
+
+        isStarting = true;
+
         SaveSlots.Select(slot, newName);
+
+        if (Curtain is not null)
+        {
+            Curtain.Drop(detail: LoadingText);
+
+            await Curtain.WaitUntilShown();
+
+            Curtain.HandOver();
+        }
 
         GetTree().ChangeSceneToFile(GameScenePath);
     }

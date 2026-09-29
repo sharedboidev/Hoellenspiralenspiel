@@ -3,6 +3,7 @@ using Godot;
 using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Utils;
+using Hoellenspiralenspiel.Scripts.World.Levels;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
@@ -13,6 +14,10 @@ public partial class PauseMenu : Control
 
     [Export]
     public GameController Game { get; set; }
+
+    //Während einer Reise hält der Abstieg das Spiel an. Das Menü bleibt dann zu, sonst liefe die Welt hinter dem Vorhang weiter
+    [Export]
+    public Descent Descent { get; set; }
 
     //Nach diesen Fenstern sucht das Menü, in der Spielszene ist das die Hud
     [Export]
@@ -37,6 +42,9 @@ public partial class PauseMenu : Control
     //Vor der Oberfläche, damit die Leertaste keinen Knopf drückt, der noch den Fokus hat
     public override void _Input(InputEvent @event)
     {
+        if (Descent?.IsTravelling == true)
+            return;
+
         if (@event.IsActionPressed(InputActions.TogglePauseMenu))
         {
             if (Visible)

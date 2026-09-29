@@ -31,7 +31,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/Objects/town_portal.tscn" id="44_town_portal"]
 [ext_resource type="Script" path="res://Scripts/UI/TownPortalBadge.cs" id="45_badge"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/circle_dialog.tscn" id="46_circle_dialog"]
-[ext_resource type="Script" path="res://Scripts/UI/Curtain.cs" id="47_curtain"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/curtain.tscn" id="47_curtain"]
 [ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit_outline.gdshader" id="48_outline"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/pause_menu.tscn" id="49_pause_menu"]
 
@@ -285,22 +285,15 @@ Descent = NodePath("../../Descent")
 unique_name_in_owner = true
 visible = false
 
-[node name="PauseMenu" parent="Hud" node_paths=PackedStringArray("Game", "WindowRoot") instance=ExtResource("49_pause_menu")]
+[node name="PauseMenu" parent="Hud" node_paths=PackedStringArray("Game", "Descent", "WindowRoot") instance=ExtResource("49_pause_menu")]
 unique_name_in_owner = true
 visible = false
 Game = NodePath("../../GameController")
+Descent = NodePath("../../Descent")
 WindowRoot = NodePath("..")
 
-[node name="Curtain" type="ColorRect" parent="Hud"]
-z_index = 200
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0, 0, 0, 1)
-script = ExtResource("47_curtain")
+[node name="Curtain" parent="Hud" instance=ExtResource("47_curtain")]
+StartsDown = true
 
 [node name="Lootsystem" parent="." instance=ExtResource("26_lootsystem")]
 

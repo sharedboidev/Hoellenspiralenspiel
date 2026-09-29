@@ -1,0 +1,63 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/Curtain.cs" id="1_curtain"]
+
+[node name="Curtain" type="ColorRect"]
+process_mode = 3
+z_index = 200
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+script = ExtResource("1_curtain")
+Tips = PackedStringArray("Press {open_town_portal} to open a Town Portal to the hub. It takes a minute to recharge.", "Press {toggle_loot_labels} to show or hide the names of the items on the ground.", "Press {toggle_overlay_map} to look at the map of this level.", "Press {toggle_character_sheet} to open your character sheet and inventory.", "Press {close_windows} to close all open windows at once.", "Every level you set foot in becomes a checkpoint. The portal of its circle in the hub takes you back there.", "Slain enemies stay dead until you begin a new descent.", "Loot left on the ground is lost once you leave the level.", "Right-click a slot of the skill bar to choose the skill it holds.", "Shields and staves block attacks. Swords and daggers parry them.")
+
+[node name="Target" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.45
+anchor_right = 0.5
+anchor_bottom = 0.45
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="Target"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.45, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 72
+horizontal_alignment = 1
+
+[node name="DetailLabel" type="Label" parent="Target"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 36
+horizontal_alignment = 1
+
+[node name="TipLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 1.0
+anchor_right = 0.8
+anchor_bottom = 1.0
+offset_top = -240.0
+offset_bottom = -120.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 30
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
