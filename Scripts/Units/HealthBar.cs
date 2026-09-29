@@ -10,12 +10,12 @@ public partial class HealthBar : Node3D
     private static readonly Color BackColor = new(0.08f, 0.08f, 0.08f, 0.85f);
     private static readonly Color FillColor = new(0.8f, 0.1f, 0.1f);
 
+    private MeshInstance3D back;
     private MeshInstance3D fill;
 
     public override void _Ready()
     {
-        var back = CreateBar(BackColor, 1);
-
+        back = CreateBar(BackColor, 1);
         fill = CreateBar(FillColor, 2);
 
         AddChild(back);
@@ -39,6 +39,12 @@ public partial class HealthBar : Node3D
 
     public void SetRatio(float ratio)
         => fill.Scale = new Vector3(Mathf.Clamp(ratio, 0.001f, 1f), 1, 1);
+
+    public void SetVisibility(float visibility)
+    {
+        back.Transparency = 1f - visibility;
+        fill.Transparency = 1f - visibility;
+    }
 
     private static MeshInstance3D CreateBar(Color color, int priority)
         => new()

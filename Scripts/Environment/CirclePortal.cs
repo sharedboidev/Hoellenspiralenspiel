@@ -1,0 +1,56 @@
+using Godot;
+using Hoellenspiralenspiel.Resources.Levels;
+using Hoellenspiralenspiel.Scripts.UI;
+
+namespace Hoellenspiralenspiel.Scripts.Environment;
+
+//Steht im Hub und führt in einen Höllenkreis. Ein gesperrtes Portal bleibt dunkel
+public partial class CirclePortal : Passage
+{
+    private const float TagHeightMeters = 3.7f;
+
+    private static readonly Color OpenColor   = new(1f, 0.75f, 0.45f);
+    private static readonly Color SealedColor = new(0.55f, 0.55f, 0.55f);
+
+    private bool    isUnlocked;
+    private NameTag tag;
+
+    [Export(PropertyHint.Range, "1,9,1")]
+    public int Number { get; set; } = 1;
+
+    [Export]
+    public Node3D OpenLook { get; set; }
+
+    //Den Kreis zu seiner Nummer nennt der Abstieg. Fehlt er, gibt es den Kreis noch nicht
+    public LevelThemeResource Circle { get; set; }
+
+    public override bool IsOpen => isUnlocked && Circle is not null;
+
+    public void SetUnlocked(bool unlocked)
+    {
+        isUnlocked = unlocked;
+
+        if (OpenLook is not null)
+            OpenLook.Visible = IsOpen;
+
+        if (!IsOpen)
+            SetHighlight(false);
+
+        ShowTag();
+    }
+
+    private void ShowTag()
+    {
+        if (IsInstanceValid(tag))
+            tag.QueueFree();
+
+        if (!IsInsideTree())
+            return;
+
+        tag = IsOpen
+                      ? NameTag.Create(this, TagHeightMeters, Circle.DisplayName, OpenColor, $"Circle {Number}")
+                      : NameTag.Create(this, TagHeightMeters, $"Circle {Number}", SealedColor, "sealed");
+
+        CombatText.GetLayer(GetTree().CurrentScene ?? GetTree().Root).AddChild(tag);
+    }
+}

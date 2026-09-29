@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.World.Levels;
 
 namespace Hoellenspiralenspiel.Scripts.World;
@@ -171,7 +172,7 @@ public partial class Ps1Look : Node
 
     private void Tune(Material material, Vector2 resolution)
     {
-        if (material is not ShaderMaterial surface || (surface.Shader != SurfaceShader && surface.Shader != WallFade.MasonryShader))
+        if (material is not ShaderMaterial surface || (surface.Shader != SurfaceShader && surface.Shader != WallFade.MasonryShader && surface.Shader != UnitSight.Shader))
             return;
 
         surface.SetShaderParameter(Snap, Enabled && SnapVertices ? 1f : 0f);

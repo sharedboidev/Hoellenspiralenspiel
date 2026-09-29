@@ -1,0 +1,211 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/World/Levels/Place.cs" id="1_place"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/HeroStart.cs" id="2_start"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/RoomZone.cs" id="3_zone"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/WallSegment.cs" id="4_wall"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="5_surface"]
+[ext_resource type="Texture2D" path="res://Textures/World/wall_brick.png" id="6_brick"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/circle_portal.tscn" id="7_portal"]
+[ext_resource type="Texture2D" path="res://Textures/World/floor_stone.png" id="8_floor"]
+
+[sub_resource type="BoxShape3D" id="Shape_floor"]
+size = Vector3(40, 1, 26)
+
+[sub_resource type="PlaneMesh" id="Mesh_floor"]
+size = Vector2(40, 26)
+subdivide_width = 19
+subdivide_depth = 12
+
+[sub_resource type="ShaderMaterial" id="Mat_floor"]
+shader = ExtResource("5_surface")
+shader_parameter/albedo = Color(1, 0.92, 0.88, 1)
+shader_parameter/albedo_texture = ExtResource("8_floor")
+shader_parameter/world_uv_scale = 0.25
+
+[sub_resource type="BoxShape3D" id="Shape_zone"]
+size = Vector3(40, 2.5, 26)
+
+[sub_resource type="BoxShape3D" id="Shape_brazier"]
+size = Vector3(0.9, 1, 0.9)
+
+[sub_resource type="BoxMesh" id="Mesh_brazier"]
+size = Vector3(0.9, 1, 0.9)
+
+[sub_resource type="ShaderMaterial" id="Mat_brazier"]
+shader = ExtResource("5_surface")
+shader_parameter/albedo = Color(0.5, 0.45, 0.45, 1)
+shader_parameter/albedo_texture = ExtResource("6_brick")
+shader_parameter/world_uv_scale = 0.25
+
+[sub_resource type="BoxMesh" id="Mesh_ember"]
+size = Vector3(0.6, 0.12, 0.6)
+
+[sub_resource type="ShaderMaterial" id="Mat_ember"]
+shader = ExtResource("5_surface")
+shader_parameter/albedo = Color(0.1, 0.02, 0.02, 1)
+shader_parameter/emission = Color(1, 0.45, 0.15, 1)
+shader_parameter/emission_energy = 5.0
+
+[node name="Hub" type="Node3D"]
+script = ExtResource("1_place")
+DisplayName = "Hub"
+HasTownPortal = true
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 1)
+collision_layer = 16
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("Shape_floor")
+debug_fill = false
+
+[node name="Mesh" type="MeshInstance3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("Mesh_floor")
+surface_material_override/0 = SubResource("Mat_floor")
+
+[node name="Zone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+script = ExtResource("3_zone")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+shape = SubResource("Shape_zone")
+debug_fill = false
+
+[node name="Walls" type="Node3D" parent="."]
+
+[node name="North" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -12)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("4_wall")
+Length = 40.5
+Texture = ExtResource("6_brick")
+
+[node name="South" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 14)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("4_wall")
+Length = 40.5
+Texture = ExtResource("6_brick")
+
+[node name="West" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -20, 0, 1)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("4_wall")
+Length = 26.5
+Texture = ExtResource("6_brick")
+
+[node name="East" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 20, 0, 1)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("4_wall")
+Length = 26.5
+Texture = ExtResource("6_brick")
+
+[node name="Portals" type="Node3D" parent="."]
+
+[node name="Circle1" parent="Portals" instance=ExtResource("7_portal")]
+transform = Transform3D(0.173648, 0, 0.984808, 0, 1, 0, -0.984808, 0, 0.173648, -12.803, 0, 1.743)
+Number = 1
+
+[node name="Circle2" parent="Portals" instance=ExtResource("7_portal")]
+transform = Transform3D(0.5, 0, 0.866025, 0, 1, 0, -0.866025, 0, 0.5, -11.258, 0, -2.5)
+Number = 2
+
+[node name="Circle3" parent="Portals" instance=ExtResource("7_portal")]
+transform = Transform3D(0.766044, 0, 0.642788, 0, 1, 0, -0.642788, 0, 0.766044, -8.356, 0, -5.959)
+Number = 3
+
+[node name="Circle4" parent="Portals" instance=ExtResource("7_portal")]
+transform = Transform3D(0.939693, 0, 0.34202, 0, 1, 0, -0.34202, 0, 0.939693, -4.446, 0, -8.216)
+Number = 4
+
+[node name="Circle5" parent="Portals" instance=ExtResource("7_portal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0, 0, -9)
+Number = 5
+
+[node name="Circle6" parent="Portals" instance=ExtResource("7_portal")]
+transform = Transform3D(0.939693, 0, -0.34202, 0, 1, 0, 0.34202, 0, 0.939693, 4.446, 0, -8.216)
+Number = 6
+
+[node name="Circle7" parent="Portals" instance=ExtResource("7_portal")]
+transform = Transform3D(0.766044, 0, -0.642788, 0, 1, 0, 0.642788, 0, 0.766044, 8.356, 0, -5.959)
+Number = 7
+
+[node name="Circle8" parent="Portals" instance=ExtResource("7_portal")]
+transform = Transform3D(0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, 0.5, 11.258, 0, -2.5)
+Number = 8
+
+[node name="Circle9" parent="Portals" instance=ExtResource("7_portal")]
+transform = Transform3D(0.173648, 0, -0.984808, 0, 1, 0, 0.984808, 0, 0.173648, 12.803, 0, 1.743)
+Number = 9
+
+[node name="Braziers" type="Node3D" parent="."]
+
+[node name="West" type="StaticBody3D" parent="Braziers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0.5, 7)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Braziers/West"]
+shape = SubResource("Shape_brazier")
+debug_fill = false
+
+[node name="Mesh" type="MeshInstance3D" parent="Braziers/West"]
+mesh = SubResource("Mesh_brazier")
+surface_material_override/0 = SubResource("Mat_brazier")
+
+[node name="Ember" type="MeshInstance3D" parent="Braziers/West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_ember")
+surface_material_override/0 = SubResource("Mat_ember")
+
+[node name="Light" type="OmniLight3D" parent="Braziers/West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+light_color = Color(1, 0.55, 0.3, 1)
+light_energy = 4.0
+omni_range = 13.0
+
+[node name="East" type="StaticBody3D" parent="Braziers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.5, 7)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Braziers/East"]
+shape = SubResource("Shape_brazier")
+debug_fill = false
+
+[node name="Mesh" type="MeshInstance3D" parent="Braziers/East"]
+mesh = SubResource("Mesh_brazier")
+surface_material_override/0 = SubResource("Mat_brazier")
+
+[node name="Ember" type="MeshInstance3D" parent="Braziers/East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_ember")
+surface_material_override/0 = SubResource("Mat_ember")
+
+[node name="Light" type="OmniLight3D" parent="Braziers/East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+light_color = Color(1, 0.55, 0.3, 1)
+light_energy = 4.0
+omni_range = 13.0
+
+[node name="HeroStart" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+script = ExtResource("2_start")
+
+[node name="TownPortalSpot" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9.5)

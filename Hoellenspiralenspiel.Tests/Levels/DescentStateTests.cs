@@ -1,6 +1,5 @@
 using System.Linq;
 using Hoellenspiralenspiel.Scripts.Core.Levels;
-using Hoellenspiralenspiel.Scripts.Core.Saving;
 using NUnit.Framework;
 
 namespace Hoellenspiralenspiel.Tests.Levels;
@@ -75,40 +74,71 @@ public class DescentStateTests
     }
 
     [Test]
-    public void DerAbstiegUeberstehtDasSpeichern()
+    public void EinNeuerAbstiegBehaeltDieCheckpoints()
     {
         var descent = new DescentState();
-        var first   = CreateExplored(new Cell(1, 1), new Cell(2, 1));
-        var second  = CreateExplored(new Cell(7, 5));
-        var save    = new SaveGame();
-        var loaded  = new DescentState();
 
-        descent.Begin(4711);
-        descent.GoTo(2);
-        descent.Remember(1, first);
-        descent.Remember(2, second);
+        descent.Begin(1);
+        descent.GoTo(3);
+        descent.Begin(2);
 
-        SaveGameMapper.CaptureDescent(descent, save);
-
-        Assert.That(SaveGameSerializer.TryDeserialize(SaveGameSerializer.Serialize(save), out var read), Is.True);
-        Assert.That(SaveGameMapper.RestoreDescent(read, loaded), Is.True);
-
-        Assert.That(loaded.Seed, Is.EqualTo(4711));
-        Assert.That(loaded.Depth, Is.EqualTo(2));
-        Assert.That(loaded.GetRevealed(1), Is.EqualTo(first.Encode()));
-        Assert.That(loaded.GetRevealed(2), Is.EqualTo(second.Encode()));
+        Assert.That(descent.DeepestDepth, Is.EqualTo(3));
+        Assert.That(descent.HasReached(3), Is.True);
+        Assert.That(descent.HasReached(4), Is.False);
     }
 
     [Test]
-    public void EinAlterSpielstandHatKeinenAbstieg()
+    public void DieErsteEbeneStehtJedemOffen()
     {
         var descent = new DescentState();
 
-        descent.Begin(5);
-        descent.GoTo(3);
+        Assert.That(descent.HasReached(1), Is.True);
+        Assert.That(descent.HasReached(2), Is.False);
+        Assert.That(descent.HasReached(0), Is.False);
+    }
 
-        Assert.That(SaveGameSerializer.TryDeserialize("{\"Version\":1,\"Character\":{\"Level\":3}}", out var read), Is.True);
-        Assert.That(SaveGameMapper.RestoreDescent(read, descent), Is.False);
-        Assert.That(descent.Depth, Is.EqualTo(3));
+    [Test]
+    public void DerWegHinaufSenktDenCheckpointNicht()
+    {
+        var descent = new DescentState();
+
+        descent.Begin(1);
+        descent.GoTo(3);
+        descent.GoTo(2);
+        descent.Leave();
+
+        Assert.That(descent.Depth, Is.EqualTo(0));
+        Assert.That(descent.DeepestDepth, Is.EqualTo(3));
+    }
+
+    [Test]
+    public void TotBleibtTotBisZumNeuenAbstieg()
+    {
+        var descent = new DescentState();
+
+        descent.Begin(1);
+
+        Assert.That(descent.RememberKill(2, 7), Is.True);
+        Assert.That(descent.RememberKill(2, 7), Is.False);
+        Assert.That(descent.IsKilled(2, 7), Is.True);
+        Assert.That(descent.IsKilled(1, 7), Is.False);
+        Assert.That(descent.IsKilled(2, 8), Is.False);
+
+        descent.Begin(2);
+
+        Assert.That(descent.IsKilled(2, 7), Is.False);
+        Assert.That(descent.GetKilled(2), Is.Empty);
+    }
+
+    [Test]
+    public void BeschworeneGegnerZaehlenNicht()
+    {
+        var descent = new DescentState();
+
+        descent.Begin(1);
+
+        Assert.That(descent.RememberKill(1, -1), Is.False);
+        Assert.That(descent.RememberKill(0, 3), Is.False);
+        Assert.That(descent.DepthsWithKills, Is.Empty);
     }
 }

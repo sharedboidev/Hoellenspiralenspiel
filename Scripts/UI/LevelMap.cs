@@ -44,6 +44,12 @@ public partial class LevelMap : Control
     public Color ExitColor { get; set; } = new(1f, 0.82f, 0.25f, 0.95f);
 
     [Export]
+    public Color EntranceColor { get; set; } = new(0.75f, 0.75f, 0.75f, 0.95f);
+
+    [Export]
+    public Color TownPortalColor { get; set; } = new(0.35f, 0.55f, 1f, 0.95f);
+
+    [Export]
     public float WallWidthPx { get; set; } = 2f;
 
     //Zum Testen: zeigt die ganze Ebene, der Stand der Erkundung bleibt dabei, wie er ist
@@ -54,8 +60,11 @@ public partial class LevelMap : Control
         Visible     = false;
         MouseFilter = MouseFilterEnum.Ignore;
 
-        if (Descent is not null)
-            Descent.LevelEntered += OnLevelEntered;
+        if (Descent is null)
+            return;
+
+        Descent.LevelEntered += OnLevelEntered;
+        Descent.PlaceEntered += OnPlaceEntered;
     }
 
     public override void _Process(double delta)
@@ -109,10 +118,12 @@ public partial class LevelMap : Control
         }
 
         foreach (var exit in level.Exits)
-        {
-            if (IsInstanceValid(exit) && IsShown(level.Grid.GetCell(exit.GlobalPosition)))
-                DrawMark(exit.GlobalPosition, ExitMarkMeters, ExitColor);
-        }
+            DrawMarkOf(level, exit, ExitColor);
+
+        foreach (var entrance in level.Entrances)
+            DrawMarkOf(level, entrance, EntranceColor);
+
+        DrawMarkOf(level, Descent.OpenPortal, TownPortalColor);
 
         DrawMark(Hero.GlobalPosition, HeroMarkMeters, HeroColor);
     }
@@ -131,6 +142,12 @@ public partial class LevelMap : Control
             if (level.Layout.HasWall(cell, SideExtensions.All[side]))
                 DrawLine(corners[side], corners[(side + 1) % corners.Length], WallColor, WallWidthPx);
         }
+    }
+
+    private void DrawMarkOf(BuiltLevel level, Node3D passage, Color color)
+    {
+        if (IsInstanceValid(passage) && IsShown(level.Grid.GetCell(passage.GlobalPosition)))
+            DrawMark(passage.GlobalPosition, ExitMarkMeters, color);
     }
 
     private void DrawMark(Vector3 place, float sizeMeters, Color color)
@@ -163,5 +180,17 @@ public partial class LevelMap : Control
         }
 
         QueueRedraw();
+    }
+
+    //Über der Erde zeigt wieder die Karte der Oberfläche, was zu sehen ist
+    private void OnPlaceEntered()
+    {
+        if (SurfaceMap is { IsSuspended: true })
+        {
+            SurfaceMap.IsSuspended                                = false;
+            SurfaceMap.GetParent<SubViewportContainer>().Visible = Visible;
+        }
+
+        Visible = false;
     }
 }

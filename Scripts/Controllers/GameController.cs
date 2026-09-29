@@ -12,6 +12,7 @@ namespace Hoellenspiralenspiel.Scripts.Controllers;
 
 public partial class GameController : Node
 {
+    private CircleDialog            circleDialog;
     private DeathScreen             deathScreen;
     private bool                    isSaveDue;
     private LevelUpDialog           levelUpDialog;
@@ -83,7 +84,7 @@ public partial class GameController : Node
         {
             Descent.RememberExploration();
 
-            SaveGameMapper.CaptureDescent(Descent.State, save);
+            SaveGameMapper.CaptureJourney(Descent.Journey, save);
         }
 
         SaveGameStore.Save(save);
@@ -96,17 +97,41 @@ public partial class GameController : Node
         if (save is not null)
             Restore(save);
         else
-            Hero.GiveStartingItems();
+            BeginNewCharacter();
 
         if (SavingEnabled)
             WatchForChanges();
+
+        if (SavingEnabled && save is null)
+            RequestSave();
+
+        Descent?.ShowHub();
+    }
+
+    private void BeginNewCharacter()
+    {
+        Hero.CharacterName = CharacterNames.Clean(SaveSlots.TakePendingName());
+
+        Hero.GiveStartingItems();
     }
 
     private static SaveGame LoadSave()
     {
         SaveGameStore.UseFileFromCommandLine();
 
+        if (!SaveGameStore.IsFileFromCommandLine)
+            AdoptSlot();
+
         return SaveGameStore.Load();
+    }
+
+    //Ohne Hauptmenü gestartet, etwa aus dem Editor, spielt der Charakter auf dem ersten Platz
+    private static void AdoptSlot()
+    {
+        SaveSlots.UseDirectoryFromCommandLine();
+        SaveSlots.AdoptLegacySave();
+
+        SaveGameStore.FilePath = SaveSlots.GetPath(SaveSlots.Selected);
     }
 
     private void Restore(SaveGame save)
@@ -123,8 +148,8 @@ public partial class GameController : Node
         if (Hero.AttributePoints > 0)
             ShowSpendablePoints();
 
-        if (Descent is not null && SaveGameMapper.RestoreDescent(save, Descent.State) && Descent.State.IsBelowGround)
-            Descent.Enter(Descent.State.Depth);
+        if (Descent is not null)
+            SaveGameMapper.RestoreJourney(save, Descent.Journey, Descent.FirstCircle?.Id);
     }
 
     private void WatchForChanges()
@@ -138,6 +163,8 @@ public partial class GameController : Node
             return;
 
         Descent.LevelEntered += RequestSave;
+        Descent.PlaceEntered += RequestSave;
+        Descent.Changed      += RequestSave;
         Descent.Explored     += () => RequestSave(ExplorationSaveDelaySec);
     }
 
@@ -160,6 +187,13 @@ public partial class GameController : Node
         Hero.Died                                 += _ => deathScreen.ShowFor(Hero.LastXpLoss);
         deathScreen.RespawnRequested              += Hero.Respawn;
         openLevelUpDialogButton.OpenDialogPressed += levelUpDialog.ShowDialog;
+
+        if (Descent is null || circleDialog is null)
+            return;
+
+        Descent.CirclePortalUsed         += portal => circleDialog.ShowFor(portal, Descent.Journey.GetDescent(portal.Circle.Id), Hero);
+        circleDialog.LevelChosen         += Descent.EnterCircle;
+        circleDialog.NewDescentRequested += Descent.BeginAnew;
     }
 
     private void ShowSpendablePoints()
@@ -171,6 +205,7 @@ public partial class GameController : Node
 
     private void LoadNodes()
     {
+        circleDialog            = GetNodeOrNull<CircleDialog>($"%{nameof(CircleDialog)}");
         deathScreen             = GetNode<DeathScreen>($"%{nameof(DeathScreen)}");
         levelUpDialog           = GetNode<LevelUpDialog>($"%{nameof(LevelUpDialog)}");
         openLevelUpDialogButton = GetNode<OpenLevelUpDialogButton>($"%{nameof(OpenLevelUpDialogButton)}");

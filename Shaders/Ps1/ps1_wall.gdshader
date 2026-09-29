@@ -18,13 +18,6 @@ uniform float cover_edge = 0.3;
 // Wie weit sich das Stück öffnet, wenn der Held hinter ihm steht: auf der Seite seiner Z-Achse (x) oder auf der anderen (y)
 instance uniform vec2 see_through = vec2(1.0, 1.0);
 
-const float BAYER[16] = float[](
-	0.0, 8.0, 2.0, 10.0,
-	12.0, 4.0, 14.0, 6.0,
-	3.0, 11.0, 1.0, 9.0,
-	15.0, 7.0, 13.0, 5.0
-);
-
 float opening(vec3 world, mat4 model, vec3 camera) {
 	// Die dünne Achse des Mauerstücks ist seine Z-Achse
 	vec2 wall_origin = model[3].xz;
@@ -72,14 +65,8 @@ void fragment() {
 	vec3 world = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	float see = max(opening(world, MODEL_MATRIX, CAMERA_POSITION_WORLD), 0.5 * cover(world, CAMERA_POSITION_WORLD));
 
-	if (see > 0.0) {
-		// Das Raster des Bildschirms, damit das Muster die grobe Auflösung übersteht
-		vec2 cell = floor(SCREEN_UV * snap_resolution);
-		int index = int(mod(cell.x, 4.0)) + int(mod(cell.y, 4.0)) * 4;
-
-		if (1.0 - see < (BAYER[index] + 0.5) / 16.0) {
-			discard;
-		}
+	if (is_cut(see, SCREEN_UV)) {
+		discard;
 	}
 
 	ALBEDO = sample_surface(affine_uv);

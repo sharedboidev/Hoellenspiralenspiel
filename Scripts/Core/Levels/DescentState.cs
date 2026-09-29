@@ -1,40 +1,70 @@
+using System;
 using System.Collections.Generic;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Levels;
 
-//Ein Abstieg hat einen Seed, aus dem jede Ebene ihren eigenen ableitet. Ebene 0 ist die Oberfläche
+//Der Abstieg in einen Kreis hat einen Seed, aus dem jede Ebene ihren eigenen ableitet. Tiefe 0 heißt, der Held ist nicht im Kreis
 public sealed class DescentState
 {
-    private readonly Dictionary<int, string> revealedByDepth = new();
+    private readonly Dictionary<int, SortedSet<int>> killedByDepth   = new();
+    private readonly Dictionary<int, string>         revealedByDepth = new();
 
     public int Seed { get; private set; }
 
     public int Depth { get; private set; }
 
+    public int DeepestDepth { get; private set; }
+
+    public bool HasBegun { get; private set; }
+
     public bool IsBelowGround => Depth > 0;
 
     public IReadOnlyDictionary<int, string> RevealedByDepth => revealedByDepth;
 
+    public IEnumerable<int> DepthsWithKills => killedByDepth.Keys;
+
+    //Die Checkpoints bleiben. Ebenen, Karten und Tote gehören zum alten Abstieg und verfallen
     public void Begin(int seed)
     {
-        Seed  = seed;
-        Depth = 0;
+        Seed     = seed;
+        Depth    = 0;
+        HasBegun = true;
 
         revealedByDepth.Clear();
+        killedByDepth.Clear();
     }
 
-    public void Restore(int seed, int depth, IEnumerable<KeyValuePair<int, string>> revealed)
+    public void Restore(int seed, int deepestDepth, IEnumerable<KeyValuePair<int, string>> revealed, IEnumerable<KeyValuePair<int, IEnumerable<int>>> killed = null)
     {
         Begin(seed);
 
-        Depth = depth < 0 ? 0 : depth;
+        DeepestDepth = Math.Max(0, deepestDepth);
 
         foreach (var (levelDepth, encoded) in revealed ?? [])
-            revealedByDepth[levelDepth] = encoded;
+        {
+            if (!string.IsNullOrEmpty(encoded))
+                revealedByDepth[levelDepth] = encoded;
+        }
+
+        foreach (var (levelDepth, spawnIndices) in killed ?? [])
+        {
+            foreach (var spawnIndex in spawnIndices ?? [])
+                RememberKill(levelDepth, spawnIndex);
+        }
     }
 
     public void GoTo(int depth)
-        => Depth = depth < 0 ? 0 : depth;
+    {
+        Depth        = Math.Max(0, depth);
+        DeepestDepth = Math.Max(DeepestDepth, Depth);
+    }
+
+    public void Leave()
+        => Depth = 0;
+
+    //Die erste Ebene steht jedem offen, jede weitere erst dem, der sie betreten hat
+    public bool HasReached(int depth)
+        => depth >= 1 && depth <= Math.Max(1, DeepestDepth);
 
     public void Remember(int depth, ExplorationMap map)
     {
@@ -44,6 +74,23 @@ public sealed class DescentState
 
     public string GetRevealed(int depth)
         => revealedByDepth.GetValueOrDefault(depth);
+
+    public bool RememberKill(int depth, int spawnIndex)
+    {
+        if (depth < 1 || spawnIndex < 0)
+            return false;
+
+        if (!killedByDepth.TryGetValue(depth, out var killed))
+            killedByDepth[depth] = killed = new SortedSet<int>();
+
+        return killed.Add(spawnIndex);
+    }
+
+    public bool IsKilled(int depth, int spawnIndex)
+        => killedByDepth.TryGetValue(depth, out var killed) && killed.Contains(spawnIndex);
+
+    public IReadOnlyCollection<int> GetKilled(int depth)
+        => killedByDepth.TryGetValue(depth, out var killed) ? killed : [];
 
     public int GetSeedOf(int depth)
         => GetSeedOf(Seed, depth);

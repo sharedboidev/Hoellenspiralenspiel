@@ -1,0 +1,79 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/MainMenu.cs" id="1_menu"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/character_slot.tscn" id="2_slot"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.015, 0.015, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 96
+theme_override_constants/margin_top = 96
+theme_override_constants/margin_right = 96
+theme_override_constants/margin_bottom = 96
+
+[node name="Rows" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 48
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Margin/Rows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.1, 0.1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 16
+theme_override_font_sizes/font_size = 120
+text = "Höllenspiralenspiel"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="Margin/Rows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 32
+text = "Choose who descends"
+horizontal_alignment = 1
+
+[node name="Slots" type="HBoxContainer" parent="Margin/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 48
+alignment = 1
+
+[node name="Slot1" parent="Margin/Rows/Slots" instance=ExtResource("2_slot")]
+layout_mode = 2
+
+[node name="Slot2" parent="Margin/Rows/Slots" instance=ExtResource("2_slot")]
+layout_mode = 2
+Slot = 2
+
+[node name="Slot3" parent="Margin/Rows/Slots" instance=ExtResource("2_slot")]
+layout_mode = 2
+Slot = 3
+
+[node name="QuitButton" type="Button" parent="Margin/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+text = "Quit"

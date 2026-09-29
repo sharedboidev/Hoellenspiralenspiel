@@ -13,6 +13,19 @@ public partial class LevelThemeResource : Resource
     [Export]
     public string DisplayName { get; set; } = string.Empty;
 
+    [ExportGroup("Kreis")]
+    //1 bis 9. Der Kreis ist offen, sobald der Held so viele Kreise freigeschaltet hat
+    [Export(PropertyHint.Range, "1,9,1")]
+    public int Number { get; set; } = 1;
+
+    [Export(PropertyHint.Range, "1,20,1")]
+    public int LevelCount { get; set; } = 4;
+
+    //Bereichslevel der ersten Ebene, jede weitere liegt eins höher
+    [Export]
+    public int FirstAreaLevel { get; set; } = 1;
+
+    [ExportGroup("Inhalt")]
     [Export]
     public Array<PackedScene> Rooms { get; set; } = new();
 

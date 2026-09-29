@@ -1,0 +1,69 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Environment/TownPortal.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="2_ps1"]
+
+[sub_resource type="BoxShape3D" id="Shape_pick"]
+size = Vector3(1.6, 2.6, 0.8)
+
+[sub_resource type="SphereMesh" id="Mesh_veil"]
+radius = 0.8
+height = 2.4
+radial_segments = 10
+rings = 6
+
+[sub_resource type="ShaderMaterial" id="Mat_veil"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.01, 0.02, 0.08, 1)
+shader_parameter/emission = Color(0.2, 0.45, 1, 1)
+shader_parameter/emission_energy = 2.2
+
+[sub_resource type="SphereMesh" id="Mesh_core"]
+radius = 0.5
+height = 1.7
+radial_segments = 10
+rings = 6
+
+[sub_resource type="ShaderMaterial" id="Mat_core"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/emission = Color(0.75, 0.9, 1, 1)
+shader_parameter/emission_energy = 5.0
+
+[node name="TownPortal" type="Area3D" node_paths=PackedStringArray("Glow", "Look")]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_script")
+Look = NodePath("Look")
+Glow = NodePath("Glow")
+UseRadius = 180.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+shape = SubResource("Shape_pick")
+
+[node name="Look" type="Node3D" parent="."]
+
+[node name="Veil" type="MeshInstance3D" parent="Look"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.08, 0, 1.25, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_veil")
+surface_material_override/0 = SubResource("Mat_veil")
+
+[node name="Light" type="OmniLight3D" parent="Look"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0.6)
+light_color = Color(0.3, 0.55, 1, 1)
+light_energy = 3.0
+omni_range = 6.0
+
+[node name="Glow" type="Node3D" parent="."]
+
+[node name="Core" type="MeshInstance3D" parent="Glow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.1, 0, 1.25, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_core")
+surface_material_override/0 = SubResource("Mat_core")
+
+[node name="Arrival" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.6)

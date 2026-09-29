@@ -40,7 +40,8 @@ public partial class NameTag : VBoxContainer
 
     public override void _Process(double delta)
     {
-        if (!IsInstanceValid(bearer))
+        //Beim Abbau eines Orts hängt der Träger schon nicht mehr im Baum, freigegeben wird er erst danach
+        if (!IsInstanceValid(bearer) || !bearer.IsInsideTree())
         {
             QueueFree();
 

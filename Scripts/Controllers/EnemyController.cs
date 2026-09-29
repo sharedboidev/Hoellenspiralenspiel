@@ -35,6 +35,7 @@ public partial class EnemyController : Node
     private readonly List<Enemy>    enemies       = new();
     private readonly List<BaseUnit> unitsNearSpot = new();
 
+    private int nextSpawnIndex;
     private int sightCursor;
 
     [Export]
@@ -89,7 +90,20 @@ public partial class EnemyController : Node
     [Export]
     public Color RareEliteNameColor { get; set; } = new(1f, 0.82f, 0.25f);
 
+    [ExportGroup("Sicht")]
+    //Gegner zeigen sich bis zu diesem Vielfachen des Lichtradius. 0 hebt die Grenze auf
+    [Export(PropertyHint.Range, "0,3,0.05,or_greater")]
+    public float SightRadiusFactor { get; set; } = 1.2f;
+
+    //Auf den letzten Metern davor blenden sie ein, mit demselben Punktmuster wie die Mauern
+    [Export(PropertyHint.Range, "0,5,0.1,or_greater")]
+    public float SightFadeMeters { get; set; } = WallFadeRule.EdgeMeters;
+
+    public SightRange Sight => SightRange.From(Hero.LightRadiusMeters, SightRadiusFactor, SightFadeMeters);
+
     public IReadOnlyList<Enemy> Enemies => enemies;
+
+    public event Action<Enemy> EnemyKilled;
 
     public override void _Ready()
     {
@@ -134,6 +148,8 @@ public partial class EnemyController : Node
 
         enemies.Clear();
 
+        nextSpawnIndex = 0;
+
         foreach (var child in EnemyContainer.GetChildren())
         {
             EnemyContainer.RemoveChild(child);
@@ -142,9 +158,37 @@ public partial class EnemyController : Node
         }
     }
 
+    //Für Gegner, die bei einem früheren Besuch der Ebene gefallen sind
+    public void Remove(Enemy enemy)
+    {
+        if (!enemies.Remove(enemy))
+            return;
+
+        enemy.Provoked -= CallGroupToArms;
+        enemy.Died     -= OnEnemyDied;
+
+        EnemyContainer.RemoveChild(enemy);
+
+        enemy.QueueFree();
+    }
+
+    public override void _Process(double delta)
+    {
+        var sight = Sight;
+
+        UnitSight.Update(Hero.GlobalPosition, sight);
+
+        foreach (var enemy in enemies)
+        {
+            if (enemy.IsSeen)
+                enemy.SetVisibility(sight.GetVisibility(GetDistanceToHero(enemy.GlobalPosition)));
+        }
+    }
+
     public override void _PhysicsProcess(double delta)
     {
         var heroPosition = Hero.GlobalPosition;
+        var sight        = Sight;
 
         //Über den Index, weil ein Monster beim Denken weitere beschwören kann
         for (var i = 0; i < enemies.Count; i++)
@@ -156,27 +200,52 @@ public partial class EnemyController : Node
 
             if (isAwake)
                 enemy.Think(delta);
+
+            if (!IsInRange(enemy, sight))
+                enemy.SetSeen(false);
         }
 
-        LookAround();
+        LookAround(sight);
     }
 
-    //Reihum, damit viele Gegner nicht in jedem Schritt alle auf einmal geprüft werden
-    private void LookAround()
+    //Wer in Reichweite steht, den könnte noch eine Mauer verdecken. Das prüft der Held reihum, damit nicht in jedem Schritt alle auf einmal an der Reihe sind
+    private void LookAround(SightRange sight)
     {
-        for (var check = 0; check < Math.Min(SightChecksPerFrame, enemies.Count); check++)
+        var checks = 0;
+
+        for (var step = 0; step < enemies.Count && checks < SightChecksPerFrame; step++)
         {
             sightCursor = (sightCursor + 1) % enemies.Count;
 
-            enemies[sightCursor].SetSeen(CanHeroSee(enemies[sightCursor]));
+            var enemy = enemies[sightCursor];
+
+            if (!IsInRange(enemy, sight))
+                continue;
+
+            enemy.SetSeen(IsUncovered(enemy));
+
+            checks++;
         }
 
         foreach (var effect in effects)
             Show(effect);
     }
 
-    //Der Held sieht, wer mit ihm im selben Raum steht und wen keine Mauer verdeckt. Es reicht, wenn ein Rand des Körpers hervorschaut
+    //Der Held sieht, wer nah genug steht und wen keine Mauer verdeckt
     public bool CanHeroSee(BaseUnit unit)
+        => IsInRange(unit, Sight) && IsUncovered(unit);
+
+    public bool CanHeroSee(Vector3 point)
+        => Sight.Reaches(GetDistanceToHero(point)) && IsUncovered(point);
+
+    private bool IsInRange(BaseUnit unit, SightRange sight)
+        => sight.Reaches(GetDistanceToHero(unit.GlobalPosition), unit.BodyRadius);
+
+    private float GetDistanceToHero(Vector3 point)
+        => WorldScale.OnGround(point - Hero.GlobalPosition).Length();
+
+    //Frei steht, wer mit dem Helden im selben Raum steht oder wen keine Mauer verdeckt. Es reicht, wenn ein Rand des Körpers hervorschaut
+    private bool IsUncovered(BaseUnit unit)
     {
         if (IsInRoomOfHero(unit.GlobalPosition))
             return true;
@@ -189,7 +258,7 @@ public partial class EnemyController : Node
         return IsInSight(space, eye, center) || IsInSight(space, eye, center + aside) || IsInSight(space, eye, center - aside);
     }
 
-    public bool CanHeroSee(Vector3 point)
+    private bool IsUncovered(Vector3 point)
         => IsInRoomOfHero(point) || IsInSight(EnemyContainer.GetWorld3D().DirectSpaceState, Hero.GlobalPosition + Vector3.Up * EyeHeightMeters, point + Vector3.Up * SightHeightMeters);
 
     private bool IsInRoomOfHero(Vector3 point)
@@ -218,7 +287,9 @@ public partial class EnemyController : Node
         {
             var modCount = EnemyRarityRules.RollModCount(chances, GameRandom.Shared);
 
-            Spawn(marker.Enemy, new SpawnArea(marker.GlobalPosition, marker.ScatterRadius, marker.MinGap, marker.Enemy.AggroRange + AggroMarginPx), marker.Name, level, modCount);
+            var enemy = Spawn(marker.Enemy, new SpawnArea(marker.GlobalPosition, marker.ScatterRadius, marker.MinGap, marker.Enemy.AggroRange + AggroMarginPx), marker.Name, level, modCount);
+
+            enemy.SpawnIndex = nextSpawnIndex++;
         }
     }
 
@@ -332,6 +403,8 @@ public partial class EnemyController : Node
         CallGroupToArms(enemy);
 
         Hero.GainExperience(enemy.XpGranted);
+
+        EnemyKilled?.Invoke(enemy);
 
         //Died feuert genau einmal pro Gegner, daher entsteht der Loot hier und nicht bei jeder Lebensänderung
         SpawnLootbags(enemy);

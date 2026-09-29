@@ -121,35 +121,82 @@ public static class SaveGameMapper
             loadout.Assign(slot, slot < savedSlots.Count ? savedSlots[slot] : null);
     }
 
-    public static void CaptureDescent(DescentState descent, SaveGame save)
+    public static void CaptureJourney(JourneyState journey, SaveGame save)
     {
-        ArgumentNullException.ThrowIfNull(descent);
+        ArgumentNullException.ThrowIfNull(journey);
         ArgumentNullException.ThrowIfNull(save);
 
-        save.Descent = new DescentSave
+        save.Descent = null;
+        save.Journey = new JourneySave
         {
-            Seed  = descent.Seed,
-            Depth = descent.Depth,
-            Levels = descent.RevealedByDepth
-                            .OrderBy(level => level.Key)
-                            .Select(level => new ExploredLevelSave { Depth = level.Key, Revealed = level.Value })
-                            .ToList()
+            UnlockedCircles = journey.UnlockedCircles,
+            Circles = journey.Descents
+                             .Where(circle => circle.Value.HasBegun)
+                             .OrderBy(circle => circle.Key, StringComparer.Ordinal)
+                             .Select(circle => ToSave(circle.Key, circle.Value))
+                             .ToList(),
+            TownPortal = journey.TownPortal is { } spot
+                                 ? new TownPortalSave { CircleId = spot.CircleId, Depth = spot.Depth, X = spot.X, Z = spot.Z }
+                                 : null
         };
     }
 
-    //Ein Spielstand aus der Zeit vor dem Abstieg hat keinen, der Held steht dann an der Oberfläche
-    public static bool RestoreDescent(SaveGame save, DescentState descent)
+    private static CircleSave ToSave(string circleId, DescentState descent)
+        => new()
+        {
+            CircleId     = circleId,
+            Seed         = descent.Seed,
+            DeepestDepth = descent.DeepestDepth,
+            Levels = descent.RevealedByDepth.Keys
+                            .Union(descent.DepthsWithKills)
+                            .OrderBy(depth => depth)
+                            .Select(depth => new ExploredLevelSave
+                            {
+                                Depth    = depth,
+                                Revealed = descent.GetRevealed(depth) ?? string.Empty,
+                                Killed   = descent.GetKilled(depth).ToList()
+                            })
+                            .ToList()
+        };
+
+    //Ein Spielstand der Version 1 kennt nur einen Abstieg ohne Kreis, er zählt für legacyCircleId
+    public static bool RestoreJourney(SaveGame save, JourneyState journey, string legacyCircleId)
     {
         ArgumentNullException.ThrowIfNull(save);
-        ArgumentNullException.ThrowIfNull(descent);
+        ArgumentNullException.ThrowIfNull(journey);
 
-        if (save.Descent is null)
-            return false;
+        if (save.Journey is null)
+            return RestoreLegacyDescent(save, journey, legacyCircleId);
 
-        descent.Restore(save.Descent.Seed,
-                        save.Descent.Depth,
-                        (save.Descent.Levels ?? []).Select(level => new KeyValuePair<int, string>(level.Depth, level.Revealed)));
+        journey.Reset(save.Journey.UnlockedCircles);
+
+        foreach (var circle in save.Journey.Circles ?? [])
+        {
+            if (!string.IsNullOrEmpty(circle?.CircleId))
+                Restore(journey.GetDescent(circle.CircleId), circle.Seed, circle.DeepestDepth, circle.Levels);
+        }
+
+        if (save.Journey.TownPortal is { } portal)
+            journey.OpenTownPortal(new TownPortalSpot(portal.CircleId, portal.Depth, portal.X, portal.Z));
 
         return true;
     }
+
+    private static bool RestoreLegacyDescent(SaveGame save, JourneyState journey, string legacyCircleId)
+    {
+        if (save.Descent is null || string.IsNullOrEmpty(legacyCircleId))
+            return false;
+
+        journey.Reset();
+
+        Restore(journey.GetDescent(legacyCircleId), save.Descent.Seed, save.Descent.Depth, save.Descent.Levels);
+
+        return true;
+    }
+
+    private static void Restore(DescentState descent, int seed, int deepestDepth, List<ExploredLevelSave> levels)
+        => descent.Restore(seed,
+                           deepestDepth,
+                           (levels ?? []).Select(level => new KeyValuePair<int, string>(level.Depth, level.Revealed)),
+                           (levels ?? []).Select(level => new KeyValuePair<int, IEnumerable<int>>(level.Depth, level.Killed)));
 }

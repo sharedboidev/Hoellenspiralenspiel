@@ -14,6 +14,7 @@ using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Stats;
+using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Skills;
 using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.World;
@@ -52,6 +53,7 @@ public partial class Enemy : BaseUnit
     private EliteAura                         aura;
     private Tween                             attackLook;
     private SkillResource                     attackSkill;
+    private MeshInstance3D                    blobShadow;
     private ShaderMaterial                    bodyMaterial;
     private EnemyBrain                        brain = new(new EnemyBehaviour());
     private bool                              hasSight;
@@ -59,6 +61,7 @@ public partial class Enemy : BaseUnit
     private Vector3                           homePoint;
     private bool                              isAwake = true;
     private bool                              isSeen  = true;
+    private float                             shownVisibility = 1f;
     private EnemyRarityLook                   look    = EnemyRarityLook.Normal;
     private MonsterModRuntime                 modRuntime;
     private IReadOnlyList<MonsterModResource> mods = [];
@@ -80,6 +83,9 @@ public partial class Enemy : BaseUnit
     public float HealthbarHeight { get; set; } = 1.3f;
 
     public string SpawnGroup { get; set; }
+
+    //Der Platz in der Reihenfolge, in der die Marker einer Ebene spawnen. Beschworene Gegner haben keinen
+    public int SpawnIndex { get; set; } = -1;
 
     public EnemyController Controller { get; set; }
 
@@ -146,7 +152,9 @@ public partial class Enemy : BaseUnit
         pathFollower    =  new PathFollower(this);
         modRuntime      =  new MonsterModRuntime(this, mods);
 
-        OwnBodyMaterial();
+        blobShadow = GetNodeOrNull<MeshInstance3D>("BlobShadow");
+
+        OwnMaterials();
         AddHealthbar();
         AddNameTag();
         AddAura();
@@ -157,6 +165,8 @@ public partial class Enemy : BaseUnit
     public override void _ExitTree()
     {
         base._ExitTree();
+
+        UnitSight.Release(bodyMaterial);
 
         if (IsInstanceValid(nameTag))
             nameTag.QueueFree();
@@ -201,17 +211,33 @@ public partial class Enemy : BaseUnit
         weaponProjectileScene = wieldedWeapon?.ProjectileScene;
     }
 
-    //Jede Instanz bekommt ihr eigenes Material, sonst färbte das Ausholen alle Gegner dieser Szene
-    private void OwnBodyMaterial()
+    //Alle Teile blenden am Rand der Sicht ein. Der Körper bekommt dazu sein eigenes Material, sonst färbte das Ausholen alle Gegner dieser Szene
+    private void OwnMaterials()
     {
-        var body = Visual?.GetNodeOrNull<MeshInstance3D>("Body");
-
-        if (body?.GetActiveMaterial(0) is not ShaderMaterial material)
+        if (Visual is null)
             return;
 
-        bodyMaterial = (ShaderMaterial)material.Duplicate();
+        var body = Visual.GetNodeOrNull<MeshInstance3D>("Body");
 
-        body.SetSurfaceOverrideMaterial(0, bodyMaterial);
+        foreach (var part in Visual.GetAllChildren<MeshInstance3D>())
+        {
+            for (var surface = 0; surface < part.GetSurfaceOverrideMaterialCount(); surface++)
+            {
+                if (part.GetActiveMaterial(surface) is not ShaderMaterial material || !UnitSight.CanAdopt(material))
+                    continue;
+
+                if (part != body || surface > 0)
+                {
+                    part.SetSurfaceOverrideMaterial(surface, UnitSight.GetShared(material));
+
+                    continue;
+                }
+
+                bodyMaterial = UnitSight.CreateOwn(material);
+
+                part.SetSurfaceOverrideMaterial(surface, bodyMaterial);
+            }
+        }
     }
 
     private void AddHealthbar()
@@ -327,6 +353,26 @@ public partial class Enemy : BaseUnit
         Visible = seen;
 
         ShowNameTag();
+    }
+
+    //Der Körper blendet über seinen Shader ein. Schatten, Aura, Lebensbalken und Namensschild folgen diesem Wert
+    public void SetVisibility(float visibility)
+    {
+        if (Mathf.IsEqualApprox(visibility, shownVisibility) || IsDying)
+            return;
+
+        shownVisibility = visibility;
+
+        healthbar.SetVisibility(visibility);
+
+        if (blobShadow is not null)
+            blobShadow.Transparency = 1f - visibility;
+
+        if (aura is not null)
+            aura.Visibility = visibility;
+
+        if (nameTag is not null)
+            nameTag.Modulate = new Color(1f, 1f, 1f, visibility);
     }
 
     private void ShowNameTag()

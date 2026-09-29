@@ -4,7 +4,7 @@ using Hoellenspiralenspiel.Scripts.World.Levels;
 
 namespace Hoellenspiralenspiel.Scripts.World;
 
-public partial class TestLevel : Node3D
+public partial class GameScene : Node3D
 {
     [Export]
     public EnemyController Enemies { get; set; }
@@ -21,7 +21,7 @@ public partial class TestLevel : Node3D
     public override void _Process(double delta)
     {
         if (Status is not null)
-            Status.Text = $"{Engine.GetFramesPerSecond():N0} FPS · {Enemies?.Enemies.Count ?? 0} Gegner · {DescribeLook()}{DescribeDepth()}";
+            Status.Text = $"{Engine.GetFramesPerSecond():N0} FPS · {Enemies?.Enemies.Count ?? 0} Gegner · {DescribeLook()}\n{DescribePlace()}";
     }
 
     private string DescribeLook()
@@ -33,6 +33,11 @@ public partial class TestLevel : Node3D
     }
 
     //Mit dem Seed des Abstiegs im Feld Seed des Knotens Descent entsteht dieselbe Folge von Ebenen noch einmal
-    private string DescribeDepth()
-        => Descent?.Level is null ? string.Empty : $"\nEbene {Descent.State.Depth} · Seed des Abstiegs {Descent.State.Seed} · Bereichslevel {Enemies?.AreaLevel}";
+    private string DescribePlace()
+    {
+        if (Descent?.Level is not null)
+            return $"{Descent.Circle.DisplayName} · Ebene {Descent.State.Depth} von {Descent.Circle.LevelCount} · Seed des Abstiegs {Descent.State.Seed} · Bereichslevel {Enemies?.AreaLevel}";
+
+        return Descent?.Place?.DisplayName ?? string.Empty;
+    }
 }

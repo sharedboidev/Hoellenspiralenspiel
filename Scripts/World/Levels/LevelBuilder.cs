@@ -27,12 +27,15 @@ public sealed class BuiltLevel
     public List<SpawnMarker> CorridorMarkers { get; } = new();
 
     public List<CellarDoor> Exits { get; } = new();
+
+    public List<StairsUp> Entrances { get; } = new();
 }
 
 //Macht aus dem Grundriss eine begehbare Ebene: Böden, Mauern und die Szenen der Räume
 public static class LevelBuilder
 {
     private const string CellarDoorPath = "res://Scenes/Objects/cellar_door.tscn";
+    private const string StairsUpPath   = "res://Scenes/Objects/stairs_up.tscn";
     private const string SurfaceShader  = "res://Shaders/Ps1/ps1_surface.gdshader";
     private const float  FloorThickness = 1f;
     private const float  MetersPerTile  = 2f;
@@ -192,7 +195,11 @@ public static class LevelBuilder
             }
 
             if (placed.Index == level.Layout.StartRoom)
+            {
                 level.HeroStart = room.GetAllChildren<HeroStart>().FirstOrDefault()?.GlobalPosition ?? room.Position;
+
+                level.Entrances.AddRange(FindEntrances(room));
+            }
 
             if (placed.Index == level.Layout.ExitRoom)
                 level.Exits.AddRange(FindExits(room));
@@ -214,6 +221,22 @@ public static class LevelBuilder
         room.AddChild(door);
 
         return [door];
+    }
+
+    private static IEnumerable<StairsUp> FindEntrances(RoomTemplate room)
+    {
+        var stairs = room.GetAllChildren<StairsUp>();
+
+        if (stairs.Length > 0)
+            return stairs;
+
+        GD.PushWarning($"Der Raumvorlage {room.Name} für den Start fehlt die Treppe hinauf.");
+
+        var fallback = GD.Load<PackedScene>(StairsUpPath).Instantiate<StairsUp>();
+
+        room.AddChild(fallback);
+
+        return [fallback];
     }
 
     private static void MarkCorridorPacks(BuiltLevel level)

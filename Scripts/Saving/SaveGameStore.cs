@@ -5,7 +5,7 @@ namespace Hoellenspiralenspiel.Scripts.Saving;
 
 public static class SaveGameStore
 {
-    public const string DefaultPath = "user://saves/character.json";
+    public const string DefaultPath = "user://saves/slot1.json";
 
     private const string TemporarySuffix = ".tmp";
     private const string BrokenSuffix    = ".broken";
@@ -16,26 +16,34 @@ public static class SaveGameStore
 
     public static bool Exists => FileAccess.FileExists(FilePath);
 
+    public static bool IsFileFromCommandLine { get; private set; }
+
     //Aufruf mit "-- --save-file=user://saves/test.json" spielt mit einem anderen Spielstand
     public static void UseFileFromCommandLine()
     {
         foreach (var argument in OS.GetCmdlineUserArgs())
         {
-            if (argument.StartsWith(FileArgument) && argument.Length > FileArgument.Length)
-                FilePath = argument[FileArgument.Length..];
+            if (!argument.StartsWith(FileArgument) || argument.Length <= FileArgument.Length)
+                continue;
+
+            FilePath              = argument[FileArgument.Length..];
+            IsFileFromCommandLine = true;
         }
     }
 
     public static SaveGame Load()
+        => Load(FilePath);
+
+    public static SaveGame Load(string path)
     {
-        if (!Exists)
+        if (!FileAccess.FileExists(path))
             return null;
 
-        using var file = FileAccess.Open(FilePath, FileAccess.ModeFlags.Read);
+        using var file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
 
         if (file is null)
         {
-            GD.PushWarning($"Der Spielstand {FilePath} lässt sich nicht öffnen: {FileAccess.GetOpenError()}");
+            GD.PushWarning($"Der Spielstand {path} lässt sich nicht öffnen: {FileAccess.GetOpenError()}");
 
             return null;
         }
@@ -47,7 +55,7 @@ public static class SaveGameStore
         if (SaveGameSerializer.TryDeserialize(json, out var save))
             return save;
 
-        SetBrokenFileAside();
+        SetBrokenFileAside(path);
 
         return null;
     }
@@ -88,17 +96,20 @@ public static class SaveGameStore
     }
 
     public static void Delete()
+        => Delete(FilePath);
+
+    public static void Delete(string path)
     {
-        if (Exists)
-            DirAccess.RemoveAbsolute(FilePath);
+        if (FileAccess.FileExists(path))
+            DirAccess.RemoveAbsolute(path);
     }
 
-    private static void SetBrokenFileAside()
+    private static void SetBrokenFileAside(string path)
     {
-        var brokenPath = FilePath + BrokenSuffix;
+        var brokenPath = path + BrokenSuffix;
 
-        GD.PushWarning($"Der Spielstand {FilePath} ist nicht lesbar. Er liegt jetzt unter {brokenPath}, das Spiel beginnt mit einem neuen Charakter.");
+        GD.PushWarning($"Der Spielstand {path} ist nicht lesbar. Er liegt jetzt unter {brokenPath}, der Platz gilt als leer.");
 
-        DirAccess.RenameAbsolute(FilePath, brokenPath);
+        DirAccess.RenameAbsolute(path, brokenPath);
     }
 }

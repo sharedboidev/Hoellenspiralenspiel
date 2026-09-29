@@ -83,6 +83,8 @@ public partial class Hero
 
     public CharacterItems Items { get; }
 
+    public string CharacterName { get; set; } = string.Empty;
+
     public SkillLoadout Loadout { get; } = new(InputActions.SkillSlots.Length);
 
     //Bis entschieden ist, wie der Held Skills bekommt, kennt er alle
@@ -98,7 +100,11 @@ public partial class Hero
 
     public WornItems WornItems => wornItems;
 
-    //Ein Charakter ohne Spielstand startet mit diesen Items
+    //Ein neuer Charakter trägt diese Items am Körper, ohne Affixe
+    [Export]
+    public Array<ItemBaseResource> StartingEquipment { get; set; } = new();
+
+    //Ein neuer Charakter hat diese Items im Inventar
     [Export]
     public Array<ItemBaseResource> StartingItems { get; set; } = new();
 
@@ -229,12 +235,19 @@ public partial class Hero
     //Hier steht der Held nach dem Betreten einer Ebene und nach dem Tod
     public void MoveToLevelStart(Vector3 position)
     {
+        Teleport(position);
+
+        spawnPosition = position;
+    }
+
+    public void Teleport(Vector3 position)
+    {
         CancelAttack();
 
+        useTarget      = null;
         heldSlot       = NoSlot;
         Velocity       = Vector3.Zero;
         GlobalPosition = position;
-        spawnPosition  = position;
 
         approachPath.Reset();
     }
@@ -773,11 +786,24 @@ public partial class Hero
 
     public void GiveStartingItems()
     {
+        foreach (var item in StartingEquipment)
+        {
+            if (item is not null)
+                Wear(new ItemInstance(item.Definition));
+        }
+
         foreach (var item in StartingItems)
         {
             if (item is not null)
                 Items.PickUp(new ItemInstance(item.Definition));
         }
+    }
+
+    //Was der Held nicht tragen kann, bleibt im Inventar liegen
+    private void Wear(ItemInstance item)
+    {
+        if (Items.PickUp(item) && !Items.EquipFromInventory(item))
+            GD.PushWarning($"Der Held erfüllt die Anforderungen von {item.Definition.Name} nicht, das Item liegt im Inventar.");
     }
 
     public bool OrderPickUp(Lootbag lootbag)
@@ -935,6 +961,7 @@ public partial class Hero
     public CharacterSave CaptureProgress()
         => new()
         {
+            Name            = CharacterName,
             Level           = progress.Level,
             XpTotal         = progress.XpTotal,
             AttributePoints = progress.AttributePoints,
@@ -947,6 +974,8 @@ public partial class Hero
 
     public void RestoreProgress(CharacterSave save)
     {
+        CharacterName = CharacterNames.Clean(save.Name);
+
         progress.Restore(save.Level, save.XpTotal, save.AttributePoints);
 
         Stats.Update(sheet =>

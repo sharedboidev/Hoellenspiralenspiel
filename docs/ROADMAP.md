@@ -1,11 +1,12 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
 Stand: 29.09.2026. M0 bis M6 liegen auf `master`, dazu die Nachträge zu M2, M3, M5.5 und M6: Bleed stapelt, Schadenswerte im Tooltip, ausgedünnte Kommentare, die Rückmeldungen aus dem ersten Spielen und die Rückmeldungen zu Mauern und Räumen.
+Die erste von vier Etappen von M7 liegt auf dem Branch `master_HubAndDescent`.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
-Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen, die Hauptszene ist das 3D-Testlevel.
+Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code samt Szenen. Die Zeilenzahl aus der ersten Analyse, rund 5.500, galt für die 2D-Fassung.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 bis M6 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die erste Etappe von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -22,12 +23,16 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Wegführung | Verzweigt mit Schleifen: mehrere Wege und Rundläufe, der Ausgang muss gesucht werden. Entschieden am 29.09.2026. |
 | Mauern | Jede Mauer hat einen Sockel und Mauerwerk darüber. Steht sie zwischen Held und Kamera, wird das Mauerwerk im Lichtradius durchsichtig. Entschieden am 29.09.2026. |
 | Räume | Ein Raum, in dem der Held nicht steht, bleibt verschlossen und dunkel. Licht scheint nicht durch Mauern, Bewegung im Raum zeigt sich erst mit Sichtkontakt. Entschieden am 29.09.2026. |
+| Sicht auf Gegner | Reicht 120 % des Lichtradius, am Rand blenden Gegner wie die Mauern mit einem Punktmuster ein. Entschieden am 29.09.2026. |
+| Weg durch einen Kreis | Treppen in beide Richtungen, ein Checkpoint je betretener Ebene, Town-Portal per Taste mit Abklingzeit. Entschieden am 29.09.2026 vor M7. |
+| Bestand | Ebenen, Karten und gefallene Gegner bleiben bis zum neuen Abstieg. Das Spiel beginnt nach dem Laden im Hub. Entschieden am 29.09.2026. |
+| Hub und Charaktere | Ein Portal je Kreis, drei feste Plätze für Charaktere. Entschieden am 29.09.2026. |
 
 ## 1. Was schon umgesetzt ist
 
 | Bereich | Stand | Abgleich mit dem PDF |
 |---|---|---|
-| Isometrische Perspektive | Testlevel in 3D mit Boden, Mauern und ummauertem Hof, gesehen von schräg oben. Seit M6 führt die Kellertür in erzeugte Ebenen. | Entspricht dem PDF |
+| Isometrische Perspektive | Hub, Testgelände und erzeugte Ebenen in 3D, gesehen von schräg oben | Entspricht dem PDF |
 | Attribute | Alle fünf Attribute mit abgeleiteten Werten und Obergrenzen | Obergrenzen stimmen exakt. Wachstum ist logistisch statt beschränkt. Lichtradius fehlt. |
 | Leben und Mana | Basisformeln, Regeneration, Orbs mit Shader | Formeln stimmen exakt |
 | Modifier-System | Flat, Percentage (increased) und More, sauber getrennt | Trägt das ganze Stat-Konzept |
@@ -37,7 +42,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen. Seit dem Nachtrag zu M5.5 liegt Beute in einem Gitter und trägt Schilder mit dem Namen des Items. | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle. Seit M5 bestimmt das Monsterlevel das Itemlevel. |
 | Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. Seit M5.5 hängt sie an der Schnittstelle `IHero` und läuft auch in 3D. |
 | Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. Seit M5.5 ist sie in 3D am Helden zu sehen. |
-| Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch. Seit M6 auch der Abstieg mit Seed, Tiefe und erkundeter Karte. | Nicht im PDF |
+| Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch. Seit M6 auch der Abstieg mit Seed, Tiefe und erkundeter Karte. Seit M7 drei Plätze für Charaktere, dazu je Kreis Checkpoints und gefallene Gegner und das Town-Portal. | Nicht im PDF |
 | Leveling | XP-Tabelle bis Level 100, Level-up-Effekt, Attributspunkte, XP-Balken. Seit M5.5 liegt die Regel für XP, Level und Punkte im Kern und treibt den 3D-Helden. | Nicht im PDF, funktioniert |
 | Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen, Tooltip mit DPS | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
 | Kampf | Zentrale Trefferauflösung, Nahkampf, Schadensarten mit Effekten, Statuseffekte, Tod und Respawn | Seit M2. Frost-Effekt war im PDF leer und ist jetzt Verlangsamung. |
@@ -47,6 +52,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Atmosphäre | Der Held trägt sein Licht, die Umgebung ist dunkel und neblig, dazu der PS1-Look und die Overlay-Karte. Seit M6 zeigt unter der Erde eine gezeichnete Karte, was der Held erkundet hat. | Passt zum düsteren Vibe |
 | 3D | Seit dem 29.09.2026 läuft das ganze Spiel in 3D auf dem unveränderten Kern. Alle Modelle sind Platzhalter aus Grundkörpern. | Offene Frage aus dem PDF, entschieden für 3D |
 | Level | Seit M6: Ebenen aus handgebauten Räumen und erzeugten Gängen, gesteuert über einen Seed. Ein Thema legt Räume, Aussehen und Gegnerpool fest. | Das PDF nennt nur die Kreise. Es gibt ein Testthema, noch keinen Höllenkreis. |
+| Spielstruktur | Seit M7, Etappe 1: Hauptmenü, Hub mit einem Portal je Kreis, mehrere Ebenen pro Kreis, Treppen, Checkpoints und Town-Portal | Das PDF fragt nach "Town-Portal mechanic mit zwischenversorgen" und lässt die Struktur offen |
 
 ## 2. Was an kritischen Systemen fehlt
 
@@ -56,7 +62,7 @@ Ohne diese Systeme gibt es kein spielbares Spiel, nur eine Testszene.
 2. **Nahkampf.** Erledigt in M2. Vorher existierten Waffenwerte nur im Tooltip.
 3. **Gegnerangriffe.** Erledigt in M2. Vorher schadeten die Blobs nur durch Berührung.
 4. **Speichern und Laden.** Erledigt in M4. Vorher gab es keine Persistenz für Charakter, Inventar oder Fortschritt.
-5. **Spielstruktur.** Hub, Hauptmenü, Pausenmenü und Freischaltung fehlen. Seit M6 führt die Kellertür hinab, und der Ausgang jeder Ebene führt eine Ebene tiefer. Einen Weg zurück gibt es noch nicht.
+5. **Spielstruktur.** Seit der ersten Etappe von M7 gibt es Hauptmenü, Hub, Treppen in beide Richtungen, Checkpoints und Town-Portal. Pausenmenü, Truhe, Händler und Freischaltung fehlen.
 6. **Levelgenerierung.** Erledigt in M6. Vorher gab es nur das handgebaute Testlevel.
 7. **Wegfindung.** Erledigt in M5. Vorher liefen Gegner in gerader Linie und blieben an Wänden hängen.
 8. **Statuseffekte.** Erledigt in M2: Bleed, Burn, Shock und Chill. Bleed und Burn stapeln. Die leeren Schadensart-Klassen sind durch eine Aufzählung im Kern ersetzt.
@@ -554,7 +560,7 @@ Vorläufige Werte der Item-Basen, alle in [Resources/Items](../Resources/Items):
 
 | Item | Art | Größe | Werte | Parry und Block | Anforderung |
 |---|---|---|---|---|---|
-| Training Sword | Einhand, Slash | 1x3 | 4 bis 9, 1,4 Angriffe pro Sekunde, 5 % Krit | 5 % Parry | Stärke 2 |
+| Training Sword | Einhand, Slash | 1x3 | 4 bis 9, 1,4 Angriffe pro Sekunde, 5 % Krit | 5 % Parry | Stärke 1, bis M7 Stärke 2 |
 | Wooden Staff | Zweihand, Crush | 1x4 | 10 bis 14, 0,33 Angriffe pro Sekunde, 3 % Krit | 10 % Block, 5 % Block gegen Spells | Intelligenz 1 |
 | Short Bow | Zweihand, Pierce | 1x3 | 5 bis 11, 1,2 Angriffe pro Sekunde, 6 % Krit, Reichweite 700 | keine | Geschick 2 |
 | Wooden Shield | Schild | 2x2 | 8 Rüstung | 15 % Block, 8 % Block gegen Spells | Stärke 2 |
@@ -849,7 +855,7 @@ Von mir festgelegt, weil es sich aus dem Umbau ergab:
 | Paarige Plätze | Hände und Handgelenke haben links und rechts je einen Befestigungspunkt und bekommen das Modell an beiden |
 | Punkt fürs Amulett | `AttachNeck` sitzt am Halsansatz. Ein Amulett hängt von dort nach vorn auf die Brust. |
 | Hieb und Schuss | Beim Hieb hebt sich der rechte Arm um 40 Grad und schwingt 140 Grad quer. Beim Schuss hebt er sich um 80 Grad. |
-| Start-Items | Ein Charakter ohne Spielstand startet im Testlevel mit je einem Stück aller neun Item-Basen, Stärke 2 und Geschick 2. Ein geladener Charakter bringt seine eigenen Items und Attribute mit. |
+| Start-Items | Ein Charakter ohne Spielstand startet im Testlevel mit je einem Stück aller neun Item-Basen, Stärke 2 und Geschick 2. Ein geladener Charakter bringt seine eigenen Items und Attribute mit. Seit M7 beginnt ein neuer Charakter mit allen Attributen auf 1 und einem weißen Training Sword in der Haupthand, das Inventar ist leer. |
 | Größe von Elite | Darstellung und Kollisionsform wachsen um denselben Faktor, 1,25 für Elite und 1,5 für Rare Elite. Klickfläche, Lebensbalken und Namensschild wachsen mit. Die Werte stehen am `EnemyController`. |
 | Aura von Elite | Ein Ring am Boden, ein pulsierendes Licht und ein glimmender Körper, alles in der Farbe des Namens: blau für Elite, golden für Rare Elite |
 | Radius der Beutel | 150 Pixel, also 1,5 m. Der Wert steht am Beutel im Feld `PickupRadius`. |
@@ -1233,29 +1239,186 @@ Bewusst offen gelassen:
 
 - Der Wechsel beim Betreten eines Raums geschieht in einem Schritt, ohne Überblenden.
 - Das Umgebungslicht bleibt. Der Boden eines verschlossenen Raums ist über die Mauern hinweg schwach zu erkennen, was darin steht, nicht.
-- Starre Schilder können sich bei perspektivischer Kamera überlappen. Rückt eine Gruppe von Beuteln beim Laufen an den oberen Bildrand, schrumpfen ihre Abstände auf dem Bildschirm, die Schilder bleiben gleich groß. `Alt` zweimal richtet sie neu aus.
-- Zwischen Räumen und Gängen ist nichts. Der Fels hat keine Oberseite, man blickt ins Schwarze.
+- Starre Schilder können sich bei perspektivischer Kamera überlappen. Rückt eine Gruppe von Beuteln beim Laufen an den oberen Bildrand, schrumpfen ihre Abstände auf dem Bildschirm, die Schilder bleiben gleich groß. `Alt` zweimal richtet sie neu aus. Am 29.09.2026 entschieden: Das bleibt so.
+- Zwischen Räumen und Gängen ist nichts. Der Fels hat keine Oberseite, man blickt ins Schwarze. Am 29.09.2026 entschieden: Das bleibt vorerst, die Frage stellt sich mit dem ersten Thema in M8 neu.
 - Türen sind Lücken in der Mauer, ohne Rahmen und ohne Türblatt.
-- Es gibt keinen Weg zurück nach oben. Treppen, Checkpoints und Town-Portal kommen mit M7.
+- Es gab keinen Weg zurück nach oben. Seit der ersten Etappe von M7 gibt es Treppen, Checkpoints und Town-Portal.
 - Räume sind Rechtecke. Eine Vorlage mit anderem Umriss gibt es nicht.
 - Das Testthema hat keine Musik. Das Feld am Thema ist da, und `Descent` spielt, was dort steht.
-- F2 schaltet die Kamera weiter um. Seit der Entscheidung für die Perspektive dient das nur noch dem Vergleich.
+- F2 schaltet die Kamera weiter um. Seit der Entscheidung für die Perspektive dient das nur noch dem Vergleich. Am 29.09.2026 entschieden: Die Taste bleibt zum Testen.
 - Die Karte zeigt weder Gegner noch Beute.
 - Ein Mauerstück in einer Raumvorlage zeigt im Editor die Textur aus dem Testthema, bis das Thema ihm seine gibt.
-- Mit "einmal pro Kreis" ist vorerst einmal pro Ebene gemeint. Kreise mit mehreren Ebenen kommen mit M7.
+- Mit "einmal pro Kreis" ist vorerst einmal pro Ebene gemeint. Seit M7 hat ein Kreis mehrere Ebenen, ein Pflichtraum erscheint weiter in jeder von ihnen.
 
-### M7: Hub und Abstieg (M)
+### M7: Hub und Abstieg (M, Etappe 1 umgesetzt am 29.09.2026 auf `master_HubAndDescent`)
 
 Ziel: die Spielstruktur steht.
 
-- Hauptmenü, Pausenmenü, Todesbildschirm, Ladebildschirm.
-- Hub-Szene mit Portal in die freigeschalteten Höllenkreise.
-- Mehrere Ebenen pro Kreis, Treppen, Checkpoints, Town-Portal.
-- Hub-Funktionen: Truhe und Händler. Dafür braucht es eine Währung.
-- Freischaltung des nächsten Kreises nach dem Boss.
-- Einstellungen für Auflösung, Tasten, Lautstärke. UI über Anker statt Code. Behebt A6.
+M7 läuft in vier Etappen:
+
+| Etappe | Inhalt | Stand |
+|---|---|---|
+| 1 | Hauptmenü, Hub, Portale, mehrere Ebenen pro Kreis, Treppen, Checkpoints, Town-Portal | Umgesetzt |
+| 2 | Pausenmenü, Ladebildschirm, Einstellungen für Auflösung, Tasten und Lautstärke. UI über Anker statt Code, behebt A6. | Offen |
+| 3 | Hub-Funktionen: Truhe und Händler. Dafür braucht es eine Währung. | Offen |
+| 4 | Platzhalter-Boss und Freischaltung des nächsten Kreises | Offen |
 
 Fertig, wenn man vom Hauptmenü in den Hub, in einen Kreis, zurück und wieder hinein kommt.
+
+Stand des Fertig-Kriteriums: erfüllt seit Etappe 1, geprüft im laufenden Spiel. Die Etappen 2 bis 4 stehen aus.
+
+#### Etappe 1: Struktur
+
+- Erledigt: Hauptmenü mit drei festen Plätzen für Charaktere. Ein neuer Charakter bekommt einen Namen, Löschen fragt nach.
+- Erledigt: Hub als handgebauter Ort mit neun Portalen, eines je Kreis. Gesperrte Portale sind dunkel.
+- Erledigt: Ein Kreis hat mehrere Ebenen, der Testkreis vier. Die Kellertür führt hinab, die Treppe im Startraum hinauf, aus Ebene 1 in den Hub.
+- Erledigt: Checkpoints. Jede betretene Ebene schaltet ihren Start frei, der Dialog am Portal bietet sie an.
+- Erledigt: Town-Portal per Taste `T` mit Wirkzeit und Abklingzeit.
+- Erledigt: Die Ebenen eines Kreises bleiben bis zum neuen Abstieg bestehen, samt Karte und gefallenen Gegnern. Alles steht im Spielstand.
+- Erledigt: Das Spiel beginnt nach dem Laden im Hub.
+- Zusätzlich: Das frühere Testlevel ist als Testgelände erhalten und mit `F6` erreichbar.
+- Zusätzlich: Beim Wechsel des Orts fällt ein Vorhang und blendet wieder auf.
+
+<img src="images/hub_m7_3d.webp" alt="Oben links das Hauptmenü mit drei Plätzen, oben rechts der Hub mit dem offenen Portal des Testkreises und gesperrten Portalen, unten links der Dialog mit den Checkpoints, unten rechts das Town-Portal neben dem Helden in einer Ebene" width="860">
+
+Getroffene Designentscheidungen vom 29.09.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| Checkpoint | Jede betretene Ebene schaltet ihren Start frei. Das Portal im Hub bietet alle freigeschalteten Ebenen des Kreises an. |
+| Town-Portal | Frei per Taste, öffnet sich nach kurzer Wirkzeit, dazu eine Abklingzeit |
+| Bestand der Ebenen | Bis zum neuen Abstieg. Der Seed gilt, bis der Spieler am Portal im Hub neu beginnt, auch über einen Neustart des Spiels. Die Karte bleibt aufgedeckt. |
+| Tod und Laden | Tod: Respawn am Start der Ebene wie seit M2. Laden: Das Spiel beginnt immer im Hub. |
+| Ebenen pro Kreis | 4 im Testkreis. Die Zahl ist ein Feld am Kreis, der Boss steht später in der letzten Ebene. |
+| Getötete Gegner | Tot bleibt tot bis zum neuen Abstieg, steht im Spielstand. Beute am Boden verfällt beim Verlassen der Ebene. |
+| Charaktere | Drei feste Plätze |
+| Wahl im Hub | Ein Portal je Kreis. Ein Klick öffnet die Checkpoints dieses Kreises. |
+| Treppen | Führen in beide Richtungen |
+| Neuer Charakter | Alle Attribute auf 1, ein weißes Training Sword in der Haupthand, das Inventar ist leer. Entschieden nach dem ersten Spielen von Etappe 1. |
+| Sicht auf Gegner | Gegner sind nicht auf unendliche Reichweite sichtbar. Sie blenden wie die Mauern am Lichtradius ein, die Sicht reicht 120 % des Lichtradius. Der Wert ist ein Feld im Inspector. Entschieden nach dem ersten Spielen von Etappe 1. |
+| Offene Punkte aus M6 | Der Fels zwischen den Räumen bleibt vorerst schwarz, entschieden wird mit dem ersten Thema in M8. `F2` bleibt als Taste zum Testen. Die Schilder der Beute bleiben starr. |
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Neuer Abstieg | Würfelt alle Ebenen des Kreises neu und vergisst Karten und Tote. Die Checkpoints bleiben. Er geht nur vom Hub aus, der zweite Klick bestätigt. |
+| Abklingzeit | 60 Sekunden ab dem Öffnen, Feld `TownPortalCooldownSec` am Knoten `Descent`. Sie steht nicht im Spielstand. |
+| Wirkzeit | 1 Sekunde, Feld `OpeningSec` am Portal. Das Portal steht sofort da und wächst, bis es offen ist. Der Held kann sich währenddessen bewegen. |
+| Ort des Town-Portals | 1,8 m neben dem Helden auf Boden, zuerst wird südlich von ihm gesucht, nie hinter einer Mauer |
+| Ein Town-Portal | Es gibt höchstens eines, ein neues ersetzt das alte. Es steht im Spielstand und bleibt beim Treppensteigen stehen. Wer aus dem Hub hindurchgeht, schließt es. |
+| Taste | `T`, als Aktion `open_town_portal` in den Projekteinstellungen |
+| Ankunft | Über die Kellertür am Start der Ebene, über die Treppe hinauf an der Kellertür der oberen Ebene, aus Ebene 1 vor dem Portal des Kreises, über das Town-Portal an dessen Stelle |
+| Tod | Am Start der Ebene, auch wenn der Held woanders ankam |
+| Bereichslevel | Die erste Ebene des Testkreises hat Bereichslevel 1, jede weitere eins mehr. Bis M6 begann Ebene 1 mit Bereichslevel 2. Feld `FirstAreaLevel` am Kreis. |
+| Letzte Ebene | Hat keine Kellertür. Der Boss kommt mit Etappe 4. |
+| Gegner bei der Rückkehr | Wer lebt, steht wieder an seinem Platz vom ersten Besuch, mit vollem Leben |
+| Beschworene Gegner | Zählen nicht zu den gemerkten Toten |
+| Name | Höchstens 16 Zeichen. Ohne Eingabe heißt der Charakter "Nameless". |
+| Start-Items | `StartingEquipment` am Helden nennt, was ein neuer Charakter trägt, `StartingItems`, was in seinem Inventar liegt. In `Scenes/game.tscn` steht nur das Training Sword als Ausrüstung. |
+| Alter Spielstand | `character.json` zieht beim ersten Start auf Platz 1. Sein Abstieg zählt für den Testkreis, die erreichte Tiefe wird zum Checkpoint. |
+| Start ohne Hauptmenü | Wer `Scenes/game.tscn` direkt startet, spielt den Charakter auf Platz 1 |
+| Testgelände | Der Inhalt des früheren Testlevels liegt als Ort unter `Scenes/Places/test_grounds.tscn`. `F6` führt hin und zurück in den Hub. Seine Kellertür führt in Ebene 1 des ersten Kreises. `Scenes/test_level.tscn` ist entfallen. |
+| Vorhang | Das Bild wird beim Wechsel des Orts schwarz und blendet in 0,35 Sekunden wieder auf |
+| Hub | Platz von 40 x 26 m mit Mauern, neun Portalen im Bogen und zwei Feuerschalen. Alles Platzhalter aus Grundkörpern. |
+| Treppe hinauf | Vier Stufen mit eigenem schwachem Licht, damit man sie im Startraum findet |
+| Karte | Zeigt die Kellertür golden, die Treppe hinauf grau und das Town-Portal blau |
+| Anzeige | Oben rechts stehen unter der Erde die Taste des Town-Portals oder seine Abklingzeit |
+| Sprache | Hauptmenü und Dialog sind englisch wie die übrige Oberfläche des Spiels |
+
+So funktioniert die Reise:
+
+- `JourneyState` im Kern ist der Weg eines Charakters: wie viele Kreise offen sind, ein `DescentState` je Kreis und die Stelle des Town-Portals.
+- `DescentState` hält je Kreis den Seed, die aktuelle und die tiefste erreichte Tiefe, dazu je Ebene die erkundete Karte und die Gefallenen.
+- `Descent` hängt in `Scenes/game.tscn` und wechselt den Ort. Ein Ort ist entweder eine erzeugte Ebene oder eine handgebaute Szene mit `Place` an der Wurzel. Beides hängt unter dem Knoten `Environment`, Held, Oberfläche und Steuerung bleiben.
+- Die Kreise stehen im Feld `Circles` am Knoten `Descent`. Ein Kreis ist die Resource `LevelThemeResource` mit Nummer, Zahl der Ebenen und Bereichslevel der ersten Ebene.
+- `Passage` ist die gemeinsame Grundlage aller Durchgänge: `CellarDoor`, `StairsUp`, `CirclePortal` und `TownPortal`. Ein Durchgang meldet `Used`, wohin er führt, entscheidet `Descent`.
+- Der Marker `Arrival` unter einem Durchgang ist die Stelle, an der ankommt, wer durch ihn kommt.
+- Jeder Gegner aus einem Spawn-Marker bekommt beim Spawnen eine laufende Nummer, `SpawnIndex`. Stirbt er, merkt sich `DescentState` die Nummer zur Ebene.
+- Beim Aufbau einer Ebene spawnen zuerst alle Gegner, danach verschwinden die Gemerkten. So stehen die Übrigen bei jedem Besuch am selben Platz.
+- Damit das gilt, steht der Held beim Spawnen immer am Start der Ebene, und die Zufallsquelle bekommt direkt vor dem Spawnen ihren Seed. Erst danach rückt der Held an die Stelle seiner Ankunft.
+- `CircleDialog` liest den `DescentState` des Kreises und meldet die gewählte Ebene oder den Wunsch nach einem neuen Abstieg. Der `GameController` verbindet ihn mit `Descent`.
+- Der Spielstand hat Version 2. Unter `Journey` stehen die Kreise mit ihren Ebenen und das Town-Portal. Spielstände der Version 1 lädt das Spiel weiter.
+- `SaveSlots` kennt die drei Plätze und den Ordner. Das Hauptmenü wählt den Platz, danach lädt `Scenes/game.tscn`.
+
+So entsteht ein neuer Kreis:
+
+1. Ein Thema unter `Resources/Levels` anlegen: `Id`, `DisplayName`, `Number`, `LevelCount`, `FirstAreaLevel`, dazu Räume, Aussehen und Gegnerpool wie in M6.
+2. Das Thema in `Scenes/game.tscn` am Knoten `Descent` unter `Circles` eintragen.
+3. Das Portal mit derselben Nummer steht schon im Hub. Es öffnet sich, sobald der Held so viele Kreise freigeschaltet hat. Bis Etappe 4 ist das nur der erste.
+
+So entsteht ein neuer Ort:
+
+1. Eine Szene unter `Scenes/Places` anlegen, an der Wurzel das Skript `Place`.
+2. Boden auf der Ebene `Ground`, Mauern als `WallSegment`, für geschlossene Bereiche eine `RoomZone`.
+3. Einen `HeroStart` setzen. Spawn-Marker, Portale und Kellertüren findet `Descent` von selbst.
+4. Soll das Gegenstück zum Town-Portal hier stehen, `HasTownPortal` einschalten und einen `Marker3D` namens `TownPortalSpot` setzen.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Unit-Tests | 26 neue für Reise, Checkpoints, gemerkte Tote, Town-Portal, Spielstand der Version 2, Übernahme der Version 1 und Namen. 2 alte sind in ihnen aufgegangen. Insgesamt 716. |
+| Laufendes Spiel, headless | 134 Schritte: Hub, Portale, Dialog, Ebene 1 bis 4, Treppen in beide Richtungen, Town-Portal hin und zurück, Tod, gemerkte Tote, dieselben Gegner am selben Ort, neuer Abstieg, Testgelände, Anklicken aller Durchgänge, Tasten `T` und `F6` |
+| Neustart mit Spielstand | 17 Schritte: Hub, Name, XP, Checkpoints, Gefallene, Town-Portal an seiner Stelle, dieselben Gegner am selben Ort |
+| Hauptmenü, headless | 29 Schritte: Übernahme des alten Spielstands auf Platz 1, neuer Charakter mit Namen, Abbrechen, Löschen mit Nachfrage, Laden eines Spielstands der Version 1 |
+| Mit Fenster | 9 Schritte mit echter Maus: Das Portal leuchtet unter der Maus, ein Klick führt den Helden hin und öffnet den Dialog. Dazu neun Bilder von Hauptmenü, Hub, Dialog, Ebene, Town-Portal und Karte. |
+
+#### Rückmeldung aus dem ersten Spielen von Etappe 1
+
+Der User hat Etappe 1 am 29.09.2026 gespielt und drei Dinge verlangt.
+
+| Rückmeldung | Änderung |
+|---|---|
+| Ein neuer Charakter darf keine Items im Inventar haben | Die neun Test-Items aus dem früheren Testlevel sind aus `Scenes/game.tscn` entfernt |
+| Der Held startet mit allen Attributen auf 1 und einem weißen Training Sword in der Haupthand | Stärke 2 und Geschick 2 aus dem Testlevel sind entfallen. Das neue Feld `StartingEquipment` am Helden nennt, was ein neuer Charakter trägt. |
+| Gegner dürfen nicht auf unendliche Reichweite sichtbar sein. Sie blenden wie die Mauern am Lichtradius ein, mit 120 % des Lichtradius, einstellbar im Inspector | Siehe unten |
+
+Von mir dazu festgelegt:
+
+| Punkt | Festlegung |
+|---|---|
+| Training Sword | Verlangt Stärke 1 statt 2. Mit Stärke 1 könnte der Held seine Startwaffe sonst nicht tragen. |
+| Rand der Sicht | 1,5 m wie bei den Mauern, als zweites Feld im Inspector |
+| Was mit einblendet | Körper und Ring der Aura über das Punktmuster. Schatten, Lebensbalken, Namensschild und Licht der Aura folgen der Sichtbarkeit in der Mitte des Gegners. |
+| Wirkungen der Gegner | Projektile und Flächen zeigen sich erst in Sichtweite, ohne Einblenden |
+| Anvisieren | Wer außer Sicht steht, lässt sich nicht anklicken. Das galt schon für Gegner hinter Mauern. |
+| Beute | Bleibt wie entschieden immer sichtbar |
+| Verhalten der Gegner | Unverändert. Sie denken, laufen und greifen an, auch wenn der Held sie nicht sieht. |
+| Test-Items | Wer zum Testen Items braucht, trägt sie im Inspector am Helden unter `StartingItems` ein |
+
+So funktioniert die Sicht auf Gegner:
+
+- Die Felder stehen am Knoten `EnemyController` in der Gruppe "Sicht": `SightRadiusFactor` mit 1,2 und `SightFadeMeters` mit 1,5. Ein Faktor von 0 hebt die Grenze auf.
+- `SightRange` im Kern rechnet daraus und aus dem Lichtradius des Helden die Sichtweite. Bei 8 m Licht sind das 9,6 m, ganz zu sehen ist ein Gegner ab 8,1 m.
+- Wächst der Lichtradius, wächst die Sicht mit.
+- Gegner tragen den Shader `Shaders/Ps1/ps1_unit.gdshader`. Er lässt jenseits der Sichtweite alles weg und blendet auf dem Rand mit dem Punktmuster der Mauern ein, Pixel für Pixel nach dem Abstand zum Helden.
+- Das Punktmuster steht jetzt in `ps1_common.gdshaderinc`, Mauern und Gegner benutzen dasselbe.
+- Die Szenen der Gegner bleiben, wie sie sind. Beim Spawnen tauscht der Gegner den Shader seiner Teile unter `Visual`. Der Körper bekommt sein eigenes Material, alle anderen Teile einer Art teilen sich eines.
+- `UnitSight` gibt Ort und Sichtweite an alle diese Materialien weiter, sobald sich eines von beiden ändert.
+- Wer ganz außer Sicht steht, ist in jedem Schritt der Physik sofort verborgen. Die Prüfung auf Mauern läuft weiter reihum, aber nur noch unter den Gegnern in Sichtweite.
+- Böden, Mauern und der Held behalten ihre Shader. Das Weglassen von Pixeln kostet so nur bei Gegnern.
+
+<img src="images/sicht_gegner_3d.webp" alt="Links eine Reihe von Gegnern mit der Sichtgrenze bei 120 % des Lichtradius, der letzte sichtbare blendet mit Punktmuster ein, rechts dieselbe Reihe ohne Grenze mit einem zweiten Elite" width="860">
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Unit-Tests | 19 neue für die Sichtweite. Insgesamt 735. |
+| Neuer Charakter, headless | Nach der ersten Rückmeldung 22 Schritte in drei Läufen: leeres Inventar mit und ohne Hauptmenü, ein geladener Charakter behält sein Item. Nach der zweiten 15 Schritte: Attribute auf 1, Schwert in der Haupthand ohne Affixe, leeres Inventar, Spielstand |
+| Sicht, headless | 37 Schritte im Testgelände und in einer erzeugten Ebene, zweimal gelaufen: verborgen jenseits der Sicht, sichtbar davor, halb sichtbar auf dem Rand, Aura und Namensschild eines Elite, Materialien, Faktor 2, Faktor 0 |
+| Mit Fenster | Vier Bilder: neuer Charakter mit Charakterbogen, eine Reihe von Gegnern bei Faktor 1,2, ohne Grenze und bei Faktor 1 |
+
+Bewusst offen gelassen:
+
+- Aus dem Spiel führt kein Weg zurück ins Hauptmenü. Er kommt mit dem Pausenmenü in Etappe 2.
+- Die Portale 2 bis 9 sind gesperrt, es gibt nur den Testkreis.
+- Die letzte Ebene endet in einem Ausgangsraum ohne Kellertür.
+- Im Hub gibt es weder Truhe noch Händler, und er hat keine Musik.
+- Gegner, die den Helden verfolgten, stehen bei seiner Rückkehr wieder an ihrem Platz.
+- Wer das Spiel in einer Ebene beendet, beginnt im Hub und geht über den Checkpoint an den Start der Ebene. An die alte Stelle führt nur ein offenes Town-Portal.
+- Das Town-Portal und die Portale der Kreise tragen keinen Ton.
 
 ### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L)
 

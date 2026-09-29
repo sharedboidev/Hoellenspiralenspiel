@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/World/Levels/RoomTemplate.cs" id="room"]
 [ext_resource type="Script" path="res://Scripts/World/Levels/RoomDoor.cs" id="door"]
 [ext_resource type="Script" path="res://Scripts/World/Levels/HeroStart.cs" id="start"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/stairs_up.tscn" id="stairs"]
 
 [sub_resource type="PlaneMesh" id="Mesh_preview"]
 size = Vector2(12, 12)
@@ -37,3 +38,6 @@ script = ExtResource("door")
 [node name="HeroStart" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 script = ExtResource("start")
+
+[node name="StairsUp" parent="." instance=ExtResource("stairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, -3.5)

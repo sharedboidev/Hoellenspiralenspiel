@@ -1,28 +1,60 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Godot.Collections;
 using Hoellenspiralenspiel.Resources.Levels;
 using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Core.Levels;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Environment;
+using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Objects;
+using Hoellenspiralenspiel.Scripts.Skills;
 using Hoellenspiralenspiel.Scripts.Skills.Effects;
+using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Scripts.Units.Enemies;
+using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.World.Levels;
 
-//Führt den Helden von der Oberfläche Ebene um Ebene hinab. Held, Oberfläche und Steuerung bleiben, nur die Ebene wechselt
+public enum ArrivalKind
+{
+    Start,
+    Exit,
+    Point,
+    CirclePortal,
+    TownPortal
+}
+
+public readonly record struct Arrival(ArrivalKind Kind, Vector3 Point = default, int CircleNumber = 0)
+{
+    public static readonly Arrival AtStart      = new(ArrivalKind.Start);
+    public static readonly Arrival AtExit       = new(ArrivalKind.Exit);
+    public static readonly Arrival AtTownPortal = new(ArrivalKind.TownPortal);
+
+    public static Arrival At(Vector3 point)
+        => new(ArrivalKind.Point, point);
+
+    public static Arrival AtPortalOf(int circleNumber)
+        => new(ArrivalKind.CirclePortal, CircleNumber: circleNumber);
+}
+
+//Führt den Helden zwischen dem Hub und den Ebenen der Kreise hin und her. Held, Oberfläche und Steuerung bleiben, nur der Ort wechselt
 public partial class Descent : Node
 {
-    private const int PoolSeedOffset = 104729;
+    private const int   PoolSeedOffset       = 104729;
+    private const int   SpawnSeedOffset      = 15485863;
+    private const float TownPortalGapMeters  = 1.8f;
+    private const float SightHeightMeters    = 0.5f;
+    private const int   TownPortalDirections = 8;
+    private const float SouthDegrees         = 90f;
 
     private Cell?             lastCell;
     private float             lastRevealRadius;
     private AudioStreamPlayer music;
-    private RoomLibrary       rooms;
-    private int               surfaceAreaLevel;
+    private TownPortal        openPortal;
+    private SurfaceLook       surfaceLook;
 
     [Export]
     public Hero Hero { get; set; }
@@ -33,15 +65,9 @@ public partial class Descent : Node
     [Export]
     public LevelNavigation Navigation { get; set; }
 
-    //Hier hinein entsteht die Ebene. Was vorher darunter hing, weicht ihr
+    //Hier hinein entsteht der Ort. Was vorher darunter hing, weicht ihm
     [Export]
     public Node3D LevelRoot { get; set; }
-
-    [Export]
-    public CellarDoor Entrance { get; set; }
-
-    [Export]
-    public LevelThemeResource Theme { get; set; }
 
     [Export]
     public WorldEnvironment Surroundings { get; set; }
@@ -49,8 +75,29 @@ public partial class Descent : Node
     [Export]
     public DirectionalLight3D Moonlight { get; set; }
 
+    [Export]
+    public Curtain Curtain { get; set; }
+
+    [ExportGroup("Orte")]
+    [Export]
+    public PackedScene Hub { get; set; }
+
+    //Zum Testen mit F6 erreichbar
+    [Export]
+    public PackedScene TestGrounds { get; set; }
+
+    [Export]
+    public Array<LevelThemeResource> Circles { get; set; } = new();
+
+    [ExportGroup("Town-Portal")]
+    [Export]
+    public PackedScene TownPortalScene { get; set; }
+
+    [Export]
+    public double TownPortalCooldownSec { get; set; } = 60;
+
     [ExportGroup("Generator")]
-    //0 würfelt bei jedem Abstieg neu
+    //0 würfelt bei jedem neuen Abstieg
     [Export]
     public int Seed { get; set; }
 
@@ -75,26 +122,55 @@ public partial class Descent : Node
     [Export]
     public int CellsPerCorridorPack { get; set; } = 14;
 
-    public DescentState State { get; } = new();
+    public JourneyState Journey { get; } = new();
+
+    public LevelThemeResource Circle { get; private set; }
+
+    public DescentState State => Circle is null ? null : Journey.GetDescent(Circle.Id);
 
     public BuiltLevel Level { get; private set; }
 
+    public Place Place { get; private set; }
+
     public ExplorationMap Exploration { get; private set; }
 
+    public bool IsTravelling { get; private set; }
+
+    public double TownPortalCooldownLeftSec { get; private set; }
+
+    public TownPortal OpenPortal => IsInstanceValid(openPortal) ? openPortal : null;
+
+    public bool IsInTestGrounds => Place is not null && TestGrounds is not null && Place.SceneFilePath == TestGrounds.ResourcePath;
+
+    public LevelThemeResource FirstCircle => Circles.Where(circle => circle is not null).OrderBy(circle => circle.Number).FirstOrDefault();
+
     public event Action LevelEntered;
+    public event Action PlaceEntered;
+    public event Action Arrived;
     public event Action Explored;
+
+    //Etwas hat sich geändert, das in den Spielstand gehört
+    public event Action Changed;
+
+    public event Action<CirclePortal> CirclePortalUsed;
 
     public override void _Ready()
     {
-        surfaceAreaLevel = Enemies?.AreaLevel ?? 1;
+        surfaceLook = SurfaceLook.From(Surroundings, Moonlight);
 
-        if (Entrance is not null)
-            Entrance.Opened += _ => Descend();
+        if (Enemies is not null)
+            Enemies.EnemyKilled += OnEnemyKilled;
+    }
+
+    public override void _Process(double delta)
+    {
+        if (TownPortalCooldownLeftSec > 0)
+            TownPortalCooldownLeftSec = Math.Max(0, TownPortalCooldownLeftSec - delta);
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        if (Level is null || !IsInstanceValid(Hero))
+        if (Level is null || IsTravelling || !IsInstanceValid(Hero))
             return;
 
         var cell   = Level.Grid.GetCell(Hero.GlobalPosition);
@@ -110,59 +186,191 @@ public partial class Descent : Node
             Explored?.Invoke();
     }
 
-    public void Descend()
+    public override void _UnhandledInput(InputEvent @event)
     {
-        if (!State.IsBelowGround)
-            State.Begin(Seed != 0 ? Seed : (int)GD.Randi());
-
-        Enter(State.Depth + 1);
+        if (@event.IsActionPressed(InputActions.OpenTownPortal) && TryOpenTownPortal())
+            GetViewport().SetInputAsHandled();
     }
 
+    public override void _UnhandledKeyInput(InputEvent @event)
+    {
+        if (@event is InputEventKey { Pressed: true, Echo: false, Keycode: Key.F6 } && TestGrounds is not null)
+            Show(IsInTestGrounds ? Hub : TestGrounds, Arrival.AtStart);
+    }
+
+    public LevelThemeResource FindCircle(string circleId)
+        => Circles.FirstOrDefault(circle => circle is not null && circle.Id == circleId);
+
+    public LevelThemeResource FindCircle(int number)
+        => Circles.FirstOrDefault(circle => circle is not null && circle.Number == number);
+
+    public void ShowHub()
+        => Show(Hub, Arrival.AtStart);
+
     //Wer eine Tür benutzt, steckt mitten in der Physik. Abgebaut und gebaut wird deshalb erst danach
-    public void Enter(int depth)
-        => Callable.From(() => Rebuild(depth)).CallDeferred();
+    public void Show(PackedScene place, Arrival arrival)
+    {
+        if (place is null || !StartTravelling())
+            return;
+
+        Callable.From(() => BuildPlace(place, arrival)).CallDeferred();
+    }
+
+    public void EnterCircle(LevelThemeResource circle, int depth)
+        => EnterCircle(circle, depth, Arrival.AtStart);
+
+    public void EnterCircle(LevelThemeResource circle, int depth, Arrival arrival)
+    {
+        if (circle is null || !StartTravelling())
+            return;
+
+        Callable.From(() => BuildLevel(circle, depth, arrival)).CallDeferred();
+    }
+
+    //Würfelt die Ebenen des Kreises neu. Die Checkpoints bleiben
+    public void BeginAnew(LevelThemeResource circle)
+    {
+        if (circle is null || circle == Circle)
+            return;
+
+        Journey.BeginAnew(circle.Id, RollSeed());
+
+        Changed?.Invoke();
+    }
 
     //Eine Ebene aus einem früheren Abstieg gehört nicht mehr dazu, ihre Karte verfällt
     public void RememberExploration()
     {
-        if (Level is not null && Level.Layout.Seed == State.GetSeedOf(Level.Depth))
+        if (Level is not null && State is not null && Level.Layout.Seed == State.GetSeedOf(Level.Depth))
             State.Remember(Level.Depth, Exploration);
     }
 
-    private void Rebuild(int depth)
+    public bool TryOpenTownPortal()
     {
-        if (Theme is null || LevelRoot is null)
+        if (Level is null || IsTravelling || TownPortalScene is null || TownPortalCooldownLeftSec > 0 || !IsInstanceValid(Hero) || Hero.IsDead)
+            return false;
+
+        var point = FindPlaceForTownPortal();
+
+        Journey.OpenTownPortal(new TownPortalSpot(Circle.Id, Level.Depth, point.X, point.Z));
+
+        StandUpTownPortal(point, false);
+
+        TownPortalCooldownLeftSec = TownPortalCooldownSec;
+
+        Changed?.Invoke();
+
+        return true;
+    }
+
+    private bool StartTravelling()
+    {
+        if (IsTravelling)
+            return false;
+
+        IsTravelling = true;
+
+        Curtain?.Drop();
+
+        return true;
+    }
+
+    private int RollSeed()
+        => Seed != 0 ? Seed : (int)GD.Randi();
+
+    private void BuildPlace(PackedScene scene, Arrival arrival)
+    {
+        if (LevelRoot is null || scene.Instantiate() is not Place place)
         {
-            GD.PushError("Dem Abstieg fehlen das Thema oder der Knoten für die Ebene.");
+            GD.PushError($"Die Szene {scene.ResourcePath} ist kein Ort, an ihrer Wurzel fehlt das Skript {nameof(Place)}.");
+
+            Arrive();
 
             return;
         }
 
-        rooms ??= new RoomLibrary(Theme.Rooms);
+        LeaveCurrent();
 
-        var seed     = State.GetSeedOf(depth);
-        var settings = GetSettings(depth);
-        var layout   = TryGenerate(settings, seed);
+        Place = place;
+
+        LevelRoot.AddChild(place);
+
+        foreach (var portal in place.GetAllChildren<CirclePortal>())
+        {
+            portal.Circle = FindCircle(portal.Number);
+
+            portal.SetUnlocked(Journey.IsUnlocked(portal.Number));
+
+            portal.Used += used => CirclePortalUsed?.Invoke((CirclePortal)used);
+        }
+
+        foreach (var door in place.GetAllChildren<CellarDoor>())
+            door.Used += _ => EnterCircle(FirstCircle, 1);
+
+        if (Journey.TownPortal is not null && place.HasTownPortal)
+            StandUpTownPortal(place.TownPortalSpot, true);
+
+        surfaceLook.ApplyTo(Surroundings, Moonlight);
+        StopMusic();
+
+        Enemies.AreaLevel = place.AreaLevel;
+
+        Hero.MoveToLevelStart(place.HeroStart);
+        Navigation?.Rebuild();
+
+        PlaceEntered?.Invoke();
+
+        Populate(place, arrival);
+    }
+
+    private void BuildLevel(LevelThemeResource circle, int wantedDepth, Arrival arrival)
+    {
+        if (LevelRoot is null)
+        {
+            GD.PushError("Dem Abstieg fehlt der Knoten für die Ebene.");
+
+            Arrive();
+
+            return;
+        }
+
+        var state = Journey.GetDescent(circle.Id);
+
+        if (!state.HasBegun)
+            Journey.BeginAnew(circle.Id, RollSeed());
+
+        var depth    = Math.Clamp(wantedDepth, 1, Math.Max(1, circle.LevelCount));
+        var rooms    = new RoomLibrary(circle.Rooms);
+        var seed     = state.GetSeedOf(depth);
+        var settings = GetSettings(circle, depth);
+        var layout   = TryGenerate(rooms, settings, seed);
 
         if (layout is null)
+        {
+            Arrive();
+
             return;
+        }
 
-        RememberExploration();
-        ClearLevel();
+        LeaveCurrent();
 
-        State.GoTo(depth);
+        Circle = circle;
+
+        state.GoTo(depth);
         GameRandom.Reseed(seed);
 
-        Level       = LevelBuilder.Build(layout, rooms, Theme, LevelRoot, depth);
+        Level       = LevelBuilder.Build(layout, rooms, circle, LevelRoot, depth);
         Exploration = new ExplorationMap(layout.Width, layout.Height);
         lastCell    = null;
 
-        Exploration.TryRestore(State.GetRevealed(depth));
+        Exploration.TryRestore(state.GetRevealed(depth));
 
-        foreach (var exit in Level.Exits)
-            exit.Opened += _ => Descend();
+        ConnectStairs(Level, circle, depth);
 
-        ApplyLook();
+        if (Journey.TownPortal is { } spot && spot.CircleId == circle.Id && spot.Depth == depth)
+            StandUpTownPortal(new Vector3(spot.X, 0f, spot.Z), true);
+
+        ApplyLook(circle);
 
         Enemies.AreaLevel = settings.AreaLevel;
 
@@ -171,11 +379,60 @@ public partial class Descent : Node
 
         LevelEntered?.Invoke();
 
-        Populate(Level);
+        Populate(Level, arrival);
+    }
+
+    //Die letzte Ebene hat keinen Weg hinab
+    private void ConnectStairs(BuiltLevel level, LevelThemeResource circle, int depth)
+    {
+        foreach (var exit in level.Exits.ToList())
+        {
+            if (depth < circle.LevelCount)
+            {
+                exit.Used += _ => EnterCircle(circle, depth + 1);
+
+                continue;
+            }
+
+            level.Exits.Remove(exit);
+
+            Remove(exit);
+        }
+
+        foreach (var entrance in level.Entrances)
+        {
+            if (depth > 1)
+                entrance.Used += _ => EnterCircle(circle, depth - 1, Arrival.AtExit);
+            else
+                entrance.Used += _ => Show(Hub, Arrival.AtPortalOf(circle.Number));
+        }
+    }
+
+    private void LeaveCurrent()
+    {
+        RememberExploration();
+
+        State?.Leave();
+
+        Enemies.Clear();
+
+        foreach (var lootbag in Lootbag.Lying.ToList())
+            Remove(lootbag);
+
+        foreach (var effect in Hero.GetParent().GetChildren().Where(child => child is SkillArea or SkillProjectile).ToList())
+            Remove(effect);
+
+        foreach (var child in LevelRoot.GetChildren())
+            Remove(child);
+
+        Circle     = null;
+        Level      = null;
+        Place      = null;
+        openPortal = null;
     }
 
     //Scheitert der Generator, bleibt der Held, wo er ist
-    private LevelLayout TryGenerate(LevelSettings settings, int seed)
+    private static LevelLayout TryGenerate(RoomLibrary rooms, LevelSettings settings, int seed)
     {
         try
         {
@@ -189,7 +446,7 @@ public partial class Descent : Node
         }
     }
 
-    private LevelSettings GetSettings(int depth)
+    private LevelSettings GetSettings(LevelThemeResource circle, int depth)
         => new()
         {
             RoomCount            = Math.Min(MaxRoomCount, RoomCount + RoomsMorePerDepth * (depth - 1)),
@@ -197,11 +454,12 @@ public partial class Descent : Node
             MaxGap               = MaxGap,
             LoopShare            = LoopShare,
             CellsPerCorridorPack = CellsPerCorridorPack,
-            AreaLevel            = surfaceAreaLevel + depth
+            AreaLevel            = circle.FirstAreaLevel + depth - 1
         };
 
-    //Erst nach einem Schritt der Physik stehen die Mauern so, dass die Suche nach freien Plätzen sie sieht
-    private async void Populate(BuiltLevel level)
+    //Erst nach einem Schritt der Physik stehen die Mauern so, dass die Suche nach freien Plätzen sie sieht.
+    //Der Held steht beim Spawnen immer am Start, sonst stünden dieselben Gegner bei jeder Ankunft woanders
+    private async void Populate(BuiltLevel level, Arrival arrival)
     {
         await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
 
@@ -221,12 +479,71 @@ public partial class Descent : Node
             marker.AmountToSpawn = entry is null ? 0 : random.NextInt(entry.MinGroupSize, entry.MaxGroupSize + 1);
         }
 
+        GameRandom.Reseed(unchecked(level.Layout.Seed + SpawnSeedOffset));
+
         Enemies.SpawnFrom(level.RoomMarkers.Concat(level.CorridorMarkers).Where(marker => marker.Enemy is not null));
+
+        foreach (var enemy in Enemies.Enemies.Where(enemy => State.IsKilled(level.Depth, enemy.SpawnIndex)).ToList())
+            Enemies.Remove(enemy);
+
+        Hero.Teleport(GetArrivalPoint(level, arrival));
+
+        if (arrival.Kind == ArrivalKind.Point)
+            CloseTownPortal();
+
+        Arrive();
+    }
+
+    private async void Populate(Place place, Arrival arrival)
+    {
+        await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+
+        if (place != Place || !IsInstanceValid(place))
+            return;
+
+        Enemies.SpawnFrom(place.GetAllChildren<SpawnMarker>().Where(marker => marker.Enemy is not null));
+
+        Hero.Teleport(GetArrivalPoint(place, arrival));
+
+        Arrive();
+    }
+
+    private void Arrive()
+    {
+        IsTravelling = false;
+
+        Curtain?.Lift();
+
+        Arrived?.Invoke();
+    }
+
+    private static Vector3 GetArrivalPoint(BuiltLevel level, Arrival arrival)
+        => arrival.Kind switch
+        {
+            ArrivalKind.Exit when level.Exits.Count > 0 => level.Exits[0].ArrivalPoint,
+            ArrivalKind.Point                           => arrival.Point,
+            _                                           => level.HeroStart
+        };
+
+    private Vector3 GetArrivalPoint(Place place, Arrival arrival)
+    {
+        if (arrival.Kind == ArrivalKind.TownPortal && IsInstanceValid(openPortal))
+            return openPortal.ArrivalPoint;
+
+        if (arrival.Kind == ArrivalKind.CirclePortal)
+        {
+            var portal = place.GetAllChildren<CirclePortal>().FirstOrDefault(portal => portal.Number == arrival.CircleNumber);
+
+            if (portal is not null)
+                return portal.ArrivalPoint;
+        }
+
+        return place.HeroStart;
     }
 
     private EnemyPoolEntry PickFromPool(IRandomSource random)
     {
-        var allowed = Theme.Enemies.Where(entry => entry?.Enemy is not null && entry.MinAreaLevel <= Enemies.AreaLevel).ToList();
+        var allowed = Circle.Enemies.Where(entry => entry?.Enemy is not null && entry.MinAreaLevel <= Enemies.AreaLevel).ToList();
         var total   = allowed.Sum(entry => Math.Max(0f, entry.Weight));
         var roll    = random.NextFloat() * total;
 
@@ -241,25 +558,86 @@ public partial class Descent : Node
         return allowed.LastOrDefault();
     }
 
-    private void ClearLevel()
+    private void OnEnemyKilled(Enemy enemy)
     {
-        Enemies.Clear();
-
-        foreach (var lootbag in Lootbag.Lying.ToList())
-            Remove(lootbag);
-
-        foreach (var effect in Hero.GetParent().GetChildren().Where(child => child is SkillArea or SkillProjectile).ToList())
-            Remove(effect);
-
-        foreach (var child in LevelRoot.GetChildren())
-            Remove(child);
-
-        if (IsInstanceValid(Entrance))
-            Remove(Entrance);
-
-        Entrance = null;
-        Level    = null;
+        if (Level is not null && State.RememberKill(Level.Depth, enemy.SpawnIndex))
+            Changed?.Invoke();
     }
+
+    #region Town-Portal
+
+    //Im Hub führt das Portal zurück an die Stelle, an der es geöffnet wurde, und schließt sich dann
+    private void StandUpTownPortal(Vector3 point, bool isOpenAtOnce)
+    {
+        if (TownPortalScene is null)
+            return;
+
+        if (IsInstanceValid(openPortal))
+            Remove(openPortal);
+
+        openPortal = TownPortalScene.Instantiate<TownPortal>();
+
+        ((Node3D)Level?.Root ?? Place).AddChild(openPortal);
+
+        openPortal.GlobalPosition = point;
+
+        if (isOpenAtOnce)
+            openPortal.OpenAtOnce();
+
+        openPortal.Used += _ => GoThroughTownPortal();
+    }
+
+    private void GoThroughTownPortal()
+    {
+        if (Level is not null)
+        {
+            Show(Hub, Arrival.AtTownPortal);
+
+            return;
+        }
+
+        if (Journey.TownPortal is { } spot && FindCircle(spot.CircleId) is { } circle)
+            EnterCircle(circle, spot.Depth, Arrival.At(new Vector3(spot.X, 0f, spot.Z)));
+    }
+
+    private void CloseTownPortal()
+    {
+        Journey.CloseTownPortal();
+
+        if (IsInstanceValid(openPortal))
+            Remove(openPortal);
+
+        openPortal = null;
+
+        Changed?.Invoke();
+    }
+
+    //Das Portal steht neben dem Helden, zuerst wird vor ihm im Bild gesucht. Hinter einer Mauer käme niemand hindurch
+    private Vector3 FindPlaceForTownPortal()
+    {
+        var origin = WorldScale.OnGround(Hero.GlobalPosition);
+        var space  = Hero.GetWorld3D().DirectSpaceState;
+
+        for (var step = 0; step < TownPortalDirections; step++)
+        {
+            var angle = Mathf.DegToRad(SouthDegrees + step * 360f / TownPortalDirections);
+            var point = origin + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * TownPortalGapMeters;
+
+            if (!Level.Layout.IsFloor(Level.Grid.GetCell(point)))
+                continue;
+
+            var sight = PhysicsRayQueryParameters3D.Create(origin + Vector3.Up * SightHeightMeters, point + Vector3.Up * SightHeightMeters, CollisionLayers.Walls);
+
+            if (space.IntersectRay(sight).Count == 0)
+                return point;
+        }
+
+        return origin;
+    }
+
+    #endregion
+
+    #region Aussehen
 
     //Erst aushängen, dann freigeben: Die Navigation und die Suche nach Plätzen sähen sonst noch die alten Mauern
     private static void Remove(Node node)
@@ -269,27 +647,23 @@ public partial class Descent : Node
         node.QueueFree();
     }
 
-    private void ApplyLook()
+    private void ApplyLook(LevelThemeResource theme)
     {
-        if (Surroundings?.Environment is { } environment)
-        {
-            environment.AmbientLightColor  = Theme.AmbientColor;
-            environment.AmbientLightEnergy = Theme.AmbientEnergy;
-            environment.FogLightColor      = Theme.FogColor;
-        }
+        new SurfaceLook(theme.AmbientColor, theme.AmbientEnergy, theme.FogColor, theme.MoonlightColor, theme.MoonlightEnergy).ApplyTo(Surroundings, Moonlight);
 
-        if (Moonlight is not null)
-        {
-            Moonlight.LightColor  = Theme.MoonlightColor;
-            Moonlight.LightEnergy = Theme.MoonlightEnergy;
-        }
-
-        PlayMusic();
+        PlayMusic(theme.Music);
     }
 
-    private void PlayMusic()
+    private void PlayMusic(AudioStream stream)
     {
-        if (Theme.Music is null || music?.Stream == Theme.Music)
+        if (stream is null)
+        {
+            StopMusic();
+
+            return;
+        }
+
+        if (music?.Stream == stream && music.Playing)
             return;
 
         if (music is null)
@@ -299,8 +673,39 @@ public partial class Descent : Node
             AddChild(music);
         }
 
-        music.Stream = Theme.Music;
+        music.Stream = stream;
 
         music.Play();
     }
+
+    private void StopMusic()
+        => music?.Stop();
+
+    private readonly record struct SurfaceLook(Color Ambient, float AmbientEnergy, Color Fog, Color Moon, float MoonEnergy)
+    {
+        public static SurfaceLook From(WorldEnvironment surroundings, DirectionalLight3D moonlight)
+            => new(surroundings?.Environment?.AmbientLightColor ?? Colors.White,
+                   surroundings?.Environment?.AmbientLightEnergy ?? 1f,
+                   surroundings?.Environment?.FogLightColor ?? Colors.Black,
+                   moonlight?.LightColor ?? Colors.White,
+                   moonlight?.LightEnergy ?? 0f);
+
+        public void ApplyTo(WorldEnvironment surroundings, DirectionalLight3D moonlight)
+        {
+            if (surroundings?.Environment is { } environment)
+            {
+                environment.AmbientLightColor  = Ambient;
+                environment.AmbientLightEnergy = AmbientEnergy;
+                environment.FogLightColor      = Fog;
+            }
+
+            if (moonlight is not null)
+            {
+                moonlight.LightColor  = Moon;
+                moonlight.LightEnergy = MoonEnergy;
+            }
+        }
+    }
+
+    #endregion
 }

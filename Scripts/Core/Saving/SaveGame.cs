@@ -6,7 +6,7 @@ namespace Hoellenspiralenspiel.Scripts.Core.Saving;
 
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
 
     public int                    Version   { get; set; } = CurrentVersion;
     public CharacterSave          Character { get; set; } = new();
@@ -14,6 +14,9 @@ public sealed class SaveGame
     public List<PlacedItemSave>   Inventory { get; set; } = new();
     public List<EquippedItemSave> Equipment { get; set; } = new();
     public List<ItemSave>         Unplaced  { get; set; } = new();
+    public JourneySave            Journey   { get; set; }
+
+    //Nur in Spielständen der Version 1. Seit Version 2 steht der Abstieg je Kreis unter Journey
     public DescentSave            Descent   { get; set; }
 }
 
@@ -26,20 +29,45 @@ public sealed class DescentSave
 
 public sealed class ExploredLevelSave
 {
+    public int       Depth    { get; set; }
+    public string    Revealed { get; set; } = string.Empty;
+    public List<int> Killed   { get; set; } = new();
+}
+
+public sealed class JourneySave
+{
+    public int              UnlockedCircles { get; set; } = 1;
+    public List<CircleSave> Circles         { get; set; } = new();
+    public TownPortalSave   TownPortal      { get; set; }
+}
+
+public sealed class CircleSave
+{
+    public string                  CircleId     { get; set; } = string.Empty;
+    public int                     Seed         { get; set; }
+    public int                     DeepestDepth { get; set; }
+    public List<ExploredLevelSave> Levels       { get; set; } = new();
+}
+
+public sealed class TownPortalSave
+{
+    public string CircleId { get; set; } = string.Empty;
     public int    Depth    { get; set; }
-    public string Revealed { get; set; } = string.Empty;
+    public float  X        { get; set; }
+    public float  Z        { get; set; }
 }
 
 public sealed class CharacterSave
 {
-    public int  Level           { get; set; } = 1;
-    public long XpTotal         { get; set; }
-    public int  AttributePoints { get; set; }
-    public int  Strength        { get; set; } = 1;
-    public int  Dexterity       { get; set; } = 1;
-    public int  Intelligence    { get; set; } = 1;
-    public int  Constitution    { get; set; } = 1;
-    public int  Awareness       { get; set; } = 1;
+    public string Name            { get; set; } = string.Empty;
+    public int    Level           { get; set; } = 1;
+    public long   XpTotal         { get; set; }
+    public int    AttributePoints { get; set; }
+    public int    Strength        { get; set; } = 1;
+    public int    Dexterity       { get; set; } = 1;
+    public int    Intelligence    { get; set; } = 1;
+    public int    Constitution    { get; set; } = 1;
+    public int    Awareness       { get; set; } = 1;
 }
 
 public sealed class ItemSave

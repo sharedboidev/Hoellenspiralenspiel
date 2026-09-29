@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-692_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-735_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -38,7 +38,7 @@ Gegner erschlagen, Beute sammeln, Charakter ausbauen.
 
 ## ✨ Feature-Umfang
 
-Das ist der Stand, der heute im Spiel steckt. Gespielt wird in einem Testlevel, dessen Kellertür in erzeugte Ebenen hinabführt.
+Das ist der Stand, der heute im Spiel steckt. Das Spiel beginnt im Hauptmenü. Vom Hub führen Portale in die Höllenkreise, bisher in einen Testkreis mit vier erzeugten Ebenen.
 Das Spiel läuft in 3D, mehr dazu im Abschnitt [3D im PS1-Look](#-3d-im-ps1-look).
 
 ### 🧙 Charakter
@@ -257,23 +257,27 @@ Auslöser und Aktionen lassen sich im Inspector frei kombinieren, zum Beispiel "
 |---|---|
 | Automatisch | Das Spiel speichert beim Beenden und kurz nach jeder Änderung am Charakter |
 | Laden beim Start | Der Charakter ist nach dem Neustart derselbe, mit Inventar, Ausrüstung und Skill-Leiste |
-| Inhalt | Level, XP, Attribute, offene Punkte, jedes Item mit Affixen, Namen und Platz, dazu der Abstieg mit Seed, Tiefe und erkundeter Karte |
+| Inhalt | Name, Level, XP, Attribute, offene Punkte, jedes Item mit Affixen, Namen und Platz, dazu die Reise: je Kreis Seed, Checkpoints, erkundete Karten und gefallene Gegner, außerdem das offene Town-Portal |
+| Drei Plätze | Das Hauptmenü bietet drei Plätze für Charaktere, jeder mit eigener Datei |
 | Sicher | Ein Absturz beim Schreiben zerstört den alten Spielstand nicht |
 
 <details>
 <summary>Wo der Spielstand liegt</summary>
 
-Die Datei heißt `character.json` und liegt im Benutzerordner von Godot.
+Die Dateien heißen `slot1.json` bis `slot3.json` und liegen im Benutzerordner von Godot.
 Unter Windows ist das `%APPDATA%\Godot\app_userdata\Hoellenspiralenspiel\saves`.
+Ein Spielstand aus der Zeit vor dem Hauptmenü, `character.json`, zieht beim ersten Start von selbst auf Platz 1.
 
 | Wunsch | Weg |
 |---|---|
-| Neu anfangen | Die Datei löschen |
-| Mit einem zweiten Charakter spielen | Godot mit `-- --save-file=user://saves/zweiter.json` starten |
+| Neu anfangen | Im Hauptmenü den Charakter löschen, der zweite Klick bestätigt |
+| Mit einem zweiten Charakter spielen | Im Hauptmenü einen freien Platz wählen |
+| Mit einer eigenen Datei spielen | Godot mit `-- --save-file=user://saves/zweiter.json` starten |
+| Die Plätze woanders ablegen | Godot mit `-- --save-dir=user://saves/test` starten |
 | Ohne Spielstand testen | Im Inspector am `GameController` den Schalter `SavingEnabled` ausschalten |
 
-Leben, Mana, Position, Gegner und Beute am Boden stehen nicht im Spielstand.
-Der Held startet mit vollem Leben und Mana am Startpunkt. War er unter der Erde, ist das der Start derselben Ebene.
+Leben, Mana, Position und Beute am Boden stehen nicht im Spielstand.
+Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints und das Town-Portal.
 
 </details>
 
@@ -281,7 +285,10 @@ Der Held startet mit vollem Leben und Mana am Startpunkt. War er unter der Erde,
 
 | Feature | Beschreibung |
 |---|---|
-| Testlevel in 3D | Boden, Mauern, ein ummauerter Hof und eine Kellertür, gesehen von schräg oben |
+| Hauptmenü | Drei Plätze für Charaktere: spielen, neu anlegen mit Namen, löschen |
+| Neuer Charakter | Alle Attribute auf 1, ein weißes Training Sword in der Haupthand, das Inventar ist leer |
+| Hub | Ein ummauerter Platz mit neun Portalen, eines je Höllenkreis. Gesperrte Portale sind dunkel |
+| Testgelände | Das frühere Testlevel mit Hof und 37 Gegnern, zum Testen mit `F6` erreichbar |
 | Navigationsnetz | Entsteht beim Start des Levels aus den Wänden, für Gegner und Held |
 | Licht und Schatten | Der Held trägt sein Licht mit sich, die Umgebung ist dunkel und neblig |
 | Lebens- und Mana-Orb | Mit Flüssigkeits-Shader |
@@ -290,6 +297,7 @@ Der Held startet mit vollem Leben und Mana am Startpunkt. War er unter der Erde,
 | Mauern | Jede Mauer hat einen Sockel und Mauerwerk darüber. Steht der Held hinter ihr, wird das Mauerwerk durchsichtig, so weit sein Licht reicht. Was dahinter liegt, lässt sich dann anklicken |
 | Räume | Ein Raum bleibt verschlossen, solange der Held nicht drin steht: Seine vorderen Mauern bleiben zu, seine hinteren werden nur halb durchsichtig |
 | Licht und Sicht | Kein Licht scheint durch Mauern, weder das des Helden noch Altar, Aura oder Feuerball. Gegner und ihre Wirkungen zeigen sich erst mit Sichtkontakt |
+| Sichtweite | Gegner zeigen sich bis 120 % des Lichtradius und blenden am Rand mit demselben Punktmuster ein wie die Mauern. Faktor und Rand stehen im Inspector am `EnemyController` |
 | Elite | Größer als ihre Art, mit Namensschild und einer Aura in der Farbe ihres Namens |
 | Beutel | Beute liegt als Beutel aus dunklem Leder am Boden, ein weißer Stern glimmt daran. Beutel liegen in einem Gitter mit 1 m Abstand und nie aufeinander |
 | Schilder der Beute | Jeder Beutel trägt ein Schild mit dem Namen des Items in der Farbe der Seltenheit. Ein neues Schild weicht den anderen nach oben aus und bleibt danach starr bei seinem Beutel. Beim Laufen können Schilder deshalb zusammenrücken, `Alt` zweimal richtet sie neu aus. `Alt` schaltet sie an und aus |
@@ -301,7 +309,22 @@ Der Held startet mit vollem Leben und Mana am Startpunkt. War er unter der Erde,
 
 ### 🕳️ Abstieg und Ebenen
 
-Die Kellertür im Testlevel führt hinab. Jede Ebene entsteht aus einem Seed, und ihr Ausgang führt eine Ebene tiefer.
+Ein Klick auf ein Portal im Hub öffnet die Checkpoints seines Kreises. Jede Ebene entsteht aus einem Seed, ihre Kellertür führt eine Ebene tiefer, ihre Treppe eine höher.
+
+<div align="center">
+<img src="docs/images/hub_m7_3d.webp" alt="Oben links das Hauptmenü mit drei Plätzen, oben rechts der Hub mit dem offenen Portal des Testkreises und gesperrten Portalen, unten links der Dialog mit den Checkpoints, unten rechts das Town-Portal neben dem Helden in einer Ebene" width="720">
+</div>
+
+| Feature | Beschreibung |
+|---|---|
+| Kreis | Ein Höllenkreis hat mehrere Ebenen, der Testkreis vier |
+| Treppen | Die Kellertür im Ausgang führt hinab, die Treppe im Startraum hinauf, aus Ebene 1 in den Hub |
+| Checkpoints | Jede betretene Ebene schaltet ihren Start frei. Das Portal im Hub bietet alle freigeschalteten Ebenen an |
+| Town-Portal | `T` öffnet neben dem Helden ein Portal in den Hub, nach einer Sekunde ist es offen. Im Hub steht das Gegenstück und führt zurück an dieselbe Stelle, danach schließt es sich. Abklingzeit 60 Sekunden |
+| Bestand | Die Ebenen eines Kreises bleiben, wie der Held sie verließ, auch über einen Neustart des Spiels |
+| Tot bleibt tot | Gefallene Gegner stehen nicht wieder auf. Beute am Boden verfällt beim Verlassen der Ebene |
+| Neuer Abstieg | Im Dialog des Portals würfelt "New Descent" alle Ebenen des Kreises neu. Die Checkpoints bleiben |
+| Tod | Der Held steht am Start der Ebene wieder auf |
 
 <div align="center">
 <img src="docs/images/ebene_m6_3d.webp" alt="Oben links der Held hinter einer Mauer, deren Mauerwerk die Sicht freigibt, oben rechts vor einer Mauer, unten links der Schrein, unten rechts die ganze Karte einer Ebene" width="720">
@@ -315,9 +338,9 @@ Die Kellertür im Testlevel führt hinab. Jede Ebene entsteht aus einem Seed, un
 | Raumvorlagen | Szenen mit Anschlusspunkten, Spawn-Markern und Regeln: Häufigkeit, frühestes Bereichslevel, Höchstzahl, Pflichtraum |
 | Pflichtraum | Der Schrein ist ein Event-Raum und erscheint in jeder Ebene genau einmal |
 | Thema | Eine Resource legt Räume, Texturen, Licht, Musik und Gegnerpool fest |
-| Tiefe | Mit jeder Ebene steigt das Bereichslevel um 1, und die Ebene bekommt einen Raum mehr |
+| Tiefe | Mit jeder Ebene steigt das Bereichslevel um 1, und die Ebene bekommt einen Raum mehr. Die erste Ebene des Testkreises hat Bereichslevel 1 |
 | Gegner | Räume bringen ihre Spawn-Marker mit, in Gängen stehen vereinzelt kleine Gruppen aus dem Gegnerpool |
-| Karte | Deckt sich beim Erkunden auf und steht im Spielstand. `F5` zeigt zum Testen die ganze Ebene |
+| Karte | Deckt sich beim Erkunden auf und steht im Spielstand. Sie zeigt Kellertür, Treppe und Town-Portal. `F5` zeigt zum Testen die ganze Ebene |
 
 <div align="center">
 <img src="docs/images/raeume_und_mauern_3d.webp" alt="Oben links der Held im Hof mit durchsichtigen südlichen Mauern, oben rechts vor dem Tor mit verschlossenem Hof, unten links nördlich des Hofs hinter der halb durchsichtigen Mauer, unten rechts an einer Gangecke hinter offenem Mauerwerk" width="720">
@@ -362,12 +385,15 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 | `F3` | 240, 360 oder 480 Bildzeilen |
 | `F4` | Schatten aus Lichtern statt dunkler Scheiben |
 | `F5` | Ganze Karte der Ebene zeigen und zurück zum Erkundeten |
+| `F6` | Ins Testgelände und zurück in den Hub |
 
 </details>
 
 ### 🚧 Noch nicht enthalten
 
-- Hub, Weg zurück nach oben und Menüs, damit auch mehrere Charaktere
+- Pausenmenü, Ladebildschirm und Einstellungen für Auflösung, Tasten und Lautstärke
+- Truhe, Händler und Währung im Hub
+- Boss und Freischaltung des nächsten Kreises
 - Ein Höllenkreis mit eigenem Thema, bisher gibt es nur das Testthema
 - Eigene Modelle statt der Platzhalter aus Grundkörpern
 - Item-Basen für die übrigen zwölf Ausrüstungsplätze
@@ -393,7 +419,8 @@ Die Skills liegen zu Beginn wie unten auf den Tasten. Jeder Platz der Leiste lä
 | Rechtsklick auf einen Platz der Leiste | Skill für diesen Platz auswählen |
 | `B` | Charakterbogen und Inventar |
 | `Tab` | Overlay-Karte |
-| Linke Maustaste auf die Kellertür | Der Held läuft hin und steigt hinab |
+| Linke Maustaste auf Portal, Treppe oder Kellertür | Der Held läuft hin und benutzt den Durchgang |
+| `T` | Town-Portal öffnen, nur in einer Ebene |
 | `Alt` | Schilder der Beute an und aus |
 | Linke Maustaste auf das Schild eines Beutels | Aufheben. Sind die Schilder aus, zählt der Klick auf den Beutel selbst |
 | Linke Maustaste auf Item im Inventar | Greifen und ablegen, außerhalb des Inventars abwerfen |
@@ -409,7 +436,7 @@ flowchart LR
     M2 --> M3(["M3 Skills"]):::done
     M2 --> M4(["M4 Items und Speichern"]):::done
     M4 --> M5(["M5 Gegner-KI"]):::done --> D{"3D im PS1-Look"}:::done
-    D --> U(["M5.5 Umstellung auf 3D"]):::done --> M6(["M6 Level"]):::done --> M7(["M7 Hub"]):::next --> M8(["M8 Höllenkreis"]):::open
+    D --> U(["M5.5 Umstellung auf 3D"]):::done --> M6(["M6 Level"]):::done --> M7(["M7 Hub, Etappe 1 von 4"]):::next --> M8(["M8 Höllenkreis"]):::open
     M8 --> M9(["M9 Inhalt"]):::open --> M10(["M10 Koop"]):::optional
 
     classDef done fill:#2e7d32,color:#ffffff,stroke:#1b5e20
@@ -430,7 +457,7 @@ flowchart LR
 | ✅ | **Entscheidung** | 3D im Look der PlayStation 1, entschieden nach dem [Vergleich](docs/VERGLEICH_2D_3D.md) | klein |
 | ✅ | **M5.5** Umstellung auf 3D | Die 3D-Fassung kann alles, was die 2D-Fassung konnte, und hat sie abgelöst | mittel |
 | ✅ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
-| ⏭️ | **M7** Hub | Stadt, Abstieg, Menüs, Truhe, Händler, Einstellungen | mittel |
+| ⏭️ | **M7** Hub | Etappe 1 von 4 steht: Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal. Offen: Menüs und Einstellungen, Truhe und Händler, Boss mit Freischaltung | mittel |
 | ⬜ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
 | 💤 | **M10** Koop | Optional, baut auf Kern und Seeds auf | groß |
@@ -471,7 +498,7 @@ git clone https://github.com/sharedboidev/Hoellenspiralenspiel.git
 ```
 
 Danach den Ordner in Godot als Projekt importieren und mit `F5` starten.
-Die Hauptszene ist das Testlevel `Scenes/test_level.tscn`. Seine Kellertür führt in die erzeugten Ebenen.
+Die Hauptszene ist das Hauptmenü `Scenes/main_menu.tscn`. Das Spiel selbst ist `Scenes/game.tscn` und lässt sich auch direkt starten, dann spielt der Charakter auf Platz 1.
 
 **Tests ausführen**
 
@@ -494,7 +521,7 @@ Hoellenspiralenspiel
 │   │   ├── Enemies     Zustandsmaschine, Seltenheit, Wahl der Mods, Wachstum mit dem Level
 │   │   ├── Navigation  Takt für die Pfadsuche
 │   │   ├── Spatial     Raster für die Suche nach Einheiten, freie Plätze für Gegner und Beutel, Stapeln der Schilder
-│   │   ├── Levels      Generator für Ebenen, Grundriss, Raumvorlagen, Erkundung, Abstieg, Regel für freie Sicht durch Mauern
+│   │   ├── Levels      Generator für Ebenen, Grundriss, Raumvorlagen, Erkundung, Reise durch die Kreise, Regel für freie Sicht durch Mauern
 │   │   ├── Saving      Format des Spielstands, Lesen und Schreiben als JSON
 │   │   ├── Rng         Zufallsquelle mit Seed
 │   │   └── Progression XP-Tabelle, Level und Attributspunkte, XP-Verlust beim Tod
@@ -503,14 +530,14 @@ Hoellenspiralenspiel
 │   ├── Items           Bibliothek aller Item-Basen
 │   ├── Enemies         Bibliothek aller Monster-Mods
 │   ├── World           Navigationsnetz, Kamera, PS1-Look, Spawn-Marker
-│   │   └── Levels      Abstieg, Aufbau einer Ebene, Raumvorlagen, Mauerstücke
+│   │   └── Levels      Wechsel zwischen Hub und Ebenen, Aufbau einer Ebene, Raumvorlagen, Orte, Mauerstücke
 │   ├── Objects         Beutel am Boden, Suche nach Benutzbarem unter der Maus
-│   ├── Environment     Kellertür
-│   ├── Saving          Datei des Spielstands
+│   ├── Environment     Durchgänge: Kellertür, Treppe, Portal eines Kreises, Town-Portal
+│   ├── Saving          Dateien der Spielstände, drei Plätze
 │   ├── Controllers     Gegnersteuerung, Beute, Spielablauf, Speichern
-│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder, Schilder der Beute, Karte der Ebene
-├── Scenes              Szenen für Level, Räume, Einheiten, Items, Skills, Objekte und Oberfläche
-├── Shaders             Shader, unter Ps1 die für den PS1-Look und der Stern der Beutel, unter Archive2D die Effekte der 2D-Fassung
+│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder, Schilder der Beute, Karte der Ebene, Hauptmenü, Dialog am Portal
+├── Scenes              Szenen für Hauptmenü, Spiel, Orte, Räume, Einheiten, Items, Skills, Objekte und Oberfläche
+├── Shaders             Shader, unter Ps1 die für den PS1-Look, die Sicht auf Gegner und der Stern der Beutel, unter Archive2D die Effekte der 2D-Fassung
 ├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Gegner, Monster-Mods, Themen der Ebenen, Themes
 ├── Interfaces          Schnittstellen, darunter IHero zwischen Held und Oberfläche
 ├── Enums               Gemeinsame Aufzählungen

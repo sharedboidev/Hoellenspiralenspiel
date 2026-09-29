@@ -1,0 +1,178 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://dsiiar38vsajb" path="res://Scripts/World/SpawnMarker.cs" id="4_marker"]
+[ext_resource type="Resource" path="res://Resources/Enemies/blue_blob.tres" id="9_blue"]
+[ext_resource type="Resource" path="res://Resources/Enemies/yellow_blob.tres" id="10_yellow"]
+[ext_resource type="Resource" path="res://Resources/Enemies/test_enemy.tres" id="11_test"]
+[ext_resource type="Shader" uid="uid://c2lknp40isk5w" path="res://Shaders/Ps1/ps1_surface.gdshader" id="13_surface"]
+[ext_resource type="Texture2D" uid="uid://bp4uxrb2dhk7x" path="res://Textures/World/floor_stone.png" id="15_floor"]
+[ext_resource type="Texture2D" uid="uid://vo27wofvjp82" path="res://Textures/World/wall_brick.png" id="16_wall"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/cellar_door.tscn" id="27_door"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/WallSegment.cs" id="35_wall_segment"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/RoomZone.cs" id="36_room_zone"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/Place.cs" id="place"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/HeroStart.cs" id="hero_start"]
+
+[sub_resource type="BoxShape3D" id="Shape_yard_zone"]
+size = Vector3(8, 2.5, 8)
+
+[sub_resource type="BoxShape3D" id="Shape_floor"]
+size = Vector3(60, 1, 60)
+
+[sub_resource type="PlaneMesh" id="Mesh_floor"]
+size = Vector2(60, 60)
+subdivide_width = 29
+subdivide_depth = 29
+
+[sub_resource type="ShaderMaterial" id="Mat_floor"]
+render_priority = 0
+shader = ExtResource("13_surface")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/albedo_texture = ExtResource("15_floor")
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.25
+shader_parameter/tint = Vector3(1, 1, 1)
+shader_parameter/emission = Color(0, 0, 0, 1)
+shader_parameter/emission_energy = 0.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(426, 240)
+shader_parameter/affine = 1.0
+
+[node name="TestGrounds" type="Node3D"]
+script = ExtResource("place")
+DisplayName = "Testgelände"
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 16
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("Shape_floor")
+debug_fill = false
+
+[node name="Mesh" type="MeshInstance3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("Mesh_floor")
+surface_material_override/0 = SubResource("Mat_floor")
+
+[node name="BorderNorth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -30)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("35_wall_segment")
+Length = 60.5
+Height = 1.0
+Texture = ExtResource("16_wall")
+
+[node name="BorderSouth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 30)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("35_wall_segment")
+Length = 60.5
+Height = 1.0
+Texture = ExtResource("16_wall")
+
+[node name="BorderWest" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -30, 0, 0)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("35_wall_segment")
+Length = 60.5
+Height = 1.0
+Texture = ExtResource("16_wall")
+
+[node name="BorderEast" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 30, 0, 0)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("35_wall_segment")
+Length = 60.5
+Height = 1.0
+Texture = ExtResource("16_wall")
+
+[node name="YardWest" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 10, 0, 0)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("35_wall_segment")
+Length = 8.5
+Texture = ExtResource("16_wall")
+
+[node name="YardNorth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, -4)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("35_wall_segment")
+Length = 8.5
+Texture = ExtResource("16_wall")
+
+[node name="YardSouth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 4)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("35_wall_segment")
+Length = 8.5
+Texture = ExtResource("16_wall")
+
+[node name="YardGateNorth" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 18, 0, -2.75)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("35_wall_segment")
+Length = 3.0
+Texture = ExtResource("16_wall")
+
+[node name="YardGateSouth" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 18, 0, 2.75)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("35_wall_segment")
+Length = 3.0
+Texture = ExtResource("16_wall")
+
+[node name="YardZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 0)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+script = ExtResource("36_room_zone")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="YardZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+shape = SubResource("Shape_yard_zone")
+debug_fill = false
+
+[node name="SpawnMarkers" type="Node3D" parent="."]
+
+[node name="BlueBlobs" type="Marker3D" parent="SpawnMarkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, -7)
+script = ExtResource("4_marker")
+Enemy = ExtResource("9_blue")
+AmountToSpawn = 16
+
+[node name="YellowBlobs" type="Marker3D" parent="SpawnMarkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, 7)
+script = ExtResource("4_marker")
+Enemy = ExtResource("10_yellow")
+AmountToSpawn = 12
+
+[node name="Courtyard" type="Marker3D" parent="SpawnMarkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 0)
+script = ExtResource("4_marker")
+Enemy = ExtResource("10_yellow")
+AmountToSpawn = 5
+
+[node name="Caster" type="Marker3D" parent="SpawnMarkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -13)
+script = ExtResource("4_marker")
+Enemy = ExtResource("11_test")
+AmountToSpawn = 4
+
+[node name="CellarDoor" parent="." instance=ExtResource("27_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 5)
+
+[node name="HeroStart" type="Marker3D" parent="."]
+script = ExtResource("hero_start")

@@ -51,6 +51,26 @@ void vertex() {
 	affine_uv = vec3(uv * depth, depth);
 }
 
+const float BAYER[16] = float[](
+	0.0, 8.0, 2.0, 10.0,
+	12.0, 4.0, 14.0, 6.0,
+	3.0, 11.0, 1.0, 9.0,
+	15.0, 7.0, 13.0, 5.0
+);
+
+// Wahr, wo das Punktmuster an dieser Stelle des Bildschirms ein Loch lässt: 0 lässt nichts weg, 1 alles.
+// Das Muster liegt auf dem Raster des Bildschirms, damit es die grobe Auflösung übersteht
+bool is_cut(float amount, vec2 screen_uv) {
+	if (amount <= 0.0) {
+		return false;
+	}
+
+	vec2 cell = floor(screen_uv * snap_resolution);
+	int index = int(mod(cell.x, 4.0)) + int(mod(cell.y, 4.0)) * 4;
+
+	return 1.0 - amount < (BAYER[index] + 0.5) / 16.0;
+}
+
 vec3 sample_surface(vec3 uv) {
 	vec4 texel = texture(albedo_texture, uv.xy / uv.z);
 
