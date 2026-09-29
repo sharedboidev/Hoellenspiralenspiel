@@ -4,6 +4,7 @@
 [ext_resource type="Resource" path="res://Resources/Enemies/blue_blob.tres" id="9_blue"]
 [ext_resource type="Resource" path="res://Resources/Enemies/yellow_blob.tres" id="10_yellow"]
 [ext_resource type="Resource" path="res://Resources/Enemies/test_enemy.tres" id="11_test"]
+[ext_resource type="Resource" path="res://Resources/Enemies/skeleton.tres" id="12_skeleton"]
 [ext_resource type="Shader" uid="uid://c2lknp40isk5w" path="res://Shaders/Ps1/ps1_surface.gdshader" id="13_surface"]
 [ext_resource type="Texture2D" uid="uid://bp4uxrb2dhk7x" path="res://Textures/World/floor_stone.png" id="15_floor"]
 [ext_resource type="Texture2D" uid="uid://vo27wofvjp82" path="res://Textures/World/wall_brick.png" id="16_wall"]
@@ -170,6 +171,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -13)
 script = ExtResource("4_marker")
 Enemy = ExtResource("11_test")
 AmountToSpawn = 4
+
+[node name="Skeletons" type="Marker3D" parent="SpawnMarkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -6)
+script = ExtResource("4_marker")
+Enemy = ExtResource("12_skeleton")
+AmountToSpawn = 3
+ScatterRadius = 250.0
 
 [node name="CellarDoor" parent="." instance=ExtResource("27_door")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 5)

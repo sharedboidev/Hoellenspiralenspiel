@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cnxyy07a3er8q"]
 
 [ext_resource type="Script" path="res://Scripts/Units/Enemies/Enemy.cs" id="1_script"]
-[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="90_ps1"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit.gdshader" id="90_ps1"]
 [ext_resource type="Texture2D" path="res://Textures/World/skin_speckled.png" id="91_skin"]
 
 [sub_resource type="CapsuleShape3D" id="Shape_body"]

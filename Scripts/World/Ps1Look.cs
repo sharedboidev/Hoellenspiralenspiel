@@ -14,14 +14,16 @@ public partial class Ps1Look : Node
 
     private static readonly int[] LineSteps = [240, 360, 480];
 
-    private static readonly StringName Snap           = "snap";
-    private static readonly StringName SnapResolution = "snap_resolution";
-    private static readonly StringName Affine         = "affine";
-    private static readonly StringName Resolution     = "resolution";
-    private static readonly StringName ColorLevelsKey = "color_levels";
-    private static readonly StringName DitherKey      = "dither";
+    private static readonly StringName Snap            = "snap";
+    private static readonly StringName SnapResolution  = "snap_resolution";
+    private static readonly StringName Affine          = "affine";
+    private static readonly StringName Resolution      = "resolution";
+    private static readonly StringName ColorLevelsKey  = "color_levels";
+    private static readonly StringName DitherKey       = "dither";
+    private static readonly StringName OutlineWidthKey = "outline_width";
 
     private readonly Dictionary<Light3D, bool> shadowOfLight = new();
+    private          int                       outlineWidth  = 1;
 
     [Export]
     public bool Enabled { get; set; } = true;
@@ -46,8 +48,26 @@ public partial class Ps1Look : Node
     [Export]
     public bool RealShadows { get; set; }
 
+    //Breite des Rands um Held und Gegner in Pixeln der PS1, 0 schaltet ihn ab. Lässt sich im laufenden Spiel verstellen
+    [Export(PropertyHint.Range, "0,4,1")]
+    public int OutlineWidth
+    {
+        get => outlineWidth;
+        set
+        {
+            outlineWidth = Math.Clamp(value, 0, 4);
+
+            if (IsInsideTree())
+                ApplyOutline();
+        }
+    }
+
     [Export]
     public Shader SurfaceShader { get; set; }
+
+    //Das Rechteck über dem Bild, das den Rand um die Figuren zieht
+    [Export]
+    public GeometryInstance3D UnitOutline { get; set; }
 
     [Export]
     public ColorRect Screen { get; set; }
@@ -115,8 +135,24 @@ public partial class Ps1Look : Node
         }
 
         TuneTree(World ?? GetParent(), resolution);
+        ApplyOutline();
 
         Changed?.Invoke();
+    }
+
+    private void ApplyOutline()
+    {
+        if (UnitOutline is null)
+            return;
+
+        //Ohne Rand liest niemand den Rauheitskanal, dann spart Godot sich dessen Aufbau
+        UnitOutline.Visible = OutlineWidth > 0;
+
+        if (UnitOutline.MaterialOverride is not ShaderMaterial material)
+            return;
+
+        material.SetShaderParameter(OutlineWidthKey, Math.Max(1, OutlineWidth));
+        material.SetShaderParameter(SnapResolution, GetResolution());
     }
 
     private Vector2 GetResolution()
@@ -172,11 +208,14 @@ public partial class Ps1Look : Node
 
     private void Tune(Material material, Vector2 resolution)
     {
-        if (material is not ShaderMaterial surface || (surface.Shader != SurfaceShader && surface.Shader != WallFade.MasonryShader && surface.Shader != UnitSight.Shader))
+        if (material is not ShaderMaterial surface || !IsPs1Shader(surface.Shader))
             return;
 
         surface.SetShaderParameter(Snap, Enabled && SnapVertices ? 1f : 0f);
         surface.SetShaderParameter(SnapResolution, resolution);
         surface.SetShaderParameter(Affine, Enabled ? AffineTextures : 0f);
     }
+
+    private bool IsPs1Shader(Shader shader)
+        => shader == SurfaceShader || shader == WallFade.MasonryShader || UnitSight.IsUnitShader(shader);
 }

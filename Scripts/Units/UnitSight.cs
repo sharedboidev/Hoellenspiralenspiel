@@ -8,6 +8,7 @@ namespace Hoellenspiralenspiel.Scripts.Units;
 public static class UnitSight
 {
     private const string ShaderPath        = "res://Shaders/Ps1/ps1_unit.gdshader";
+    private const string CutoutShaderPath  = "res://Shaders/Ps1/ps1_unit_cutout.gdshader";
     private const string SurfaceShaderPath = "res://Shaders/Ps1/ps1_surface.gdshader";
 
     private static readonly StringName SightCenter = "sight_center";
@@ -20,6 +21,9 @@ public static class UnitSight
     private static readonly Shader SurfaceShader = GD.Load<Shader>(SurfaceShaderPath);
 
     public static Shader Shader { get; } = GD.Load<Shader>(ShaderPath);
+
+    //Für Figuren, deren Textur Löcher ins Netz schneidet, etwa das Skelett
+    public static Shader CutoutShader { get; } = GD.Load<Shader>(CutoutShaderPath);
 
     public static Vector3 Center { get; private set; }
 
@@ -37,16 +41,21 @@ public static class UnitSight
             Apply(material);
     }
 
-    //Beide Shader kennen dieselben Werte, nur so lässt sich einer gegen den anderen tauschen
+    public static bool IsUnitShader(Shader shader)
+        => shader == Shader || shader == CutoutShader;
+
+    //Beide Shader kennen dieselben Werte, nur so lässt sich einer gegen den anderen tauschen.
+    //Wer schon einen Shader für Figuren trägt, behält ihn
     public static bool CanAdopt(Material material)
-        => material is ShaderMaterial surface && surface.Shader == SurfaceShader;
+        => material is ShaderMaterial surface && (surface.Shader == SurfaceShader || IsUnitShader(surface.Shader));
 
     //Das eigene Material eines einzelnen Gegners. Wer es nicht mehr braucht, gibt es mit Release zurück
     public static ShaderMaterial CreateOwn(ShaderMaterial source)
     {
         var material = (ShaderMaterial)source.Duplicate();
 
-        material.Shader = Shader;
+        if (!IsUnitShader(material.Shader))
+            material.Shader = Shader;
 
         return Register(material);
     }

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EnemyResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Enemies/EnemyResource.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://b3kq7skel0nmx" path="res://Scenes/Units/Enemies/skeleton.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "skeleton"
+DisplayName = "Skeleton"
+Scene = ExtResource("2_scene")
+LootTableId = "blue_blob_loot"
+StrengthPerLevel = 1.0
+DexterityPerLevel = 0.5
+ConstitutionPerLevel = 1.0
+LifeBonus = 40
+Movementspeed = 90.0
+DamageMin = 3.0
+DamageMax = 5.0
+DamageType = 2
+AttackRange = 40.0
+AttackWindupSec = 0.5
+AttackRecoverySec = 0.75

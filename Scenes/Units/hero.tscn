@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://b6vkaowkmc3ie" path="res://Scripts/Units/Hero.cs" id="hero"]
 [ext_resource type="PackedScene" path="res://Scenes/Units/level_up_effect.tscn" id="level_up"]
 [ext_resource type="AudioStream" uid="uid://sri6stb07ual" path="res://Audio/no mana.mp3" id="no_mana"]
-[ext_resource type="Shader" uid="uid://c2lknp40isk5w" path="res://Shaders/Ps1/ps1_surface.gdshader" id="ps1"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit.gdshader" id="ps1"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.3

@@ -32,6 +32,7 @@
 [ext_resource type="Script" path="res://Scripts/UI/TownPortalBadge.cs" id="45_badge"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/circle_dialog.tscn" id="46_circle_dialog"]
 [ext_resource type="Script" path="res://Scripts/UI/Curtain.cs" id="47_curtain"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit_outline.gdshader" id="48_outline"]
 
 [sub_resource type="Environment" id="Env_level"]
 background_mode = 1
@@ -47,6 +48,13 @@ fog_sky_affect = 0.0
 fog_depth_begin = 38.0
 fog_depth_end = 62.0
 
+[sub_resource type="QuadMesh" id="Mesh_unit_outline"]
+size = Vector2(2, 2)
+
+[sub_resource type="ShaderMaterial" id="Mat_unit_outline"]
+render_priority = 100
+shader = ExtResource("48_outline")
+
 [sub_resource type="ShaderMaterial" id="Mat_screen"]
 shader = ExtResource("14_screen")
 shader_parameter/resolution = Vector2(426, 240)
@@ -58,12 +66,13 @@ background_mode = 1
 ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
 
-[node name="Game" type="Node3D" node_paths=PackedStringArray("Enemies", "Status", "Look", "Descent")]
+[node name="Game" type="Node3D" node_paths=PackedStringArray("Enemies", "Status", "Look", "Descent", "Camera")]
 script = ExtResource("40_game")
 Enemies = NodePath("EnemyController")
 Status = NodePath("Hud/Margin/Rows/Status")
 Look = NodePath("Ps1Look")
 Descent = NodePath("Descent")
+Camera = NodePath("Camera")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Env_level")
@@ -96,10 +105,19 @@ near = 0.1
 far = 150.0
 script = ExtResource("3_camera")
 Target = NodePath("../Hero")
+ViewHeight = 18.0
 
-[node name="Ps1Look" type="Node" parent="." node_paths=PackedStringArray("Screen", "World")]
+[node name="UnitOutline" type="MeshInstance3D" parent="Camera"]
+cast_shadow = 0
+extra_cull_margin = 16384.0
+mesh = SubResource("Mesh_unit_outline")
+material_override = SubResource("Mat_unit_outline")
+
+[node name="Ps1Look" type="Node" parent="." node_paths=PackedStringArray("Screen", "World", "UnitOutline")]
 script = ExtResource("12_look")
+OutlineWidth = 1
 SurfaceShader = ExtResource("13_surface")
+UnitOutline = NodePath("../Camera/UnitOutline")
 Screen = NodePath("../Ps1Screen/Picture")
 World = NodePath("..")
 
@@ -153,7 +171,7 @@ theme_override_font_sizes/font_size = 22
 text = "WASD laufen · Skills über die Leiste · Rechtsklick auf einen Platz belegt ihn
 B Inventar und Ausrüstung · Rechtsklick auf ein Item legt es an · Tab Karte · Alt Namen der Beute
 T Town-Portal · Portale, Treppen und Kellertüren per Klick
-F1 PS1-Look · F2 Kamera · F3 Bildzeilen · F4 Schatten · F5 ganze Karte · F6 Testgelände"
+F1 PS1-Look · F2 Kamera · F3 Bildzeilen · F4 Schatten · F5 ganze Karte · F6 Testgelände · Mausrad Abstand der Kamera"
 
 [node name="LifeOrb" parent="Hud" node_paths=PackedStringArray("player") instance=ExtResource("23_orb")]
 player = NodePath("../../Hero")

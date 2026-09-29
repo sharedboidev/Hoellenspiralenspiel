@@ -5,6 +5,7 @@ using Hoellenspiralenspiel.Scripts.Core.Spatial;
 using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Utils;
+using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
@@ -193,10 +194,16 @@ public partial class LootLabels : Control
     private static void Keep(LootLabel label, LabelBox box, Camera3D camera)
         => label.Offset = new Vector2(box.Left, box.Top) - camera.UnprojectPosition(label.WorldAnchor);
 
-    //Wechselt die Kamera ihre Art oder ihren Ausschnitt, rücken die Beutel auf dem Bildschirm anders zusammen
+    //Wechselt die Kamera ihre Art oder ihren Ausschnitt, rücken die Beutel auf dem Bildschirm anders zusammen.
+    //Die IsoCamera zoomt perspektivisch über den Abstand, nicht über das Sichtfeld
     private bool HasViewChanged(Camera3D camera)
     {
-        var zoom = camera.Projection == Camera3D.ProjectionType.Orthogonal ? camera.Size : camera.Fov;
+        var zoom = camera switch
+        {
+            IsoCamera isoCamera                                => isoCamera.ViewHeight,
+            { Projection: Camera3D.ProjectionType.Orthogonal } => camera.Size,
+            _                                                  => camera.Fov
+        };
 
         if (camera.Projection == lastProjection && Mathf.IsEqualApprox(zoom, lastZoom))
             return false;

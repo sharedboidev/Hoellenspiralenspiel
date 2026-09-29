@@ -14,7 +14,8 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 |---|---|
 | 2D oder 3D | 3D im Look der PlayStation 1, Vorbild Silent Hill. Entschieden am 29.09.2026 nach dem Vergleich. |
 | Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen, auch das Amulett. Nur die Ringe bleiben unsichtbar. Gegner zeigen ihre Ausrüstung, sobald es Gegner mit Armen gibt. Entschieden am 29.09.2026. |
-| Modelle | Starre Teile ohne Skelett. Entschieden am 29.09.2026. |
+| Modelle | Held und humanoide Gegner bekommen ein Skelett mit starrer Gewichtung, in Godot `Skeleton3D`. Blobs und einfache Gegner bleiben bei Knoten und Tweens. Entschieden am 29.09.2026, löst "Starre Teile ohne Skelett" vom selben Tag ab. |
+| Kontrast der Figuren | Held und Gegner tragen einen dunklen Umriss, der Gegner unter der Maus einen roten. Randlicht und Helligkeitskontrast sind verworfen. Entschieden am 29.09.2026 nach einem Vergleich im Spiel. |
 | Spielstruktur | Hub (Stadt) plus Abstieg in einen Höllenkreis mit mehreren Ebenen |
 | Leveldesign | Etwa 90 % prozedural, dazu handgebaute Räume und Event-Locations, die gezielt eingestreut werden |
 | Multiplayer | Singleplayer zuerst, Koop soll später nachrüstbar bleiben |
@@ -47,10 +48,10 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen, Tooltip mit DPS | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
 | Kampf | Zentrale Trefferauflösung, Nahkampf, Schadensarten mit Effekten, Statuseffekte, Tod und Respawn | Seit M2. Frost-Effekt war im PDF leer und ist jetzt Verlangsamung. |
 | Schadensminderung | Rüstungsformel, Resistenzen, Dodge, Parry und Block für alle Einheiten | Seit M4 bringen Schild, Stab und Schwert Block und Parry mit |
-| Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler. Seit M5 sind sie Resources mit Level, Ausrüstung und Verhalten, dazu Elite und Rare Elite mit Mods aus Bausteinen. Seit dem Nachtrag zu M5.5 kollidieren sie miteinander und spawnen verstreut. | Nur Blobs und ein Testgegner |
+| Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler. Seit M5 sind sie Resources mit Level, Ausrüstung und Verhalten, dazu Elite und Rare Elite mit Mods aus Bausteinen. Seit dem Nachtrag zu M5.5 kollidieren sie miteinander und spawnen verstreut. Seit dem 29.09.2026 gibt es als vierten Typ das Skelett mit Knochen und Animationen. | Blobs, ein Testgegner und das Skelett |
 | Wegfindung | Seit M5: Navigationsnetz pro Level, zur Laufzeit gebacken. Gegner und Held laufen um Wände herum | Nicht im PDF |
 | Atmosphäre | Der Held trägt sein Licht, die Umgebung ist dunkel und neblig, dazu der PS1-Look und die Overlay-Karte. Seit M6 zeigt unter der Erde eine gezeichnete Karte, was der Held erkundet hat. | Passt zum düsteren Vibe |
-| 3D | Seit dem 29.09.2026 läuft das ganze Spiel in 3D auf dem unveränderten Kern. Alle Modelle sind Platzhalter aus Grundkörpern. | Offene Frage aus dem PDF, entschieden für 3D |
+| 3D | Seit dem 29.09.2026 läuft das ganze Spiel in 3D auf dem unveränderten Kern. Bis auf das Skelett sind alle Modelle Platzhalter aus Grundkörpern. | Offene Frage aus dem PDF, entschieden für 3D |
 | Level | Seit M6: Ebenen aus handgebauten Räumen und erzeugten Gängen, gesteuert über einen Seed. Ein Thema legt Räume, Aussehen und Gegnerpool fest. | Das PDF nennt nur die Kreise. Es gibt ein Testthema, noch keinen Höllenkreis. |
 | Spielstruktur | Seit M7, Etappe 1: Hauptmenü, Hub mit einem Portal je Kreis, mehrere Ebenen pro Kreis, Treppen, Checkpoints und Town-Portal | Das PDF fragt nach "Town-Portal mechanic mit zwischenversorgen" und lässt die Struktur offen |
 
@@ -833,7 +834,7 @@ Getroffene Designentscheidungen vom 29.09.2026:
 |---|---|
 | 2D oder 3D | 3D im Look der PlayStation 1 |
 | Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen |
-| Modelle | Starre Teile: Kopf, Torso, Arme und Beine sind einzelne Netze ohne Gewichte. Kein Skelett. |
+| Modelle | In M5.5: starre Teile, also Kopf, Torso, Arme und Beine als einzelne Netze ohne Gewichte und ohne Skelett. Danach abgelöst: Held und humanoide Gegner bekommen ein Skelett, siehe "Eigene Modelle". |
 | Sichtbare Plätze | 12 von 16: Waffe, Nebenhand, Helm, Amulett, Schultern, Torso, Rücken, Gürtel, Handgelenke, Hände, Beine, Füße. Nur die vier Ringe bleiben unsichtbar. |
 | Ausrüstung an Gegnern | Ja, sobald es Gegner mit Armen gibt |
 | Kamera | In M5.5 vertagt, vor M6 entschieden: perspektivisch. F2 schaltet zum Vergleich weiter um. |
@@ -1040,13 +1041,226 @@ Bewusst offen gelassen:
 
 ### Eigene Modelle (läuft neben den Meilensteinen)
 
-Ziel: Held, Gegner und Items bekommen eigene Low-Poly-Modelle aus Blender statt der Grundkörper.
+Ziel: Held, Gegner und Items bekommen eigene Low-Poly-Modelle aus Blender statt der Grundkörper. Held und Gegner sollen sich richtig bewegen, also laufen, ausholen und zuschlagen.
 
-- Die Modelle bestehen aus starren Teilen ohne Skelett.
-- Der Held braucht die Knoten `Visual`, `Visual/Body`, `Visual/WeaponPivot` und die Befestigungspunkte mit dem Namen `Attach` plus Platz.
-- Ein Gegner braucht `Visual` und `Visual/Body`. An `Body` hängen Klickfläche und das Färben beim Ausholen.
+Stand 29.09.2026: Das Skelett ist als erster Gegner mit Skelett und Animationen umgesetzt, auf `master_Skeleton3D`. Held, Blobs und Testgegner sind weiter Platzhalter aus Grundkörpern.
+
+#### Entscheidung vom 29.09.2026: Skelett für Held und humanoide Gegner
+
+| Frage | Entscheidung |
+|---|---|
+| Held und humanoide Gegner | Ein Netz mit Skelett, in Godot `Skeleton3D` mit `AnimationPlayer` |
+| Gewichtung | Starr: Jeder Punkt hängt an genau einem Knochen. Das Modell bewegt sich dadurch wie starre Teile. |
+| Blobs und einfache Gegner | Bleiben bei Knoten und Tweens. Beides läuft im selben Spiel nebeneinander. |
+| Ausrüstung | Hängt an einem `BoneAttachment3D` mit dem Namen `Attach` plus Platz |
+| Platzhalter aus Grundkörpern | Bleiben, bis ein Modell aus Blender sie ersetzt |
+
+Die Entscheidung löst "Starre Teile ohne Skelett" aus M5.5 ab. Einen Grund für die alte Entscheidung hält die Roadmap nicht fest. Anlass für die neue war das erste fremde Modell, ein Skelett-Gegner mit fertigem Rig.
+
+Starre Teile lassen sich auch ohne Skelett animieren. In Godot dreht der `AnimationPlayer` dann Knoten, und jedes Gelenk braucht einen eigenen Drehpunkt wie `WeaponPivot`. In Blender hängen die Teile als Objekte aneinander. Das ist ein Skelett von Hand, nur aus Knoten statt Knochen. Dem Helden aus Grundkörpern fehlen dafür die Drehpunkte der Beine, Knie hat er keine.
+
+| Punkt | Starre Teile als Knoten | `Skeleton3D` |
+|---|---|---|
+| Fertige Animationen aus Mixamo oder freien Paketen | Nicht nutzbar, das sind Knochenanimationen | Nutzbar |
+| Animation zwischen Figuren teilen | Nur bei gleichen Knotennamen und gleichem Aufbau | Per Retargeting |
+| Netze pro Figur | Eines pro Körperteil, bei einem Humanoiden rund 15 | Eines |
+| Arbeit in Blender | Teile anordnen und verketten | Zusätzlich Knochen anlegen und jedes Teil einem Knochen zuweisen |
+| PS1-Look | Ja | Ja, bei starrer Gewichtung |
+
+Nach dem [Vergleich](VERGLEICH_2D_3D.md) zählt für die Bildrate nach den Schatten die Zahl der Netze. Was das Skinning kostet, ist nicht gemessen.
+
+#### Vorgaben für ein Modell
+
+Für alle Modelle:
+
+- Material ist ein Shader aus `Shaders/Ps1`, Texturen sind klein und ungefiltert. Die Umgebung nimmt `ps1_surface`, Held, Gegner und getragene Items nehmen `ps1_unit`. Nur so bekommen sie den Umriss, siehe "Kontrast der Figuren". Hat die Textur einer Figur durchsichtige Stellen, nimmt man `ps1_unit_cutout`. Dort schneidet der Alphakanal Löcher ins Netz, etwa zwischen die Rippen.
+- Beim Import einer Textur steht `detect_3d/compress_to` auf 0, sonst komprimiert Godot sie beim ersten Einsatz in 3D verlustbehaftet.
 - Die Kollisionsform eines Gegners ist eine Kapsel mit dem Radius des Modells plus 3 cm, Maske 11. Sie ist so hoch, dass ein gerader Teil bleibt, sonst schieben sich Körper verschiedener Größe nach oben und unten weg.
-- Material ist der Shader `Shaders/Ps1/ps1_surface.gdshader`, Texturen sind klein und ungefiltert.
+- Jede Einheit braucht den Knoten `Visual`. Er dreht sich in Blickrichtung.
+
+Für Modelle mit Skelett:
+
+- Ein Netz und eine Armature. Jeder Punkt hängt mit Gewicht 1 an genau einem Knochen. Übergänge wie der Hals dürfen sich zwei Knochen teilen, damit keine Lücke aufreißt.
+- Das Netz heißt `Body`. Daran hängen Klickfläche und das Färben beim Ausholen, der Code findet es auch tief im importierten Modell.
+- Ein einziger Wurzelknochen an der Hüfte. Oberkörper und beide Beine hängen daran.
+- Knochen einer Seite enden auf `.L` und `.R`. Nur dann spiegelt Blender eine Pose auf die andere Seite.
+- Das Modell schaut in Blender nach -Y. In Godot schaut es danach nach +Z, die Szene dreht es deshalb um 180 Grad.
+- Die Animationen heißen `Idle-loop`, `Walk-loop`, `AttackWindup`, `AttackRecover` und `Death`. Fehlt eine davon, bleibt die Einheit beim Tween für Angriff oder Tod.
+- Die Laufanimation spielt auf der Stelle, den Körper bewegt der Code. Die Endung `-loop` stellt Godot beim Import auf Schleife und schneidet sie vom Namen ab.
+- Der Angriff sind zwei Animationen. `AttackWindup` endet im Moment des Treffers, `AttackRecover` beginnt dort. So braucht der Code keine Angabe, wann der Treffer fällt.
+- Jede Action bekommt in Blender einen "Fake User". Sonst verwirft Blender beim Speichern die Actions, die gerade nicht zugewiesen sind.
+- Ins Repo kommt die exportierte `.glb` mit Animationen unter `Models`. Die `.blend` liegt unter `Models/Source`, dort übergeht Godot sie wegen einer `.gdignore`. Sonst verlangte Godot Blender bei jedem, der das Projekt öffnet.
+- Export aus Blender als glTF-Binärdatei: Modifier anwenden, keine Materialien, Animationen im Modus "Actions", Beginn jeder Animation auf 0 schieben. Das Material setzt die Szene in Godot.
+- Beim Import stehen die LODs aus. Godot vereinfacht das Netz sonst mit dem Abstand und zerreißt dabei die Alpha-Maske.
+- Die Szene setzt `WalkCycleSpeed` am Wurzelknoten: So viele Meter pro Sekunde legt die Laufanimation bei normalem Tempo zurück.
+- Befestigungspunkte sind `BoneAttachment3D` mit dem Namen `Attach` plus Platz, etwa `AttachHelmet` am Kopf. Paarige Plätze enden wie bisher auf `Left` und `Right`.
+
+Für Modelle ohne Skelett, also Blobs und einfache Gegner:
+
+- Ein Gegner braucht `Visual` und `Visual/Body`. An `Body` hängen Klickfläche und das Färben beim Ausholen.
+
+#### Umbau im Code
+
+Die Animationen spielt [UnitAnimations.cs](../Scripts/Units/UnitAnimations.cs). `BaseUnit` sucht beim Start einen `AnimationPlayer` unter `Visual`. Findet es keinen, bleibt alles beim Alten.
+
+| Stelle | Vorher | Jetzt |
+|---|---|---|
+| `MeasurePickVolume` in [BaseUnit.cs](../Scripts/Units/BaseUnit.cs) | Suchte `Visual/Body` und misst daran die Klickfläche | Sucht `Body` in allen Ebenen unter `Visual`. Die Lage rechnet es über die Transformationen bis `Visual` aus. |
+| `OwnBodyMaterial` in [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs) | Suchte `Visual/Body` | Nimmt dieselbe Suche |
+| `MoveOnGround` in [BaseUnit.cs](../Scripts/Units/BaseUnit.cs) | Nur Bewegung | Spielt `Walk` mit einem Tempo aus tatsächlicher Geschwindigkeit, `WalkCycleSpeed` und Größe des Körpers. Unter 10 % davon spielt `Idle`. |
+| `StandStill` in [BaseUnit.cs](../Scripts/Units/BaseUnit.cs) | Neu | Hält an und spielt `Idle`. Ein Gegner ohne Bewegungsziel ruft es auf. |
+| `BeginAttackLook` in [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs) | Vorstoß um 0,3 m per Tween | Mit Animationen `AttackWindup` statt Tween. Die Färbung beim Ausholen bleibt. |
+| `Strike` in [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs) | Treffer | Startet vor dem Treffer `AttackRecover` |
+| `EndAttackLook` in [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs) | Setzte den Vorstoß zurück | Kehrt zusätzlich zu `Idle` zurück |
+| `BeginDeath` in [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs) | Zusammensacken per Tween | Mit Animationen `Death`, danach bleibt der Körper 0,5 s liegen |
+| `SetAwake` und `SetSeen` in [Enemy.cs](../Scripts/Units/Enemies/Enemy.cs) | Hielten nur Denken und Anzeige an | Halten auch die Animation an. Sie läuft nur, wenn der Gegner wach und zu sehen ist. |
+| `PlaySwingLook` in [Hero.cs](../Scripts/Units/Hero.cs) | Dreht `WeaponPivot` per Tween, getrennt nach Hieb und Schuss | Unverändert, bis der Held ein Modell hat. Dann je eine Animation für Hieb und Schuss. |
+| `Die` in [Hero.cs](../Scripts/Units/Hero.cs) | Legt `Visual` um 90 Grad um | Unverändert, bis der Held ein Modell hat |
+| [WornItems.cs](../Scripts/Units/WornItems.cs) | Sucht unter `Visual` alle `Node3D`, deren Name mit `Attach` plus Platz beginnt | Bleibt. Ein `BoneAttachment3D` ist ein `Node3D`. |
+
+Zum Zeitpunkt des Treffers:
+
+- Beim Gegner fällt der Treffer ans Ende des Ausholens. Die Dauer steht als `AttackWindupSec` und `AttackRecoverySec` an der `EnemyResource` und schrumpft mit dem Angriffstempo.
+- `AttackWindup` spielt mit dem Tempo Länge der Animation durch Dauer des Ausholens. Mit dem Treffer wechselt es zu `AttackRecover`, dessen Tempo sich genauso aus der Dauer des Erholens ergibt. Der Treffer fällt damit auf das Ende von `AttackWindup`, egal wie schnell der Gegner angreift.
+- Beim Helden fällt der Treffer nach dem Anteil `ImpactFraction` der Schwungzeit, heute nach der Hälfte. Er braucht dieselbe Teilung, sobald er ein Modell hat.
+
+#### Skelett-Gegner (umgesetzt am 29.09.2026 auf `master_Skeleton3D`)
+
+Das Modell ist "Retro Lowpoly PSX Skeleton" von LonesomeDucky von Blendswap, Lizenz CC-BY. Die Namensnennung steht in der [README](../README.md). Das Modell ist nach dem "Anatomically Correct Skeleton" von xandizandi auf Sketchfab entstanden. Dieses lässt sich nicht mehr herunterladen und zeigt keine Lizenz. Der Autor erlaubt in den Kommentaren Änderungen mit Namensnennung, deshalb nennt die README auch ihn.
+
+| Punkt | Befund |
+|---|---|
+| Version | Gespeichert mit Blender 4.3. Blender 3.1 stürzt beim Öffnen ab, bearbeitet ist es mit Blender 4.5.14 LTS. |
+| Netz | 585 Punkte, 882 Flächen, 1,73 m hoch, Arme hängen seitlich herab |
+| Rig | Armature mit 19 Knochen, dazu 19 Vertex-Gruppen mit denselben Namen |
+| Gewichte | 570 Punkte hängen an genau einem Knochen. 15 Punkte am Hals teilen sich `Torso` und `Neck` und bleiben so, sie schließen den Übergang. |
+| Textur | 256 × 256 Pixel, 118 Farben, ungefiltert. 68 % der Textur sind durchsichtig, das sind die Lücken zwischen den Knochen. |
+| Material in Blender | Die Textur mit einer harten Alpha-Maske bei 0,5, die Rückseiten ausgeblendet. `ps1_unit_cutout` bildet das nach, bis zum Kontrast der Figuren hieß der Shader `ps1_cutout`. |
+
+Geändert habe ich:
+
+- Ein neuer Knochen `Root` an der Hüfte trägt `Torso`, `Hip.L` und `Hip.R`. Er verformt nichts.
+- Das Netz heißt `Body`.
+- Fünf Actions mit "Fake User", die Posen hat ein Skript in Blender gesetzt. Nachbessern lassen sie sich von Hand in `Models/Source/skeleton.blend`.
+
+Aufbau der Knochen:
+
+```
+Root
+  Torso
+    Neck -> Head
+    Shoulder.L -> UpperArm.L -> LowerArm.L -> Hand.L
+    Shoulder.R -> UpperArm.R -> LowerArm.R -> Hand.R
+  Hip.L -> UpperLeg.L -> LowerLeg.L -> Foot.L
+  Hip.R -> UpperLeg.R -> LowerLeg.R -> Foot.R
+```
+
+Die Animationen, bei 24 Bildern pro Sekunde:
+
+| Animation | Länge | Inhalt |
+|---|---|---|
+| `Idle` | 2 s, Schleife | Leicht gebeugt, atmet und neigt den Kopf |
+| `Walk` | 1 s, Schleife | Ein schlurfender Gang mit Posen für Aufsetzen und Durchgang, die zweite Hälfte gespiegelt. Bei normalem Tempo legt er 1,1 m/s zurück. |
+| `AttackWindup` | 0,5 s | Holt den rechten Arm über den Kopf, dreht den Oberkörper zurück und schlägt bis zum Treffer nach vorn unten |
+| `AttackRecover` | 0,75 s | Schwingt nach und kehrt in die Ruhe zurück |
+| `Death` | 1 s | Knie knicken ein, der Körper fällt nach hinten und bleibt mit ausgebreiteten Armen liegen |
+
+Werte des Gegners in `Resources/Enemies/skeleton.tres`:
+
+| Wert | Stand |
+|---|---|
+| Waffe | Klauen, 3 bis 5 Schaden Slash, Reichweite 40 Pixel |
+| Ausholen und Erholen | 0,5 s und 0,75 s, gleich lang wie die Animationen. Bei normalem Angriffstempo spielen beide in normalem Tempo. |
+| Bewegung | 90 Pixel pro Sekunde, die Laufanimation spielt damit mit 0,82-fachem Tempo |
+| Leben und Attribute | 40 Leben zusätzlich. Stärke, Geschick und Konstitution wachsen pro Level wie beim Yellow Blob. |
+| Beute | Tabelle der Blobs |
+| Körper | Kapsel mit 0,35 m Radius und 1,75 m Höhe, Lebensbalken auf 2 m |
+
+Das Skelett erscheint an einem neuen Spawn-Marker mit drei Stück und im Gegnerpool des Testkreises mit Gewicht 2 ab Bereichslevel 1. Der Marker stand im Testlevel und steht seit dem Merge mit M7 im Testgelände, `Scenes/Places/test_grounds.tscn`.
+
+Stand des Fertig-Kriteriums: erfüllt. Die 692 Unit-Tests sind grün. Eine Laufzeitprüfung mit 31 Schritten im Testlevel lief achtmal hintereinander fehlerfrei, darunter mit zufälligen Elite- und Rare-Elite-Skeletten. Dazu kamen Bildschirmfotos aus dem laufenden Spiel und Renderbilder aller Posen aus Blender.
+
+Die Laufzeitprüfung deckt ab:
+
+- Aufbau: `Body` liegt unter dem `Skeleton3D`, jedes Skelett hat sein eigenes Material mit `ps1_cutout`, Klickhöhe 1,73 m, Körperradius 0,35 m, jeweils bezogen auf die Größe.
+- Animationen: alle fünf vorhanden, `Idle` und `Walk` als Schleife.
+- Laufen: Beim Verfolgen spielt `Walk` mit 0,82-fachem Tempo bei 0,9 m/s.
+- Angriff: Das Ausholen dauerte 0,483 s. `AttackWindup` stand kurz vor dem Treffer bei 0,486 von 0,5 s. Mit dem Treffer beginnt `AttackRecover` bei 0. Der rechte Oberarm dreht sich dabei um 155 Grad, das Skelett bewegt sich also wirklich.
+- Nach dem Angriff geht es mit `Idle` oder `Walk` weiter.
+- Tod: `Death` spielt, nach 1,3 s liegt der Körper noch, nach Animation und 0,5 s ist er entfernt.
+- Schlaf: Ein ferner, ruhender Gegner hält seine Animation an. Kommt der Held näher, läuft sie wieder.
+- Rare Elite: 1,5-mal so groß, die Laufanimation spielt entsprechend langsamer.
+- Blue Blob: kein `AnimationPlayer`, der Vorstoß beim Ausholen und das Zusammensacken beim Tod laufen weiter per Tween.
+
+Die Prüfszenen sind wie bei den Meilensteinen wieder gelöscht.
+
+Bekannte Einschränkungen:
+
+- Was 200 Gegner mit Skelett an Bildrate kosten, ist nicht gemessen.
+- Das Skelett fällt beim Tod 0,4 m nach hinten und liegt bis zu 2 m hinter seinem Platz. Steht es mit dem Rücken zur Wand, ragt die Leiche in die Mauer.
+- Das Skelett hat Arme, trägt aber noch keine Ausrüstung. Dafür fehlen `BoneAttachment3D` an den Händen und Gegner mit Waffen in den Daten.
+- Ein Rare Elite leuchtet wie alle Elite in der Farbe seines Namens. Beim Skelett färbt das den ganzen Körper gelb.
+- Zauber und Fernkampf haben keine eigene Animation. Ein Skelett mit Skill spielt dafür dieselbe Angriffsanimation.
+
+Nachtrag: `Ps1Look` stimmte `ps1_cutout` nicht ab. Das Skelett rastete deshalb immer auf 240 Zeilen ein, auch mit F1 oder F3. Behoben auf `master_Skeleton3D`.
+
+### Kontrast der Figuren (umgesetzt am 29.09.2026 auf `master_UnitContrast`)
+
+Ziel: Held und Gegner heben sich von der Umgebung ab.
+
+Im Spiel verglichen habe ich fünf Wege, in derselben eingefrorenen Szene:
+
+| Weg | Befund |
+|---|---|
+| Umriss um alle Figuren, der Gegner unter der Maus rot | Hebt helle und mittlere Figuren klar vom Boden ab. Beim dunklen Helden bringt Schwarz wenig, im Dunkeln ist der Rand unsichtbar. |
+| Umriss nur beim Anvisieren | Hilft beim Zielen, nicht beim Überblick |
+| Randlicht an den Kanten | Die stärkste Trennung, macht aber Gegner außerhalb des Lichts sichtbar. Die Kästen des Helden wirken grau. |
+| Helligkeitskontrast: Boden und Mauern dunkler und blasser | Das Bild wird 25 bis 28 % dunkler, die Figuren heben sich kaum stärker ab |
+| Umriss und Randlicht | Die klarste Trennung, mit dem Nachteil des Randlichts |
+
+Entschieden ist der erste Weg. Die anderen sind wieder entfernt.
+
+| Punkt | Umsetzung |
+|---|---|
+| Markierung | Held, Gegner und getragene Items nehmen `ps1_unit` oder `ps1_unit_cutout`. Sie schreiben 0,4 in den Rauheitskanal, der Gegner unter der Maus 0,7. Die Umgebung hat 1, der leere Hintergrund 0. Ohne Glanzlicht spielt die Rauheit für das Aussehen keine Rolle. |
+| Rand | Ein Rechteck an der Kamera liegt über dem ganzen Bild, Shader `ps1_unit_outline`. Es liest Rauheit und Tiefe und färbt jede Zelle des PS1-Rasters, neben der eine Figur liegt. |
+| Verdeckung | Der Rand entsteht nur, wo die Figur vor dem liegt, was an der Stelle zu sehen ist. Eine Mauer vor einer Figur bekommt keinen Rand. |
+| Rippen | Die Lücken zwischen den Knochen schreiben keine Marke. Der Rand läuft deshalb auch innen um die Knochen, schmale Lücken füllt er ganz. |
+| Breite | `OutlineWidth` am Knoten `Ps1Look`, in Pixeln der PS1, von 0 bis 4. 0 schaltet den Rand samt Rechteck ab. Der Wert lässt sich im laufenden Spiel verstellen. |
+| Farben | `outline_color` und `highlight_color` am Material des Rechtecks `Camera/UnitOutline` |
+| Anvisieren | Der Held sucht jeden Physik-Frame den Gegner unter der Maus, wie beim Anklicken, und setzt an dessen Netzen `highlight` |
+
+Kosten, gemessen im Testlevel bei 2560 × 1440 mit 40 Gegnern, je ein Lauf:
+
+| Breite | Bilder pro Sekunde | Zeit pro Bild |
+|---|---|---|
+| 0 | 425 | |
+| 1 | 358 | 0,4 ms mehr |
+| 2 | 282 | 1,2 ms mehr |
+| 3 | 241 | 1,8 ms mehr |
+
+Die Kosten hängen nicht von der Zahl der Gegner ab, nur von der Bildgröße und der Breite. Jedes Bildpixel prüft bei Breite 1, 2 und 3 bis zu 4, 20 und 36 Nachbarzellen.
+
+Zum Testen der Kameradistanz verstellt das Mausrad die Sichthöhe der Kamera in Schritten von 2 m, zwischen 6 und 40 m. Die Statuszeile zeigt Sichthöhe und Abstand. Bisher waren es 18 m Sichthöhe aus 28,5 m Abstand. Startwert, Grenzen und Schritt stehen als `ViewHeight`, `MinViewHeight`, `MaxViewHeight` und `ZoomStep` an der Kamera. Die Schilder der Beute ordnen sich nach jedem Schritt neu.
+
+Stand: Die Laufzeitprüfung mit 14 Schritten lief fehlerfrei. Sie deckt das Mausrad samt Grenzen und Statuszeile ab, dazu die Breiten 0 bis 3 im Material und die Sichtbarkeit des Rechtecks. Die 692 Unit-Tests sind grün. Dazu kamen Bildschirmfotos aller Breiten und dreier Kameradistanzen.
+
+Offen:
+
+- Welcher Gegner unter der Maus liegt, entscheidet dieselbe Suche wie beim Anklicken. Mit echter Maus geprüft habe ich das nicht, die Bilder setzen die Markierung direkt.
+- Beim dunklen Helden ist der Rand kaum zu sehen.
+- Ob die Maus einen Gegner trifft, folgt weiter seiner Klickfläche, nicht dem Rand.
+
+Nachtrag vom 29.09.2026, Merge mit M7 Etappe 1:
+
+| Punkt | Lösung |
+|---|---|
+| `ps1_unit` gab es auf beiden Seiten | M7 blendet damit Gegner am Rand der Sicht ein. Beides steht jetzt in `ps1_unit.gdshaderinc` und gilt auch für `ps1_unit_cutout`. |
+| Einblenden | Solange eine Figur über das Punktmuster einblendet, trägt sie keine Marke. Sonst bekäme jedes Loch im Muster einen eigenen Rand. Der Umriss kommt, sobald sie ganz zu sehen ist. |
+| `UnitSight` | Nimmt neben `ps1_surface` auch Materialien an, die schon einen Figuren-Shader tragen, und behält ihn. Nur so behält das Skelett seine Alpha-Maske. `UnitSight` kennt dazu `ps1_unit_cutout`. |
+| `Enemy.OwnMaterials` | Findet `Body` wie `BaseUnit` auch tief im importierten Modell |
+| Aura der Elite | Nimmt seit M7 `ps1_unit`. Der Ring schaltet mit `outlined = false` seine Marke ab, sonst bekäme er einen Umriss. |
+| Szenen | Umriss-Rechteck, `OutlineWidth` und die Anzeige der Kamera sitzen in `Scenes/game.tscn`. `Ps1Look` braucht keine eigenen Felder für die Figuren-Shader mehr, es fragt `UnitSight`. |
 
 ### M6: Prozedurale Level mit handgebauten Räumen (L, umgesetzt am 29.09.2026 auf `master_ProceduralLevels`)
 

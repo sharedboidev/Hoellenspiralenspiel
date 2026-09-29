@@ -81,6 +81,9 @@ public partial class EliteAura : Node3D
         ringMaterial.SetShaderParameter("emission", color);
         ringMaterial.SetShaderParameter("emission_energy", RingEnergy);
 
+        //Der Ring liegt am Boden und gehört nicht zur Figur, er bekommt keinen Umriss
+        ringMaterial.SetShaderParameter("outlined", false);
+
         return new MeshInstance3D
         {
             Name             = "Ring",
