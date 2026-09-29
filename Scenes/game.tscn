@@ -33,6 +33,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/UI/circle_dialog.tscn" id="46_circle_dialog"]
 [ext_resource type="Script" path="res://Scripts/UI/Curtain.cs" id="47_curtain"]
 [ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit_outline.gdshader" id="48_outline"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/pause_menu.tscn" id="49_pause_menu"]
 
 [sub_resource type="Environment" id="Env_level"]
 background_mode = 1
@@ -45,8 +46,8 @@ fog_mode = 1
 fog_light_color = Color(0.05, 0.025, 0.02, 1)
 fog_density = 1.0
 fog_sky_affect = 0.0
-fog_depth_begin = 38.0
-fog_depth_end = 62.0
+fog_depth_begin = 31.7
+fog_depth_end = 55.7
 
 [sub_resource type="QuadMesh" id="Mesh_unit_outline"]
 size = Vector2(2, 2)
@@ -100,12 +101,12 @@ Movementspeed = 500.0
 transform = Transform3D(0.70710677, -0.35355338, 0.61237246, 0, 0.8660254, 0.5, -0.70710677, -0.35355338, 0.61237246, 24.5, 20, 24.5)
 projection = 1
 current = true
-size = 18.0
+size = 14.0
 near = 0.1
 far = 150.0
 script = ExtResource("3_camera")
 Target = NodePath("../Hero")
-ViewHeight = 18.0
+ViewHeight = 14.0
 
 [node name="UnitOutline" type="MeshInstance3D" parent="Camera"]
 cast_shadow = 0
@@ -283,6 +284,12 @@ Descent = NodePath("../../Descent")
 [node name="CircleDialog" parent="Hud" instance=ExtResource("46_circle_dialog")]
 unique_name_in_owner = true
 visible = false
+
+[node name="PauseMenu" parent="Hud" node_paths=PackedStringArray("Game", "WindowRoot") instance=ExtResource("49_pause_menu")]
+unique_name_in_owner = true
+visible = false
+Game = NodePath("../../GameController")
+WindowRoot = NodePath("..")
 
 [node name="Curtain" type="ColorRect" parent="Hud"]
 z_index = 200

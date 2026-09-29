@@ -29,6 +29,9 @@ public partial class Hero
     public const int InventoryWidth  = 14;
     public const int InventoryHeight = 5;
 
+    //Auf dieser Ebene liegt der Körper des Helden samt Ausrüstung. Sein eigenes Licht wirft davon keinen Schatten
+    public const uint BodyLayer = 1u << 18;
+
     private const float  ImpactFraction     = 0.5f;
     private const float  EngageFraction     = 0.9f;
     private const int    NoSlot             = -1;
@@ -185,7 +188,10 @@ public partial class Hero
         levelUpEffect = GetNodeOrNull<LevelUpEffect>("LevelUpEffect");
 
         if (light is not null)
-            lightBaseRange = light.OmniRange;
+        {
+            lightBaseRange          =  light.OmniRange;
+            light.ShadowCasterMask &= ~BodyLayer;
+        }
 
         ApplyLightRadius();
         AssignStartingSkills();
@@ -195,9 +201,38 @@ public partial class Hero
             wornItems = new WornItems(Visual);
 
             wornItems.ShowAll(Items.Equipment);
+
+            MarkBody(Visual);
+
+            GetTree().NodeAdded += OnNodeAdded;
         }
 
         LifeChanged += OnLifeChanged;
+    }
+
+    public override void _ExitTree()
+    {
+        base._ExitTree();
+
+        if (Visual is not null)
+            GetTree().NodeAdded -= OnNodeAdded;
+    }
+
+    //Angelegte Ausrüstung kommt später dazu und gehört ebenso zum Körper
+    private void OnNodeAdded(Node node)
+    {
+        if (Visual.IsAncestorOf(node))
+            MarkBody(node);
+    }
+
+    //Nur auf dieser Ebene: Ein Licht wirft den Schatten eines Meshs, sobald eine seiner Ebenen in der Maske steht
+    private static void MarkBody(Node node)
+    {
+        if (node is GeometryInstance3D geometry)
+            geometry.Layers = BodyLayer;
+
+        foreach (var child in node.GetChildren())
+            MarkBody(child);
     }
 
     protected override void ApplyBaseValues(StatSheet sheet)

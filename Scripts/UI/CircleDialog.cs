@@ -8,7 +8,7 @@ using Hoellenspiralenspiel.Scripts.Units;
 namespace Hoellenspiralenspiel.Scripts.UI;
 
 //Öffnet sich am Portal eines Kreises und bietet seine Checkpoints an
-public partial class CircleDialog : Control
+public partial class CircleDialog : Control, IClosableWindow
 {
     private const string NewDescentText     = "New Descent";
     private const string ConfirmDescentText = "Reroll all levels?";
@@ -55,15 +55,7 @@ public partial class CircleDialog : Control
             Close();
     }
 
-    public override void _UnhandledInput(InputEvent @event)
-    {
-        if (!Visible || !@event.IsActionPressed("ui_cancel"))
-            return;
-
-        Close();
-
-        GetViewport().SetInputAsHandled();
-    }
+    public bool IsOpen => Visible;
 
     public void ShowFor(CirclePortal usedPortal, DescentState state, Hero user)
     {

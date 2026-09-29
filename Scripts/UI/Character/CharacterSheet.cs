@@ -5,7 +5,7 @@ using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
-public partial class CharacterSheet : Control
+public partial class CharacterSheet : Control, IClosableWindow
 {
     [Export] private EquipmentPanel equipmentPanel;
     private          IHero          hero;
@@ -93,6 +93,10 @@ public partial class CharacterSheet : Control
         if (hero is not null && Input.IsActionJustPressed(InputActions.ToggleCharacterSheet))
             ToggleVisibility();
     }
+
+    public bool IsOpen => Visible;
+
+    public void Close() => Hide();
 
     private void ToggleVisibility()
     {

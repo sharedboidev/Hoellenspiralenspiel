@@ -7,7 +7,7 @@ using Hoellenspiralenspiel.Scripts.World.Levels;
 namespace Hoellenspiralenspiel.Scripts.UI;
 
 //Die gezeichnete Karte einer erzeugten Ebene. Sie liest den Grundriss und zeigt, was der Held schon gesehen hat
-public partial class LevelMap : Control
+public partial class LevelMap : Control, IClosableWindow
 {
     private const float HeroMarkMeters = 1.2f;
     private const float ExitMarkMeters = 1.6f;
@@ -83,6 +83,17 @@ public partial class LevelMap : Control
     {
         if (@event is InputEventKey { Pressed: true, Echo: false, Keycode: Key.F5 })
             ToggleShowsEverything();
+    }
+
+    //Über der Erde steht die Karte der Oberfläche für diese hier
+    public bool IsOpen => Visible || (SurfaceMap?.GetParent<SubViewportContainer>().Visible ?? false);
+
+    public void Close()
+    {
+        Visible = false;
+
+        if (SurfaceMap is not null)
+            SurfaceMap.GetParent<SubViewportContainer>().Visible = false;
     }
 
     public void ToggleShowsEverything()

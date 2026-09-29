@@ -22,8 +22,8 @@ public partial class Ps1Look : Node
     private static readonly StringName DitherKey       = "dither";
     private static readonly StringName OutlineWidthKey = "outline_width";
 
-    private readonly Dictionary<Light3D, bool> shadowOfLight = new();
-    private          int                       outlineWidth  = 1;
+    private readonly Dictionary<Light3D, (bool HadShadow, uint CasterMask)> shadowOfLight = new();
+    private          int                                                    outlineWidth  = 1;
 
     [Export]
     public bool Enabled { get; set; } = true;
@@ -46,7 +46,7 @@ public partial class Ps1Look : Node
 
     //Die PS1 kannte keine Schatten aus Lichtern, Figuren standen auf dunklen Scheiben
     [Export]
-    public bool RealShadows { get; set; }
+    public bool RealShadows { get; set; } = true;
 
     //Breite des Rands um Held und Gegner in Pixeln der PS1, 0 schaltet ihn ab. Lässt sich im laufenden Spiel verstellen
     [Export(PropertyHint.Range, "0,4,1")]
@@ -195,12 +195,12 @@ public partial class Ps1Look : Node
 
                 break;
             case Light3D light:
-                if (!shadowOfLight.TryGetValue(light, out var hadShadow))
-                    shadowOfLight[light] = hadShadow = light.ShadowEnabled;
+                if (!shadowOfLight.TryGetValue(light, out var original))
+                    shadowOfLight[light] = original = (light.ShadowEnabled, light.ShadowCasterMask);
 
                 //Kein Licht scheint durch Mauern. Die Schatten von allem anderen wirft ein Licht nur, wenn es das von sich aus tut und der Look sie zulässt
                 light.ShadowEnabled    = true;
-                light.ShadowCasterMask = hadShadow && (!Enabled || RealShadows) ? uint.MaxValue : WallSegment.ShadowLayer;
+                light.ShadowCasterMask = original.HadShadow && (!Enabled || RealShadows) ? original.CasterMask : WallSegment.ShadowLayer;
 
                 break;
         }

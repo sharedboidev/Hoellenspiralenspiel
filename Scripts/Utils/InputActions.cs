@@ -15,6 +15,8 @@ public static class InputActions
     public static readonly StringName ToggleOverlayMap     = "toggle_overlay_map";
     public static readonly StringName ToggleLootLabels     = "toggle_loot_labels";
     public static readonly StringName OpenTownPortal       = "open_town_portal";
+    public static readonly StringName TogglePauseMenu      = "toggle_pause_menu";
+    public static readonly StringName CloseWindows         = "close_windows";
 
     public static readonly StringName[] SkillSlots =
     [

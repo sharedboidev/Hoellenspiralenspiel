@@ -4,7 +4,7 @@ using Hoellenspiralenspiel.Interfaces;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
-public partial class LevelUpDialog : Control
+public partial class LevelUpDialog : Control, IClosableWindow
 {
     private          IHero hero;
     [Export] private Node  player;
@@ -20,8 +20,12 @@ public partial class LevelUpDialog : Control
         SetPositionInViewport();
     }
 
+    public bool IsOpen => Visible;
+
     public void ShowDialog()
         => Visible = true;
+
+    public void Close() => Hide();
 
     private void SubscribeClickEvents()
     {

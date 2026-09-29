@@ -9,7 +9,7 @@ public partial class IsoCamera : Camera3D
     private float             fogEnd;
     private Godot.Environment fogEnvironment;
     private Vector3           offset;
-    private float             viewHeight = 18f;
+    private float             viewHeight = 14f;
 
     [Export]
     public Node3D Target { get; set; }
@@ -28,7 +28,7 @@ public partial class IsoCamera : Camera3D
     public float MinViewHeight { get; set; } = 6f;
 
     [Export]
-    public float MaxViewHeight { get; set; } = 40f;
+    public float MaxViewHeight { get; set; } = 14f;
 
     [Export]
     public float ZoomStep { get; set; } = 2f;
