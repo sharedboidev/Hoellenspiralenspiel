@@ -105,7 +105,7 @@ public partial class SkillProjectile : Area3D
 
     private static float GetDistanceSquaredPx(Vector3 origin, BaseUnit unit)
     {
-        var distancePx = WorldScale.GroundDistancePx(origin, unit.GlobalPosition);
+        var distancePx = unit.DistancePxTo(origin);
 
         return distancePx * distancePx;
     }

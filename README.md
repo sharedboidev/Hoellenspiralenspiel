@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-560_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-599_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -100,6 +100,7 @@ Beispiel: 14 % und 22 % increased von der Ausrüstung, dazu 2,97 % more aus Inte
 | Trefferauflösung | Jeder Treffer läuft durch dieselbe Kette: Treffen, Ausweichen, Parry, Block, Krit, Minderung |
 | Nahkampf | Klick auf einen Gegner, der Held läuft hin und schlägt im Takt der Waffe zu |
 | Fernkampf | Mit einem Bogen läuft der Held in Reichweite und schießt. Ohne Gegner unter der Maus schießt er in ihre Richtung |
+| Reichweiten | Zählen vom Rand des Körpers bis zum Rand des Ziels. Ein großer Elite ist so gut zu erreichen wie ein kleiner Blob |
 | ATTACK und SPELL | Attacks skalieren mit dem Waffenschaden, Spells bringen eigenen Grundschaden mit |
 | Sechs Schadensarten | Crush, Pierce, Slash, Fire, Frost, Lightning, jede mit eigenem Effekt |
 | Statuseffekte | Stapelnder Bleed und Burn, Shock mit Fehlschlägen, Chill mit Verlangsamung |
@@ -187,7 +188,8 @@ Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
 | Drei Gegnertypen | Blue Blob mit Frost, Yellow Blob mit Blitz und ein Testgegner, der Feuer spuckt |
 | Gegner als Daten | Jeder Gegner ist eine Resource mit Attributen, Ausrüstung, Skills, Beute und Verhalten. Ein neuer Gegner braucht keinen Code |
 | Level | Jede Karte hat ein Bereichslevel. Attribute wachsen mit dem Level, die Beute trägt das Level des Monsters |
-| Spawn-Marker | Gegner erscheinen in Gruppen an festgelegten Orten |
+| Spawn-Marker | Gegner erscheinen in Gruppen, locker verstreut um festgelegte Orte. Zwischen zwei Körpern bleibt mindestens 1 m Luft, und keine Gruppe startet in Aggro-Reichweite des Helden |
+| Kollision | Gegner überlappen sich nie, weder untereinander noch mit dem Helden. Auch beschworene und springende Gegner suchen sich einen freien Platz |
 | Aggro | Reichweite pro Gegner, die ganze Gruppe reagiert auf einen Treffer |
 | Wegfindung | Gegner laufen um Wände herum. Schützen greifen nur mit freier Sicht an |
 | Aufgeben | Entkommt der Held, gibt der Gegner nach einigen Sekunden auf und geht langsam in die Nähe seines Startorts zurück |
@@ -243,6 +245,7 @@ Auslöser und Aktionen lassen sich im Inspector frei kombinieren, zum Beispiel "
 |---|---|
 | Raster-Inventar | 70 Felder, Items belegen je nach Größe mehrere Felder |
 | Drag-and-drop | Aufnehmen, ablegen, tauschen, auf den Boden werfen |
+| Abwerfen | Abgeworfene Items landen in einem Gitter im Kreis um den Helden, nie auf einem anderen Beutel und nie hinter einer Mauer |
 | Stapel | Tränke stapeln sich bis 5, aufgehobene Tränke füllen vorhandene Stapel |
 | 16 Ausrüstungsplätze | Inklusive vier Ringe |
 | Zweihandwaffen | Bogen und Stab sperren den Schildplatz, der Schild wandert ins Inventar |
@@ -285,7 +288,13 @@ Der Held startet am Startpunkt mit vollem Leben und Mana.
 | Erfahrungsbalken | Unterteilt, mit Anzeige beim Überfahren |
 | Overlay-Karte | Das Level aus dem Winkel der Kamera, nur von weiter weg, mit `Tab` ein- und ausgeblendet |
 | Elite | Größer als ihre Art, mit Namensschild und einer Aura in der Farbe ihres Namens |
-| Beutel | Beute liegt als Beutel am Boden. Ein Klick hebt ihn auf, aus der Ferne läuft der Held erst hin |
+| Beutel | Beute liegt als Beutel aus dunklem Leder am Boden, ein weißer Stern glimmt daran. Beutel liegen in einem Gitter mit 1 m Abstand und nie aufeinander |
+| Schilder der Beute | Jeder Beutel trägt ein Schild mit dem Namen des Items in der Farbe der Seltenheit. Schilder überlappen nie, sie stapeln sich nach oben. `Alt` schaltet sie an und aus |
+| Aufheben | Mit Schildern ein Klick auf das Schild, ohne Schilder ein Klick auf den Beutel. Aus der Ferne läuft der Held erst hin. Unter der Maus wird der Beutel heller |
+
+<div align="center">
+<img src="docs/images/beute_schilder_3d.webp" alt="Oben links 16 abgeworfene Items mit Schildern, oben rechts dieselben nach dem Aufheben eines Bogens, unten links nach Aus und An neu ausgerichtet, unten rechts die Beute von vier Gegnern im Gitter" width="720">
+</div>
 
 ### 🧊 3D im PS1-Look
 
@@ -356,7 +365,9 @@ Die Skills liegen zu Beginn wie unten auf den Tasten. Jeder Platz der Leiste lä
 | Rechtsklick auf einen Platz der Leiste | Skill für diesen Platz auswählen |
 | `B` | Charakterbogen und Inventar |
 | `Tab` | Overlay-Karte |
-| Linke Maustaste auf Item | Aufheben, im Inventar greifen und ablegen |
+| `Alt` | Schilder der Beute an und aus |
+| Linke Maustaste auf das Schild eines Beutels | Aufheben. Sind die Schilder aus, zählt der Klick auf den Beutel selbst |
+| Linke Maustaste auf Item im Inventar | Greifen und ablegen, außerhalb des Inventars abwerfen |
 | Rechte Maustaste im Inventar | Item anlegen oder Trank trinken |
 
 ---
@@ -453,7 +464,7 @@ Hoellenspiralenspiel
 │   │   ├── Items       Item-Basis und Instanz, Inventar-Raster, Ausrüstung, Affixe, Beute
 │   │   ├── Enemies     Zustandsmaschine, Seltenheit, Wahl der Mods, Wachstum mit dem Level
 │   │   ├── Navigation  Takt für die Pfadsuche
-│   │   ├── Spatial     Raster für die Suche nach Einheiten in der Nähe
+│   │   ├── Spatial     Raster für die Suche nach Einheiten, freie Plätze für Gegner und Beutel, Stapeln der Schilder
 │   │   ├── Saving      Format des Spielstands, Lesen und Schreiben als JSON
 │   │   ├── Rng         Zufallsquelle mit Seed
 │   │   └── Progression XP-Tabelle, Level und Attributspunkte, XP-Verlust beim Tod
@@ -466,9 +477,9 @@ Hoellenspiralenspiel
 │   ├── Environment     Kellertür
 │   ├── Saving          Datei des Spielstands
 │   ├── Controllers     Gegnersteuerung, Beute, Spielablauf, Speichern
-│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder
+│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder, Schilder der Beute
 ├── Scenes              Szenen für Level, Einheiten, Items, Skills, Objekte und Oberfläche
-├── Shaders             Shader, unter Ps1 die beiden für den PS1-Look, unter Archive2D die Effekte der 2D-Fassung
+├── Shaders             Shader, unter Ps1 die für den PS1-Look und der Stern der Beutel, unter Archive2D die Effekte der 2D-Fassung
 ├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Gegner, Monster-Mods, Themes
 ├── Interfaces          Schnittstellen, darunter IHero zwischen Held und Oberfläche
 ├── Enums               Gemeinsame Aufzählungen

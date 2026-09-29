@@ -32,7 +32,7 @@ public static class SkillExecutor
 
                 break;
             case SkillDelivery.AreaAroundCaster:
-                LaunchArea(caster, cast, skill.EffectScene, definition.Area, caster.GlobalPosition);
+                LaunchArea(caster, cast, skill.EffectScene, StartAtBodyEdge(definition.Area, caster), caster.GlobalPosition);
 
                 break;
             case SkillDelivery.AreaAtPoint:
@@ -75,6 +75,10 @@ public static class SkillExecutor
             projectile.GlobalPosition = origin;
         }
     }
+
+    //Eine Fläche um den Wirkenden beginnt wie jede Reichweite an seinem Rand
+    private static AreaSettings StartAtBodyEdge(AreaSettings settings, BaseUnit caster)
+        => settings is null ? null : settings with { Radius = settings.Radius + caster.BodyRadiusPx };
 
     private static void LaunchArea(BaseUnit caster, SkillCast cast, PackedScene scene, AreaSettings settings, Vector3 center)
     {

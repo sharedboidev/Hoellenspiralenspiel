@@ -59,6 +59,14 @@ public abstract partial class BaseUnit : CharacterBody3D
 
     public Vector3 BodyCenter => bodyShape?.GlobalPosition ?? GlobalPosition;
 
+    //In Metern. Reichweiten und Abstände zählen ab diesem Rand, nicht ab der Mitte
+    public float BodyRadius { get; private set; }
+
+    public float BodyRadiusPx => WorldScale.ToPx(BodyRadius);
+
+    //Ein Körper ohne Kollision versperrt niemandem den Platz
+    public virtual bool IsSolid => true;
+
     public float PickHeight { get; private set; } = 1f;
 
     public float PickRadius { get; private set; } = MinPickRadius;
@@ -100,10 +108,14 @@ public abstract partial class BaseUnit : CharacterBody3D
     {
         MotionMode = MotionModeEnum.Floating;
 
+        //Godot hält einen Körper an, der fast senkrecht auf eine Mauer läuft. Große Körper blieben so an jeder Ecke hängen
+        WallMinSlideAngle = 0f;
+
         bodyShape = GetNodeOrNull<CollisionShape3D>(nameof(CollisionShape3D));
         Visual    = GetNodeOrNull<Node3D>(nameof(Visual));
 
         MeasurePickVolume();
+        MeasureBody();
 
         Stats.Update(sheet =>
         {
@@ -143,6 +155,27 @@ public abstract partial class BaseUnit : CharacterBody3D
 
         PickHeight = Math.Max(MinPickRadius, bounds.End.Y);
         PickRadius = Math.Max(MinPickRadius, Math.Max(bounds.Size.X, bounds.Size.Z) / 2f);
+    }
+
+    private void MeasureBody()
+    {
+        BodyRadius = GetBodyRadius();
+
+        UnitRegistry.NoteBodyRadius(BodyRadiusPx);
+    }
+
+    //Gilt schon vor dem Einhängen in den Szenenbaum, dann noch ohne die Skalierung aus ScaleBody
+    public float GetBodyRadius()
+    {
+        var shape = GetNodeOrNull<CollisionShape3D>(nameof(CollisionShape3D));
+
+        return shape?.Shape switch
+        {
+            CapsuleShape3D capsule   => capsule.Radius * shape.Scale.X,
+            CylinderShape3D cylinder => cylinder.Radius * shape.Scale.X,
+            SphereShape3D sphere     => sphere.Radius * shape.Scale.X,
+            _                        => 0f
+        };
     }
 
     //Liefert den Abstand entlang des Strahls, negativ bei einem Fehlgriff
@@ -187,7 +220,10 @@ public abstract partial class BaseUnit : CharacterBody3D
         => other is not null && other.Faction != Faction;
 
     public float DistancePxTo(BaseUnit other)
-        => WorldScale.GroundDistancePx(GlobalPosition, other.GlobalPosition);
+        => Math.Max(0f, WorldScale.GroundDistancePx(GlobalPosition, other.GlobalPosition) - BodyRadiusPx - other.BodyRadiusPx);
+
+    public float DistancePxTo(Vector3 point)
+        => Math.Max(0f, WorldScale.GroundDistancePx(GlobalPosition, point) - BodyRadiusPx);
 
     public virtual void ReceiveDamage(HitResult hit, BaseUnit attacker = null)
     {
@@ -213,8 +249,6 @@ public abstract partial class BaseUnit : CharacterBody3D
 
         return chance > 0 && GameRandom.Shared.NextFloat() < chance;
     }
-
-    public virtual void SetHighlight(bool active) { }
 
     protected void MoveOnGround(Vector3 direction, float speedPx)
     {
@@ -254,6 +288,8 @@ public abstract partial class BaseUnit : CharacterBody3D
 
         PickHeight *= factor;
         PickRadius *= factor;
+
+        MeasureBody();
     }
 
     protected virtual void OnStatsRecalculated() { }

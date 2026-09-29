@@ -28,17 +28,18 @@ public partial class Enemy : BaseUnit
 
     private const float  MinAttackspeedRate    = 0.1f;
     private const float  ArrivalDistancePx     = 24f;
+    private const double HomeBlockedSec        = 0.6;
+    private const float  BlockedSpeedFraction  = 0.1f;
+    private const float  NearHomePx            = 300f;
     private const float  EngageFraction        = 0.9f;
     private const double SightCheckIntervalSec = 0.2;
     private const float  LungeMeters           = 0.3f;
     private const double DeathLookSec          = 0.4;
-    private const float  HighlightEnergy       = 0.6f;
     private const float  NameTagLiftMeters     = 0.15f;
     private const float  EliteGlowEnergy       = 0.35f;
     private const float  AuraRadiusFactor      = 1.3f;
 
-    private static readonly Vector3 WindupTint    = new(1.6f, 0.7f, 0.7f);
-    private static readonly Color   HighlightGlow = new(0.9f, 0.3f, 0.6f);
+    private static readonly Vector3 WindupTint = new(1.6f, 0.7f, 0.7f);
 
     private static readonly StringName TintParameter           = "tint";
     private static readonly StringName EmissionParameter       = "emission";
@@ -47,23 +48,22 @@ public partial class Enemy : BaseUnit
     private static readonly AttackSkillResource StandardAttack = new() { Id = "attack", DisplayName = AttackDefinition.Standard.Name };
 
     private bool                              attackFailed;
+    private float                             closestToHomePx;
     private EliteAura                         aura;
     private Tween                             attackLook;
     private SkillResource                     attackSkill;
     private ShaderMaterial                    bodyMaterial;
     private EnemyBrain                        brain = new(new EnemyBehaviour());
-    private Color                             glowColor = HighlightGlow;
-    private float                             glowEnergy;
     private bool                              hasSight;
     private HealthBar                         healthbar;
     private Vector3                           homePoint;
     private bool                              isAwake = true;
-    private bool                              isHighlighted;
     private EnemyRarityLook                   look    = EnemyRarityLook.Normal;
     private MonsterModRuntime                 modRuntime;
     private IReadOnlyList<MonsterModResource> mods = [];
     private NameTag                           nameTag;
     private PathFollower                      pathFollower;
+    private double                            secBlockedOnWayHome;
     private double                            secUntilSightCheck;
     private Vector3                           spawnPoint;
     private WeaponProfile                     weapon = WeaponProfile.Unarmed;
@@ -112,6 +112,7 @@ public partial class Enemy : BaseUnit
 
     public override Faction Faction      => Faction.Monster;
     public override bool    IsTargetable => !IsDead && !IsDying;
+    public override bool    IsSolid      => !IsDying;
 
     public override WeaponProfile Weapon => weapon;
 
@@ -235,19 +236,12 @@ public partial class Enemy : BaseUnit
         if (Rarity == EnemyRarity.Normal)
             return;
 
-        glowColor  = look.NameColor;
-        glowEnergy = EliteGlowEnergy;
-        aura       = EliteAura.Create(look.NameColor, PickRadius * AuraRadiusFactor);
+        aura = EliteAura.Create(look.NameColor, PickRadius * AuraRadiusFactor);
 
         AddChild(aura);
-        ShowGlow();
-    }
 
-    //Unter der Maus leuchtet jedes Monster gleich, sonst glimmt ein Elite in der Farbe seines Namens
-    private void ShowGlow()
-    {
-        bodyMaterial?.SetShaderParameter(EmissionParameter, isHighlighted ? HighlightGlow : glowColor);
-        bodyMaterial?.SetShaderParameter(EmissionEnergyParameter, isHighlighted ? HighlightEnergy : glowEnergy);
+        bodyMaterial?.SetShaderParameter(EmissionParameter, look.NameColor);
+        bodyMaterial?.SetShaderParameter(EmissionEnergyParameter, EliteGlowEnergy);
     }
 
     private void OnLifeChanged(BaseUnit unit)
@@ -258,13 +252,6 @@ public partial class Enemy : BaseUnit
 
         if (IsDead)
             BeginDeath();
-    }
-
-    public override void SetHighlight(bool active)
-    {
-        isHighlighted = active;
-
-        ShowGlow();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -308,7 +295,7 @@ public partial class Enemy : BaseUnit
 
     public void TeleportTo(Vector3 point)
     {
-        GlobalPosition = WorldScale.OnGround(point);
+        GlobalPosition = Controller?.FindFreeSpot(new SpawnArea(point), BodyRadius, this) ?? WorldScale.OnGround(point);
         Velocity       = Vector3.Zero;
 
         pathFollower.Reset();
@@ -484,9 +471,34 @@ public partial class Enemy : BaseUnit
         var angle  = GameRandom.Shared.NextFloat() * MathF.Tau;
         var reach  = MathF.Sqrt(GameRandom.Shared.NextFloat()) * radius;
 
-        homePoint = pathFollower.SnapToNavigation(spawnPoint + new Vector3(MathF.Cos(angle), 0, MathF.Sin(angle)) * reach);
+        homePoint           = pathFollower.SnapToNavigation(spawnPoint + new Vector3(MathF.Cos(angle), 0, MathF.Sin(angle)) * reach);
+        secBlockedOnWayHome = 0;
+        closestToHomePx     = float.MaxValue;
 
         pathFollower.Reset();
+    }
+
+    //Steht ein anderer auf dem Platz oder im Weg, endet der Rückweg dort, wo es nicht mehr weitergeht.
+    //Wer kurz vor dem Ziel nur noch um einen anderen herumrutscht, kommt dem Ziel nicht näher und gilt ebenfalls als angekommen
+    private void SettleWhenBlocked(float speedPx, double delta)
+    {
+        var distancePx = WorldScale.GroundDistancePx(GlobalPosition, homePoint);
+        var isCrawling = GetRealVelocity().Length() <= WorldScale.ToMeters(speedPx) * BlockedSpeedFraction;
+        var isCircling = distancePx <= NearHomePx && distancePx >= closestToHomePx;
+
+        closestToHomePx = Math.Min(closestToHomePx, distancePx);
+
+        if (!isCrawling && !isCircling)
+        {
+            secBlockedOnWayHome = 0;
+
+            return;
+        }
+
+        secBlockedOnWayHome += delta;
+
+        if (secBlockedOnWayHome >= HomeBlockedSec)
+            homePoint = GlobalPosition;
     }
 
     private void StartAttack(SkillResource skill, EnemyPerception perception)
@@ -518,7 +530,10 @@ public partial class Enemy : BaseUnit
 
                 break;
             case EnemyMovement.TowardHome:
-                MoveAlong(pathFollower.GetDirectionTo(homePoint, delta), MovementspeedPx * (Definition?.ReturnSpeedFactor ?? 1f));
+                var returnSpeedPx = MovementspeedPx * (Definition?.ReturnSpeedFactor ?? 1f);
+
+                MoveAlong(pathFollower.GetDirectionTo(homePoint, delta), returnSpeedPx);
+                SettleWhenBlocked(returnSpeedPx, delta);
 
                 break;
             default:

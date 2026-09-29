@@ -5,20 +5,29 @@ using Hoellenspiralenspiel.Resources.Enemies;
 using Hoellenspiralenspiel.Resources.MonsterMods;
 using Hoellenspiralenspiel.Scripts.Core.Enemies;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
+using Hoellenspiralenspiel.Scripts.Core.Spatial;
 using Hoellenspiralenspiel.Scripts.Enemies;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Objects;
+using Hoellenspiralenspiel.Scripts.Skills;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
 using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.Controllers;
 
+//Die Mitte ist der Wunschplatz. Ist er belegt oder soll die Gruppe streuen, liegt der Platz im Umkreis.
+//HeroClearancePx hält Abstand zum Helden, damit eine Gruppe nicht schon beim Laden der Karte angreift
+public readonly record struct SpawnArea(Vector3 Center, float ScatterPx = 0f, float GapPx = 0f, float HeroClearancePx = 0f);
+
 public partial class EnemyController : Node
 {
-    private const float LootSpreadMeters = 0.48f;
+    private const float SightHeightMeters = 0.5f;
+    private const float ProbeLiftMeters   = 0.1f;
+    private const float AggroMarginPx     = 100f;
 
-    private readonly List<Enemy> enemies = new();
+    private readonly List<Enemy>    enemies       = new();
+    private readonly List<BaseUnit> unitsNearSpot = new();
 
     [Export]
     public Hero Hero { get; set; }
@@ -116,27 +125,34 @@ public partial class EnemyController : Node
         {
             var modCount = EnemyRarityRules.RollModCount(chances, GameRandom.Shared);
 
-            Spawn(marker.Enemy, marker.GetSpawnPosition(i), marker.Name, level, modCount);
+            Spawn(marker.Enemy, new SpawnArea(marker.GlobalPosition, marker.ScatterRadius, marker.MinGap, marker.Enemy.AggroRange + AggroMarginPx), marker.Name, level, modCount);
         }
     }
 
     public Enemy Spawn(EnemyResource definition, Vector3 position, string spawnGroup, int level, int modCount = 0)
+        => Spawn(definition, new SpawnArea(position), spawnGroup, level, modCount);
+
+    public Enemy Spawn(EnemyResource definition, SpawnArea area, string spawnGroup, int level, int modCount = 0)
     {
         var traits = new MonsterTraits(level, definition.UsesProjectiles);
         var mods   = MonsterModRoller.Pick(MonsterModLibrary.Pool, modCount, traits, GameRandom.Shared)
                                      .Select(mod => MonsterModLibrary.Find(mod.Id))
                                      .ToList();
 
-        return Spawn(definition, position, spawnGroup, level, mods);
+        return Spawn(definition, area, spawnGroup, level, mods);
     }
 
     public Enemy Spawn(EnemyResource definition, Vector3 position, string spawnGroup, int level, IReadOnlyList<MonsterModResource> mods)
+        => Spawn(definition, new SpawnArea(position), spawnGroup, level, mods);
+
+    public Enemy Spawn(EnemyResource definition, SpawnArea area, string spawnGroup, int level, IReadOnlyList<MonsterModResource> mods)
     {
         var enemy = definition.Scene.Instantiate<Enemy>();
+        var look  = GetLookOf(EnemyRarityRules.FromModCount(mods.Count));
 
-        enemy.Configure(definition, level, mods, GetLookOf(EnemyRarityRules.FromModCount(mods.Count)));
+        enemy.Configure(definition, level, mods, look);
 
-        enemy.Position   = position;
+        enemy.Position   = FindFreeSpot(area, enemy.GetBodyRadius() * look.Scale);
         enemy.SpawnGroup = spawnGroup;
         enemy.Controller = this;
         enemy.Target     = Hero;
@@ -147,6 +163,60 @@ public partial class EnemyController : Node
         EnemyContainer.AddChild(enemy);
 
         return enemy;
+    }
+
+    //Frei ist ein Platz ohne Mauer und ohne anderen Körper, den man von der Mitte aus sieht
+    public Vector3 FindFreeSpot(SpawnArea area, float bodyRadius, BaseUnit ignored = null)
+    {
+        var center   = WorldScale.OnGround(area.Center);
+        var space    = EnemyContainer.GetWorld3D().DirectSpaceState;
+        var probe    = new SphereShape3D { Radius = bodyRadius };
+        var wasFound = SpotSearch.TryFind(new Spot(WorldScale.ToPx(center.X), WorldScale.ToPx(center.Z)),
+                                          area.ScatterPx,
+                                          GameRandom.Shared,
+                                          spot => IsFree(ToWorld(spot), center, bodyRadius, area, ignored, space, probe),
+                                          out var found);
+
+        if (!wasFound)
+            GD.PushWarning($"Um {center} ist kein Platz frei, der Körper landet auf der Mitte.");
+
+        return ToWorld(found);
+    }
+
+    private static Vector3 ToWorld(Spot spot)
+        => new(WorldScale.ToMeters(spot.X), 0f, WorldScale.ToMeters(spot.Y));
+
+    private bool IsFree(Vector3 point, Vector3 center, float bodyRadius, SpawnArea area, BaseUnit ignored, PhysicsDirectSpaceState3D space, Shape3D probe)
+    {
+        var reachPx = WorldScale.ToPx(bodyRadius) + area.GapPx;
+
+        if (area.HeroClearancePx > 0f && IsInstanceValid(Hero) && Hero.DistancePxTo(point) < WorldScale.ToPx(bodyRadius) + area.HeroClearancePx)
+            return false;
+
+        UnitRegistry.FindNear(point, reachPx, unitsNearSpot);
+
+        foreach (var unit in unitsNearSpot)
+        {
+            if (unit != ignored && unit.IsSolid && unit.DistancePxTo(point) < reachPx)
+                return false;
+        }
+
+        var touch = new PhysicsShapeQueryParameters3D
+        {
+            Shape         = probe,
+            Transform     = new Transform3D(Basis.Identity, point + Vector3.Up * (bodyRadius + ProbeLiftMeters)),
+            CollisionMask = CollisionLayers.Walls
+        };
+
+        if (space.IntersectShape(touch, 1).Count > 0)
+            return false;
+
+        if (point.IsEqualApprox(center))
+            return true;
+
+        var sight = PhysicsRayQueryParameters3D.Create(center + Vector3.Up * SightHeightMeters, point + Vector3.Up * SightHeightMeters, CollisionLayers.Walls);
+
+        return space.IntersectRay(sight).Count == 0;
     }
 
     private EnemyRarityLook GetLookOf(EnemyRarity rarity)
@@ -188,16 +258,7 @@ public partial class EnemyController : Node
 
         var loot = Lootsystem.GenerateLoot(enemy);
 
-        for (var i = 0; i < loot.Count; i++)
-            Lootbag.Drop(Hero.GetParent(), enemy.GlobalPosition + GetLootbagOffset(i, loot.Count), loot[i], Hero.Items);
-    }
-
-    //Mehrere Beutel werden im Kreis um den Gegner verteilt, damit sie sich nicht überdecken
-    private static Vector3 GetLootbagOffset(int index, int totalAmount)
-    {
-        if (totalAmount <= 1)
-            return Vector3.Zero;
-
-        return Vector3.Right.Rotated(Vector3.Up, Mathf.Tau * index / totalAmount) * LootSpreadMeters;
+        foreach (var item in loot)
+            Lootbag.DropAround(Hero.GetParent<Node3D>(), enemy.GlobalPosition, 0f, item, Hero.Items);
     }
 }

@@ -1,5 +1,6 @@
 using Godot;
 using Hoellenspiralenspiel.Resources.Enemies;
+using Hoellenspiralenspiel.Scripts.Controllers;
 
 namespace Hoellenspiralenspiel.Resources.MonsterMods.Actions;
 
@@ -26,8 +27,7 @@ public partial class SummonAction : ModAction
 
         for (var i = 0; i < Count; i++)
         {
-            var position = owner.SnapToNavigation(ModAimResolver.GetRandomPointAround(owner.GlobalPosition, Radius));
-            var summoned = owner.Controller.Spawn(definition, position, owner.SpawnGroup, owner.Level);
+            var summoned = owner.Controller.Spawn(definition, new SpawnArea(owner.GlobalPosition, Radius), owner.SpawnGroup, owner.Level);
 
             if (owner.IsInCombat)
                 summoned.Provoke();

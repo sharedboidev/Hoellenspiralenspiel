@@ -1,11 +1,12 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
-Stand: 29.09.2026. M0 bis M5 liegen auf `master`, dazu die Nachträge zu M2 und M3: Bleed stapelt, Schadenswerte im Tooltip und ausgedünnte Kommentare.
-Der Vergleich von 2D und 3D und die Umstellung M5.5 liegen auf dem Branch `master_Compare3D`. Das Spiel läuft seitdem in 3D im Look der PlayStation 1.
+Stand: 29.09.2026. M0 bis M5.5 liegen auf `master`, dazu die Nachträge zu M2 und M3: Bleed stapelt, Schadenswerte im Tooltip und ausgedünnte Kommentare.
+Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
+Der Nachtrag zu M5.5 mit den Rückmeldungen aus dem ersten Spielen liegt auf dem Branch `master_PlaytestFeedback`.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen, die Hauptszene ist das 3D-Testlevel.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code samt Szenen. Die Zeilenzahl aus der ersten Analyse, rund 5.500, galt für die 2D-Fassung.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 bis M5 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 und die Meilensteine M2 bis M5.5 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -29,7 +30,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Waffen | Schadensspanne, Angriffe pro Sekunde, Swingtimer, Typ, Schadensart, Krit, Anforderungen | Seit M2 bestimmen die Werte den Nahkampf, seit M3 gibt es Fernkampfwaffen mit Projektil. Seit M4 sind Waffen Resources und bringen Parry oder Block mit. Klassen-Anforderung fehlt. |
 | Rüstung | Helm, Torso, Handschuhe und Schild mit Rüstungswert | 4 von 16 Slots haben Item-Basen |
 | Affixe | 17 Affixe mit Tiers, Gewichten, Itemlevel-Grenze, Prefix/Suffix, lokale und globale Mods | Slot-Tabelle aus dem PDF nur teilweise abgedeckt |
-| Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle. Seit M5 bestimmt das Monsterlevel das Itemlevel. |
+| Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen. Seit dem Nachtrag zu M5.5 liegt Beute in einem Gitter und trägt Schilder mit dem Namen des Items. | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle. Seit M5 bestimmt das Monsterlevel das Itemlevel. |
 | Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. Seit M5.5 hängt sie an der Schnittstelle `IHero` und läuft auch in 3D. |
 | Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. Seit M5.5 ist sie in 3D am Helden zu sehen. |
 | Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch | Nicht im PDF |
@@ -37,7 +38,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen, Tooltip mit DPS | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
 | Kampf | Zentrale Trefferauflösung, Nahkampf, Schadensarten mit Effekten, Statuseffekte, Tod und Respawn | Seit M2. Frost-Effekt war im PDF leer und ist jetzt Verlangsamung. |
 | Schadensminderung | Rüstungsformel, Resistenzen, Dodge, Parry und Block für alle Einheiten | Seit M4 bringen Schild, Stab und Schwert Block und Parry mit |
-| Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler. Seit M5 sind sie Resources mit Level, Ausrüstung und Verhalten, dazu Elite und Rare Elite mit Mods aus Bausteinen | Nur Blobs und ein Testgegner |
+| Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler. Seit M5 sind sie Resources mit Level, Ausrüstung und Verhalten, dazu Elite und Rare Elite mit Mods aus Bausteinen. Seit dem Nachtrag zu M5.5 kollidieren sie miteinander und spawnen verstreut. | Nur Blobs und ein Testgegner |
 | Wegfindung | Seit M5: Navigationsnetz pro Level, zur Laufzeit gebacken. Gegner und Held laufen um Wände herum | Nicht im PDF |
 | Atmosphäre | Der Held trägt sein Licht, die Umgebung ist dunkel und neblig, dazu der PS1-Look und die Overlay-Karte | Passt zum düsteren Vibe |
 | 3D | Seit dem 29.09.2026 läuft das ganze Spiel in 3D auf dem unveränderten Kern. Alle Modelle sind Platzhalter aus Grundkörpern. | Offene Frage aus dem PDF, entschieden für 3D |
@@ -147,6 +148,7 @@ Beobachtungen aus den Laufzeitprüfungen von M2 bis M5. Der Balance-Durchgang st
 | B9 | Neu seit M5: Attribute wirken bei kleinen Werten kaum. Ein Blob auf Level 10 hat Stärke 10 statt 1 und schlägt damit nur 2,5 % härter zu. Sein Leben steigt dagegen von 9 auf rund 45, und er regeneriert 5 Leben pro Sekunde. Den Schaden hoher Level müssen Ausrüstung und Mods tragen. | [DerivedStatProvider.cs](../Scripts/Core/Stats/DerivedStatProvider.cs), [Resources/Enemies](../Resources/Enemies) |
 | B10 | Neu seit M5: Natürliche Waffen mit Frost, Fire oder Lightning wachsen mit keinem Attribut. Stärke verstärkt nur physischen Schaden, Intelligenz nur Spells. | [HitRequests.cs](../Scripts/Core/Combat/HitRequests.cs) |
 | B11 | Neu seit M5: Chancen für Elite und Rare Elite, alle Werte der Mods und der Schaden von Meteor, Death Blast und Frost Pulse sind geschätzt. Der Schaden der drei Skills wächst nicht mit dem Level. | [EnemyController.cs](../Scripts/Controllers/EnemyController.cs), [Resources/MonsterMods/Pool](../Resources/MonsterMods/Pool) |
+| B13 | Neu seit dem Nachtrag zu M5.5: Reichweiten zählen ab dem Rand des Körpers, die Werte stammen aus der Zeit der Körpermitten. Der Held trifft unbewaffnet mit 0,95 m Luft zum Gegner, ein Blob mit 0,79 m. Das sieht nach einem Schlag in die Luft aus. Vorschlag: rund 40 Pixel für unbewaffnet und 30 für Blobs. | [WeaponProfile.cs](../Scripts/Core/Combat/WeaponProfile.cs), [Resources/Enemies](../Resources/Enemies) |
 | B12 | Neu seit M5: Ein Blue Blob läuft 25 Pixel pro Sekunde und gibt auf, sobald der Held 6 Sekunden lang außerhalb des Aggroradius bleibt. Aus der Ferne getroffen, kommt er deshalb nur 150 Pixel weit. | [blue_blob.tres](../Resources/Enemies/blue_blob.tres) |
 
 ## 4. Meilensteinplan
@@ -253,7 +255,7 @@ So funktioniert die Pipeline:
 - `StatusEffectTracker` lässt die Effekte ablaufen. Chill legt seine Modifier selbst auf das Stat-Blatt und nimmt sie wieder herunter.
 - `AttackCycle` ist der Takt aus Ausholen, Treffer und Erholen. Spieler und Gegner benutzen denselben.
 - Die Waffe legt Angriffstempo und Krit-Chance als Grundwerte ins Stat-Blatt. Ohne Waffe gilt `WeaponProfile.Unarmed`.
-- Abstände im Kampf werden zwischen den Körpermitten gemessen, also zwischen den Kollisionsformen.
+- Abstände im Kampf wurden zwischen den Körpermitten gemessen. Seit dem Nachtrag zu M5.5 zählen sie vom Rand des Körpers bis zum Rand des Ziels.
 - `HitResult` kennt drei Stufen des Schadens. `RolledDamage` ist der gewürfelte Wert. `UnmitigatedDamage` ist der Wert nach Krit, Faktor der Schadensart und Block. `FinalDamage` ist der Wert nach Rüstung oder Resistenz und wird vom Leben abgezogen.
 - Einheiten: Chancen, Krit-Schaden und Resistenzen sind Prozent. Die Anteile in `CombatRules` sind Brüche, 0,5 bedeutet 50 %. Nur die drei Werte mit `Base` im Namen sind dort Prozent.
 - Die Stärke eines Statuseffekts ist bei Bleed und Burn der Schaden pro Sekunde, bei Shock und Chill ein Anteil von 0 bis 1.
@@ -913,9 +915,9 @@ Die Platzhalter, alle in [Scenes/Skills](../Scenes/Skills):
 So funktionieren Beute, Karte und Kellertür:
 
 - `Lootbag` ist ein `Area3D` auf der Ebene `Interactive`. `Lootbag.Drop` legt einen Beutel in die Welt, `Collect` hebt ihn auf. Ist das Inventar voll, hüpft der Beutel und bleibt liegen.
-- Der Held prüft bei einem Linksklick zuerst mit einem Strahl, ob ein Beutel unter der Maus liegt. In Reichweite hebt er ihn sofort auf, sonst läuft er über das Navigationsnetz hin.
+- Der Held prüft bei einem Linksklick zuerst mit einem Strahl, ob ein Beutel unter der Maus liegt. In Reichweite hebt er ihn sofort auf, sonst läuft er über das Navigationsnetz hin. Seit dem Nachtrag unten gilt das nur, solange die Schilder der Beute aus sind.
 - Die Karte ist ein `SubViewport` mit eigener Kamera und eigener Umgebung ohne Nebel. Die Kamera übernimmt die Ausrichtung der Spielkamera. Gerechnet wird die Karte nur, solange sie zu sehen ist.
-- `EliteAura` baut Ring und Licht eines Elite aus Farbe und Radius. Unter der Maus leuchtet ein Elite wie jedes Monster, danach glimmt er wieder in seiner Farbe.
+- `EliteAura` baut Ring und Licht eines Elite aus Farbe und Radius. Der Körper glimmt in der Farbe des Namens. Das Aufleuchten unter der Maus ist mit dem Nachtrag unten entfallen.
 - Die Kellertür ist ein `Area3D`. Ihr Knoten `Glow` ist das Gegenstück zu den Lichtstrahlen der 2D-Tür.
 
 <img src="images/elite_aura_und_karte_3d.webp" alt="Links ein Elite und ein Rare Elite mit Aura, rechts die Overlay-Karte aus dem Winkel der Spielkamera" width="860">
@@ -937,11 +939,93 @@ Bewusst offen gelassen:
 - Gegner zeigen ihre Ausrüstung noch nicht.
 - Es gibt noch keine Item-Basis für Amulette. Der Platz wird mit dem ersten Amulett sichtbar, das ein Modell hat.
 - Die Karte zeigt die Welt, wie sie ist, mit Boden, Mauern und Nebel der Ferne. Eine gezeichnete Karte kommt mit M6, wenn sie den logischen Grundriss liest.
-- Beutel haben keinen Tooltip und kein Schimmern wie in 2D.
+- Beutel hatten keinen Tooltip und kein Schimmern wie in 2D. Seit dem Nachtrag unten tragen sie einen Stern und ein Schild mit dem Namen des Items.
 - Tunika und Gugel decken den Körper nur zu. Ein Modell, das Körperteile ersetzt, gibt es noch nicht.
 - Die Sterne des Level-up-Effekts benutzen ein Standardmaterial, weil der Shader des PS1-Looks weder Partikelfarben noch additives Mischen kennt. Ihre Eckpunkte rasten deshalb nicht ein.
 - Die Beschreibungen unter M2 bis M5 sind für 2D geschrieben. Regeln und Kern gelten unverändert, Szenen und Knoten sind jetzt die aus diesem Abschnitt.
 - Sprites, Tilesets, die Texturen der 2D-Effekte und die Addons für 2D liegen ungenutzt im Repo.
+
+#### Nachtrag vom 29.09.2026: Rückmeldung aus dem ersten Spielen
+
+Umgesetzt auf dem Branch `master_PlaytestFeedback`. Der User hat die 3D-Fassung zum ersten Mal selbst gespielt. Aura und Karte bleiben, wie sie sind.
+
+Vorher lief die Nachprüfung, die nach M5.5 offen war. Beim Umbenennen hatten die Knoten `CollisionShape3D` ihr "3D" verloren, die große Prüfung lief vor der Korrektur. Auf dem Stand von M5.5 bestanden 56 Schritte für Kampf, Schützen hinter Mauern und Tod ohne Fehler.
+
+Getroffene Designentscheidungen vom 29.09.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| Gegner untereinander | Gegner dürfen sich nie überlappen |
+| Spawn | Locker verstreut um den Marker, mindestens 1 m Luft zwischen den Körpern. Umkreis und Mindestabstand sind Felder am Marker. |
+| Reichweiten | Zählen ab dem Rand des Körpers, nicht ab der Mitte. Die Werte bleiben bis zum Balance-Durchgang in M8, siehe B13. |
+| Beutel | Dunkles Braun wie altes Leder. Ein kleiner weißer Stern glimmt rechts oben am Beutel und wird langsam größer und wieder kleiner. |
+| Maus über Gegnern | Kein Aufleuchten mehr |
+| Maus über Beuteln | Der Beutel wird etwas heller |
+| Abwerfen | Items landen in einem Gitter im Kreis um den Helden. Liegt in der Nähe eines Punkts schon ein Beutel, kommt der nächste Punkt dran. Beute von Gegnern benutzt dasselbe Gitter. |
+| Schilder der Beute | Name des Items in der Farbe der Seltenheit auf dunklem Kasten, wie in den großen ARPGs. `Alt` schaltet sie an und aus, beim Start sind sie an. |
+| Aufheben | Sind die Schilder an, hebt man nur über das Schild auf. Sind sie aus, über den Beutel, und der Beutel unter der Maus zeigt sein Schild. |
+| Ordnung der Schilder | Schilder überlappen nie und stapeln sich nach oben. Beim Aufheben verschiebt sich kein anderes Schild. Nach Aus und An dürfen sie sich neu ausrichten. |
+
+Von mir festgelegt, weil es sich aus dem Umbau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Kollisionsformen | Kapseln mit dem Radius des Modells plus 3 cm: Blue Blob 0,48 m, Yellow Blob 0,58 m, Testgegner 0,53 m. Der Held hat 0,3 m statt 0,2 m. Gegner tragen die Maske 11 und stoßen damit auch aneinander. |
+| Abstand zum Helden | Eine Marker-Gruppe spawnt nicht näher am Helden als ihre Aggro-Reichweite plus 100 Pixel. Mit 16 und 12 Blobs griff die Gruppe sonst schon beim Laden an. |
+| Marker im Hof | Liegt in der Hofmitte bei (14, 0, 0). In der Ecke war für fünf Gegner mit Abstand kein Platz, einer landete vor dem Tor. |
+| Navigationsnetz | Wege halten 0,75 m Abstand zu Mauern statt 0,5 m |
+| Flächen | Treffen ein Ziel ab seinem Rand. Eine Fläche um den Wirkenden beginnt an dessen Rand. |
+| Gitter der Beutel | Punkte im Abstand von 100 Pixeln, fest in der Welt. Die nächsten Punkte zuerst, bis 800 Pixel weit. Das Abwerfen in Richtung Maus ist entfallen. |
+| Stern | Vier Zacken, vom Shader gezeichnet, 0,3 m groß. Ein Atemzug dauert 2,6 Sekunden, die Größe schwankt um 15 %, die Helligkeit sinkt um bis zu 35 %. Der Stern mit fünf Zacken aus dem Level-up war bei 240 Bildzeilen nur ein Fleck. |
+| Aufhellen | Die Farbe des Leders mal 1,5 und das Eigenleuchten mal 3. Die Farbe allein reichte nicht, weil die dunkle Seite des Beutels kaum Licht bekommt. |
+| Text der Schilder | Magic zeigt den Namen mit Affixen, Rare den erzeugten Namen und die Basis, Stapel die Anzahl in Klammern |
+| Schild ohne Schilder | Das Schild des Beutels unter der Maus steht direkt über ihm und fängt die Maus nicht ab, sonst flackerte es |
+| Kollisionsformen im Editor | Boden und Mauern des Testlevels haben `debug_fill = false`. Die Füllung lag genau auf den Flächen und flimmerte als welliges Muster, im Editor immer und im Spiel mit "Visible Collision Shapes". |
+
+So funktionieren Körper und Plätze:
+
+- `BaseUnit.BodyRadius` kommt aus der Kollisionsform. `DistancePxTo` misst von Rand zu Rand, für eine Einheit und für einen Punkt.
+- `UnitRegistry` merkt sich den größten Körper und sucht um so viel weiter, sonst entginge der Suche ein großer Gegner am Rand.
+- `SpotSearch` im Kern würfelt Punkte in einem Kreis, bis einer frei ist. Nach jeder erfolglosen Runde wächst der Kreis.
+- `EnemyController.FindFreeSpot` entscheidet, was frei heißt: kein anderer Körper im Abstand, keine Mauer, und von der Mitte aus zu sehen. Jeder Spawn läuft darüber, auch Beschwören und Teleport.
+- `SpawnArea` beschreibt den Wunsch: Mitte, Umkreis, Mindestabstand und Abstand zum Helden. Ohne Umkreis ist die Mitte der Wunschplatz.
+- Am `SpawnMarker` stehen `ScatterRadius` mit 400 und `MinGap` mit 100, beide in Pixeln.
+- `WallMinSlideAngle` ist 0. Godot hält einen Körper sonst an, der steiler als 15 Grad auf eine Mauer läuft, und große Körper blieben an jeder Ecke hängen.
+- Auf dem Rückweg gilt als angekommen, wer 0,6 Sekunden lang nicht vorankommt oder näher als 300 Pixel am Ziel nur noch um einen anderen herumrutscht.
+
+So funktionieren Beutel und Schilder:
+
+- `GridSearch` im Kern geht die Punkte eines festen Gitters im Kreis um eine Mitte durch. `Lootbag.DropAround` sperrt Punkte, an denen ein Beutel näher als 75 Pixel liegt oder eine Mauer die Sicht zur Mitte versperrt.
+- Wer abwirft, steht noch da. Der Beutel hält deshalb Abstand zu seinem Körper. Bei der Beute eines Gegners ist der tote Gegner die Mitte, ohne Abstand.
+- `Lootbag` meldet `Appeared` und `Vanished` und kennt die Oberfläche nicht.
+- `LabelStacker` im Kern hebt ein Schild über alle, die es berührt. Die liegenden Schilder bleiben, wo sie sind. `PlaceAll` ordnet alle auf einmal, von unten nach oben.
+- `LootLabels` liegt im Level unter `CombatTextLayer` und braucht den Helden im Feld `Hero`. Jedes Schild merkt sich seinen Abstand zum Beutel auf dem Bildschirm und folgt damit der Kamera.
+- Der Stern ist der Shader `Shaders/Ps1/glimmer.gdshader`. Er dreht sich zur Kamera, rückt 0,4 m auf sie zu und lässt sich über `view_offset` auf dem Bildschirm verschieben.
+- Die Taste ist die Aktion `toggle_loot_labels` in den Projekteinstellungen.
+
+<img src="images/beute_schilder_3d.webp" alt="Oben links 16 abgeworfene Items mit Schildern, oben rechts dieselben nach dem Aufheben eines Bogens, unten links nach Aus und An neu ausgerichtet, unten rechts die Beute von vier Gegnern im Gitter" width="860">
+
+Geprüft, alles im laufenden Spiel und fehlerfrei:
+
+| Prüfung | Schritte |
+|---|---|
+| Kampf, Schützen, Tod, Spawn, Gedränge, Rückweg, Elite durch das Tor, Tod des Helden | 80, mit sechs verschiedenen Seeds |
+| Aufhellen der Beutel und Gegner ohne Aufleuchten | 13 |
+| Abwerfen im Gitter, auch von zwei Orten und an einer Mauer | 15 |
+| Beute von Gegnern im Gitter und Schilder | 36 |
+
+Im Gedränge von 18 Gegnern blieben zwischen den sichtbaren Körpern mindestens 3,5 cm Luft. 39 neue Unit-Tests decken die Platzsuche, das Gitter und das Stapeln ab, insgesamt sind es 599.
+
+Bewusst offen gelassen:
+
+- Nahkampf sieht nach einem Schlag in die Luft aus, siehe B13.
+- Bei der perspektivischen Kamera ändern sich die Abstände der Beutel auf dem Bildschirm beim Laufen. Schilder können dort zusammenrücken. Beim Umschalten mit F2 richten sie sich neu aus.
+- Die Taste schaltet beim Drücken. Wer mit Alt+Tab das Fenster wechselt, schaltet die Schilder dabei um.
+- Ob die Schilder an oder aus sind, steht nicht im Spielstand.
+- Der Text eines Schilds ändert sich nicht, wenn ein Stapel Tränke nur zum Teil ins Inventar passt.
+- Der Todeseffekt zieht den Körper flach und 1,4-mal breiter. Er ragt dabei kurz unter die Nachbarn.
+- Ein Gegner mit Blinking springt dem Helden alle vier Sekunden hinterher, auch außer Reichweite. Das Verhalten stammt aus M5.
+- Bei 0,3 m Größe ist der Stern bei 240 Bildzeilen zwei bis drei Pixel groß. Auf dem dunklen Leder ist er als Kreuz zu erkennen.
 
 ### Eigene Modelle (läuft neben den Meilensteinen)
 
@@ -949,7 +1033,8 @@ Ziel: Held, Gegner und Items bekommen eigene Low-Poly-Modelle aus Blender statt 
 
 - Die Modelle bestehen aus starren Teilen ohne Skelett.
 - Der Held braucht die Knoten `Visual`, `Visual/Body`, `Visual/WeaponPivot` und die Befestigungspunkte mit dem Namen `Attach` plus Platz.
-- Ein Gegner braucht `Visual` und `Visual/Body`. An `Body` hängen Klickfläche, Hervorhebung und das Färben beim Ausholen.
+- Ein Gegner braucht `Visual` und `Visual/Body`. An `Body` hängen Klickfläche und das Färben beim Ausholen.
+- Die Kollisionsform eines Gegners ist eine Kapsel mit dem Radius des Modells plus 3 cm, Maske 11. Sie ist so hoch, dass ein gerader Teil bleibt, sonst schieben sich Körper verschiedener Größe nach oben und unten weg.
 - Material ist der Shader `Shaders/Ps1/ps1_surface.gdshader`, Texturen sind klein und ungefiltert.
 
 ### M6: Prozedurale Level mit handgebauten Räumen (L)
@@ -962,6 +1047,7 @@ Ziel: jeder Abstieg sieht anders aus, und eigene Räume lassen sich einstreuen.
 - Thema pro Höllenkreis als Resource: Tiles oder Meshes, Licht, Gegnerpool, Musik.
 - Overlay-Karte liest den logischen Grundriss.
 - Feste Szenenpfade durch globale Dienste ersetzen. Behebt A1.
+- Gänge und Tore sind breiter als der größte Körper. Jedes erzeugte Level bringt die Ebene `CombatTextLayer` mit dem Knoten `LootLabels` mit.
 
 Fertig, wenn derselbe Seed zweimal dasselbe Level ergibt und ein handgebauter Event-Raum garantiert erscheint.
 

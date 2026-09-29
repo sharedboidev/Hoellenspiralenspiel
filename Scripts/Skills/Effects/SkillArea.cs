@@ -107,7 +107,7 @@ public partial class SkillArea : Node3D
 
             var offset = unit.GlobalPosition - center;
 
-            if (AreaSettings.Contains(WorldScale.ToPx(offset.X), WorldScale.ToPx(offset.Z), radiusPx))
+            if (AreaSettings.Contains(WorldScale.ToPx(offset.X), WorldScale.ToPx(offset.Z), radiusPx + unit.BodyRadiusPx))
                 cast.ApplyTo(unit);
         }
     }

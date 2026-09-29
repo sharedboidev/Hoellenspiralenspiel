@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Spatial;
@@ -12,6 +13,8 @@ public static class UnitRegistry
 
     private static readonly SpatialHash<BaseUnit> Grid            = new(CellSizePx);
     private static readonly List<BaseUnit>        RegisteredUnits = new();
+
+    private static float largestBodyRadiusPx;
 
     public static IReadOnlyList<BaseUnit> Units => RegisteredUnits;
 
@@ -36,7 +39,11 @@ public static class UnitRegistry
         Grid.Place(unit, WorldScale.ToPx(position.X), WorldScale.ToPx(position.Z));
     }
 
+    //Abstände zählen ab dem Rand der Körper, die Suche muss deshalb um den größten Körper weiter reichen
+    public static void NoteBodyRadius(float radiusPx)
+        => largestBodyRadiusPx = Math.Max(largestBodyRadiusPx, radiusPx);
+
     //Liefert eine Obermenge. Den genauen Abstand prüft der Aufrufer
     public static void FindNear(Vector3 center, float radiusPx, List<BaseUnit> results)
-        => Grid.Query(WorldScale.ToPx(center.X), WorldScale.ToPx(center.Z), radiusPx + SearchPaddingPx, results);
+        => Grid.Query(WorldScale.ToPx(center.X), WorldScale.ToPx(center.Z), radiusPx + SearchPaddingPx + largestBodyRadiusPx, results);
 }

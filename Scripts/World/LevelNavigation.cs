@@ -14,8 +14,9 @@ public partial class LevelNavigation : NavigationRegion3D
     [Export(PropertyHint.Layers3DPhysics)]
     public uint SourceLayers { get; set; } = CollisionLayers.NavigationSources;
 
+    //Wege halten diesen Abstand zu Mauern. Er richtet sich nach den großen Körpern, sonst schleifen sie um jede Ecke
     [Export]
-    public float AgentRadius { get; set; } = 0.5f;
+    public float AgentRadius { get; set; } = 0.75f;
 
     [Export]
     public float AgentHeight { get; set; } = 2f;

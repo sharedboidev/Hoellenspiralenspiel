@@ -37,7 +37,6 @@ public partial class Hero
     private const float  SwingArcDegrees    = 70f;
     private const float  SwingRaiseDegrees  = 40f;
     private const float  AimRaiseDegrees    = 80f;
-    private const float  DropDistanceMeters = 0.3f;
 
     private static readonly List<BaseUnit> UnitsNearPoint = new();
 
@@ -49,7 +48,7 @@ public partial class Hero
     private          ItemInstance  equippedWeapon;
     private          bool          hasDied;
     private          int           heldSlot = NoSlot;
-    private          BaseUnit      hoveredUnit;
+    private          Lootbag       hoveredLootbag;
     private          double        invulnerableTimeLeftSec;
     private          LevelUpEffect levelUpEffect;
     private          OmniLight3D   light;
@@ -259,7 +258,7 @@ public partial class Hero
         invulnerableTimeLeftSec = Math.Max(0, invulnerableTimeLeftSec - delta);
 
         RegenerateMana(delta);
-        UpdateHoveredUnit();
+        UpdateHoveredLootbag();
         RepeatHeldSkill();
         AdvanceAttack(delta);
         Move(GetWantedDirection(delta), delta);
@@ -328,20 +327,6 @@ public partial class Hero
         return nearestUnit;
     }
 
-    private void UpdateHoveredUnit()
-    {
-        var unitUnderMouse = FindHostileUnitUnderMouse();
-
-        if (unitUnderMouse == hoveredUnit)
-            return;
-
-        if (IsInstanceValid(hoveredUnit))
-            hoveredUnit.SetHighlight(false);
-
-        hoveredUnit = unitUnderMouse;
-        hoveredUnit?.SetHighlight(true);
-    }
-
     #endregion
 
     #region Skills
@@ -351,7 +336,7 @@ public partial class Hero
         if (IsDead)
             return;
 
-        if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } && OrderPickUp(Lootbag.FindUnderMouse(this)))
+        if (!LootLabels.AreShown && @event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } && OrderPickUp(Lootbag.FindUnderMouse(this)))
         {
             GetViewport().SetInputAsHandled();
 
@@ -784,7 +769,7 @@ public partial class Hero
 
         CancelAttack();
 
-        if (lootbag.IsInReachOf(GlobalPosition))
+        if (lootbag.IsInReachOf(this))
         {
             lootbag.Collect();
 
@@ -799,6 +784,21 @@ public partial class Hero
         return true;
     }
 
+    //Sind die Schilder zu sehen, hellen sie ihren Beutel selbst auf
+    private void UpdateHoveredLootbag()
+    {
+        var lootbagUnderMouse = LootLabels.AreShown ? null : Lootbag.FindUnderMouse(this);
+
+        if (lootbagUnderMouse == hoveredLootbag)
+            return;
+
+        if (IsInstanceValid(hoveredLootbag))
+            hoveredLootbag.SetHighlight(false);
+
+        hoveredLootbag = lootbagUnderMouse;
+        hoveredLootbag?.SetHighlight(true);
+    }
+
     private Vector3 ApproachLoot(double delta)
     {
         if (!IsInstanceValid(lootTarget) || lootTarget.IsQueuedForDeletion())
@@ -808,7 +808,7 @@ public partial class Hero
             return Vector3.Zero;
         }
 
-        if (!lootTarget.IsInReachOf(GlobalPosition))
+        if (!lootTarget.IsInReachOf(this))
             return approachPath.GetDirectionTo(lootTarget.GlobalPosition, delta);
 
         lootTarget.Collect();
@@ -823,9 +823,7 @@ public partial class Hero
         if (!IsInsideTree())
             return;
 
-        var towardsMouse = WorldScale.OnGround(GetMouseGroundPoint() - GlobalPosition).Normalized();
-
-        Lootbag.Drop(GetParent(), GlobalPosition + towardsMouse * DropDistanceMeters, item, Items);
+        Lootbag.DropAround(this, item, Items);
     }
 
     #endregion

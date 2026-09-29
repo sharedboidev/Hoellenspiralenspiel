@@ -2,7 +2,8 @@
 
 [ext_resource type="Script" uid="uid://c6ieb4psqn6s1" path="res://Scripts/Objects/Lootbag.cs" id="1_script"]
 [ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="2_ps1"]
-[ext_resource type="Texture2D" path="res://Textures/World/cloth_weave.png" id="3_cloth"]
+[ext_resource type="Texture2D" path="res://Textures/World/skin_speckled.png" id="3_leather"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/glimmer.gdshader" id="4_glimmer"]
 
 [sub_resource type="SphereShape3D" id="Shape_pick"]
 radius = 0.4
@@ -15,20 +16,27 @@ rings = 4
 
 [sub_resource type="ShaderMaterial" id="Mat_sack"]
 shader = ExtResource("2_ps1")
-shader_parameter/albedo = Color(0.5, 0.34, 0.18, 1)
-shader_parameter/albedo_texture = ExtResource("3_cloth")
+shader_parameter/albedo = Color(0.3, 0.17, 0.09, 1)
+shader_parameter/albedo_texture = ExtResource("3_leather")
 shader_parameter/uv_scale = Vector2(2, 2)
-shader_parameter/emission = Color(1, 0.8, 0.4, 1)
-shader_parameter/emission_energy = 0.35
+shader_parameter/emission = Color(0.4, 0.2, 0.08, 1)
+shader_parameter/emission_energy = 0.12
 
 [sub_resource type="BoxMesh" id="Mesh_knot"]
 size = Vector3(0.12, 0.12, 0.12)
 
 [sub_resource type="ShaderMaterial" id="Mat_knot"]
 shader = ExtResource("2_ps1")
-shader_parameter/albedo = Color(0.3, 0.2, 0.1, 1)
-shader_parameter/emission = Color(1, 0.8, 0.4, 1)
-shader_parameter/emission_energy = 0.35
+shader_parameter/albedo = Color(0.17, 0.09, 0.05, 1)
+shader_parameter/emission = Color(0.4, 0.2, 0.08, 1)
+shader_parameter/emission_energy = 0.12
+
+[sub_resource type="QuadMesh" id="Mesh_star"]
+size = Vector2(0.3, 0.3)
+
+[sub_resource type="ShaderMaterial" id="Mat_star"]
+shader = ExtResource("4_glimmer")
+shader_parameter/view_offset = Vector2(0.11, 0.08)
 
 [node name="Lootbag" type="Area3D"]
 collision_layer = 32
@@ -51,3 +59,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 cast_shadow = 0
 mesh = SubResource("Mesh_knot")
 surface_material_override/0 = SubResource("Mat_knot")
+
+[node name="Star" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.23, 0)
+cast_shadow = 0
+extra_cull_margin = 0.5
+mesh = SubResource("Mesh_star")
+surface_material_override/0 = SubResource("Mat_star")

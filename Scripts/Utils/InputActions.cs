@@ -13,6 +13,7 @@ public static class InputActions
     public static readonly StringName MoveDown             = "move_down";
     public static readonly StringName ToggleCharacterSheet = "toggle_character_sheet";
     public static readonly StringName ToggleOverlayMap     = "toggle_overlay_map";
+    public static readonly StringName ToggleLootLabels     = "toggle_loot_labels";
 
     public static readonly StringName[] SkillSlots =
     [
