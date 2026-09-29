@@ -14,6 +14,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19 un
 | 2D oder 3D | 3D im Look der PlayStation 1, Vorbild Silent Hill. Entschieden am 29.09.2026 nach dem Vergleich. |
 | Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen, auch das Amulett. Nur die Ringe bleiben unsichtbar. Gegner zeigen ihre Ausrüstung, sobald es Gegner mit Armen gibt. Entschieden am 29.09.2026. |
 | Modelle | Held und humanoide Gegner bekommen ein Skelett mit starrer Gewichtung, in Godot `Skeleton3D`. Blobs und einfache Gegner bleiben bei Knoten und Tweens. Entschieden am 29.09.2026, löst "Starre Teile ohne Skelett" vom selben Tag ab. |
+| Kontrast der Figuren | Held und Gegner tragen einen dunklen Umriss, der Gegner unter der Maus einen roten. Randlicht und Helligkeitskontrast sind verworfen. Entschieden am 29.09.2026 nach einem Vergleich im Spiel. |
 | Spielstruktur | Hub (Stadt) plus Abstieg in einen Höllenkreis mit mehreren Ebenen |
 | Leveldesign | Etwa 90 % prozedural, dazu handgebaute Räume und Event-Locations, die gezielt eingestreut werden |
 | Multiplayer | Singleplayer zuerst, Koop soll später nachrüstbar bleiben |
@@ -1066,7 +1067,7 @@ Nach dem [Vergleich](VERGLEICH_2D_3D.md) zählt für die Bildrate nach den Schat
 
 Für alle Modelle:
 
-- Material ist der Shader `Shaders/Ps1/ps1_surface.gdshader`, Texturen sind klein und ungefiltert. Hat die Textur durchsichtige Stellen, nimmt man `Shaders/Ps1/ps1_cutout.gdshader`. Dort schneidet der Alphakanal Löcher ins Netz, etwa zwischen die Rippen.
+- Material ist ein Shader aus `Shaders/Ps1`, Texturen sind klein und ungefiltert. Die Umgebung nimmt `ps1_surface`, Held, Gegner und getragene Items nehmen `ps1_unit`. Nur so bekommen sie den Umriss, siehe "Kontrast der Figuren". Hat die Textur einer Figur durchsichtige Stellen, nimmt man `ps1_unit_cutout`. Dort schneidet der Alphakanal Löcher ins Netz, etwa zwischen die Rippen.
 - Beim Import einer Textur steht `detect_3d/compress_to` auf 0, sonst komprimiert Godot sie beim ersten Einsatz in 3D verlustbehaftet.
 - Die Kollisionsform eines Gegners ist eine Kapsel mit dem Radius des Modells plus 3 cm, Maske 11. Sie ist so hoch, dass ein gerader Teil bleibt, sonst schieben sich Körper verschiedener Größe nach oben und unten weg.
 - Jede Einheit braucht den Knoten `Visual`. Er dreht sich in Blickrichtung.
@@ -1128,7 +1129,7 @@ Das Modell ist "Retro Lowpoly PSX Skeleton" von LonesomeDucky von Blendswap, Liz
 | Rig | Armature mit 19 Knochen, dazu 19 Vertex-Gruppen mit denselben Namen |
 | Gewichte | 570 Punkte hängen an genau einem Knochen. 15 Punkte am Hals teilen sich `Torso` und `Neck` und bleiben so, sie schließen den Übergang. |
 | Textur | 256 × 256 Pixel, 118 Farben, ungefiltert. 68 % der Textur sind durchsichtig, das sind die Lücken zwischen den Knochen. |
-| Material in Blender | Die Textur mit einer harten Alpha-Maske bei 0,5, die Rückseiten ausgeblendet. `ps1_cutout` bildet das nach. |
+| Material in Blender | Die Textur mit einer harten Alpha-Maske bei 0,5, die Rückseiten ausgeblendet. `ps1_unit_cutout` bildet das nach, bis zum Kontrast der Figuren hieß der Shader `ps1_cutout`. |
 
 Geändert habe ich:
 
@@ -1194,6 +1195,55 @@ Bekannte Einschränkungen:
 - Das Skelett hat Arme, trägt aber noch keine Ausrüstung. Dafür fehlen `BoneAttachment3D` an den Händen und Gegner mit Waffen in den Daten.
 - Ein Rare Elite leuchtet wie alle Elite in der Farbe seines Namens. Beim Skelett färbt das den ganzen Körper gelb.
 - Zauber und Fernkampf haben keine eigene Animation. Ein Skelett mit Skill spielt dafür dieselbe Angriffsanimation.
+
+Nachtrag: `Ps1Look` stimmte `ps1_cutout` nicht ab. Das Skelett rastete deshalb immer auf 240 Zeilen ein, auch mit F1 oder F3. Behoben auf `master_Skeleton3D`.
+
+### Kontrast der Figuren (umgesetzt am 29.09.2026 auf `master_UnitContrast`)
+
+Ziel: Held und Gegner heben sich von der Umgebung ab.
+
+Im Spiel verglichen habe ich fünf Wege, in derselben eingefrorenen Szene:
+
+| Weg | Befund |
+|---|---|
+| Umriss um alle Figuren, der Gegner unter der Maus rot | Hebt helle und mittlere Figuren klar vom Boden ab. Beim dunklen Helden bringt Schwarz wenig, im Dunkeln ist der Rand unsichtbar. |
+| Umriss nur beim Anvisieren | Hilft beim Zielen, nicht beim Überblick |
+| Randlicht an den Kanten | Die stärkste Trennung, macht aber Gegner außerhalb des Lichts sichtbar. Die Kästen des Helden wirken grau. |
+| Helligkeitskontrast: Boden und Mauern dunkler und blasser | Das Bild wird 25 bis 28 % dunkler, die Figuren heben sich kaum stärker ab |
+| Umriss und Randlicht | Die klarste Trennung, mit dem Nachteil des Randlichts |
+
+Entschieden ist der erste Weg. Die anderen sind wieder entfernt.
+
+| Punkt | Umsetzung |
+|---|---|
+| Markierung | Held, Gegner und getragene Items nehmen `ps1_unit` oder `ps1_unit_cutout`. Sie schreiben 0,4 in den Rauheitskanal, der Gegner unter der Maus 0,7. Die Umgebung hat 1, der leere Hintergrund 0. Ohne Glanzlicht spielt die Rauheit für das Aussehen keine Rolle. |
+| Rand | Ein Rechteck an der Kamera liegt über dem ganzen Bild, Shader `ps1_unit_outline`. Es liest Rauheit und Tiefe und färbt jede Zelle des PS1-Rasters, neben der eine Figur liegt. |
+| Verdeckung | Der Rand entsteht nur, wo die Figur vor dem liegt, was an der Stelle zu sehen ist. Eine Mauer vor einer Figur bekommt keinen Rand. |
+| Rippen | Die Lücken zwischen den Knochen schreiben keine Marke. Der Rand läuft deshalb auch innen um die Knochen, schmale Lücken füllt er ganz. |
+| Breite | `OutlineWidth` am Knoten `Ps1Look`, in Pixeln der PS1, von 0 bis 4. 0 schaltet den Rand samt Rechteck ab. Der Wert lässt sich im laufenden Spiel verstellen. |
+| Farben | `outline_color` und `highlight_color` am Material des Rechtecks `Camera/UnitOutline` |
+| Anvisieren | Der Held sucht jeden Physik-Frame den Gegner unter der Maus, wie beim Anklicken, und setzt an dessen Netzen `highlight` |
+
+Kosten, gemessen im Testlevel bei 2560 × 1440 mit 40 Gegnern, je ein Lauf:
+
+| Breite | Bilder pro Sekunde | Zeit pro Bild |
+|---|---|---|
+| 0 | 425 | |
+| 1 | 358 | 0,4 ms mehr |
+| 2 | 282 | 1,2 ms mehr |
+| 3 | 241 | 1,8 ms mehr |
+
+Die Kosten hängen nicht von der Zahl der Gegner ab, nur von der Bildgröße und der Breite. Jedes Bildpixel prüft bei Breite 1, 2 und 3 bis zu 4, 20 und 36 Nachbarzellen.
+
+Zum Testen der Kameradistanz verstellt das Mausrad die Sichthöhe der Kamera in Schritten von 2 m, zwischen 6 und 40 m. Die Statuszeile zeigt Sichthöhe und Abstand. Bisher waren es 18 m Sichthöhe aus 28,5 m Abstand. Startwert, Grenzen und Schritt stehen als `ViewHeight`, `MinViewHeight`, `MaxViewHeight` und `ZoomStep` an der Kamera. Die Schilder der Beute ordnen sich nach jedem Schritt neu.
+
+Stand: Die Laufzeitprüfung mit 14 Schritten lief fehlerfrei. Sie deckt das Mausrad samt Grenzen und Statuszeile ab, dazu die Breiten 0 bis 3 im Material und die Sichtbarkeit des Rechtecks. Die 692 Unit-Tests sind grün. Dazu kamen Bildschirmfotos aller Breiten und dreier Kameradistanzen.
+
+Offen:
+
+- Welcher Gegner unter der Maus liegt, entscheidet dieselbe Suche wie beim Anklicken. Mit echter Maus geprüft habe ich das nicht, die Bilder setzen die Markierung direkt.
+- Beim dunklen Helden ist der Rand kaum zu sehen.
+- Ob die Maus einen Gegner trifft, folgt weiter seiner Klickfläche, nicht dem Rand.
 
 ### M6: Prozedurale Level mit handgebauten Räumen (L, umgesetzt am 29.09.2026 auf `master_ProceduralLevels`)
 

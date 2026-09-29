@@ -5,7 +5,7 @@ namespace Hoellenspiralenspiel.Scripts.World;
 public partial class IsoCamera : Camera3D
 {
     private Vector3 offset;
-    private float   orthogonalSize;
+    private float   viewHeight = 18f;
 
     [Export]
     public Node3D Target { get; set; }
@@ -19,12 +19,35 @@ public partial class IsoCamera : Camera3D
     [Export]
     public float PerspectiveFov { get; set; } = 35f;
 
-    public override void _Ready()
-    {
-        orthogonalSize = Size;
+    //Grenzen für das Mausrad. Sie stehen vor ViewHeight, weil Godot die Felder in dieser Reihenfolge setzt
+    [Export]
+    public float MinViewHeight { get; set; } = 6f;
 
-        ApplyProjection();
+    [Export]
+    public float MaxViewHeight { get; set; } = 40f;
+
+    [Export]
+    public float ZoomStep { get; set; } = 2f;
+
+    //So viele Meter Welt zeigt das Bild in der Höhe, gemessen am Helden. Das Mausrad verstellt den Wert in Schritten, zum Testen
+    [Export(PropertyHint.Range, "4,60,0.5")]
+    public float ViewHeight
+    {
+        get => viewHeight;
+        set
+        {
+            viewHeight = Mathf.Clamp(value, MinViewHeight, MaxViewHeight);
+
+            if (IsInsideTree())
+                ApplyProjection();
+        }
     }
+
+    //Abstand zum Helden in Metern. Bei orthogonaler Sicht bestimmt er nicht, wie groß die Welt erscheint
+    public float TargetDistance => offset.Length();
+
+    public override void _Ready()
+        => ApplyProjection();
 
     public override void _Process(double delta)
         => Follow();
@@ -39,6 +62,26 @@ public partial class IsoCamera : Camera3D
         ApplyProjection();
     }
 
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        if (@event is not InputEventMouseButton { Pressed: true } button)
+            return;
+
+        var step = button.ButtonIndex switch
+        {
+            MouseButton.WheelUp   => -ZoomStep,
+            MouseButton.WheelDown => ZoomStep,
+            _                     => 0f
+        };
+
+        if (step == 0f)
+            return;
+
+        ViewHeight += step;
+
+        GetViewport().SetInputAsHandled();
+    }
+
     //Die Perspektive rückt so weit heran, dass der Held so groß bleibt wie in der orthogonalen Sicht
     private void ApplyProjection()
     {
@@ -46,12 +89,12 @@ public partial class IsoCamera : Camera3D
         {
             Projection = ProjectionType.Perspective;
             Fov        = PerspectiveFov;
-            offset     = GlobalBasis.Z * (orthogonalSize / 2f / Mathf.Tan(Mathf.DegToRad(PerspectiveFov) / 2f));
+            offset     = GlobalBasis.Z * (ViewHeight / 2f / Mathf.Tan(Mathf.DegToRad(PerspectiveFov) / 2f));
         }
         else
         {
             Projection = ProjectionType.Orthogonal;
-            Size       = orthogonalSize;
+            Size       = ViewHeight;
             offset     = GlobalBasis.Z * Distance;
         }
 

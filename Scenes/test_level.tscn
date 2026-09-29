@@ -104,12 +104,13 @@ background_mode = 1
 ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
 
-[node name="TestLevel" type="Node3D" unique_id=528324007 node_paths=PackedStringArray("Enemies", "Status", "Look", "Descent")]
+[node name="TestLevel" type="Node3D" unique_id=528324007 node_paths=PackedStringArray("Enemies", "Status", "Look", "Descent", "Camera")]
 script = ExtResource("1_level")
 Enemies = NodePath("EnemyController")
 Status = NodePath("Hud/Margin/Rows/Status")
 Look = NodePath("Ps1Look")
 Descent = NodePath("Descent")
+Camera = NodePath("Camera")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=416123770]
 environment = SubResource("Env_level")
@@ -283,6 +284,7 @@ near = 0.1
 far = 150.0
 script = ExtResource("3_camera")
 Target = NodePath("../Hero")
+ViewHeight = 18.0
 
 [node name="UnitOutline" type="MeshInstance3D" parent="Camera"]
 cast_shadow = 0
@@ -294,6 +296,7 @@ material_override = SubResource("Mat_unit_outline")
 script = ExtResource("12_look")
 SurfaceShader = ExtResource("13_surface")
 UnitShader = ExtResource("39_unit")
+OutlineWidth = 1
 UnitCutoutShader = ExtResource("38_cutout")
 UnitOutline = NodePath("../Camera/UnitOutline")
 Screen = NodePath("../Ps1Screen/Picture")
@@ -348,7 +351,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "WASD laufen · Skills über die Leiste · Rechtsklick auf einen Platz belegt ihn
 B Inventar und Ausrüstung · Rechtsklick auf ein Item legt es an · Tab Karte · Alt Namen der Beute
-F1 PS1-Look · F2 Kamera · F3 Bildzeilen · F4 Schatten · F5 ganze Karte · F6 Kontrast
+F1 PS1-Look · F2 Kamera · F3 Bildzeilen · F4 Schatten · F5 ganze Karte · Mausrad Abstand der Kamera
 Die Kellertür führt hinab"
 
 [node name="LifeOrb" parent="Hud" unique_id=1868031920 node_paths=PackedStringArray("player") instance=ExtResource("23_orb")]

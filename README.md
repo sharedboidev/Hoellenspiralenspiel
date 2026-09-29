@@ -340,6 +340,7 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 | Feature | Beschreibung |
 |---|---|
 | PS1-Look | Wackelnde Eckpunkte, verzogene Texturen, 240 Bildzeilen, 15 Bit Farbtiefe mit Punktmuster |
+| Umriss | Held und Gegner tragen einen dunklen Rand von einem PS1-Pixel, der Gegner unter der Maus einen roten. Die Breite steht als `OutlineWidth` am Knoten `Ps1Look`. |
 | Sichtbare Ausrüstung | Angelegte Waffen, Schilde und Rüstung erscheinen am Helden. Sichtbar sind alle Plätze außer den Ringen. |
 | Skills | Projektile fliegen, Flächen liegen als Kreis auf dem Boden |
 | Level-up | Ein Sternenregen aus Partikeln |
@@ -367,7 +368,7 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 | `F3` | 240, 360 oder 480 Bildzeilen |
 | `F4` | Schatten aus Lichtern statt dunkler Scheiben |
 | `F5` | Ganze Karte der Ebene zeigen und zurück zum Erkundeten |
-| `F6` | Kontrast der Figuren durchschalten: ohne, Umriss, Umriss nur beim Anvisieren, Randlicht, Helligkeitskontrast, Umriss und Randlicht, alles zusammen |
+| Mausrad | Abstand der Kamera in Schritten ändern, zum Testen. Die Statuszeile zeigt, wie viele Meter das Bild zeigt und wie weit die Kamera entfernt ist. |
 
 </details>
 

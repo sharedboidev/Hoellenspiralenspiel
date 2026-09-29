@@ -82,7 +82,7 @@ void fragment() {
 		}
 	}
 
-	ALBEDO = mute_environment(sample_surface(affine_uv));
+	ALBEDO = sample_surface(affine_uv);
 	ROUGHNESS = 1.0;
 	METALLIC = 0.0;
 	EMISSION = emission.rgb * emission_energy;

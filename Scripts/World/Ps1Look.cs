@@ -5,18 +5,6 @@ using Hoellenspiralenspiel.Scripts.World.Levels;
 
 namespace Hoellenspiralenspiel.Scripts.World;
 
-//Wie sich Held und Gegner von der Umgebung abheben. F6 schaltet durch, zum Vergleich
-public enum UnitContrast
-{
-    Off,
-    Outline,
-    HoverOutline,
-    Rim,
-    Brightness,
-    OutlineAndRim,
-    All
-}
-
 public partial class Ps1Look : Node
 {
     public delegate void ChangedEventHandler();
@@ -25,19 +13,16 @@ public partial class Ps1Look : Node
 
     private static readonly int[] LineSteps = [240, 360, 480];
 
-    private static readonly StringName Snap           = "snap";
-    private static readonly StringName SnapResolution = "snap_resolution";
-    private static readonly StringName Affine         = "affine";
-    private static readonly StringName Resolution     = "resolution";
-    private static readonly StringName ColorLevelsKey = "color_levels";
-    private static readonly StringName DitherKey      = "dither";
-
-    private static readonly StringName UnitOutlineKey         = "unit_outline";
-    private static readonly StringName UnitHoverOutlineKey    = "unit_hover_outline";
-    private static readonly StringName UnitRimKey             = "unit_rim";
-    private static readonly StringName EnvironmentContrastKey = "environment_contrast";
+    private static readonly StringName Snap            = "snap";
+    private static readonly StringName SnapResolution  = "snap_resolution";
+    private static readonly StringName Affine          = "affine";
+    private static readonly StringName Resolution      = "resolution";
+    private static readonly StringName ColorLevelsKey  = "color_levels";
+    private static readonly StringName DitherKey       = "dither";
+    private static readonly StringName OutlineWidthKey = "outline_width";
 
     private readonly Dictionary<Light3D, bool> shadowOfLight = new();
+    private          int                       outlineWidth  = 1;
 
     [Export]
     public bool Enabled { get; set; } = true;
@@ -62,11 +47,19 @@ public partial class Ps1Look : Node
     [Export]
     public bool RealShadows { get; set; }
 
-    [Export]
-    public UnitContrast Contrast { get; set; } = UnitContrast.Outline;
+    //Breite des Rands um Held und Gegner in Pixeln der PS1, 0 schaltet ihn ab. Lässt sich im laufenden Spiel verstellen
+    [Export(PropertyHint.Range, "0,4,1")]
+    public int OutlineWidth
+    {
+        get => outlineWidth;
+        set
+        {
+            outlineWidth = Math.Clamp(value, 0, 4);
 
-    [Export(PropertyHint.Range, "0,1,0.05")]
-    public float RimStrength { get; set; } = 0.5f;
+            if (IsInsideTree())
+                ApplyOutline();
+        }
+    }
 
     [Export]
     public Shader SurfaceShader { get; set; }
@@ -123,10 +116,6 @@ public partial class Ps1Look : Node
                 RealShadows = !RealShadows;
 
                 break;
-            case Key.F6:
-                Contrast = (UnitContrast)(((int)Contrast + 1) % Enum.GetValues<UnitContrast>().Length);
-
-                break;
             default:
                 return;
         }
@@ -151,42 +140,24 @@ public partial class Ps1Look : Node
         }
 
         TuneTree(World ?? GetParent(), resolution);
-        ApplyContrast(resolution);
+        ApplyOutline();
 
         Changed?.Invoke();
     }
 
-    public string DescribeContrast()
-        => Contrast switch
-        {
-            UnitContrast.Outline       => "Umriss",
-            UnitContrast.HoverOutline  => "Umriss beim Anvisieren",
-            UnitContrast.Rim           => "Randlicht",
-            UnitContrast.Brightness    => "Helligkeitskontrast",
-            UnitContrast.OutlineAndRim => "Umriss und Randlicht",
-            UnitContrast.All           => "alles zusammen",
-            _                          => "ohne Kontrasthilfe"
-        };
-
-    private void ApplyContrast(Vector2 resolution)
+    private void ApplyOutline()
     {
-        var outline = Contrast is UnitContrast.Outline or UnitContrast.OutlineAndRim or UnitContrast.All;
-        var hover   = outline || Contrast == UnitContrast.HoverOutline;
-        var rim     = Contrast is UnitContrast.Rim or UnitContrast.OutlineAndRim or UnitContrast.All;
-        var muted   = Contrast is UnitContrast.Brightness or UnitContrast.All;
-
-        RenderingServer.GlobalShaderParameterSet(UnitOutlineKey, outline ? 1f : 0f);
-        RenderingServer.GlobalShaderParameterSet(UnitHoverOutlineKey, hover ? 1f : 0f);
-        RenderingServer.GlobalShaderParameterSet(UnitRimKey, rim ? RimStrength : 0f);
-        RenderingServer.GlobalShaderParameterSet(EnvironmentContrastKey, muted ? 1f : 0f);
-
         if (UnitOutline is null)
             return;
 
         //Ohne Rand liest niemand den Rauheitskanal, dann spart Godot sich dessen Aufbau
-        UnitOutline.Visible = hover;
+        UnitOutline.Visible = OutlineWidth > 0;
 
-        (UnitOutline.MaterialOverride as ShaderMaterial)?.SetShaderParameter(SnapResolution, resolution);
+        if (UnitOutline.MaterialOverride is not ShaderMaterial material)
+            return;
+
+        material.SetShaderParameter(OutlineWidthKey, Math.Max(1, OutlineWidth));
+        material.SetShaderParameter(SnapResolution, GetResolution());
     }
 
     private Vector2 GetResolution()
