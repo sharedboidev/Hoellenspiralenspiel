@@ -1,33 +1,50 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://Scripts/Skills/Effects/SkillProjectile.cs" id="1_proj"]
+[ext_resource type="Script" path="res://Scripts/Skills/Effects/SkillProjectile.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="90_ps1"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bolt"]
-radius = 14.0
-height = 96.0
+[sub_resource type="CylinderShape3D" id="Shape_hit"]
+height = 2.0
+radius = 0.25
 
-[node name="LightningBolt" type="Area2D"]
-z_index = 1
+[sub_resource type="BoxMesh" id="Mesh_bolt"]
+size = Vector3(0.1, 0.1, 0.5)
+
+[sub_resource type="ShaderMaterial" id="Mat_bolt"]
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/emission = Color(0.65, 0.85, 1, 1)
+shader_parameter/emission_energy = 4.0
+
+[node name="LightningBolt" type="Area3D"]
 collision_layer = 4
 collision_mask = 0
-script = ExtResource("1_proj")
+script = ExtResource("1_script")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-rotation = 1.5707964
-shape = SubResource("CapsuleShape2D_bolt")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("Shape_hit")
 
-[node name="Glow" type="Line2D" parent="."]
-points = PackedVector2Array(-48, 0, -30, -12, -14, 9, 4, -10, 22, 8, 48, 0)
-width = 14.0
-default_color = Color(0.45, 0.55, 1.6, 0.45)
-joint_mode = 2
-begin_cap_mode = 2
-end_cap_mode = 2
+[node name="Front" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9659258, 0, 0.25881904, 0, 1, 0, -0.25881904, 0, 0.9659258, 0.06, 0.9, -0.35)
+cast_shadow = 0
+mesh = SubResource("Mesh_bolt")
+surface_material_override/0 = SubResource("Mat_bolt")
 
-[node name="Core" type="Line2D" parent="."]
-points = PackedVector2Array(-48, 0, -30, -12, -14, 9, 4, -10, 22, 8, 48, 0)
-width = 5.0
-default_color = Color(1.8, 1.8, 2.2, 1)
-joint_mode = 2
-begin_cap_mode = 2
-end_cap_mode = 2
+[node name="Middle" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, 0, 0.9, 0.05)
+cast_shadow = 0
+mesh = SubResource("Mesh_bolt")
+surface_material_override/0 = SubResource("Mat_bolt")
+
+[node name="Back" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9659258, 0, 0.25881904, 0, 1, 0, -0.25881904, 0, 0.9659258, 0.06, 0.9, 0.45)
+cast_shadow = 0
+mesh = SubResource("Mesh_bolt")
+surface_material_override/0 = SubResource("Mat_bolt")
+
+[node name="Light" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+light_color = Color(0.6, 0.8, 1, 1)
+light_energy = 2.0
+omni_range = 4.0

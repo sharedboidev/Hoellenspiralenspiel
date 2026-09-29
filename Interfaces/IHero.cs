@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
@@ -41,6 +42,8 @@ public interface IHero
 
     long XpForNextLevel { get; }
 
+    int AttributePoints { get; }
+
     event Action SheetChanged;
 
     event Action ResourcesChanged;
@@ -48,4 +51,6 @@ public interface IHero
     event Action XpChanged;
 
     void Consume(ItemInstance item);
+
+    bool RaiseAttribute(Attributes attribute);
 }

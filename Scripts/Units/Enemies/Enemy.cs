@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Enums;
@@ -14,8 +13,10 @@ using Hoellenspiralenspiel.Scripts.Core.Enemies;
 using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
-using Hoellenspiralenspiel.Scripts.Extensions;
+using Hoellenspiralenspiel.Scripts.Core.Stats;
 using Hoellenspiralenspiel.Scripts.Skills;
+using Hoellenspiralenspiel.Scripts.UI;
+using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.Units.Enemies;
 
@@ -25,43 +26,46 @@ public partial class Enemy : BaseUnit
 
     public delegate void ProvokedEventHandler(Enemy enemy);
 
-    private const float  MinAttackspeedRate     = 0.1f;
-    private const float  ArrivalDistancePx      = 24f;
-    private const float  EngageFraction         = 0.9f;
-    private const double SightCheckIntervalSec  = 0.2;
-    private const float  MinFacingChangeSquared = 0.0004f;
-    private const int    NameFontSize           = 20;
-    private const int    ModsFontSize           = 15;
-    private const float  NameLabelLiftPx        = 14f;
-    private const float  NameLabelWidthPx       = 360f;
+    private const float  MinAttackspeedRate    = 0.1f;
+    private const float  ArrivalDistancePx     = 24f;
+    private const float  EngageFraction        = 0.9f;
+    private const double SightCheckIntervalSec = 0.2;
+    private const float  LungeMeters           = 0.3f;
+    private const double DeathLookSec          = 0.4;
+    private const float  HighlightEnergy       = 0.6f;
+    private const float  NameTagLiftMeters     = 0.15f;
+    private const float  EliteGlowEnergy       = 0.35f;
+    private const float  AuraRadiusFactor      = 1.3f;
 
-    private static readonly Color WindupTint    = new(1.6f, 0.7f, 0.7f);
-    private static readonly Color ModsNameColor = new(0.8f, 0.8f, 0.8f);
+    private static readonly Vector3 WindupTint    = new(1.6f, 0.7f, 0.7f);
+    private static readonly Color   HighlightGlow = new(0.9f, 0.3f, 0.6f);
 
-    private static readonly StringName RunBlendPosition   = "parameters/StateMachine/MoveState/RunState/blend_position";
-    private static readonly StringName IdleBlendPosition  = "parameters/StateMachine/MoveState/IdleState/blend_position";
-    private static readonly StringName DeathBlendPosition = "parameters/StateMachine/MoveState/DeathState/blend_position";
+    private static readonly StringName TintParameter           = "tint";
+    private static readonly StringName EmissionParameter       = "emission";
+    private static readonly StringName EmissionEnergyParameter = "emission_energy";
 
     private static readonly AttackSkillResource StandardAttack = new() { Id = "attack", DisplayName = AttackDefinition.Standard.Name };
 
-    private AnimationPlayer                   animationPlayer;
     private bool                              attackFailed;
+    private EliteAura                         aura;
+    private Tween                             attackLook;
     private SkillResource                     attackSkill;
+    private ShaderMaterial                    bodyMaterial;
     private EnemyBrain                        brain = new(new EnemyBehaviour());
-    private Vector2                           facedDirection;
+    private Color                             glowColor = HighlightGlow;
+    private float                             glowEnergy;
     private bool                              hasSight;
-    private ProgressBar                       healthbar;
-    private Vector2                           homePoint;
-    private bool                              isAttackAnimationRunning;
+    private HealthBar                         healthbar;
+    private Vector3                           homePoint;
     private bool                              isAwake = true;
+    private bool                              isHighlighted;
     private EnemyRarityLook                   look    = EnemyRarityLook.Normal;
     private MonsterModRuntime                 modRuntime;
     private IReadOnlyList<MonsterModResource> mods = [];
-    private Control                           nameLabel;
+    private NameTag                           nameTag;
     private PathFollower                      pathFollower;
     private double                            secUntilSightCheck;
-    private Vector2                           spawnPoint;
-    private bool                              usesAnimationTree;
+    private Vector3                           spawnPoint;
     private WeaponProfile                     weapon = WeaponProfile.Unarmed;
     private PackedScene                       weaponProjectileScene;
 
@@ -71,9 +75,8 @@ public partial class Enemy : BaseUnit
     [Export]
     public int Level { get; set; } = 1;
 
-    //Verschiebt den Start der Animation, damit eine Gruppe nicht im Gleichschritt wackelt
     [Export]
-    public bool RandomizeAnimationStart { get; set; }
+    public float HealthbarHeight { get; set; } = 1.3f;
 
     public string SpawnGroup { get; set; }
 
@@ -103,6 +106,10 @@ public partial class Enemy : BaseUnit
 
     public string DisplayName => Definition?.NameOrId ?? Name;
 
+    public NameTag NameTag => nameTag;
+
+    public EliteAura Aura => aura;
+
     public override Faction Faction      => Faction.Monster;
     public override bool    IsTargetable => !IsDead && !IsDying;
 
@@ -110,14 +117,13 @@ public partial class Enemy : BaseUnit
 
     public override PackedScene WeaponProjectileScene => weaponProjectileScene;
 
-    private AnimationTree AnimationTree  { get; set; }
-    private Sprite2D      MovementSprite { get; set; }
+    public override float CombatTextHeight => HealthbarHeight + 0.3f;
 
     public event EngagedEventHandler  Engaged;
     public event ProvokedEventHandler Provoked;
 
     //Vor dem Einhängen in den Szenenbaum aufrufen
-    public void Configure(EnemyResource definition, int level, IReadOnlyList<MonsterModResource> rolledMods, EnemyRarityLook rarityLook)
+    public void Configure(EnemyResource definition, int level, IReadOnlyList<MonsterModResource> rolledMods = null, EnemyRarityLook rarityLook = null)
     {
         Definition = definition;
         Level      = level;
@@ -127,69 +133,63 @@ public partial class Enemy : BaseUnit
 
     public override void _Ready()
     {
-        ApplyDefinition();
-
         base._Ready();
 
-        Scale *= look.Scale;
+        ScaleBody(look.Scale);
 
-        AnimationTree      = GetNode<AnimationTree>(nameof(AnimationTree));
-        animationPlayer    = GetNodeOrNull<AnimationPlayer>(nameof(AnimationPlayer));
-        MovementSprite     = RunSprite ?? GetNodeOrNull<Sprite2D>(nameof(Sprite2D));
-        healthbar          = GetNode<ProgressBar>("%Healthbar");
-        healthbar.MaxValue = LifeMaximum;
-        healthbar.Value    = LifeCurrent;
-        spawnPoint         = GlobalPosition;
-        homePoint          = GlobalPosition;
-        pathFollower       = new PathFollower(this);
-        modRuntime         = new MonsterModRuntime(this, mods);
+        HealthbarHeight *= look.Scale;
+        spawnPoint      =  GlobalPosition;
+        homePoint       =  GlobalPosition;
+        pathFollower    =  new PathFollower(this);
+        modRuntime      =  new MonsterModRuntime(this, mods);
 
-        if (RandomizeAnimationStart)
-            RandomizeAnimation();
+        OwnBodyMaterial();
+        AddHealthbar();
+        AddNameTag();
+        AddAura();
 
-        usesAnimationTree = AnimationTree.Active;
-
-        ShowNameLabel();
-
-        PropertyChanged                += OnPropertyChanged;
-        StatsChanged                   += OnStatsChanged;
-        AnimationTree.AnimationStarted += AnimationTreeOnAnimationStarted;
+        LifeChanged += OnLifeChanged;
     }
 
-    private void ApplyDefinition()
+    public override void _ExitTree()
+    {
+        base._ExitTree();
+
+        if (IsInstanceValid(nameTag))
+            nameTag.QueueFree();
+    }
+
+    protected override void ApplyBaseValues(StatSheet sheet)
     {
         if (Definition is null)
         {
-            GD.PushWarning($"{Name} hat keine Gegner-Definition und behält die Werte aus der Szene.");
+            GD.PushWarning($"{Name} hat keine Gegner-Definition.");
 
             return;
         }
 
         brain = new EnemyBrain(Definition.ToBehaviour());
 
-        Stats.Update(sheet =>
-        {
-            StrengthBase      = EnemyScaling.GetAttribute(Definition.Strength, Definition.StrengthPerLevel, Level);
-            DexterityBase     = EnemyScaling.GetAttribute(Definition.Dexterity, Definition.DexterityPerLevel, Level);
-            IntelligenceBase  = EnemyScaling.GetAttribute(Definition.Intelligence, Definition.IntelligencePerLevel, Level);
-            ConstitutionBase  = EnemyScaling.GetAttribute(Definition.Constitution, Definition.ConstitutionPerLevel, Level);
-            AwarenessBase     = EnemyScaling.GetAttribute(Definition.Awareness, Definition.AwarenessPerLevel, Level);
-            LifeBaseBonus     = Definition.LifeBonus;
-            Movementspeed     = Definition.Movementspeed;
-            ArmorBase         = Definition.Armor;
-            DodgeBase         = Definition.Dodge;
-            FireResiBase      = Definition.FireResistance;
-            FrostResiBase     = Definition.FrostResistance;
-            LightningResiBase = Definition.LightningResistance;
-
-            foreach (var item in Definition.Equipment.Where(item => item is not null))
-                sheet.AddModifiers(new ItemInstance(item.Definition, Level).GetEquipModifiers());
-
-            foreach (var mod in mods)
-                sheet.AddModifiers(mod.Definition.GetStampedModifiers());
-        });
-
         WieldWeapon(Definition.WieldedWeapon);
+
+        sheet.SetBase(CombatStat.Strength, EnemyScaling.GetAttribute(Definition.Strength, Definition.StrengthPerLevel, Level));
+        sheet.SetBase(CombatStat.Dexterity, EnemyScaling.GetAttribute(Definition.Dexterity, Definition.DexterityPerLevel, Level));
+        sheet.SetBase(CombatStat.Intelligence, EnemyScaling.GetAttribute(Definition.Intelligence, Definition.IntelligencePerLevel, Level));
+        sheet.SetBase(CombatStat.Constitution, EnemyScaling.GetAttribute(Definition.Constitution, Definition.ConstitutionPerLevel, Level));
+        sheet.SetBase(CombatStat.Awareness, EnemyScaling.GetAttribute(Definition.Awareness, Definition.AwarenessPerLevel, Level));
+        sheet.SetBase(CombatStat.Life, Definition.LifeBonus);
+        sheet.SetBase(CombatStat.Movementspeed, Definition.Movementspeed);
+        sheet.SetBase(CombatStat.Armor, Definition.Armor);
+        sheet.SetBase(CombatStat.Dodge, Definition.Dodge);
+        sheet.SetBase(CombatStat.FireResistance, Definition.FireResistance);
+        sheet.SetBase(CombatStat.FrostResistance, Definition.FrostResistance);
+        sheet.SetBase(CombatStat.LightningResistance, Definition.LightningResistance);
+
+        foreach (var item in Definition.Equipment.Where(item => item is not null))
+            sheet.AddModifiers(new ItemInstance(item.Definition, Level).GetEquipModifiers());
+
+        foreach (var mod in mods)
+            sheet.AddModifiers(mod.Definition.GetStampedModifiers());
     }
 
     private void WieldWeapon(WeaponBaseResource wieldedWeapon)
@@ -198,156 +198,87 @@ public partial class Enemy : BaseUnit
         weaponProjectileScene = wieldedWeapon?.ProjectileScene;
     }
 
-    private void RandomizeAnimation()
+    //Jede Instanz bekommt ihr eigenes Material, sonst färbte das Ausholen alle Gegner dieser Szene
+    private void OwnBodyMaterial()
     {
-        if (animationPlayer is null || !animationPlayer.HasAnimation(Animation.RunDown))
+        var body = Visual?.GetNodeOrNull<MeshInstance3D>("Body");
+
+        if (body?.GetActiveMaterial(0) is not ShaderMaterial material)
             return;
 
-        AnimationTree.Active = false;
+        bodyMaterial = (ShaderMaterial)material.Duplicate();
 
-        animationPlayer.Play(Animation.RunDown);
-        animationPlayer.Seek(GD.Randf() * animationPlayer.CurrentAnimationLength, true);
-
-        AnimationTree.Active = true;
+        body.SetSurfaceOverrideMaterial(0, bodyMaterial);
     }
 
-    //Die Schrift gleicht die Skalierung des Monsters aus, sonst wäre sie bei großen Monstern unscharf
-    private void ShowNameLabel()
+    private void AddHealthbar()
+    {
+        healthbar = new HealthBar { Name = "Healthbar", Visible = false };
+
+        AddChild(healthbar);
+
+        healthbar.Position = Vector3.Up * HealthbarHeight;
+    }
+
+    private void AddNameTag()
     {
         if (Rarity == EnemyRarity.Normal)
             return;
 
-        var title = new Label { Text = DisplayName, HorizontalAlignment = HorizontalAlignment.Center };
-        var names = new Label { Text = string.Join(" · ", mods.Select(mod => mod.Definition.Name)), HorizontalAlignment = HorizontalAlignment.Center };
+        nameTag = NameTag.Create(this, HealthbarHeight + NameTagLiftMeters, DisplayName, look.NameColor, string.Join(" · ", mods.Select(mod => mod.Definition.Name)));
 
-        title.AddThemeFontSizeOverride("font_size", NameFontSize);
-        title.AddThemeColorOverride("font_color", look.NameColor);
-        title.AddThemeColorOverride("font_outline_color", Colors.Black);
-        title.AddThemeConstantOverride("outline_size", 4);
-
-        names.AddThemeFontSizeOverride("font_size", ModsFontSize);
-        names.AddThemeColorOverride("font_color", ModsNameColor);
-        names.AddThemeColorOverride("font_outline_color", Colors.Black);
-        names.AddThemeConstantOverride("outline_size", 4);
-
-        var box = new VBoxContainer
-        {
-            Name              = "NameLabel",
-            ZIndex            = 2,
-            MouseFilter       = Control.MouseFilterEnum.Ignore,
-            CustomMinimumSize = new Vector2(NameLabelWidthPx, 0),
-            GrowVertical      = Control.GrowDirection.Begin,
-            Scale             = Vector2.One / Scale
-        };
-
-        box.AddThemeConstantOverride("separation", -4);
-        box.AddChild(title);
-        box.AddChild(names);
-
-        AddChild(box);
-
-        box.Position = new Vector2(-NameLabelWidthPx / 2f / Scale.X, healthbar.Position.Y - (NameLabelLiftPx + box.GetCombinedMinimumSize().Y) / Scale.Y);
-
-        nameLabel = box;
+        CombatText.GetLayer(GetTree().CurrentScene ?? GetTree().Root).AddChild(nameTag);
     }
 
-    private void OnStatsChanged()
+    private void AddAura()
     {
-        healthbar.MaxValue = LifeMaximum;
-        healthbar.Value    = LifeCurrent;
+        if (Rarity == EnemyRarity.Normal)
+            return;
+
+        glowColor  = look.NameColor;
+        glowEnergy = EliteGlowEnergy;
+        aura       = EliteAura.Create(look.NameColor, PickRadius * AuraRadiusFactor);
+
+        AddChild(aura);
+        ShowGlow();
     }
 
-    private void AnimationTreeOnAnimationStarted(StringName animname)
+    //Unter der Maus leuchtet jedes Monster gleich, sonst glimmt ein Elite in der Farbe seines Namens
+    private void ShowGlow()
     {
-        switch (animname)
-        {
-            case Animation.DieLeft or Animation.DieRight or Animation.DieTop or Animation.DieDown:
-                SetAsOnlyVisibleSprite(DeathSprite);
+        bodyMaterial?.SetShaderParameter(EmissionParameter, isHighlighted ? HighlightGlow : glowColor);
+        bodyMaterial?.SetShaderParameter(EmissionEnergyParameter, isHighlighted ? HighlightEnergy : glowEnergy);
+    }
 
-                break;
-            case Animation.RunLeft or Animation.RunRight or Animation.RunTop or Animation.RunDown:
-                SetAsOnlyVisibleSprite(RunSprite);
+    private void OnLifeChanged(BaseUnit unit)
+    {
+        healthbar.SetRatio(LifeMaximum > 0 ? LifeCurrent / LifeMaximum : 0f);
 
-                break;
-            case Animation.AttackLeft or Animation.AttackRight or Animation.AttackTop or Animation.AttackDown:
-                SetAsOnlyVisibleSprite(AttackSprite);
+        healthbar.Visible = LifeCurrent < LifeMaximum && !IsDying;
 
-                break;
-            case Animation.IdleLeft or Animation.IdleRight or Animation.IdleTop or Animation.IdleDown:
-                SetAsOnlyVisibleSprite(IdleSprite);
-
-                break;
-        }
+        if (IsDead)
+            BeginDeath();
     }
 
     public override void SetHighlight(bool active)
     {
-        if (MovementSprite is not null)
-            MovementSprite.SelfModulate = active ? new Color(3f, 1f, 2.0f) : new Color(1, 1, 1);
-    }
+        isHighlighted = active;
 
-    private void SetAsOnlyVisibleSprite(Sprite2D sprite)
-    {
-        if (IdleSprite is not null)
-            IdleSprite.Visible = IdleSprite == sprite;
-
-        if (RunSprite is not null)
-            RunSprite.Visible = RunSprite == sprite;
-
-        if (AttackSprite is not null)
-            AttackSprite.Visible = AttackSprite == sprite;
-
-        if (DeathSprite is not null)
-            DeathSprite.Visible = DeathSprite == sprite;
+        ShowGlow();
     }
 
     public override void _PhysicsProcess(double delta)
     {
         base._PhysicsProcess(delta);
 
-        if (IsDying)
-            return;
-
-        modRuntime.Advance(delta);
-
-        if (MovementDirection != Vector2.Zero)
-            FaceTowards(MovementDirection);
-    }
-
-    private void FaceTowards(Vector2 direction)
-    {
-        if (direction.DistanceSquaredTo(facedDirection) < MinFacingChangeSquared)
-            return;
-
-        facedDirection = direction;
-
-        AnimationTree.Set(RunBlendPosition, direction);
-        AnimationTree.Set(IdleBlendPosition, direction);
-        AnimationTree.Set(DeathBlendPosition, direction);
-    }
-
-    protected override void ResolveLifeReg(double delta)
-    {
-        //Ein sterbender Gegner regeneriert nicht zurück ins Leben
         if (!IsDying)
-            base.ResolveLifeReg(delta);
+            modRuntime.Advance(delta);
     }
 
-    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    protected override void RegenerateLife(double delta)
     {
-        if (e.PropertyName == nameof(LifeCurrent))
-        {
-            healthbar.Value   = LifeCurrent;
-            healthbar.Visible = LifeCurrent < LifeMaximum;
-
-            if (IsDead)
-                BeginDeath();
-        }
-        else
-        {
-            if (e.PropertyName == nameof(MovementDirection) && MovementDirection.Length() > 0.0f && !isAttackAnimationRunning)
-                SetAsOnlyVisibleSprite(RunSprite); //Hack, die Statemachine im Animationtree Startet die Animation nicht mehr
-        }
+        if (!IsDying)
+            base.RegenerateLife(delta);
     }
 
     public override void ReceiveDamage(HitResult hit, BaseUnit attacker = null)
@@ -372,18 +303,18 @@ public partial class Enemy : BaseUnit
     public void AddModifiers(IEnumerable<StatModifierResource> modifiers, double durationSec)
         => modRuntime.AddModifiers(modifiers, durationSec);
 
-    public Vector2 SnapToNavigation(Vector2 point)
+    public Vector3 SnapToNavigation(Vector3 point)
         => pathFollower.SnapToNavigation(point);
 
-    public void TeleportTo(Vector2 point)
+    public void TeleportTo(Vector3 point)
     {
-        GlobalPosition = point;
-        Velocity       = Vector2.Zero;
+        GlobalPosition = WorldScale.OnGround(point);
+        Velocity       = Vector3.Zero;
 
         pathFollower.Reset();
     }
 
-    //Ruhende Monster fern vom Helden sparen sich Denken, Bewegung und Animation. Leben, Statuseffekte und Abklingzeiten laufen weiter
+    //Ruhende Monster fern vom Helden sparen sich Denken und Bewegung. Leben, Statuseffekte und Abklingzeiten laufen weiter
     public void SetAwake(bool awake)
     {
         if (isAwake == awake || IsDying)
@@ -392,16 +323,13 @@ public partial class Enemy : BaseUnit
         isAwake = awake;
 
         if (!awake)
-            Stop();
+            Velocity = Vector3.Zero;
 
-        if (!isAttackAnimationRunning)
-            AnimationTree.Active = awake && usesAnimationTree;
-
-        if (nameLabel is not null)
-            nameLabel.Visible = awake;
+        if (nameTag is not null)
+            nameTag.IsShown = awake;
     }
 
-    //Der Tod wird genau einmal ausgelöst: XP und Loot sofort, entfernt wird der Gegner erst nach der Todesanimation
+    //Der Tod wird genau einmal ausgelöst: XP und Loot sofort, entfernt wird der Gegner erst nach dem Zusammensinken
     private void BeginDeath()
     {
         if (IsDying)
@@ -411,38 +339,35 @@ public partial class Enemy : BaseUnit
         healthbar.Visible = false;
 
         brain.Die();
-        Stop();
         EndAttackLook();
         StatusEffects.Clear();
 
-        if (nameLabel is not null)
-            nameLabel.Visible = false;
+        Velocity = Vector3.Zero;
 
-        AnimationTree.Active = usesAnimationTree;
+        if (nameTag is not null)
+            nameTag.IsShown = false;
 
-        GetNodeOrNull<CollisionShape2D>(nameof(CollisionShape2D))?.SetDeferred(CollisionShape2D.PropertyName.Disabled, true);
+        aura?.QueueFree();
 
-        PropertyChanged -= OnPropertyChanged;
+        GetNodeOrNull<CollisionShape3D>(nameof(CollisionShape3D))?.SetDeferred(CollisionShape3D.PropertyName.Disabled, true);
+
+        LifeChanged -= OnLifeChanged;
 
         RaiseDied();
 
         modRuntime.Release();
 
-        GetTree().CreateTimer(GetDeathAnimationLengthSec()).Timeout += RemoveCorpse;
-    }
-
-    private double GetDeathAnimationLengthSec()
-    {
-        if (animationPlayer is null || !animationPlayer.HasAnimation(Animation.DieDown))
-            return 0;
-
-        return animationPlayer.GetAnimation(Animation.DieDown).Length;
-    }
-
-    private void RemoveCorpse()
-    {
-        if (IsInstanceValid(this) && !IsQueuedForDeletion())
+        if (Visual is null)
+        {
             QueueFree();
+
+            return;
+        }
+
+        var collapse = CreateTween();
+
+        collapse.TweenProperty(Visual, "scale", Visual.Scale * new Vector3(1.4f, 0.05f, 1.4f), DeathLookSec);
+        collapse.TweenCallback(Callable.From(QueueFree));
     }
 
     public void Think(double delta)
@@ -450,8 +375,9 @@ public partial class Enemy : BaseUnit
         if (IsDying)
             return;
 
-        var skill    = brain.IsInCombat ? ChooseSkill() : null;
-        var decision = brain.Tick(delta, Perceive(skill, delta));
+        var skill      = brain.IsInCombat ? ChooseSkill() : null;
+        var perception = Perceive(skill, delta);
+        var decision   = brain.Tick(delta, perception);
 
         if (decision.Engages)
             Engaged?.Invoke(this);
@@ -460,7 +386,7 @@ public partial class Enemy : BaseUnit
             BeginReturn();
 
         if (decision.StartsAttack)
-            StartAttack(skill);
+            StartAttack(skill, perception);
 
         if (decision.Strikes)
             Strike();
@@ -474,7 +400,7 @@ public partial class Enemy : BaseUnit
     private EnemyPerception Perceive(SkillResource skill, double delta)
     {
         var hasTarget   = IsInstanceValid(Target) && Target.IsTargetable;
-        var distance    = hasTarget ? DistanceTo(Target) : float.MaxValue;
+        var distance    = hasTarget ? DistancePxTo(Target) : float.MaxValue;
         var engageRange = 0f;
         var canAttack   = false;
 
@@ -490,7 +416,7 @@ public partial class Enemy : BaseUnit
         var attackspeedRate = Math.Max(MinAttackspeedRate, Stats.GetTotalMultiplier(CombatStat.Attackspeed));
         var windupSec       = (Definition?.AttackWindupSec ?? 0.3f) / attackspeedRate;
         var recoverySec     = (Definition?.AttackRecoverySec ?? 0.2f) / attackspeedRate;
-        var hasArrivedHome  = BodyCenter.DistanceTo(homePoint) <= ArrivalDistancePx;
+        var hasArrivedHome  = WorldScale.GroundDistancePx(GlobalPosition, homePoint) <= ArrivalDistancePx;
 
         return new EnemyPerception(hasTarget, distance, engageRange, canAttack, hasArrivedHome, windupSec, recoverySec);
     }
@@ -545,44 +471,42 @@ public partial class Enemy : BaseUnit
 
         secUntilSightCheck = SightCheckIntervalSec;
 
-        var ray = PhysicsRayQueryParameters2D.Create(BodyCenter, Target.BodyCenter, CollisionLayers.Walls);
+        var ray = PhysicsRayQueryParameters3D.Create(BodyCenter, Target.BodyCenter, CollisionLayers.Walls);
 
-        hasSight = GetWorld2D().DirectSpaceState.IntersectRay(ray).Count == 0;
+        hasSight = GetWorld3D().DirectSpaceState.IntersectRay(ray).Count == 0;
 
         return hasSight;
     }
 
     private void BeginReturn()
     {
-        var radius = Definition?.HomeRadius ?? 0f;
+        var radius = WorldScale.ToMeters(Definition?.HomeRadius ?? 0f);
         var angle  = GameRandom.Shared.NextFloat() * MathF.Tau;
         var reach  = MathF.Sqrt(GameRandom.Shared.NextFloat()) * radius;
 
-        homePoint = pathFollower.SnapToNavigation(spawnPoint + Vector2.FromAngle(angle) * reach);
+        homePoint = pathFollower.SnapToNavigation(spawnPoint + new Vector3(MathF.Cos(angle), 0, MathF.Sin(angle)) * reach);
 
         pathFollower.Reset();
     }
 
-    private void StartAttack(SkillResource skill)
+    private void StartAttack(SkillResource skill, EnemyPerception perception)
     {
-        var toTarget = Target.BodyCenter - BodyCenter;
-
         attackSkill  = skill;
         attackFailed = RollActionFailure();
 
         TryPayFor(skill);
 
-        BeginAttackLook(toTarget, brain.AttackSec);
+        BeginAttackLook(Target.GlobalPosition - GlobalPosition, perception.WindupSec, perception.RecoverySec);
     }
 
     private void Strike()
     {
-        Modulate = Colors.White;
+        SetTint(Vector3.One);
 
         if (attackFailed)
-            this.ShowCombatText("Failed", Colors.Yellow, 28);
+            CombatText.Show(this, "Failed", Colors.Yellow, 28);
         else if (attackSkill is not null && IsInstanceValid(Target))
-            SkillExecutor.Execute(this, attackSkill, new SkillAim(Target.BodyCenter, Target));
+            SkillExecutor.Execute(this, attackSkill, new SkillAim(Target.GlobalPosition, Target));
     }
 
     private void Move(EnemyMovement movement, double delta)
@@ -590,72 +514,56 @@ public partial class Enemy : BaseUnit
         switch (movement)
         {
             case EnemyMovement.TowardTarget when IsInstanceValid(Target):
-                MoveAlong(pathFollower.GetDirectionTo(Target.BodyCenter, delta), MovementspeedFinal);
+                MoveAlong(pathFollower.GetDirectionTo(Target.GlobalPosition, delta), MovementspeedPx);
 
                 break;
             case EnemyMovement.TowardHome:
-                MoveAlong(pathFollower.GetDirectionTo(homePoint, delta), MovementspeedFinal * (Definition?.ReturnSpeedFactor ?? 1f));
+                MoveAlong(pathFollower.GetDirectionTo(homePoint, delta), MovementspeedPx * (Definition?.ReturnSpeedFactor ?? 1f));
 
                 break;
             default:
-                Stop();
+                Velocity = Vector3.Zero;
 
                 break;
         }
     }
 
-    private void MoveAlong(Vector2 direction, float speed)
+    private void MoveAlong(Vector3 direction, float speedPx)
     {
-        MovementDirection = direction;
-        Velocity          = speed * direction;
-
-        MoveAndSlide();
+        Face(direction);
+        MoveOnGround(direction, speedPx);
     }
 
-    private void Stop()
+    private void BeginAttackLook(Vector3 toTarget, double windupSec, double recoverySec)
     {
-        MovementDirection = Vector2.Zero;
-        Velocity          = Vector2.Zero;
-    }
+        Face(toTarget);
+        SetTint(WindupTint);
 
-    private void BeginAttackLook(Vector2 direction, double attackSec)
-    {
-        Modulate = WindupTint;
-
-        var animationName = GetAttackAnimationName(direction);
-
-        if (AttackSprite is null || animationPlayer is null || !animationPlayer.HasAnimation(animationName) || attackSec <= 0)
+        if (Visual is null || windupSec <= 0)
             return;
 
-        isAttackAnimationRunning = true;
-        AnimationTree.Active     = false;
+        var lunge = WorldScale.OnGround(toTarget).Normalized() * LungeMeters;
 
-        SetAsOnlyVisibleSprite(AttackSprite);
+        attackLook?.Kill();
 
-        animationPlayer.Play(animationName, customSpeed: (float)(animationPlayer.GetAnimation(animationName).Length / attackSec));
+        attackLook = CreateTween();
+
+        attackLook.TweenProperty(Visual, "position", lunge, windupSec).SetEase(Tween.EaseType.In).SetTrans(Tween.TransitionType.Back);
+        attackLook.TweenProperty(Visual, "position", Vector3.Zero, Math.Max(0.05, recoverySec));
     }
 
     private void EndAttackLook()
     {
-        Modulate = Colors.White;
+        SetTint(Vector3.One);
 
-        if (!isAttackAnimationRunning)
-            return;
+        attackLook?.Kill();
 
-        isAttackAnimationRunning = false;
+        attackLook = null;
 
-        animationPlayer.Stop();
-
-        SetAsOnlyVisibleSprite(IdleSprite ?? RunSprite);
-
-        AnimationTree.Active = usesAnimationTree && isAwake;
+        if (Visual is not null)
+            Visual.Position = Vector3.Zero;
     }
 
-    private static string GetAttackAnimationName(Vector2 direction)
-    {
-        if (Math.Abs(direction.X) > Math.Abs(direction.Y))
-            return direction.X > 0 ? Animation.AttackRight : Animation.AttackLeft;
-
-        return direction.Y > 0 ? Animation.AttackDown : Animation.AttackTop;
-    }
+    private void SetTint(Vector3 tint)
+        => bodyMaterial?.SetShaderParameter(TintParameter, tint);
 }

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://drwg3qy4e4uo6" path="res://Resources/Items/ArmorBaseResource.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://dgsjcn1x6xnn2" path="res://Textures/Items/Armor/Gloves/wool_gloves.png" id="2_icon"]
-[ext_resource type="PackedScene" path="res://Scenes/Spike3D/Items/wool_gloves_3d.tscn" id="9_worn"]
+[ext_resource type="PackedScene" path="res://Scenes/Items/wool_gloves.tscn" id="9_worn"]
 
 [resource]
 script = ExtResource("1_script")

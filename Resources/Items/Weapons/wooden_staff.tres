@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b1dxfvrfqmolb" path="res://Resources/Items/WeaponBaseResource.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://30hpggqgjfab" path="res://Textures/Items/Weapons/Staffs/Staff.png" id="2_icon"]
-[ext_resource type="PackedScene" path="res://Scenes/Spike3D/Items/wooden_staff_3d.tscn" id="9_worn"]
+[ext_resource type="PackedScene" path="res://Scenes/Items/wooden_staff.tscn" id="9_worn"]
 
 [resource]
 script = ExtResource("1_script")

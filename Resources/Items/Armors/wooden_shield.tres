@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Resources/Items/ArmorBaseResource.cs" id="1_script"]
 [ext_resource type="Texture2D" path="res://Textures/Items/Armor/Shields/WoodenShield.png" id="2_icon"]
-[ext_resource type="PackedScene" path="res://Scenes/Spike3D/Items/wooden_shield_3d.tscn" id="9_worn"]
+[ext_resource type="PackedScene" path="res://Scenes/Items/wooden_shield.tscn" id="9_worn"]
 
 [resource]
 script = ExtResource("1_script")

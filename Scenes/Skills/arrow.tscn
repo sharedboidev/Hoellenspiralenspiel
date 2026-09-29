@@ -1,31 +1,57 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://Scripts/Skills/Effects/SkillProjectile.cs" id="1_proj"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="ps1"]
+[ext_resource type="Texture2D" path="res://Textures/World/cloth_weave.png" id="cloth"]
+[ext_resource type="Script" path="res://Scripts/Skills/Effects/SkillProjectile.cs" id="projectile"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_arrow"]
-size = Vector2(84, 14)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_1"]
+height = 2.0
+radius = 0.15
 
-[node name="Arrow" type="Area2D"]
-z_index = 1
+[sub_resource type="BoxMesh" id="BoxMesh_2"]
+size = Vector3(0.025, 0.025, 0.7)
+
+[sub_resource type="ShaderMaterial" id="Mat_1"]
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.5, 0.34, 0.2, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3"]
+size = Vector3(0.07, 0.02, 0.12)
+
+[sub_resource type="ShaderMaterial" id="Mat_2"]
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.75, 0.77, 0.82, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_4"]
+size = Vector3(0.09, 0.02, 0.12)
+
+[sub_resource type="ShaderMaterial" id="Mat_3"]
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.75, 0.15, 0.12, 1)
+
+[node name="Arrow" type="Area3D"]
 collision_layer = 4
 collision_mask = 0
-script = ExtResource("1_proj")
+script = ExtResource("projectile")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_arrow")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_1")
 
-[node name="Outline" type="Polygon2D" parent="."]
-color = Color(0.12, 0.08, 0.05, 1)
-polygon = PackedVector2Array(-50, -11, -34, -5, 22, -5, 22, -12, 48, 0, 22, 12, 22, 5, -34, 5, -50, 11, -43, 0)
+[node name="Shaft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+cast_shadow = 0
+mesh = SubResource("BoxMesh_2")
+surface_material_override/0 = SubResource("Mat_1")
 
-[node name="Shaft" type="Polygon2D" parent="."]
-color = Color(0.93, 0.78, 0.52, 1)
-polygon = PackedVector2Array(-38, -2.5, 24, -2.5, 24, 2.5, -38, 2.5)
+[node name="Head" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -0.4)
+cast_shadow = 0
+mesh = SubResource("BoxMesh_3")
+surface_material_override/0 = SubResource("Mat_2")
 
-[node name="Head" type="Polygon2D" parent="."]
-color = Color(0.92, 0.93, 0.97, 1)
-polygon = PackedVector2Array(24, -9, 44, 0, 24, 9)
-
-[node name="Fletching" type="Polygon2D" parent="."]
-color = Color(0.9, 0.22, 0.2, 1)
-polygon = PackedVector2Array(-47, -9, -33, -2.5, -33, 2.5, -47, 9, -41, 0)
+[node name="Fletching" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0.3)
+cast_shadow = 0
+mesh = SubResource("BoxMesh_4")
+surface_material_override/0 = SubResource("Mat_3")

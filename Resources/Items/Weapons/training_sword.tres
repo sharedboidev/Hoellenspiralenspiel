@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Resources/Items/WeaponBaseResource.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://iro2pd1blvre" path="res://Textures/Items/Weapons/Swords/WoodenSword.png" id="2_icon"]
-[ext_resource type="PackedScene" path="res://Scenes/Spike3D/Items/training_sword_3d.tscn" id="9_worn"]
+[ext_resource type="PackedScene" path="res://Scenes/Items/training_sword.tscn" id="9_worn"]
 
 [resource]
 script = ExtResource("1_script")

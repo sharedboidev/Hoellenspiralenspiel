@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Resources/Items/ArmorBaseResource.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://cyu3672iep1er" path="res://Textures/Items/Armor/Torsos/peasant_tunic.png" id="2_icon"]
-[ext_resource type="PackedScene" path="res://Scenes/Spike3D/Items/peasant_tunic_3d.tscn" id="9_worn"]
+[ext_resource type="PackedScene" path="res://Scenes/Items/peasant_tunic.tscn" id="9_worn"]
 
 [resource]
 script = ExtResource("1_script")

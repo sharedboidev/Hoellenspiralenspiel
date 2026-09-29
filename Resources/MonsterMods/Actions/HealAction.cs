@@ -1,5 +1,5 @@
 using Godot;
-using Hoellenspiralenspiel.Scripts.Extensions;
+using Hoellenspiralenspiel.Scripts.UI;
 
 namespace Hoellenspiralenspiel.Resources.MonsterMods.Actions;
 
@@ -23,6 +23,6 @@ public partial class HealAction : ModAction
         var healed = owner.LifeCurrent - lifeBefore;
 
         if (healed >= 1f)
-            owner.ShowHeal(healed, owner.CombatTextOffset);
+            CombatText.ShowHeal(owner, healed);
     }
 }

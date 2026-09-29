@@ -1,5 +1,7 @@
 # Vergleich 2D und 3D
 
+Hinweis vom 29.09.2026: Dieses Dokument hält den Vergleich fest, wie er gebaut wurde. Mit dem Abschluss von M5.5 ist die 2D-Fassung entfallen, und die Ordner `Spike3D` sind aufgelöst. Wo die Teile heute liegen, steht in der [Roadmap](ROADMAP.md) unter M5.5.
+
 Stand: 29.09.2026, Branch `master_Compare3D`.
 Das Dokument gehört zum Entscheidungspunkt in der [Roadmap](ROADMAP.md). Es hält den Vergleich fest, wie er zur Entscheidung vorlag. Was seitdem in 3D dazukam, steht in der Roadmap unter M5.5.
 Held, Gegner und ein Zauber laufen einmal in 3D auf demselben Logik-Kern wie das 2D-Spiel. Alle Modelle sind Platzhalter aus Grundkörpern.

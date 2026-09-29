@@ -1,92 +1,69 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://Scripts/Skills/Effects/SkillArea.cs" id="1_area"]
-[ext_resource type="Shader" uid="uid://csu07l2uwwqk0" path="res://Scenes/Spells/cool.tres" id="2_shader"]
-[ext_resource type="PackedScene" uid="uid://ce03tbl6it2fh" path="res://Scenes/Spells/lightning_strike.tscn" id="3_strike"]
-[ext_resource type="Texture2D" uid="uid://dha4dmsjhrjen" path="res://Textures/Cool/frame0000.png" id="4_f00"]
-[ext_resource type="Texture2D" uid="uid://84vtqj8g7sa1" path="res://Textures/Cool/frame0001.png" id="5_f01"]
-[ext_resource type="Texture2D" uid="uid://8dwyjnkv4hke" path="res://Textures/Cool/frame0002.png" id="6_f02"]
-[ext_resource type="Texture2D" uid="uid://d0axcs7px0vlo" path="res://Textures/Cool/frame0003.png" id="7_f03"]
-[ext_resource type="Texture2D" uid="uid://c8y0hb65hucar" path="res://Textures/Cool/frame0004.png" id="8_f04"]
-[ext_resource type="Texture2D" uid="uid://b715amleecy0a" path="res://Textures/Cool/frame0005.png" id="9_f05"]
-[ext_resource type="Texture2D" uid="uid://cd32v6tdlgq76" path="res://Textures/Cool/frame0006.png" id="10_f06"]
-[ext_resource type="Texture2D" uid="uid://c4n5x3rds83ko" path="res://Textures/Cool/frame0007.png" id="11_f07"]
-[ext_resource type="Texture2D" uid="uid://dcc6xpo72gkfo" path="res://Textures/Cool/frame0008.png" id="12_f08"]
-[ext_resource type="Texture2D" uid="uid://bbdkngtfcenvx" path="res://Textures/Cool/frame0009.png" id="13_f09"]
-[ext_resource type="Texture2D" uid="uid://d2ipq8ngbh4ok" path="res://Textures/Cool/frame0010.png" id="14_f10"]
-[ext_resource type="Texture2D" uid="uid://bbpgxhwfymtdi" path="res://Textures/Cool/frame0011.png" id="15_f11"]
-[ext_resource type="Texture2D" uid="uid://bdr3xoj45emnx" path="res://Textures/Cool/frame0012.png" id="16_f12"]
-[ext_resource type="Texture2D" uid="uid://bbjgn2c8502ig" path="res://Textures/Cool/frame0013.png" id="17_f13"]
-[ext_resource type="Texture2D" uid="uid://dc3ancrcbivwo" path="res://Textures/Cool/frame0014.png" id="18_f14"]
+[ext_resource type="Script" path="res://Scripts/Skills/Effects/SkillArea.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="90_ps1"]
+[ext_resource type="AudioStream" path="res://Audio/lightning strike.mp3" id="91_strike"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_circle"]
-shader = ExtResource("2_shader")
-shader_parameter/Glow_Color2 = Color(0, 0.478401, 0.891977, 1)
+[sub_resource type="TorusMesh" id="Mesh_ring"]
+inner_radius = 0.93
+outer_radius = 1.0
+rings = 16
+ring_segments = 4
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_circle"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("4_f00")
-}, {
-"duration": 1.0,
-"texture": ExtResource("5_f01")
-}, {
-"duration": 1.0,
-"texture": ExtResource("6_f02")
-}, {
-"duration": 1.0,
-"texture": ExtResource("7_f03")
-}, {
-"duration": 1.0,
-"texture": ExtResource("8_f04")
-}, {
-"duration": 1.0,
-"texture": ExtResource("9_f05")
-}, {
-"duration": 1.0,
-"texture": ExtResource("10_f06")
-}, {
-"duration": 1.0,
-"texture": ExtResource("11_f07")
-}, {
-"duration": 1.0,
-"texture": ExtResource("12_f08")
-}, {
-"duration": 1.0,
-"texture": ExtResource("13_f09")
-}, {
-"duration": 1.0,
-"texture": ExtResource("14_f10")
-}, {
-"duration": 1.0,
-"texture": ExtResource("15_f11")
-}, {
-"duration": 1.0,
-"texture": ExtResource("16_f12")
-}, {
-"duration": 1.0,
-"texture": ExtResource("17_f13")
-}, {
-"duration": 1.0,
-"texture": ExtResource("18_f14")
-}],
-"loop": false,
-"name": &"Cool",
-"speed": 60.0
-}]
+[sub_resource type="ShaderMaterial" id="Mat_ring"]
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/emission = Color(0.25, 0.55, 1, 1)
+shader_parameter/emission_energy = 2.5
 
-[node name="Thunderbolt" type="Node2D" node_paths=PackedStringArray("Visual", "Indicator")]
-script = ExtResource("1_area")
-Visual = NodePath("Circle")
-VisualRadius = 243.0
-Indicator = NodePath("Circle")
-ImpactScene = ExtResource("3_strike")
-ImpactScale = Vector2(8, 8)
-LingerSec = 1.5
+[sub_resource type="BoxMesh" id="Mesh_bolt"]
+size = Vector3(0.14, 2.2, 0.14)
 
-[node name="Circle" type="AnimatedSprite2D" parent="."]
-material = SubResource("ShaderMaterial_circle")
-scale = Vector2(1, 0.5)
-sprite_frames = SubResource("SpriteFrames_circle")
-animation = &"Cool"
+[sub_resource type="ShaderMaterial" id="Mat_bolt"]
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/emission = Color(0.8, 0.9, 1, 1)
+shader_parameter/emission_energy = 5.0
+
+[node name="Thunderbolt" type="Node3D" node_paths=PackedStringArray("Visual", "Impact")]
+script = ExtResource("1_script")
+Visual = NodePath("Visual")
+Impact = NodePath("Impact")
+LingerSec = 0.35
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Ring" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 0.4, 0, 0, 0, 1, 0, 0.06, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_ring")
+surface_material_override/0 = SubResource("Mat_ring")
+
+[node name="Impact" type="Node3D" parent="."]
+
+[node name="BoltLow" type="MeshInstance3D" parent="Impact"]
+transform = Transform3D(0.9848077, -0.17364818, 0, 0.17364818, 0.9848077, 0, 0, 0, 1, 0, 1.05, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_bolt")
+surface_material_override/0 = SubResource("Mat_bolt")
+
+[node name="BoltMiddle" type="MeshInstance3D" parent="Impact"]
+transform = Transform3D(0.9848077, 0.17364818, 0, -0.17364818, 0.9848077, 0, 0, 0, 1, 0, 3.15, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_bolt")
+surface_material_override/0 = SubResource("Mat_bolt")
+
+[node name="BoltHigh" type="MeshInstance3D" parent="Impact"]
+transform = Transform3D(0.9848077, -0.17364818, 0, 0.17364818, 0.9848077, 0, 0, 0, 1, 0, 5.25, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_bolt")
+surface_material_override/0 = SubResource("Mat_bolt")
+
+[node name="Flash" type="OmniLight3D" parent="Impact"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+light_color = Color(0.7, 0.85, 1, 1)
+light_energy = 6.0
+omni_range = 9.0
+
+[node name="Sound" type="AudioStreamPlayer" parent="Impact"]
+stream = ExtResource("91_strike")

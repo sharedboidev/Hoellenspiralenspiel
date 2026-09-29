@@ -28,18 +28,18 @@ Gegner erschlagen, Beute sammeln, Charakter ausbauen.
 
 | Eckpunkt | Entscheidung |
 |---|---|
-| Perspektive | Klassisch isometrisch |
+| Perspektive | Klassisch isometrisch, von schräg oben |
 | Spielstruktur | Stadt als Hub, von dort Abstieg in einen Höllenkreis mit mehreren Ebenen |
 | Level | Überwiegend prozedural, dazu handgebaute Räume und Event-Orte |
 | Mehrspieler | Erst allein, Koop soll später nachrüstbar bleiben |
-| 2D oder 3D | 3D im Look der PlayStation 1. Die Umstellung steht an, spielbar ist bisher die 2D-Fassung |
+| 2D oder 3D | 3D im Look der PlayStation 1. Die frühere 2D-Fassung ist seit dem 29.09.2026 abgelöst |
 
 ---
 
 ## ✨ Feature-Umfang
 
 Das ist der Stand, der heute im Spiel steckt. Gespielt wird in einem Testlevel.
-Die Abschnitte beschreiben das 2D-Spiel, die 3D-Fassung hat einen [eigenen Abschnitt](#-3d-fassung-im-aufbau).
+Das Spiel läuft in 3D, mehr dazu im Abschnitt [3D im PS1-Look](#-3d-im-ps1-look).
 
 ### 🧙 Charakter
 
@@ -278,17 +278,19 @@ Der Held startet am Startpunkt mit vollem Leben und Mana.
 
 | Feature | Beschreibung |
 |---|---|
-| Isometrisches Testlevel | Boden, Wände und Objekte auf getrennten Ebenen |
+| Testlevel in 3D | Boden, Mauern, ein ummauerter Hof und eine Kellertür, gesehen von schräg oben |
 | Navigationsnetz | Entsteht beim Start des Levels aus den Wänden, für Gegner und Held |
-| Licht und Schatten | Punktlichter mit Schattenwurf in abgedunkelter Umgebung |
+| Licht und Schatten | Der Held trägt sein Licht mit sich, die Umgebung ist dunkel und neblig |
 | Lebens- und Mana-Orb | Mit Flüssigkeits-Shader |
 | Erfahrungsbalken | Unterteilt, mit Anzeige beim Überfahren |
-| Overlay-Karte | Lässt sich ein- und ausblenden |
+| Overlay-Karte | Das Level aus dem Winkel der Kamera, nur von weiter weg, mit `Tab` ein- und ausgeblendet |
+| Elite | Größer als ihre Art, mit Namensschild und einer Aura in der Farbe ihres Namens |
+| Beutel | Beute liegt als Beutel am Boden. Ein Klick hebt ihn auf, aus der Ferne läuft der Held erst hin |
 
-### 🧊 3D-Fassung im Aufbau
+### 🧊 3D im PS1-Look
 
-Seit dem 29.09.2026 steht fest: Das Spiel wird 3D, im Look der PlayStation 1.
-Die 3D-Fassung läuft in einem eigenen Testlevel neben dem 2D-Spiel und benutzt dieselbe Spiellogik und dieselben Daten.
+Seit dem 29.09.2026 steht fest: Das Spiel ist 3D, im Look der PlayStation 1.
+Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und dieselben Daten.
 
 <div align="center">
 <img src="docs/images/vergleich_3d_ps1_perspektive.webp" alt="3D-Testlevel im PS1-Look mit Held, Gegnern und Feuerball" width="720">
@@ -296,15 +298,11 @@ Die 3D-Fassung läuft in einem eigenen Testlevel neben dem 2D-Spiel und benutzt 
 
 | Feature | Beschreibung |
 |---|---|
-| Held und Gegner | Laufen, Nahkampf, Fernkampf, Verfolgen, Aufgeben, Tod und Respawn |
-| Skills | Alle fünf Skills des Helden und die vier der Monster, als Projektil oder als Fläche auf dem Boden |
-| Skill-Leiste, Orbs, XP-Balken | Dieselbe Oberfläche wie im 2D-Spiel, mit Auswahl per Rechtsklick und Tooltip |
-| XP und Level | Gegner geben XP, der Held steigt mit einem Sternenregen auf, der Tod kostet XP |
-| Wegfindung | Navigationsnetz aus den Wänden, zur Laufzeit gebacken |
 | PS1-Look | Wackelnde Eckpunkte, verzogene Texturen, 240 Bildzeilen, 15 Bit Farbtiefe mit Punktmuster |
 | Sichtbare Ausrüstung | Angelegte Waffen, Schilde und Rüstung erscheinen am Helden. Sichtbar sind alle Plätze außer den Ringen. |
-| Inventar und Charakterbogen | Dieselbe Oberfläche wie im 2D-Spiel |
-| Platzhalter | Alle Modelle bestehen aus Grundkörpern, die Texturen sind erzeugt |
+| Skills | Projektile fliegen, Flächen liegen als Kreis auf dem Boden |
+| Level-up | Ein Sternenregen aus Partikeln |
+| Platzhalter | Alle Modelle bestehen aus Grundkörpern, die Texturen sind erzeugt. Eigene Modelle folgen. |
 
 <div align="center">
 <img src="docs/images/ausruestung_3d_varianten.webp" alt="Der 3D-Held ohne Ausrüstung, mit Schwert und Schild, mit Stab und beim Schuss mit dem Bogen" width="720">
@@ -314,19 +312,15 @@ Die 3D-Fassung läuft in einem eigenen Testlevel neben dem 2D-Spiel und benutzt 
 <img src="docs/images/hud_und_flaechen_3d.webp" alt="Das 3D-Testlevel mit Orbs, Skill-Leiste und XP-Balken: Frost Nova, Einschlag von Thunderbolt, Einschlag eines Meteors und der Tooltip von Fireball" width="720">
 </div>
 
-Es fehlen noch Level-up-Dialog, Todesbildschirm, Monster-Mods, Beute und Speichern. Der Plan steht in der [Roadmap](docs/ROADMAP.md) unter M5.5.
+<div align="center">
+<img src="docs/images/elite_aura_und_karte_3d.webp" alt="Links ein Elite und ein Rare Elite mit Aura, rechts die Overlay-Karte aus dem Winkel der Spielkamera" width="720">
+</div>
 
 <details>
-<summary>So startest du das 3D-Testlevel</summary>
-
-Im Godot-Editor die Szene `Scenes/Spike3D/spike_3d.tscn` öffnen und mit `F6` starten.
+<summary>Tasten für den Look</summary>
 
 | Taste | Aktion |
 |---|---|
-| `W` `A` `S` `D` | Bewegen |
-| Linke und rechte Maustaste, `Q` `E` `R` `F`, `1` bis `4` | Skill auf diesem Platz der Leiste |
-| Rechtsklick auf einen Platz | Platz neu belegen |
-| `B` | Charakterbogen und Inventar, der Held hat alle neun Items dabei |
 | `F1` | PS1-Look an und aus |
 | `F2` | Kamera orthogonal oder perspektivisch |
 | `F3` | 240, 360 oder 480 Bildzeilen |
@@ -338,6 +332,7 @@ Im Godot-Editor die Szene `Scenes/Spike3D/spike_3d.tscn` öffnen und mit `F6` st
 
 - Hub, Levelwechsel und Menüs, damit auch mehrere Charaktere
 - Prozedurale Level
+- Eigene Modelle statt der Platzhalter aus Grundkörpern
 - Item-Basen für die übrigen zwölf Ausrüstungsplätze
 - Tasten im Spiel umbelegen
 - Klassen und Erwerb von Skills, der Held kennt vorerst alle
@@ -374,7 +369,7 @@ flowchart LR
     M2 --> M3(["M3 Skills"]):::done
     M2 --> M4(["M4 Items und Speichern"]):::done
     M4 --> M5(["M5 Gegner-KI"]):::done --> D{"3D im PS1-Look"}:::done
-    D --> U(["M5.5 Umstellung auf 3D"]):::next --> M6(["M6 Level"]):::open --> M7(["M7 Hub"]):::open --> M8(["M8 Höllenkreis"]):::open
+    D --> U(["M5.5 Umstellung auf 3D"]):::done --> M6(["M6 Level"]):::next --> M7(["M7 Hub"]):::open --> M8(["M8 Höllenkreis"]):::open
     M8 --> M9(["M9 Inhalt"]):::open --> M10(["M10 Koop"]):::optional
 
     classDef done fill:#2e7d32,color:#ffffff,stroke:#1b5e20
@@ -393,8 +388,8 @@ flowchart LR
 | ✅ | **M4** Items und Speichern | Items als Daten, Inventar-Modell, Schild mit Block, Speichern und Laden | mittel |
 | ✅ | **M5** Gegner-KI | Gegner als Daten, Zustandsmaschine, Wegfindung, Level, Elite mit Mods | mittel |
 | ✅ | **Entscheidung** | 3D im Look der PlayStation 1, entschieden nach dem [Vergleich](docs/VERGLEICH_2D_3D.md) | klein |
-| ⏭️ | **M5.5** Umstellung auf 3D | Die 3D-Fassung lernt alles, was die 2D-Fassung kann. Held, Gegner, Wegfindung, PS1-Look, sichtbare Ausrüstung, Skill-Leiste, Orbs, XP und alle Skills stehen | mittel |
-| ⬜ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
+| ✅ | **M5.5** Umstellung auf 3D | Die 3D-Fassung kann alles, was die 2D-Fassung konnte, und hat sie abgelöst | mittel |
+| ⏭️ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
 | ⬜ | **M7** Hub | Stadt, Abstieg, Menüs, Truhe, Händler, Einstellungen | mittel |
 | ⬜ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
@@ -436,8 +431,7 @@ git clone https://github.com/sharedboidev/Hoellenspiralenspiel.git
 ```
 
 Danach den Ordner in Godot als Projekt importieren und mit `F5` starten.
-Die Hauptszene ist `Scenes/test_plane.tscn`, das 2D-Spiel.
-Das 3D-Testlevel ist `Scenes/Spike3D/spike_3d.tscn` und startet aus dem Editor mit `F6`.
+Die Hauptszene ist das Testlevel `Scenes/test_level.tscn`.
 
 **Tests ausführen**
 
@@ -463,17 +457,18 @@ Hoellenspiralenspiel
 │   │   ├── Saving      Format des Spielstands, Lesen und Schreiben als JSON
 │   │   ├── Rng         Zufallsquelle mit Seed
 │   │   └── Progression XP-Tabelle, Level und Attributspunkte, XP-Verlust beim Tod
-│   ├── Spike3D         Die 3D-Fassung: Held, Gegner, Projektil, Fläche, Wegfindung, PS1-Look, sichtbare Ausrüstung
-│   ├── Units           Spieler, Gegner, Pfadfolger
+│   ├── Units           Held, Gegner, Pfadfolger, sichtbare Ausrüstung
 │   ├── Skills          Ausführung der Skills, Projektil und Fläche
 │   ├── Items           Bibliothek aller Item-Basen
 │   ├── Enemies         Bibliothek aller Monster-Mods
-│   ├── World           Navigationsnetz des Levels
+│   ├── World           Navigationsnetz, Kamera, PS1-Look, Spawn-Marker
+│   ├── Objects         Beutel am Boden
+│   ├── Environment     Kellertür
 │   ├── Saving          Datei des Spielstands
 │   ├── Controllers     Gegnersteuerung, Beute, Spielablauf, Speichern
-│   └── UI              Charakterbogen, Inventar, Orbs, Tooltips
-├── Scenes              Szenen für Level, Einheiten, Zauber, Oberfläche, unter Spike3D die 3D-Fassung
-├── Shaders             Shader, unter Spike3D die beiden für den PS1-Look
+│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder
+├── Scenes              Szenen für Level, Einheiten, Items, Skills, Objekte und Oberfläche
+├── Shaders             Shader, unter Ps1 die beiden für den PS1-Look, unter Archive2D die Effekte der 2D-Fassung
 ├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Gegner, Monster-Mods, Themes
 ├── Interfaces          Schnittstellen, darunter IHero zwischen Held und Oberfläche
 ├── Enums               Gemeinsame Aufzählungen

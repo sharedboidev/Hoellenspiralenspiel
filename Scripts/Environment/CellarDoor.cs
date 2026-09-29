@@ -2,34 +2,41 @@ using Godot;
 
 namespace Hoellenspiralenspiel.Scripts.Environment;
 
-public partial class CellarDoor : PanelContainer
+public partial class CellarDoor : Area3D
 {
-    private CollisionShape2D collisionPolygon;
-    private TextureRect      godRaysTexture;
+    [Export]
+    public Node3D Glow { get; set; }
+
+    public bool IsHovered { get; private set; }
+
+    public int TimesOpened { get; private set; }
 
     public override void _Ready()
     {
-        godRaysTexture   = GetNode<TextureRect>("%GodRays");
-        collisionPolygon = GetNode<CollisionShape2D>("%CollisionShape2D");
+        MouseEntered += () => SetHovered(true);
+        MouseExited  += () => SetHovered(false);
+
+        SetHovered(false);
     }
 
-    public override void _Input(InputEvent @event)
+    public override void _InputEvent(Camera3D camera, InputEvent @event, Vector3 eventPosition, Vector3 normal, int shapeIdx)
     {
-        if (@event is not InputEventMouseButton { ButtonIndex: MouseButton.Left } mouseEvent)
-            return;
+        if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
+            Open();
+    }
+
+    public void Open()
+    {
+        TimesOpened++;
 
         GD.Print("Init Scene Transition!!");
     }
 
-    public void _mouse_entered()
+    public void SetHovered(bool hovered)
     {
-        GD.Print("Activated");
-        godRaysTexture.SetVisible(true);
-    }
+        IsHovered = hovered;
 
-    public void _mouse_exited()
-    {
-        GD.Print("Deactivated");
-        godRaysTexture.SetVisible(false);
+        if (Glow is not null)
+            Glow.Visible = hovered;
     }
 }

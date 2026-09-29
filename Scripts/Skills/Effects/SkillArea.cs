@@ -2,10 +2,11 @@ using System.Collections.Generic;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.Skills.Effects;
 
-public partial class SkillArea : Node2D
+public partial class SkillArea : Node3D
 {
     private readonly List<BaseUnit> unitsInRange = new();
 
@@ -16,23 +17,17 @@ public partial class SkillArea : Node2D
     private bool         hasStarted;
     private double       lingerLeftSec;
     private AreaSettings settings;
-    private Vector2      visualBaseScale = Vector2.One;
+    private Vector3      visualBaseScale = Vector3.One;
 
     [Export]
-    public Node2D Visual { get; set; }
+    public Node3D Visual { get; set; }
 
-    //Der Radius, den Visual bei der Skalierung aus der Szene zeigt
+    //Der Radius in Metern, den Visual bei der Skalierung aus der Szene zeigt
     [Export]
-    public float VisualRadius { get; set; } = 100f;
-
-    [Export]
-    public AnimatedSprite2D Indicator { get; set; }
+    public float VisualRadius { get; set; } = 1f;
 
     [Export]
-    public PackedScene ImpactScene { get; set; }
-
-    [Export]
-    public Vector2 ImpactScale { get; set; } = Vector2.One;
+    public Node3D Impact { get; set; }
 
     [Export]
     public float LingerSec { get; set; }
@@ -50,11 +45,11 @@ public partial class SkillArea : Node2D
         if (Visual is not null)
             visualBaseScale = Visual.Scale;
 
-        if (settings is null)
-            return;
+        if (Impact is not null)
+            Impact.Visible = false;
 
-        ShowRadius(settings.DelaySec > 0 ? settings.Radius : settings.GetRadiusAfter(0));
-        PlayIndicator();
+        if (settings is not null)
+            ShowRadius(settings.DelaySec > 0 ? settings.Radius : settings.GetRadiusAfter(0));
     }
 
     public override void _PhysicsProcess(double delta)
@@ -99,73 +94,58 @@ public partial class SkillArea : Node2D
             QueueFree();
     }
 
-    private void HitUnitsWithin(float radius)
+    private void HitUnitsWithin(float radiusPx)
     {
         var center = GlobalPosition;
 
-        UnitRegistry.FindNear(center, radius, unitsInRange);
+        UnitRegistry.FindNear(center, radiusPx, unitsInRange);
 
         foreach (var unit in unitsInRange)
         {
             if (!cast.CanHit(unit))
                 continue;
 
-            var offset = unit.BodyCenter - center;
+            var offset = unit.GlobalPosition - center;
 
-            if (AreaSettings.Contains(offset.X, offset.Y, radius))
+            if (AreaSettings.Contains(WorldScale.ToPx(offset.X), WorldScale.ToPx(offset.Z), radiusPx))
                 cast.ApplyTo(unit);
         }
     }
 
-    private void ShowRadius(float radius)
+    //Die Fläche liegt auf dem Boden, in die Höhe wächst sie nicht
+    private void ShowRadius(float radiusPx)
     {
         if (Visual is null || VisualRadius <= 0f)
             return;
 
-        Visual.Scale = visualBaseScale * (radius / VisualRadius);
-    }
+        var factor = WorldScale.ToMeters(radiusPx) / VisualRadius;
 
-    private void PlayIndicator()
-    {
-        if (Indicator?.SpriteFrames is null)
-            return;
-
-        var animation = Indicator.Animation;
-        var frames    = Indicator.SpriteFrames;
-        var speed     = frames.GetAnimationSpeed(animation) * Indicator.SpeedScale;
-
-        if (speed <= 0 || settings.DelaySec <= 0f)
-        {
-            Indicator.Play();
-
-            return;
-        }
-
-        var frameUnits = 0f;
-
-        for (var frame = 0; frame < frames.GetFrameCount(animation); frame++)
-            frameUnits += frames.GetFrameDuration(animation, frame);
-
-        Indicator.Play(customSpeed: (float)(frameUnits / speed / settings.DelaySec));
+        Visual.Scale = new Vector3(visualBaseScale.X * factor, visualBaseScale.Y, visualBaseScale.Z * factor);
     }
 
     private void ShowImpact()
     {
         lingerLeftSec = LingerSec;
 
-        if (ImpactScene is null)
+        if (Impact is null)
             return;
 
-        var impact = ImpactScene.Instantiate<Node2D>();
+        Impact.Visible = true;
 
-        impact.Scale = ImpactScale;
-
-        AddChild(impact);
-
-        foreach (var child in impact.GetChildren())
+        foreach (var child in Impact.GetChildren())
         {
-            if (child is AudioStreamPlayer2D sound)
-                sound.Play();
+            if (child is AudioStreamPlayer sound)
+                PlayToTheEnd(sound);
         }
+    }
+
+    //Der Ton ist länger als die Fläche und risse mit ihr ab
+    private void PlayToTheEnd(AudioStreamPlayer sound)
+    {
+        sound.Reparent(GetParent());
+
+        sound.Finished += sound.QueueFree;
+
+        sound.Play();
     }
 }
