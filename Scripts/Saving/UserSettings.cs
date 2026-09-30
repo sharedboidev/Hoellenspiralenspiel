@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Settings;
+using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.Saving;
 
@@ -28,6 +29,7 @@ public partial class UserSettings : Node
         Current = SettingsStore.Load();
 
         ApplyDisplay(Current.Display);
+        ApplyAudio(Current.Audio);
     }
 
     public override void _ExitTree()
@@ -36,7 +38,7 @@ public partial class UserSettings : Node
             Instance = null;
     }
 
-    //Ändert eine Kopie, speichert sie und wendet sie an
+    //Ändert eine Kopie, speichert sie und wendet sie an. Das Fenster fasst sie nur an, wenn sich die Anzeige ändert, sonst spränge ein verschobenes Fenster in die Mitte
     public void Change(Action<GameSettings> change)
     {
         var next = Current.Copy();
@@ -45,12 +47,43 @@ public partial class UserSettings : Node
 
         SettingsSerializer.Repair(next);
 
+        var isDisplayChanged = !next.Display.SameAs(Current.Display);
+
         Current = next;
 
         SettingsStore.Save(Current);
-        ApplyDisplay(Current.Display);
+
+        if (isDisplayChanged)
+            ApplyDisplay(Current.Display);
+
+        ApplyAudio(Current.Audio);
 
         Changed?.Invoke();
+    }
+
+    //Wirkt sofort, speichert aber nicht. Die Regler hören so ihre Wirkung schon beim Ziehen
+    public void ApplyAudio(AudioSettings audio)
+    {
+        SetBus(AudioBuses.Master, audio.Master);
+        SetBus(AudioBuses.Music, audio.Music);
+        SetBus(AudioBuses.Effects, audio.Effects);
+    }
+
+    private static void SetBus(StringName name, float share)
+    {
+        var index = AudioServer.GetBusIndex(name);
+
+        if (index < 0)
+        {
+            GD.PushWarning($"Den Bus {name} gibt es nicht. Er gehört in default_bus_layout.tres.");
+
+            return;
+        }
+
+        AudioServer.SetBusMute(index, VolumeCurve.IsMuted(share));
+
+        if (!VolumeCurve.IsMuted(share))
+            AudioServer.SetBusVolumeDb(index, VolumeCurve.ToDecibels(share));
     }
 
     //Ohne Fenster gibt es nichts anzuwenden

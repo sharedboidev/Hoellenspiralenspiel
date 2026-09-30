@@ -465,6 +465,9 @@ public partial class Descent : Node
         foreach (var effect in Hero.GetParent().GetChildren().Where(child => child is SkillArea or SkillProjectile).ToList())
             Remove(effect);
 
+        foreach (var sound in GetTree().GetNodesInGroup(SkillArea.LingeringSoundGroup))
+            Remove(sound);
+
         foreach (var child in LevelRoot.GetChildren())
             Remove(child);
 
@@ -712,13 +715,13 @@ public partial class Descent : Node
             return;
         }
 
-        //Während der Reise ist dieselbe Musik nur angehalten. Sie spielt nach der Ankunft an derselben Stelle weiter
-        if (music?.Stream == stream && (music.Playing || music.StreamPaused))
+        if (music?.Stream == stream && music.Playing)
             return;
 
+        //Die Musik läuft auch im Pausenmenü und hinter dem Vorhang weiter
         if (music is null)
         {
-            music = new AudioStreamPlayer { Name = "Music" };
+            music = new AudioStreamPlayer { Name = "Music", Bus = AudioBuses.Music, ProcessMode = ProcessModeEnum.Always };
 
             AddChild(music);
         }

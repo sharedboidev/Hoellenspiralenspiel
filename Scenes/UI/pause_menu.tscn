@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/UI/PauseMenu.cs" id="1_menu"]
 [ext_resource type="StyleBox" uid="uid://d0lsfuyas70d8" path="res://Resources/Themes/boxes_stylebox.tres" id="2_box"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/settings_window.tscn" id="3_settings"]
 
 [node name="PauseMenu" type="Control"]
 process_mode = 3
@@ -69,8 +70,6 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(400, 64)
 layout_mode = 2
 size_flags_horizontal = 4
-tooltip_text = "Coming soon"
-disabled = true
 theme_override_font_sizes/font_size = 30
 text = "Settings"
 
@@ -89,3 +88,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 30
 text = "Quit Game"
+
+[node name="SettingsWindow" parent="." instance=ExtResource("3_settings")]
+visible = false
+layout_mode = 1

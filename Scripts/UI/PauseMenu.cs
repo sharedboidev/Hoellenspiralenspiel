@@ -10,7 +10,10 @@ namespace Hoellenspiralenspiel.Scripts.UI;
 //Hält das Spiel an. Escape schließt zuerst offene Fenster, erst danach geht das Menü auf
 public partial class PauseMenu : Control
 {
-    private Button resumeButton;
+    private Control[]      menuParts = [];
+    private Button         resumeButton;
+    private SettingsWindow settings;
+    private Button         settingsButton;
 
     [Export]
     public GameController Game { get; set; }
@@ -30,11 +33,20 @@ public partial class PauseMenu : Control
     {
         ProcessMode = ProcessModeEnum.Always;
 
-        resumeButton = GetNode<Button>("%ResumeButton");
+        resumeButton   = GetNode<Button>("%ResumeButton");
+        settingsButton = GetNode<Button>("%SettingsButton");
+        settings       = GetNodeOrNull<SettingsWindow>(nameof(SettingsWindow));
+        menuParts      = [GetNode<Control>("Shade"), GetNode<Control>("CenterContainer")];
 
         resumeButton.Pressed                       += Resume;
+        settingsButton.Pressed                     += OpenSettings;
         GetNode<Button>("%MainMenuButton").Pressed += ReturnToMainMenu;
         GetNode<Button>("%QuitButton").Pressed     += Quit;
+
+        settingsButton.Disabled = settings is null;
+
+        if (settings is not null)
+            settings.Closed += OnSettingsClosed;
 
         Hide();
     }
@@ -71,6 +83,8 @@ public partial class PauseMenu : Control
 
     public void Resume()
     {
+        settings?.Close();
+
         Hide();
 
         GetTree().Paused = false;
@@ -89,8 +103,29 @@ public partial class PauseMenu : Control
         return openWindows.Count;
     }
 
+    //Das Menü tritt zurück, solange die Einstellungen offen sind. Deren Escape führt hierher zurück
+    public void OpenSettings()
+    {
+        if (settings is null)
+            return;
+
+        foreach (var part in menuParts)
+            part.Hide();
+
+        settings.Open();
+    }
+
+    private void OnSettingsClosed()
+    {
+        foreach (var part in menuParts)
+            part.Show();
+
+        settingsButton.GrabFocus();
+    }
+
     public void ReturnToMainMenu()
     {
+        settings?.Close();
         Game?.SaveCharacter();
 
         GetTree().Paused = false;
@@ -99,6 +134,7 @@ public partial class PauseMenu : Control
 
     public void Quit()
     {
+        settings?.Close();
         Game?.SaveCharacter();
 
         GetTree().Quit();

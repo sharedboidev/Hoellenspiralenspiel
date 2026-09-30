@@ -35,6 +35,28 @@ public partial class MainMenu : Control
         }
 
         GetNode<Button>("%QuitButton").Pressed += () => GetTree().Quit();
+
+        if (GetNodeOrNull<SettingsWindow>(nameof(SettingsWindow)) is { } settings)
+            BindSettings(settings);
+    }
+
+    //Das Menü tritt zurück, solange die Einstellungen offen sind. Sonst wanderte der Fokus mit Tab auf Knöpfe dahinter
+    private void BindSettings(SettingsWindow settings)
+    {
+        var button = GetNode<Button>("%SettingsButton");
+        var menu   = GetNode<Control>("Margin");
+
+        button.Pressed += () =>
+        {
+            menu.Hide();
+            settings.Open();
+        };
+
+        settings.Closed += () =>
+        {
+            menu.Show();
+            button.GrabFocus();
+        };
     }
 
     //Das Laden der Spielszene hält das Bild an. Der Vorhang muss deshalb vorher einmal gezeichnet sein

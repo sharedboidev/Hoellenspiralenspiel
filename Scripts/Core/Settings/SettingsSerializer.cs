@@ -57,7 +57,15 @@ public static class SettingsSerializer
 
         settings.Display.WindowWidth  = size.Width;
         settings.Display.WindowHeight = size.Height;
+
+        settings.Audio         ??= new AudioSettings();
+        settings.Audio.Master  =   ToShare(settings.Audio.Master);
+        settings.Audio.Music   =   ToShare(settings.Audio.Music);
+        settings.Audio.Effects =   ToShare(settings.Audio.Effects);
     }
+
+    private static float ToShare(float value)
+        => float.IsFinite(value) ? Math.Clamp(value, 0f, 1f) : 1f;
 
     private sealed class LenientEnumConverter<T> : JsonConverter<T> where T : struct, Enum
     {

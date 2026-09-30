@@ -24,6 +24,14 @@ script = ExtResource("1_kqng3")
 equipmentPanel = NodePath("HBoxContainer/EquipmentPanel")
 inventory = NodePath("HBoxContainer/Inventory")
 
+[node name="Statdisplay" parent="." unique_id=322490862 node_paths=PackedStringArray("equipmentPanel") instance=ExtResource("4_dwqj4")]
+visible = false
+layout_mode = 0
+offset_left = -444.0
+offset_right = 6.0
+offset_bottom = 670.0
+equipmentPanel = NodePath("../HBoxContainer/EquipmentPanel")
+
 [node name="HBoxContainer" type="VBoxContainer" parent="." unique_id=745077026]
 layout_mode = 0
 offset_right = 918.0
@@ -37,15 +45,6 @@ layout_mode = 2
 [node name="Inventory" parent="HBoxContainer" unique_id=2062578477 instance=ExtResource("2_kqng3")]
 unique_name_in_owner = true
 layout_mode = 2
-
-[node name="Statdisplay" parent="." unique_id=322490862 node_paths=PackedStringArray("equipmentPanel") instance=ExtResource("4_dwqj4")]
-visible = false
-z_index = -1
-layout_mode = 0
-offset_left = -444.0
-offset_right = 6.0
-offset_bottom = 670.0
-equipmentPanel = NodePath("../HBoxContainer/EquipmentPanel")
 
 [node name="StatdisplayButton" type="TextureButton" parent="." unique_id=1686612181]
 layout_mode = 0

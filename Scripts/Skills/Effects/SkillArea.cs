@@ -8,6 +8,9 @@ namespace Hoellenspiralenspiel.Scripts.Skills.Effects;
 
 public partial class SkillArea : Node3D
 {
+    //Nachklingende Töne gehören zum Ort. Wer ihn verlässt, hört sie am nächsten nicht mehr
+    public const string LingeringSoundGroup = "lingering_sounds";
+
     private readonly List<BaseUnit> unitsInRange = new();
 
     private double       activeSec;
@@ -143,6 +146,7 @@ public partial class SkillArea : Node3D
     private void PlayToTheEnd(AudioStreamPlayer sound)
     {
         sound.Reparent(GetParent());
+        sound.AddToGroup(LingeringSoundGroup);
 
         sound.Finished += sound.QueueFree;
 

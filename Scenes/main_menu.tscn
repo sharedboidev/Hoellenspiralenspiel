@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/UI/MainMenu.cs" id="1_menu"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/character_slot.tscn" id="2_slot"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/curtain.tscn" id="3_curtain"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/settings_window.tscn" id="4_settings"]
 
 [node name="MainMenu" type="Control" node_paths=PackedStringArray("Curtain")]
 layout_mode = 3
@@ -72,13 +73,29 @@ Slot = 2
 layout_mode = 2
 Slot = 3
 
-[node name="QuitButton" type="Button" parent="Margin/Rows"]
+[node name="Buttons" type="VBoxContainer" parent="Margin/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="SettingsButton" type="Button" parent="Margin/Rows/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+text = "Settings"
+
+[node name="QuitButton" type="Button" parent="Margin/Rows/Buttons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(320, 72)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 32
 text = "Quit"
+
+[node name="SettingsWindow" parent="." instance=ExtResource("4_settings")]
+visible = false
+layout_mode = 1
 
 [node name="Curtain" parent="." instance=ExtResource("3_curtain")]
 layout_mode = 1

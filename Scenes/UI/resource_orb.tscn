@@ -22,7 +22,6 @@ OrbTexture = NodePath("Orb")
 ResourceText = NodePath("ResourceText")
 
 [node name="Orb" type="TextureRect" parent="." unique_id=1177697242]
-z_index = 10
 y_sort_enabled = true
 material = SubResource("ShaderMaterial_by0lb")
 layout_mode = 0
@@ -31,7 +30,6 @@ offset_bottom = 184.0
 texture = ExtResource("3_6lu0o")
 
 [node name="ResourceText" type="Label" parent="." unique_id=837161245]
-z_index = 10
 y_sort_enabled = true
 layout_mode = 0
 offset_left = 54.0

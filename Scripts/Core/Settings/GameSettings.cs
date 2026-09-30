@@ -17,9 +17,10 @@ public sealed class GameSettings
 
     public int             Version { get; set; } = CurrentVersion;
     public DisplaySettings Display { get; set; } = new();
+    public AudioSettings   Audio   { get; set; } = new();
 
     public GameSettings Copy()
-        => new() { Version = Version, Display = Display.Copy() };
+        => new() { Version = Version, Display = Display.Copy(), Audio = Audio.Copy() };
 }
 
 public sealed class DisplaySettings
@@ -34,4 +35,18 @@ public sealed class DisplaySettings
 
     public DisplaySettings Copy()
         => new() { Mode = Mode, WindowWidth = WindowWidth, WindowHeight = WindowHeight };
+
+    public bool SameAs(DisplaySettings other)
+        => other is not null && Mode == other.Mode && WindowWidth == other.WindowWidth && WindowHeight == other.WindowHeight;
+}
+
+//Anteile von 0 bis 1 je Bus. Wie laut das klingt, rechnet VolumeCurve
+public sealed class AudioSettings
+{
+    public float Master  { get; set; } = 1f;
+    public float Music   { get; set; } = 1f;
+    public float Effects { get; set; } = 1f;
+
+    public AudioSettings Copy()
+        => new() { Master = Master, Music = Music, Effects = Effects };
 }

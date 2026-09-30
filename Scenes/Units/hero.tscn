@@ -26,6 +26,10 @@ shader_parameter/emission_energy = 0.0
 shader_parameter/snap = 1.0
 shader_parameter/snap_resolution = Vector2(426, 240)
 shader_parameter/affine = 1.0
+shader_parameter/sight_center = Vector3(0, 0, 0)
+shader_parameter/sight_radius = 0.0
+shader_parameter/sight_edge = 1.5
+shader_parameter/outlined = true
 
 [sub_resource type="BoxMesh" id="BoxMesh_7"]
 size = Vector3(0.42, 0.2, 0.24)
@@ -43,6 +47,10 @@ shader_parameter/emission_energy = 0.0
 shader_parameter/snap = 1.0
 shader_parameter/snap_resolution = Vector2(426, 240)
 shader_parameter/affine = 1.0
+shader_parameter/sight_center = Vector3(0, 0, 0)
+shader_parameter/sight_radius = 0.0
+shader_parameter/sight_edge = 1.5
+shader_parameter/outlined = true
 
 [sub_resource type="BoxMesh" id="BoxMesh_5"]
 size = Vector3(0.17, 0.62, 0.19)
@@ -65,6 +73,10 @@ shader_parameter/emission_energy = 0.0
 shader_parameter/snap = 1.0
 shader_parameter/snap_resolution = Vector2(426, 240)
 shader_parameter/affine = 1.0
+shader_parameter/sight_center = Vector3(0, 0, 0)
+shader_parameter/sight_radius = 0.0
+shader_parameter/sight_edge = 1.5
+shader_parameter/outlined = true
 
 [sub_resource type="BoxMesh" id="BoxMesh_9"]
 size = Vector3(0.06, 0.06, 0.09)
@@ -204,11 +216,12 @@ mesh = SubResource("CylinderMesh_2")
 surface_material_override/0 = SubResource("Mat_blob_shadow")
 
 [node name="LevelUpEffect" parent="." unique_id=454393998 instance=ExtResource("level_up")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.037217855, 0)
 
 [node name="NoManaSound" type="AudioStreamPlayer" parent="." unique_id=377379938]
 stream = ExtResource("no_mana")
 volume_db = -20.0
+bus = &"Effects"
 
 [node name="Light" type="OmniLight3D" parent="." unique_id=1935674331]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)

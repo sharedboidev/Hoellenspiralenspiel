@@ -1,0 +1,160 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/SettingsWindow.cs" id="1_window"]
+[ext_resource type="StyleBox" uid="uid://d0lsfuyas70d8" path="res://Resources/Themes/boxes_stylebox.tres" id="2_box"]
+[ext_resource type="AudioStream" path="res://Audio/no mana.mp3" id="3_preview"]
+
+[node name="SettingsWindow" type="Control"]
+process_mode = 3
+z_index = 160
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_window")
+
+[node name="Shade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(1000, 0)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("2_box")
+
+[node name="Margin" type="MarginContainer" parent="CenterContainer/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 36
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 36
+theme_override_constants/margin_bottom = 36
+
+[node name="Rows" type="VBoxContainer" parent="CenterContainer/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/Panel/Margin/Rows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.45, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 56
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="Tabs" type="TabContainer" parent="CenterContainer/Panel/Margin/Rows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+current_tab = 0
+
+[node name="Audio" type="VBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs"]
+layout_mode = 2
+theme_override_constants/separation = 18
+metadata/_tab_index = 0
+
+[node name="MasterRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/MasterRow"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Master"
+
+[node name="MasterSlider" type="HSlider" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/MasterRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(480, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+value = 100.0
+
+[node name="MasterValue" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/MasterRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "100 %"
+horizontal_alignment = 2
+
+[node name="MusicRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/MusicRow"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Music"
+
+[node name="MusicSlider" type="HSlider" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/MusicRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(480, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+value = 100.0
+
+[node name="MusicValue" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/MusicRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "100 %"
+horizontal_alignment = 2
+
+[node name="EffectsRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/EffectsRow"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Effects"
+
+[node name="EffectsSlider" type="HSlider" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/EffectsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(480, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+value = 100.0
+
+[node name="EffectsValue" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/EffectsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "100 %"
+horizontal_alignment = 2
+
+[node name="BackButton" type="Button" parent="CenterContainer/Panel/Margin/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Back"
+
+[node name="PreviewSound" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+process_mode = 3
+stream = ExtResource("3_preview")
+bus = &"Effects"

@@ -67,3 +67,4 @@ omni_range = 9.0
 
 [node name="Sound" type="AudioStreamPlayer" parent="Impact"]
 stream = ExtResource("91_strike")
+bus = &"Effects"
