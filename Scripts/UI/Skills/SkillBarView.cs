@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Interfaces;
+using Hoellenspiralenspiel.Resources.Items;
 using Hoellenspiralenspiel.Resources.Skills;
+using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Saving;
 using Hoellenspiralenspiel.Scripts.Skills;
 using Hoellenspiralenspiel.Scripts.Utils;
@@ -39,8 +42,10 @@ public partial class SkillBarView : HBoxContainer
         AddChild(picker);
 
         picker.SkillChosen          += OnSkillChosen;
-        hero.Loadout.SlotChanged    += OnSlotChanged;
+        picker.ConsumableChosen     += OnConsumableChosen;
+        hero.Loadout.SlotChanged    += ShowSlot;
         hero.SkillCooldowns.Started += OnCooldownStarted;
+        hero.Items.Changed          += ShowConsumableCounts;
 
         //Nach einer Neubelegung in den Einstellungen stehen die neuen Tasten auf den Plätzen
         if (UserSettings.Instance is { } settings)
@@ -55,8 +60,9 @@ public partial class SkillBarView : HBoxContainer
         if (hero is null)
             return;
 
-        hero.Loadout.SlotChanged    -= OnSlotChanged;
+        hero.Loadout.SlotChanged    -= ShowSlot;
         hero.SkillCooldowns.Started -= OnCooldownStarted;
+        hero.Items.Changed          -= ShowConsumableCounts;
     }
 
     private void AddSlot(int slot)
@@ -66,11 +72,31 @@ public partial class SkillBarView : HBoxContainer
         AddChild(slotView);
 
         slotView.Init(slot, InputActions.GetKeyLabel(InputActions.SkillSlots[slot]), hero);
-        slotView.ShowSkill(SkillLibrary.Find(hero.Loadout.GetSkillId(slot)));
 
         slotView.PickerRequested += OpenPicker;
 
         slots.Add(slotView);
+
+        ShowSlot(slot);
+    }
+
+    private void ShowSlot(int slot)
+    {
+        var consumableId = hero.Loadout.GetConsumableId(slot);
+
+        if (consumableId is null)
+            slots[slot].ShowSkill(SkillLibrary.Find(hero.Loadout.GetSkillId(slot)));
+        else
+            slots[slot].ShowConsumable(ItemLibrary.Find(consumableId) as ConsumableBaseResource, hero.Items.CountInInventory(consumableId));
+    }
+
+    private void ShowConsumableCounts()
+    {
+        for (var slot = 0; slot < slots.Count; slot++)
+        {
+            if (hero.Loadout.GetConsumableId(slot) is not null)
+                ShowSlot(slot);
+        }
     }
 
     private void ShowKeys()
@@ -80,13 +106,20 @@ public partial class SkillBarView : HBoxContainer
     }
 
     private void OpenPicker(SkillSlotView slotView)
-        => picker.Open(slotView.Slot, hero.KnownSkills, slotView.GetGlobalRect(), hero);
+        => picker.Open(slotView.Slot, hero.KnownSkills, GetConsumables(), slotView.GetGlobalRect(), hero);
+
+    private static List<ConsumableBaseResource> GetConsumables()
+        => ItemLibrary.All
+                      .OfType<ConsumableBaseResource>()
+                      .OrderBy(consumable => consumable.Definition.Name)
+                      .ThenBy(consumable => consumable.Id)
+                      .ToList();
 
     private void OnSkillChosen(int slot, SkillResource skill)
         => hero.Loadout.Assign(slot, skill?.Id);
 
-    private void OnSlotChanged(int slot)
-        => slots[slot].ShowSkill(SkillLibrary.Find(hero.Loadout.GetSkillId(slot)));
+    private void OnConsumableChosen(int slot, ConsumableBaseResource consumable)
+        => hero.Loadout.AssignConsumable(slot, consumable?.Id);
 
     private void OnCooldownStarted(string skillId)
     {

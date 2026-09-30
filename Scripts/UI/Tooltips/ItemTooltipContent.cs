@@ -16,6 +16,9 @@ public sealed class ItemTooltipContent : ITooltipObject
     private const string UnmetColor = "firebrick";
     private const string PriceColor = "gold";
 
+    private const string EquippedNote = "Currently Equipped";
+    private const int    NoteFontSize = 20;
+
     private readonly ItemInstance               item;
     private readonly string                     priceNote;
     private readonly IReadOnlyList<Requirement> unmetRequirements;
@@ -27,9 +30,14 @@ public sealed class ItemTooltipContent : ITooltipObject
         this.priceNote         = priceNote;
     }
 
+    public bool ShowsEquippedNote { get; init; }
+
     public string GetTooltipTitle()
     {
         var text = new StringBuilder("[center]");
+
+        if (ShowsEquippedNote)
+            text.Append($"[font_size={NoteFontSize}][color=gray]{EquippedNote}[/color][/font_size]").Append('\n');
 
         switch (item.Rarity)
         {

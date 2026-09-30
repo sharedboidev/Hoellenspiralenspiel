@@ -132,4 +132,118 @@ public class SkillLoadoutTests
     [Test]
     public void LeisteOhnePlaetze_IstNichtErlaubt()
         => Assert.That(() => new SkillLoadout(0), Throws.InstanceOf<ArgumentOutOfRangeException>());
+
+    [Test]
+    public void AssignConsumable_LegtDenTrankAufDenPlatz()
+    {
+        var loadout = new SkillLoadout(10);
+
+        loadout.AssignConsumable(6, "health_potion");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(loadout.GetConsumableId(6), Is.EqualTo("health_potion"));
+            Assert.That(loadout.GetSkillId(6), Is.Null);
+            Assert.That(loadout.IsEmpty(6), Is.False);
+            Assert.That(loadout.GetConsumableId(5), Is.Null);
+        });
+    }
+
+    [Test]
+    public void AssignConsumable_ErsetztDenSkill()
+    {
+        var loadout = new SkillLoadout(10);
+
+        loadout.Assign(0, "attack");
+        loadout.AssignConsumable(0, "health_potion");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(loadout.GetSkillId(0), Is.Null);
+            Assert.That(loadout.GetConsumableId(0), Is.EqualTo("health_potion"));
+            Assert.That(loadout.FindSlotOf("attack"), Is.EqualTo(-1));
+        });
+    }
+
+    [Test]
+    public void Assign_ErsetztDenTrank()
+    {
+        var loadout = new SkillLoadout(10);
+
+        loadout.AssignConsumable(1, "mana_potion");
+        loadout.Assign(1, "fireball");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(loadout.GetSkillId(1), Is.EqualTo("fireball"));
+            Assert.That(loadout.GetConsumableId(1), Is.Null);
+        });
+    }
+
+    [Test]
+    public void Clear_LeertAuchEinenTrankplatz()
+    {
+        var loadout = new SkillLoadout(10);
+
+        loadout.AssignConsumable(7, "health_potion");
+        loadout.Assign(8, "fireball");
+        loadout.AssignConsumable(8, "health_potion");
+        loadout.Clear(7);
+        loadout.Assign(8, null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(loadout.IsEmpty(7), Is.True);
+            Assert.That(loadout.IsEmpty(8), Is.True);
+            Assert.That(loadout.GetConsumableId(7), Is.Null);
+            Assert.That(loadout.GetConsumableId(8), Is.Null);
+        });
+    }
+
+    [Test]
+    public void GleicheIdAlsSkillOderTrank_SindVerschiedeneBelegungen()
+    {
+        var loadout = new SkillLoadout(10);
+
+        loadout.Assign(2, "health_potion");
+        loadout.AssignConsumable(2, "health_potion");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(loadout.GetSkillId(2), Is.Null);
+            Assert.That(loadout.GetConsumableId(2), Is.EqualTo("health_potion"));
+            Assert.That(loadout.FindSlotOf("health_potion"), Is.EqualTo(-1));
+        });
+    }
+
+    [Test]
+    public void SlotChanged_FeuertBeimTrankNurBeiEchterAenderung()
+    {
+        var loadout = new SkillLoadout(10);
+        var changed = new List<int>();
+
+        loadout.SlotChanged += changed.Add;
+
+        loadout.AssignConsumable(4, "health_potion");
+        loadout.AssignConsumable(4, "health_potion");
+        loadout.AssignConsumable(4, "mana_potion");
+        loadout.Assign(4, "mana_potion");
+        loadout.AssignConsumable(4, " ");
+        loadout.Clear(4);
+
+        Assert.That(changed, Is.EqualTo(new[] { 4, 4, 4, 4 }));
+    }
+
+    [Test]
+    public void AssignConsumable_AufUnbekanntenPlatz_WirftAusnahme()
+    {
+        var loadout = new SkillLoadout(10);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(() => loadout.AssignConsumable(10, "health_potion"), Throws.InstanceOf<ArgumentOutOfRangeException>());
+            Assert.That(loadout.GetConsumableId(10), Is.Null);
+            Assert.That(loadout.GetConsumableId(-1), Is.Null);
+        });
+    }
 }

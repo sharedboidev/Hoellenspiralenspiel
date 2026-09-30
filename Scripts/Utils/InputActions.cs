@@ -56,6 +56,10 @@ public static class InputActions
         (CloseWindows, "Close Windows")
     ];
 
+    //Abgefragte Aktionen sehen den Fokus nicht. Liegt eine davon auf einer Ziffer, schaltete sie sonst beim Tippen ins Goldfeld
+    public static bool IsTyping(Viewport viewport)
+        => viewport?.GuiGetFocusOwner() is LineEdit;
+
     public static string GetKeyLabel(StringName action)
     {
         if (!InputMap.HasAction(action))

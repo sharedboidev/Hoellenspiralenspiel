@@ -35,7 +35,7 @@ public partial class OverlayMapViewport : SubViewport
             return;
         }
 
-        if (Input.IsActionJustPressed(InputActions.ToggleOverlayMap))
+        if (Input.IsActionJustPressed(InputActions.ToggleOverlayMap) && !InputActions.IsTyping(container.GetViewport()))
             container.Visible = !container.Visible;
 
         if (container.Visible)

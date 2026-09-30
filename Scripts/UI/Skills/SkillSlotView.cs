@@ -1,5 +1,6 @@
 using Godot;
 using Hoellenspiralenspiel.Interfaces;
+using Hoellenspiralenspiel.Resources.Items;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 
@@ -9,13 +10,19 @@ public partial class SkillSlotView : Control
 {
     public delegate void PickerRequestedEventHandler(SkillSlotView slot);
 
-    private TextureProgressBar cooldownOverlay;
-    private SkillCooldowns     cooldowns;
-    private TextureRect        icon;
-    private Label              keyLabel;
-    private IHero              owner;
-    private SkillResource      skill;
-    private Label              timeLabel;
+    private ConsumableBaseResource consumable;
+    private int                    consumableCount;
+    private TextureProgressBar     cooldownOverlay;
+    private SkillCooldowns         cooldowns;
+    private Label                  countLabel;
+    private TextureRect            icon;
+    private Label                  keyLabel;
+    private IHero                  owner;
+    private SkillResource          skill;
+    private Label                  timeLabel;
+
+    [Export]
+    public Color OutOfStockTint { get; set; } = new(0.35f, 0.35f, 0.35f);
 
     public int Slot { get; private set; }
 
@@ -28,6 +35,7 @@ public partial class SkillSlotView : Control
         cooldownOverlay = GetNode<TextureProgressBar>("%CooldownOverlay");
         keyLabel        = GetNode<Label>("%KeyLabel");
         timeLabel       = GetNode<Label>("%TimeLabel");
+        countLabel      = GetNode<Label>("%CountLabel");
 
         Slot          = slot;
         owner         = skillOwner;
@@ -42,8 +50,33 @@ public partial class SkillSlotView : Control
 
     public void ShowSkill(SkillResource newSkill)
     {
-        skill        = newSkill;
-        icon.Texture = skill?.Icon;
+        skill      = newSkill;
+        consumable = null;
+
+        icon.Texture       = skill?.Icon;
+        icon.Modulate      = Colors.White;
+        countLabel.Visible = false;
+
+        RefreshCooldown();
+    }
+
+    public void ShowConsumable(ConsumableBaseResource newConsumable, int countInInventory)
+    {
+        if (newConsumable is null)
+        {
+            ShowSkill(null);
+
+            return;
+        }
+
+        skill           = null;
+        consumable      = newConsumable;
+        consumableCount = countInInventory;
+
+        icon.Texture       = consumable.Icon;
+        icon.Modulate      = countInInventory > 0 ? Colors.White : OutOfStockTint;
+        countLabel.Text    = countInInventory.ToString("N0");
+        countLabel.Visible = true;
 
         RefreshCooldown();
     }
@@ -93,8 +126,11 @@ public partial class SkillSlotView : Control
 
     public string BuildTooltip()
     {
+        if (consumable is not null)
+            return ConsumableTooltip.Build(consumable, consumableCount, "Right click to change");
+
         if (skill is null || owner is null)
-            return SkillTooltip.BuildNote("Empty", "Right click to assign a skill");
+            return SkillTooltip.BuildNote("Empty", "Right click to assign a skill or potion");
 
         return SkillTooltip.Build(skill, owner);
     }

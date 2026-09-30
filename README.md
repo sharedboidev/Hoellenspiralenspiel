@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-1002_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-1106_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -136,7 +136,8 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 | Flächen | Um den Helden oder am Mauszeiger, sofort oder mit Verzögerung |
 | Für jeden gleich | Wen ein Skill trifft, entscheidet die Fraktion. Gegner setzen dieselben Skills ein wie der Held |
 | Skill-Leiste | Zehn Plätze mit Icon, Taste und Abklingzeit |
-| Freie Belegung | Rechtsklick auf einen Platz öffnet die Liste aller Skills |
+| Freie Belegung | Rechtsklick auf einen Platz öffnet die Liste aller Skills, darunter im Abschnitt Consumables alle Trankarten mit ihrer Zahl im Inventar |
+| Tränke auf der Leiste | Ein Platz kann statt eines Skills eine Trankart halten. Oben links steht, wie viele davon im Inventar liegen. Bei 0 wird das Bild grau, der Platz bleibt belegt. Die Taste trinkt einen Trank aus dem Inventar, den kleinsten Stapel zuerst, gehalten nur einen. Truhe und Item an der Maus zählen nicht |
 | Gehaltene Taste | Wiederholt den Skill, sobald er wieder bereit ist |
 | Kosten | Mana und Abklingzeit pro Skill, Ton bei leerem Mana |
 | Tooltip mit DPS | Schaden pro Sekunde, mittlerer Treffer, Krit-Chance, Einsätze pro Sekunde und Abklingzeit, gerechnet mit den Werten des Helden |
@@ -252,14 +253,16 @@ Auslöser und Aktionen lassen sich im Inspector frei kombinieren, zum Beispiel "
 | Feature | Beschreibung |
 |---|---|
 | Raster-Inventar | 70 Felder, Items belegen je nach Größe mehrere Felder |
-| Drag-and-drop | Aufnehmen, ablegen, tauschen, auf den Boden werfen |
+| Drag-and-drop | Aufnehmen, ablegen, tauschen, auf den Boden werfen. Das Item an der Maus hat die Form seiner Felder |
 | Abwerfen | Abgeworfene Items landen in einem Gitter im Kreis um den Helden, nie auf einem anderen Beutel und nie hinter einer Mauer |
 | Stapel | Tränke stapeln sich bis 5, aufgehobene Tränke füllen vorhandene Stapel |
-| 16 Ausrüstungsplätze | Inklusive vier Ringe |
+| 16 Ausrüstungsplätze | Inklusive vier Ringe. Ein angelegtes Item hat die Form seiner Felder und steht mittig im Platz |
 | Zweihandwaffen | Bogen und Stab sperren den Schildplatz, der Schild wandert ins Inventar |
 | Tooltips | Werte, Affixe und Anforderungen, farbig nach Seltenheit. Bei offenem Händler steht der Preis dabei |
+| Vergleich | Mit gehaltenem `Shift` zeigt ein zweiter Tooltip links daneben das Item, das am selben Platz getragen wird, mit dem grauen Vermerk "Currently Equipped". Vergleichszahlen gibt es nicht. Das gilt in Inventar, Truhe und Händler, nicht an den Ausrüstungsplätzen und nicht am Boden |
 | Gold | Unter dem Inventar steht das Gold, das der Held bei sich trägt |
-| Truhe | Im Hub, je Charakter, mit 140 Feldern. Sie liegt als Fenster links neben dem Charakterbogen und hält auch Gold: Knöpfe zahlen 10, 100, 1.000 oder alles ein und aus |
+| Truhe | Im Hub, je Charakter, mit 140 Feldern. Sie liegt als Fenster oben links und hält auch Gold |
+| Gold in der Truhe | Ins Feld passen nur Ziffern. Deposit und Withdraw buchen den Betrag, wer mehr einträgt, als da ist, bucht alles. Ein leeres Feld bucht nichts. Deposit all und Withdraw all buchen alles |
 | Umlagern | `Strg` + Linksklick legt ein Item aus dem Inventar in die offene Truhe und zurück. Der Weg über die Maus geht auch: greifen und im anderen Fenster ablegen |
 
 ### 💾 Speichern
@@ -267,7 +270,7 @@ Auslöser und Aktionen lassen sich im Inspector frei kombinieren, zum Beispiel "
 | Feature | Beschreibung |
 |---|---|
 | Automatisch | Das Spiel speichert beim Beenden und kurz nach jeder Änderung am Charakter |
-| Laden beim Start | Der Charakter ist nach dem Neustart derselbe, mit Inventar, Ausrüstung und Skill-Leiste |
+| Laden beim Start | Der Charakter ist nach dem Neustart derselbe, mit Inventar, Ausrüstung und Skill-Leiste samt Tränken |
 | Inhalt | Name, Level, XP, Attribute, offene Punkte, jedes Item mit Affixen, Namen und Platz, dazu die Reise: je Kreis Seed, Checkpoints, erkundete Karten und gefallene Gegner, außerdem das offene Town-Portal. Seit der Truhe auch Gold, Truhe samt ihrem Gold und der Bestand des Händlers |
 | Drei Plätze | Das Hauptmenü bietet drei Plätze für Charaktere, jeder mit eigener Datei |
 | Einstellungen | Anzeige, Look, Lautstärke und Tasten stehen in einer eigenen Datei `settings.json` und gelten für alle Plätze. Sie entsteht bei der ersten Änderung. Eine unlesbare Datei wird als `settings.json.broken` beiseitegelegt, dann gelten die Standards |
@@ -291,7 +294,7 @@ Die Einstellungen liegen als `settings.json` eine Ebene darüber, direkt in `%AP
 | Ohne Spielstand testen | Im Inspector am `GameController` den Schalter `SavingEnabled` ausschalten |
 
 Leben, Mana, Position, Beute und Gold am Boden und der Rückkauf des Händlers stehen nicht im Spielstand.
-Der Spielstand hat Version 3. Ältere Spielstände lädt das Spiel weiter, sie beginnen mit 0 Gold und leerer Truhe. Eine ältere Fassung des Spiels legt einen Spielstand der Version 3 als `.broken` zur Seite.
+Der Spielstand hat Version 4. Ältere Spielstände lädt das Spiel weiter. Vor Version 3 beginnen sie mit 0 Gold und leerer Truhe. Bis Version 3 liegen keine Tränke auf der Leiste, und ein gespeicherter Bestand des Händlers wird beim Laden einmal nach Itemtyp neu ausgelegt, ohne neu zu würfeln. Eine ältere Fassung des Spiels legt einen Spielstand der Version 4 als `.broken` zur Seite.
 Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints und das Town-Portal.
 
 </details>
@@ -306,10 +309,11 @@ Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints
 | Ladebildschirm | Jeder Ortswechsel blendet ab und zeigt auf Schwarz das Ziel: den Kreis mit "Level n of m" oder den Namen des Orts. Darunter steht ein Tipp. Nennt er eine Aktion, zeigt er die Taste, die der Spieler ihr gegeben hat. Der Vorhang steht mindestens 1,5 Sekunden. Vom Hauptmenü ins Spiel steht dort "Loading..." |
 | Einstellungen | Ein Fenster mit den Reitern Display, Audio und Controls, erreichbar aus Haupt- und Pausenmenü. Es ist bei jedem Reiter gleich groß |
 | Hud an Ankern | Orbs, Skill-Leiste und XP-Balken hängen als Gruppe unten mittig, der Level-up-Knopf neben dem Lebens-Orb, der Charakterbogen oben rechts. Alles sitzt bei jedem Seitenverhältnis richtig, auch nach einem Wechsel im laufenden Spiel. Fenster wie der Charakterbogen liegen über den Orbs |
-| Statuszeile | Oben links. Die Bildrate zeigt sie mit Show FPS aus den Einstellungen, Gegner, Look, Kamera, Ort und Seed nur im Debug-Build |
+| Statuszeile | Oben links. Die Bildrate zeigt sie mit Show FPS aus den Einstellungen, Gegner, Look, Kamera, Ort und Seed nur im Debug-Build. Truhe und Händler verdecken sie, solange sie offen sind |
 | Neuer Charakter | Alle Attribute auf 1, ein weißes Training Sword in der Haupthand, das Inventar ist leer |
 | Hub | Ein ummauerter Platz mit neun Portalen, eines je Höllenkreis. Gesperrte Portale sind dunkel. Nahe am Start stehen eine Truhe und ein Händler |
-| Händler | Ein Klick auf ihn öffnet sein Fenster neben dem Charakterbogen, mit drei Reitern. Consumables: Heil- und Manatrank, sie gehen nie aus. Equipment: zwanzig gewürfelte Basen, davon jedes zwanzigste Magic und jedes dreißigste Rare, der Rest weiß. Buyback: alles, was der Held verkauft hat |
+| Händler | Ein Klick auf ihn öffnet sein Fenster oben links, mit drei Reitern. Consumables: Heil- und Manatrank, sie gehen nie aus. Equipment: zwanzig gewürfelte Basen, davon jedes zwanzigste Magic und jedes dreißigste Rare, der Rest weiß. Buyback: alles, was der Held verkauft hat, in der Reihenfolge des Verkaufs |
+| Ordnung beim Händler | Consumables und Equipment liegen nach Itemtyp: Waffen nach Art, Schilde, Rüstung vom Helm bis zu den Stiefeln, Schmuck, zuletzt Heil- und Manatrank. Innerhalb einer Art nach Basis, dann Rare, Magic, Normal. Das Gitter füllt sich Spalte für Spalte von oben nach unten. Ein Kauf aus dem Equipment lässt eine Lücke |
 | Kaufen und verkaufen | Ein Klick kauft, mit `Strg` einen ganzen Stapel Tränke. `Strg` + Linksklick im Inventar verkauft, ebenso ein Klick mit dem Item an der Maus ins Händlerfenster. Der Händler zahlt ein Viertel des Preises und verkauft zum selben Betrag zurück, bis der Held den Hub verlässt |
 | Neue Ware | Der Händler würfelt sein Equipment neu, wenn der Held eine Ebene zum ersten Mal erreicht, mit deren Bereichslevel als Itemlevel, und bei jedem Stufenaufstieg. Gekauftes ist bis dahin weg |
 | Testgelände | Das frühere Testlevel mit Hof und 37 Gegnern, zum Testen im Debug-Build mit `F6` erreichbar |
@@ -318,6 +322,7 @@ Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints
 | Lebens- und Mana-Orb | Mit Flüssigkeits-Shader |
 | Erfahrungsbalken | Unterteilt, mit Anzeige beim Überfahren |
 | Overlay-Karte | Das Level aus dem Winkel der Kamera, nur von weiter weg, mit Map, zu Beginn `Tab`, ein- und ausgeblendet. Unter der Erde ist sie gezeichnet und zeigt nur, was der Held schon erkundet hat |
+| Karte und Fenster | Die Karte liegt unter allen Fenstern und füllt nur den breitesten Streifen, den Charakterbogen, Werteliste, Truhe und Händler frei lassen, mit dem Helden in der Mitte. Ist der Streifen schmaler als 400 px, bleibt sie weg, bis wieder Platz ist. Die Grenze steht als `MinWidthPx` an `Hud/MapFrame` |
 | Mauern | Jede Mauer hat einen Sockel und Mauerwerk darüber. Steht der Held hinter ihr, wird das Mauerwerk durchsichtig, so weit sein Licht reicht. Was dahinter liegt, lässt sich dann anklicken |
 | Räume | Ein Raum bleibt verschlossen, solange der Held nicht drin steht: Seine vorderen Mauern bleiben zu, seine hinteren werden nur halb durchsichtig |
 | Licht und Sicht | Kein Licht scheint durch Mauern, weder das des Helden noch Altar, Aura oder Feuerball. Gegner und ihre Wirkungen zeigen sich erst mit Sichtkontakt |
@@ -453,10 +458,10 @@ Das Mausrad wirkt immer.
 
 ## 🎮 Steuerung
 
-Die Tabelle zeigt die Standardbelegung. Die Skills liegen zu Beginn wie unten auf den Tasten. Jeder Platz der Leiste lässt sich im Spiel mit einem anderen Skill belegen.
+Die Tabelle zeigt die Standardbelegung. Die Skills liegen zu Beginn wie unten auf den Tasten. Jeder Platz der Leiste lässt sich im Spiel mit einem anderen Skill oder einem Trank belegen.
 
 Unter Settings im Reiter Controls lassen sich 19 Aktionen umbelegen: Bewegen, die zehn Skill-Plätze, Charakterbogen, Karte, Schilder der Beute, Town-Portal und Close Windows.
-Fest bleiben `Esc`, das Mausrad, die Klicks auf Items, Schilder, Beutel, Durchgänge, Truhe und Händler, `Strg` beim Klick auf ein Item und der Rechtsklick auf die Leiste.
+Fest bleiben `Esc`, das Mausrad, die Klicks auf Items, Schilder, Beutel, Durchgänge, Truhe und Händler, `Strg` beim Klick auf ein Item, `Shift` für den Vergleich und der Rechtsklick auf die Leiste.
 Jede Aktion hat eine Taste, Kombinationen gibt es nicht. Maustasten (links, rechts, Mitte, Seitentasten) gibt es nur für die Skill-Plätze.
 Hält eine andere Aktion die Taste schon, tauschen beide, sofern die andere die bisherige Taste nehmen darf. Sonst bleibt die Belegung, wie sie war. `F1` bis `F6` und das Mausrad lassen sich keiner Aktion geben.
 Die Skill-Leiste zeigt immer die aktuelle Taste.
@@ -471,19 +476,21 @@ Die Skill-Leiste zeigt immer die aktuelle Taste.
 | `F` | Fireball in Richtung der Maus |
 | `Q`, `1` bis `4` | Freie Plätze der Skill-Leiste |
 | Taste gedrückt halten | Wiederholt den Skill |
-| Rechtsklick auf einen Platz der Leiste | Skill für diesen Platz auswählen |
+| Taste eines Platzes mit Trank | Einen Trank dieser Art aus dem Inventar trinken, gehalten nur einen |
+| Rechtsklick auf einen Platz der Leiste | Skill oder Trank für diesen Platz auswählen |
 | `B` | Charakterbogen und Inventar |
 | `Tab` | Overlay-Karte |
 | `Esc` | Offene Fenster schließen. Ohne offenes Fenster Pausenmenü öffnen und wieder schließen |
 | Leertaste | Offene Fenster schließen |
 | Linke Maustaste auf Portal, Treppe oder Kellertür | Der Held läuft hin und benutzt den Durchgang |
-| Linke Maustaste auf Truhe oder Händler | Der Held läuft hin, das Fenster öffnet sich neben dem Charakterbogen. Wer wegläuft, schließt es |
+| Linke Maustaste auf Truhe oder Händler | Der Held läuft hin, das Fenster öffnet sich oben links, der Charakterbogen dazu. Wer wegläuft, schließt es |
 | `Strg` + linke Maustaste auf Item | Bei offener Truhe umlagern, bei offenem Händler verkaufen. Auf einen Trank des Händlers: einen ganzen Stapel kaufen |
 | `T` | Town-Portal öffnen, nur in einer Ebene |
 | `Alt` | Schilder der Beute an und aus |
 | Linke Maustaste auf das Schild eines Beutels | Aufheben. Sind die Schilder aus, zählt der Klick auf den Beutel selbst |
 | Linke Maustaste auf Item im Inventar | Greifen und ablegen, außerhalb des Inventars abwerfen |
 | Rechte Maustaste im Inventar | Item anlegen oder Trank trinken |
+| `Shift` halten über einem Item | Das getragene Item am selben Platz links daneben zeigen, in Inventar, Truhe und Händler |
 | Mausrad | Kamera näher heranholen und zurück |
 | `F1` bis `F6` | Tasten zum Testen, nur im Debug-Build. Mehr unter [3D im PS1-Look](#-3d-im-ps1-look) |
 
@@ -578,8 +585,8 @@ Hoellenspiralenspiel
 │   │   ├── Stats       Stat-Blatt, Rechenregeln, abgeleitete Werte
 │   │   ├── Combat      Trefferauflösung, Schadensarten, Statuseffekte, Angriffstakt
 │   │   ├── Skills      Skill-Definition, Abklingzeiten, Kosten, Belegung der Leiste
-│   │   ├── Items       Item-Basis und Instanz, Inventar-Raster, Ausrüstung, Truhe, Affixe, Beute
-│   │   ├── Economy     Gold, Gold von Gegnern, Stufen des Münzhaufens, Preise, Händler und Handel
+│   │   ├── Items       Item-Basis und Instanz, Inventar-Raster, Ausrüstung, Truhe, Affixe, Beute, Reihenfolge der Itemtypen
+│   │   ├── Economy     Gold, Gold von Gegnern, Stufen des Münzhaufens, Preise, Händler und Handel, Eingabe im Goldfeld
 │   │   ├── Enemies     Zustandsmaschine, Seltenheit, Wahl der Mods, Wachstum mit dem Level
 │   │   ├── Navigation  Takt für die Pfadsuche
 │   │   ├── Spatial     Raster für die Suche nach Einheiten, freie Plätze für Gegner und Beutel, Stapeln der Schilder
@@ -587,6 +594,7 @@ Hoellenspiralenspiel
 │   │   ├── Saving      Format des Spielstands, Lesen und Schreiben als JSON
 │   │   ├── Settings    Einstellungen für Anzeige, Look, Ton und Tasten, tolerantes Lesen, Fenstergrößen, Lautstärkekurve, Pixelraster, Regeln der Tastenbelegung
 │   │   ├── Loading     Tipps des Ladebildschirms mit der aktuellen Taste
+│   │   ├── Hud         Freier Streifen für die Karte, Lage von Tooltip und Vergleich
 │   │   ├── Rng         Zufallsquelle mit Seed
 │   │   └── Progression XP-Tabelle, Level und Attributspunkte, XP-Verlust beim Tod
 │   ├── Units           Held, Gegner, Pfadfolger, sichtbare Ausrüstung, Animationen mit Skelett

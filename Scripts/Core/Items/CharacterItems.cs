@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Hoellenspiralenspiel.Enums;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Items;
@@ -265,6 +266,15 @@ public sealed class CharacterItems
 
         return item.Definition.Consumable;
     }
+
+    public int CountInInventory(string baseId)
+        => Inventory.GetItemsInReadingOrder().Where(item => item.Definition.Id == baseId).Sum(item => item.StackSize);
+
+    //Der kleinste Stapel zuerst, so wird am ehesten ein Platz im Inventar frei
+    public ItemInstance FindStackToConsume(string baseId)
+        => Inventory.GetItemsInReadingOrder()
+                    .Where(item => item.Definition.Id == baseId && item.Definition.Consumable is not null)
+                    .MinBy(item => item.StackSize);
 
     public bool DropHeld()
     {

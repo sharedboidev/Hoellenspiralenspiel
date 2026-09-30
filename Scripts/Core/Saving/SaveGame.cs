@@ -6,11 +6,15 @@ namespace Hoellenspiralenspiel.Scripts.Core.Saving;
 
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 3;
+    public const int CurrentVersion = 4;
 
     public int                    Version   { get; set; } = CurrentVersion;
     public CharacterSave          Character { get; set; } = new();
     public List<string>           Loadout   { get; set; } = new();
+
+    //Fehlt vor Version 4. Parallel zu Loadout je Platz die Item-Basis eines Tranks oder null
+    public List<string>           LoadoutConsumables { get; set; } = new();
+
     public List<PlacedItemSave>   Inventory { get; set; } = new();
     public List<EquippedItemSave> Equipment { get; set; } = new();
     public List<ItemSave>         Unplaced  { get; set; } = new();

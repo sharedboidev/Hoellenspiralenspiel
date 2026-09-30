@@ -35,6 +35,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/UI/curtain.tscn" id="47_curtain"]
 [ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit_outline.gdshader" id="48_outline"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/pause_menu.tscn" id="49_pause_menu"]
+[ext_resource type="Script" path="res://Scripts/UI/MapFrame.cs" id="51_map_frame"]
 
 [sub_resource type="Environment" id="Env_level"]
 background_mode = 1
@@ -242,18 +243,21 @@ grow_horizontal = 2
 grow_vertical = 0
 player = NodePath("../../../Hero")
 
-[node name="ItemTooltip" parent="Hud" instance=ExtResource("21_tooltip")]
-unique_name_in_owner = true
-visible = false
+[node name="MapFrame" type="Control" parent="Hud" node_paths=PackedStringArray("Sheet")]
+clip_contents = true
+layout_mode = 3
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 2560.0
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("51_map_frame")
+Sheet = NodePath("../CharacterSheet")
 
-[node name="CharacterSheet" parent="Hud" node_paths=PackedStringArray("player") instance=ExtResource("20_sheet")]
-unique_name_in_owner = true
-visible = false
-player = NodePath("../../Hero")
-
-[node name="OverlayMapContainer" type="SubViewportContainer" parent="Hud"]
+[node name="OverlayMapContainer" type="SubViewportContainer" parent="Hud/MapFrame"]
 visible = false
 modulate = Color(1, 1, 1, 0.6)
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -262,25 +266,25 @@ grow_vertical = 2
 mouse_filter = 2
 stretch = true
 
-[node name="OverlayMapViewport" type="SubViewport" parent="Hud/OverlayMapContainer" node_paths=PackedStringArray("Camera", "Target")]
+[node name="OverlayMapViewport" type="SubViewport" parent="Hud/MapFrame/OverlayMapContainer" node_paths=PackedStringArray("Camera", "Target")]
 transparent_bg = true
 handle_input_locally = false
 size = Vector2i(2560, 1440)
 render_target_update_mode = 0
 script = ExtResource("8_map")
 Camera = NodePath("MapCamera")
-Target = NodePath("../../../Hero")
+Target = NodePath("../../../../Hero")
 
-[node name="MapCamera" type="Camera3D" parent="Hud/OverlayMapContainer/OverlayMapViewport"]
+[node name="MapCamera" type="Camera3D" parent="Hud/MapFrame/OverlayMapContainer/OverlayMapViewport"]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 60, 0)
 environment = SubResource("Env_map")
 projection = 1
 size = 70.0
 far = 200.0
 
-[node name="LevelMap" type="Control" parent="Hud" node_paths=PackedStringArray("Descent", "Hero", "SurfaceMap")]
+[node name="LevelMap" type="Control" parent="Hud/MapFrame" node_paths=PackedStringArray("Descent", "Hero", "SurfaceMap")]
 visible = false
-layout_mode = 3
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -288,9 +292,18 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("34_level_map")
-Descent = NodePath("../../Descent")
-Hero = NodePath("../../Hero")
+Descent = NodePath("../../../Descent")
+Hero = NodePath("../../../Hero")
 SurfaceMap = NodePath("../OverlayMapContainer/OverlayMapViewport")
+
+[node name="ItemTooltip" parent="Hud" instance=ExtResource("21_tooltip")]
+unique_name_in_owner = true
+visible = false
+
+[node name="CharacterSheet" parent="Hud" node_paths=PackedStringArray("player") instance=ExtResource("20_sheet")]
+unique_name_in_owner = true
+visible = false
+player = NodePath("../../Hero")
 
 [node name="LevelUpDialog" parent="Hud" node_paths=PackedStringArray("player") instance=ExtResource("28_level_up")]
 unique_name_in_owner = true

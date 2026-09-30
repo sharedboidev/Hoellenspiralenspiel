@@ -29,6 +29,9 @@ public sealed class Equipment
     public ItemInstance Get(ItemSlot place)
         => items.GetValueOrDefault(GetPlaceFor(place));
 
+    public ItemInstance GetWornCounterpart(ItemInstance item)
+        => item is { Definition.IsEquippable: true } && item.Definition.Slot != ItemSlot.Undefined ? Get(item.Definition.Slot) : null;
+
     public ItemInstance Put(ItemInstance item)
     {
         ArgumentNullException.ThrowIfNull(item);

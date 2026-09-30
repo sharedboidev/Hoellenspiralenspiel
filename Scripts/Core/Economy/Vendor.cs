@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Hoellenspiralenspiel.Scripts.Core.Items;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Economy;
@@ -35,19 +36,16 @@ public sealed class Vendor
     {
         Wares.Clear();
 
-        foreach (var ware in wares ?? [])
-            Wares.TryAdd(ware);
+        LayOutByType(Wares, wares);
 
         Changed?.Invoke();
     }
 
-    //Was nicht mehr ins Gitter passt, bietet der Händler nicht an
     public void Restock(IEnumerable<ItemInstance> items, int itemLevel)
     {
         Stock.Clear();
 
-        foreach (var item in items ?? [])
-            Stock.TryAdd(item);
+        LayOutByType(Stock, items);
 
         FinishStocking(itemLevel);
     }
@@ -123,5 +121,91 @@ public sealed class Vendor
         IsStocked = true;
 
         Changed?.Invoke();
+    }
+
+    //Genommen wird die erste Auslage, in die alles passt, sonst die mit den meisten Stücken. So bringt die Sortierung nie weniger unter als dichtes Packen
+    private static void LayOutByType(InventoryGrid grid, IEnumerable<ItemInstance> items)
+    {
+        var sorted = ItemTypeOrder.Sort(items);
+        List<(ItemInstance Item, GridCell Cell)> best = null;
+
+        foreach (var strategy in new[] { Strategy.EvenTopFirst, Strategy.FillLine, Strategy.FirstGap })
+        {
+            var placed = LayOut(grid.Width, grid.Height, sorted, strategy);
+
+            if (best is null || placed.Count > best.Count)
+                best = placed;
+
+            if (best.Count == sorted.Count)
+                break;
+        }
+
+        foreach (var (item, cell) in best)
+            grid.TryPlace(item, cell);
+    }
+
+    //Jede Spalte füllt sich von oben nach unten in Typreihenfolge. EvenTopFirst setzt breite Items zuerst auf gleich weit gefüllte Spalten, sonst entstünde eine Treppe
+    private static List<(ItemInstance Item, GridCell Cell)> LayOut(int width, int height, List<ItemInstance> sorted, Strategy strategy)
+    {
+        var scratch  = new InventoryGrid(width, height);
+        var filledTo = new int[width];
+        var column   = 0;
+        var placed   = new List<(ItemInstance Item, GridCell Cell)>();
+
+        foreach (var item in sorted)
+        {
+            var cell = strategy == Strategy.FirstGap
+                           ? FindFirstGap(scratch, item)
+                           : (strategy == Strategy.EvenTopFirst ? FindOnFillLine(scratch, filledTo, column, item, true) : null) ?? FindOnFillLine(scratch, filledTo, column, item, false);
+
+            if (cell is not { } at || !scratch.TryPlace(item, at))
+                continue;
+
+            for (var covered = at.X; covered < at.X + item.Definition.Width; covered++)
+                filledTo[covered] = at.Y + item.Definition.Height;
+
+            column = at.X;
+
+            placed.Add((item, at));
+        }
+
+        return placed;
+    }
+
+    private static GridCell? FindOnFillLine(InventoryGrid grid, int[] filledTo, int from, ItemInstance item, bool needsEvenTop)
+    {
+        var width = item.Definition.Width;
+
+        for (var x = from; x <= grid.Width - width; x++)
+        {
+            var tops = filledTo.Skip(x).Take(width).ToList();
+            var cell = new GridCell(x, tops.Max());
+
+            if ((!needsEvenTop || tops.Distinct().Count() == 1) && grid.CanPlace(item, cell))
+                return cell;
+        }
+
+        return null;
+    }
+
+    private static GridCell? FindFirstGap(InventoryGrid grid, ItemInstance item)
+    {
+        for (var x = 0; x <= grid.Width - item.Definition.Width; x++)
+        {
+            for (var y = 0; y <= grid.Height - item.Definition.Height; y++)
+            {
+                if (grid.CanPlace(item, new GridCell(x, y)))
+                    return new GridCell(x, y);
+            }
+        }
+
+        return null;
+    }
+
+    private enum Strategy
+    {
+        EvenTopFirst,
+        FillLine,
+        FirstGap
     }
 }

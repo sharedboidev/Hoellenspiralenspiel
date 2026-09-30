@@ -17,7 +17,6 @@ public partial class CharacterSheet : Control, IClosableWindow
     [Export] private Node           player;
     private          Control        side;
     private          Statdisplay    statdisplay;
-    private          Control        statSpace;
 
     public StashWindow Stash { get; private set; }
 
@@ -67,10 +66,9 @@ public partial class CharacterSheet : Control, IClosableWindow
         inventory.Bind(hero);
         equipmentPanel.Bind(hero.Items);
 
-        side      = GetNode<Control>("Side");
-        statSpace = side.GetNode<Control>("StatSpace");
-        Stash     = side.GetNode<StashWindow>(nameof(StashWindow));
-        Vendor    = side.GetNode<VendorWindow>(nameof(VendorWindow));
+        side   = GetNode<Control>("Side");
+        Stash  = side.GetNode<StashWindow>(nameof(StashWindow));
+        Vendor = side.GetNode<VendorWindow>(nameof(VendorWindow));
 
         Stash.Bind(hero, this);
         Vendor.Bind(hero, this);
@@ -84,12 +82,10 @@ public partial class CharacterSheet : Control, IClosableWindow
 
     private void SetDisplayedLevel() => levelDisplay?.SetDisplayedValue(hero.Level);
 
-    //Der Platzhalter schiebt Truhe und Händler nach links, solange die Werteliste neben dem Bogen liegt
     private void OnPressed(bool isToggledOpen)
     {
         statdisplay.Render(hero.Stats);
         statdisplay.Visible = isToggledOpen;
-        statSpace.Visible   = isToggledOpen;
     }
 
     private void ShowCurrentValues()
@@ -99,16 +95,19 @@ public partial class CharacterSheet : Control, IClosableWindow
         SetDisplayedLevel();
     }
 
-    //Zum Bogen gehören auch die Werteliste links, die Anzeige der Stufe und die Fenster von Truhe und Händler. Ein geschlossener Bogen deckt nichts ab
-    public bool Covers(Vector2 globalPosition)
-        => GetChildren().OfType<Control>().Any(part => part == side ? SideWindows.OfType<Control>().Any(window => IsHit(window, globalPosition)) : IsHit(part, globalPosition));
+    //Zum Bogen gehören auch die Werteliste links, die Anzeige der Stufe und die Fenster von Truhe und Händler oben links. Ein geschlossener Bogen deckt nichts ab
+    public IEnumerable<Rect2> GetCoveredRects()
+        => GetChildren().OfType<Control>()
+                        .SelectMany(part => part == side ? SideWindows.OfType<Control>() : [part])
+                        .Where(part => part.IsVisibleInTree())
+                        .Select(part => part.GetGlobalRect());
 
-    private static bool IsHit(Control part, Vector2 globalPosition)
-        => part.IsVisibleInTree() && part.GetGlobalRect().HasPoint(globalPosition);
+    public bool Covers(Vector2 globalPosition)
+        => GetCoveredRects().Any(rect => rect.HasPoint(globalPosition));
 
     public override void _Process(double delta)
     {
-        if (hero is not null && Input.IsActionJustPressed(InputActions.ToggleCharacterSheet))
+        if (hero is not null && Input.IsActionJustPressed(InputActions.ToggleCharacterSheet) && !InputActions.IsTyping(GetViewport()))
             ToggleVisibility();
     }
 

@@ -425,7 +425,13 @@ public partial class Hero
             if (!@event.IsActionPressed(InputActions.SkillSlots[slot]))
                 continue;
 
-            if (UseSlot(slot))
+            //Tränke gehen an heldSlot vorbei: Gehalten tränke der Held sonst jeden Frame, und ein gehaltener Angriff bräche ab
+            if (Loadout.GetConsumableId(slot) is { } consumableId)
+            {
+                if (UseConsumable(consumableId))
+                    GetViewport().SetInputAsHandled();
+            }
+            else if (UseSlot(slot))
             {
                 heldSlot = slot;
 
@@ -793,6 +799,16 @@ public partial class Hero
 
                 break;
         }
+    }
+
+    public bool UseConsumable(string itemBaseId)
+    {
+        if (IsDead || Items.FindStackToConsume(itemBaseId) is not { } stack)
+            return false;
+
+        Consume(stack);
+
+        return true;
     }
 
     private void OnItemEquipped(ItemInstance item)

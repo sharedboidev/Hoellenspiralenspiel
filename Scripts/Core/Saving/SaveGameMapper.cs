@@ -134,7 +134,11 @@ public static class SaveGameMapper
                    .Where(placed => placed.Item is not null)
                    .ToList();
 
-        vendor.RestoreStock(stock, save.Vendor.ItemLevel);
+        //Bis Version 3 lag der Bestand ungeordnet. Er wird einmal nach Itemtyp neu ausgelegt
+        if (save.Version < 4)
+            vendor.Restock(stock.Select(placed => placed.Item), save.Vendor.ItemLevel);
+        else
+            vendor.RestoreStock(stock, save.Vendor.ItemLevel);
 
         return true;
     }
@@ -144,19 +148,32 @@ public static class SaveGameMapper
         ArgumentNullException.ThrowIfNull(loadout);
         ArgumentNullException.ThrowIfNull(save);
 
-        save.Loadout = Enumerable.Range(0, loadout.SlotCount).Select(loadout.GetSkillId).ToList();
+        save.Loadout            = Enumerable.Range(0, loadout.SlotCount).Select(loadout.GetSkillId).ToList();
+        save.LoadoutConsumables = Enumerable.Range(0, loadout.SlotCount).Select(loadout.GetConsumableId).ToList();
     }
 
-    public static void RestoreLoadout(SaveGame save, SkillLoadout loadout)
+    //Ein Trank zählt nur, wenn der Katalog seine Item-Basis als Verbrauchsgut kennt. Ohne Katalog bleiben nur die Skills
+    public static void RestoreLoadout(SaveGame save, SkillLoadout loadout, IItemCatalog catalog = null)
     {
         ArgumentNullException.ThrowIfNull(save);
         ArgumentNullException.ThrowIfNull(loadout);
 
-        var savedSlots = save.Loadout ?? [];
+        var savedSkills      = save.Loadout ?? [];
+        var savedConsumables = save.LoadoutConsumables ?? [];
 
         for (var slot = 0; slot < loadout.SlotCount; slot++)
-            loadout.Assign(slot, slot < savedSlots.Count ? savedSlots[slot] : null);
+        {
+            var consumableId = slot < savedConsumables.Count ? savedConsumables[slot] : null;
+
+            if (IsConsumable(consumableId, catalog))
+                loadout.AssignConsumable(slot, consumableId);
+            else
+                loadout.Assign(slot, slot < savedSkills.Count ? savedSkills[slot] : null);
+        }
     }
+
+    private static bool IsConsumable(string itemBaseId, IItemCatalog catalog)
+        => !string.IsNullOrWhiteSpace(itemBaseId) && catalog?.Find(itemBaseId)?.Consumable is not null;
 
     public static void CaptureJourney(JourneyState journey, SaveGame save)
     {

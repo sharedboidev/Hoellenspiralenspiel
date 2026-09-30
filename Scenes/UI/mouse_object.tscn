@@ -22,3 +22,4 @@ unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0.21960784)
 layout_mode = 2
 expand_mode = 1
+stretch_mode = 5

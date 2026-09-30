@@ -1,5 +1,6 @@
 ﻿using Godot;
 using Hoellenspiralenspiel.Interfaces;
+using Hoellenspiralenspiel.Scripts.Core.Hud;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
@@ -14,9 +15,8 @@ public abstract partial class BaseTooltip : PanelContainer
         if (objectContainer is null)
             return;
 
-        FindUIComponents();
-        SetDisplayedDataByItem(objectContainer.ContainedItem);
-        SetPositionByContainer(objectContainer);
+        Fill(objectContainer.ContainedItem);
+        PlaceBy(objectContainer);
 
         Visible = true;
     }
@@ -24,8 +24,10 @@ public abstract partial class BaseTooltip : PanelContainer
     public new virtual void Hide()
         => Visible = false;
 
-    private void SetDisplayedDataByItem(ITooltipObject tooltipObject)
+    protected void Fill(ITooltipObject tooltipObject)
     {
+        FindUIComponents();
+
         if (ObjectTitleLabel is null || ObjectDescriptionLabel is null || tooltipObject is null)
             return;
 
@@ -37,22 +39,16 @@ public abstract partial class BaseTooltip : PanelContainer
         ResetSize();
     }
 
-    //Über dem Element, ist oben kein Platz, darunter. Er bleibt an allen vier Rändern im Bild, bei jeder Größe des Fensters
-    private void SetPositionByContainer(ITooltipObjectContainer container)
+    protected void PlaceBy(ITooltipObjectContainer container)
     {
         var screen = GetViewportRect().Size;
-        var anchor = container.TooltipAnchorPoint;
-        var x      = anchor.X + container.Size.X / 2 - Size.X / 2;
-        var y      = anchor.Y - Size.Y;
+        var placed = TooltipPlacement.Place(ToBox(container), Size.X, Size.Y, screen.X, screen.Y);
 
-        if (y < 0)
-            y = anchor.Y + container.Size.Y;
-
-        x = Mathf.Clamp(x, 0, Mathf.Max(0, screen.X - Size.X));
-        y = Mathf.Clamp(y, 0, Mathf.Max(0, screen.Y - Size.Y));
-
-        GlobalPosition = new Vector2(x, y);
+        GlobalPosition = new Vector2(placed.X, placed.Y);
     }
+
+    protected static ScreenBox ToBox(ITooltipObjectContainer container)
+        => new(container.TooltipAnchorPoint.X, container.TooltipAnchorPoint.Y, container.Size.X, container.Size.Y);
 
     private void FindUIComponents()
     {

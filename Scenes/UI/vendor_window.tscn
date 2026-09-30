@@ -25,6 +25,7 @@ corner_detail = 5
 visible = false
 z_index = 10
 size_flags_vertical = 0
+mouse_filter = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 script = ExtResource("1_script")
 

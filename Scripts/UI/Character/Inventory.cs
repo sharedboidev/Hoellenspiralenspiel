@@ -55,6 +55,8 @@ public partial class Inventory : PanelContainer
 
         items.DropHeld();
 
+        //Sonst behielte das Goldfeld der Truhe den Fokus, dessen eigenes _Input kommt nach diesem nicht mehr dran
+        GetViewport().GuiReleaseFocus();
         GetViewport().SetInputAsHandled();
     }
 

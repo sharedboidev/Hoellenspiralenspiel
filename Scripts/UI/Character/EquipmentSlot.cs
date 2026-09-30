@@ -15,6 +15,9 @@ public partial class EquipmentSlot
 {
     public delegate void HoverChangedEventHandler(EquipmentSlot slot, bool isHovered);
 
+    //Rand und Rahmen aus equipment_slot.tscn, 2 + 2 px pro Seite. Muss dazu passen, sonst wächst der Slot mit dem Item
+    private const int FramePx = 8;
+
     private          Texture2D      defaultTexture;
     private          CharacterItems items;
     [Export] private int            pxDimension = 64;
@@ -76,10 +79,21 @@ public partial class EquipmentSlot
 
     public void Refresh()
     {
-        if (IsEmpty)
+        var item     = Item;
+        var itemIcon = GetNode<TextureRect>("%ItemIcon");
+
+        if (item is null)
+        {
             SetDefaultTexture();
-        else
-            GetNode<TextureRect>("%Icon").Texture = ItemLibrary.GetIcon(Item);
+            itemIcon.Texture = null;
+            return;
+        }
+
+        var (width, height) = EquippedIconSize.Get(item.Definition, SlotWidth, SlotHeight, pxDimension, FramePx);
+
+        GetNode<TextureRect>("%Icon").Texture = null;
+        itemIcon.Texture                      = ItemLibrary.GetIcon(item);
+        itemIcon.CustomMinimumSize            = new Vector2(width, height);
     }
 
     private void SetScaledSize()

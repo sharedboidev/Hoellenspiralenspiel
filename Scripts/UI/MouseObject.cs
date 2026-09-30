@@ -12,6 +12,9 @@ public partial class MouseObject : PanelContainer
 
     private TextureRect Icon => icon ??= GetNode<TextureRect>("%Icon");
 
+    [Export]
+    public float CellPx { get; set; } = 28;
+
     public override void _Process(double delta)
     {
         if (Visible)
@@ -21,6 +24,14 @@ public partial class MouseObject : PanelContainer
     public void ShowItem(ItemInstance item)
     {
         Icon.Texture = ItemLibrary.GetIcon(item);
+
+        if (item is not null)
+        {
+            CustomMinimumSize = new Vector2(item.Definition.Width, item.Definition.Height) * CellPx;
+
+            //Von selbst wird ein Control nur größer, nie kleiner
+            ResetSize();
+        }
 
         SetVisible(item is not null);
     }

@@ -33,6 +33,11 @@ public partial class InventoryItem
     public ITooltipObject ContainedItem      => new ItemTooltipContent(Item, items.GetUnmetRequirements(Item), PriceNote?.Invoke(Item));
     public Vector2        TooltipAnchorPoint => GlobalPosition;
 
+    public ITooltipObject WornCounterpart
+        => items.Equipment.GetWornCounterpart(Item) is { } worn
+               ? new ItemTooltipContent(worn, items.GetUnmetRequirements(worn)) { ShowsEquippedNote = true }
+               : null;
+
     public event ClickedEventHandler      Clicked;
     public event HoverChangedEventHandler HoverChanged;
 

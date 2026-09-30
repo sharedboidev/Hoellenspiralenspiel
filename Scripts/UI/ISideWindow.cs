@@ -2,7 +2,7 @@ using Hoellenspiralenspiel.Scripts.Core.Items;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
-//Ein Fenster neben dem Charakterbogen, das Items aus dem Inventar annimmt: Truhe oder Händler
+//Ein Fenster oben links, das mit dem Charakterbogen aufgeht und Items aus dem Inventar annimmt: Truhe oder Händler
 public interface ISideWindow : IClosableWindow
 {
     //Strg+Klick auf ein Item im Inventar

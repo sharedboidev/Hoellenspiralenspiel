@@ -1,8 +1,9 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
 Stand: 30.09.2026. M0 bis M6 liegen auf `master`, dazu die Nachträge zu M2, M3, M5.5 und M6: Bleed stapelt, Schadenswerte im Tooltip, ausgedünnte Kommentare, die Rückmeldungen aus dem ersten Spielen und die Rückmeldungen zu Mauern und Räumen.
-Die ersten beiden von vier Etappen von M7 liegen ebenfalls auf `master`, samt den Rückmeldungen aus dem Spielen. Etappe 2 ist seit dem 30.09.2026 vollständig: Pausenmenü, Ladebildschirm, Hud an Ankern und Einstellungen für Anzeige, Ton und Tasten, gebaut auf `master_PauseMenu` und `master_SettingsAndLoading`.
-Etappe 3 ist am 30.09.2026 auf `master_GoldStashVendor` gebaut und liegt noch nicht auf `master`: Gold, Münzhaufen, eine Truhe je Charakter und ein Händler im Hub.
+Die ersten drei von vier Etappen von M7 liegen ebenfalls auf `master`, Etappe 1 und 2 samt den Rückmeldungen aus dem Spielen. Etappe 2 ist seit dem 30.09.2026 vollständig: Pausenmenü, Ladebildschirm, Hud an Ankern und Einstellungen für Anzeige, Ton und Tasten, gebaut auf `master_PauseMenu` und `master_SettingsAndLoading`.
+Etappe 3 liegt seit dem 30.09.2026 auf `master`: Gold, Münzhaufen, eine Truhe je Charakter und ein Händler im Hub. Der User hat sie selbst über Pull Request #15 zusammengeführt, Merge-Commit `67e855b`.
+Die Rückmeldungen aus dem Spielen von Etappe 3 sind am selben Tag auf `master_PlaytestFeedback2` gebaut und liegen noch nicht auf `master`.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
@@ -54,9 +55,9 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen. Seit dem Nachtrag zu M5.5 liegt Beute in einem Gitter und trägt Schilder mit dem Namen des Items. Seit Etappe 3 von M7 lassen Gegner auch Gold fallen. | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle. Seit M5 bestimmt das Monsterlevel das Itemlevel. |
 | Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. Seit M5.5 hängt sie an der Schnittstelle `IHero` und läuft auch in 3D. Seit Etappe 3 von M7 kennt das Modell eine Truhe, und eine Gitteransicht zeigt Inventar, Truhe und Händler. |
 | Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. Seit M5.5 ist sie in 3D am Helden zu sehen. |
-| Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch. Seit M6 auch der Abstieg mit Seed, Tiefe und erkundeter Karte. Seit M7 drei Plätze für Charaktere, dazu je Kreis Checkpoints und gefallene Gegner und das Town-Portal. Seit Etappe 3 auch Gold, Truhe und der Bestand des Händlers, das Format hat Version 3. | Nicht im PDF |
+| Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch. Seit M6 auch der Abstieg mit Seed, Tiefe und erkundeter Karte. Seit M7 drei Plätze für Charaktere, dazu je Kreis Checkpoints und gefallene Gegner und das Town-Portal. Seit Etappe 3 auch Gold, Truhe und der Bestand des Händlers, das Format hatte damit Version 3. Seit den Rückmeldungen zu Etappe 3 stehen auch Tränke auf der Skill-Leiste darin, das Format hat Version 4. | Nicht im PDF |
 | Leveling | XP-Tabelle bis Level 100, Level-up-Effekt, Attributspunkte, XP-Balken. Seit M5.5 liegt die Regel für XP, Level und Punkte im Kern und treibt den 3D-Helden. | Nicht im PDF, funktioniert |
-| Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen, Tooltip mit DPS | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
+| Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen, Tooltip mit DPS. Seit den Rückmeldungen zu Etappe 3 von M7 nehmen die Plätze auch Tränke. | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
 | Kampf | Zentrale Trefferauflösung, Nahkampf, Schadensarten mit Effekten, Statuseffekte, Tod und Respawn | Seit M2. Frost-Effekt war im PDF leer und ist jetzt Verlangsamung. |
 | Schadensminderung | Rüstungsformel, Resistenzen, Dodge, Parry und Block für alle Einheiten | Seit M4 bringen Schild, Stab und Schwert Block und Parry mit |
 | Gegner | 3 Typen, Spawn-Marker, Gruppen-Aggro, Lebensbalken, Schadenszahlen, eigene Angriffe. Seit M3 setzen sie Skills auf demselben Weg ein wie der Spieler. Seit M5 sind sie Resources mit Level, Ausrüstung und Verhalten, dazu Elite und Rare Elite mit Mods aus Bausteinen. Seit dem Nachtrag zu M5.5 kollidieren sie miteinander und spawnen verstreut. Seit dem 29.09.2026 gibt es als vierten Typ das Skelett mit Knochen und Animationen. | Blobs, ein Testgegner und das Skelett |
@@ -387,7 +388,7 @@ So funktionieren Skills:
 - Flächen suchen ihre Ziele über den Abstand, nicht über die Physik. Der Boden ist isometrisch gestaucht, der Abstand nach oben und unten zählt deshalb doppelt.
 - Kosten und Abklingzeit regelt, wer den Skill einsetzt. `BaseUnit.TryPayFor` prüft beides über `SkillGate` und zahlt.
 - Eine ATTACK läuft über den Takt der Waffe und zahlt beim Ausholen. Ein SPELL wirkt sofort.
-- Die Belegung der Leiste ist ein `SkillLoadout` im Kern und speichert nur die Ids der Skills. Die Startbelegung steht in `Resources/Skills/starting_loadout.tres`.
+- Die Belegung der Leiste ist ein `SkillLoadout` im Kern und speichert nur Ids. Die Startbelegung steht in `Resources/Skills/starting_loadout.tres`. Bis zu den Rückmeldungen zu Etappe 3 von M7 waren das nur Ids von Skills. Seitdem hält ein Platz die Id eines Skills oder die Id einer Trankbasis, nie einen bestimmten Stapel.
 - Jeder Platz hat eine Eingabeaktion `skill_slot_1` bis `skill_slot_10` in den Projekteinstellungen.
 - Die Abklingzeit gehört zum Skill, nicht zum Platz. Liegt derselbe Skill auf mehreren Plätzen, zeigen alle dieselbe Abklingzeit.
 - Eine Skill-Resource baut ihre Definition beim ersten Zugriff und behält sie. Wer Werte der Resource im laufenden Spiel ändert, sieht davon nichts.
@@ -875,7 +876,7 @@ Von mir festgelegt, weil es sich aus dem Umbau ergab:
 | Radius der Beutel | 150 Pixel, also 1,5 m. Der Wert steht am Beutel im Feld `PickupRadius`. |
 | Namensschild | Liegt wie die Schadenszahlen auf der 2D-Ebene und folgt dem Monster. Schrift in der 3D-Welt ginge in den 240 Bildzeilen unter. |
 | Klick auf einen Beutel | Der Klick gehört zuerst dem Beutel, dann dem Skill auf der linken Maustaste. Eine Lauftaste oder ein Angriff bricht den Weg zum Beutel ab. |
-| Overlay-Karte | Halb durchsichtig über dem Spiel, der Held steht in der Mitte. Sie zeigt 60 m von oben nach unten, gut dreimal so viel wie das Spiel. |
+| Overlay-Karte | Halb durchsichtig über dem Spiel, der Held steht in der Mitte. Sie zeigt 60 m von oben nach unten, gut dreimal so viel wie das Spiel. Seit den Rückmeldungen zu Etappe 3 von M7 füllt sie nur die freie Fläche neben offenen Fenstern, und der Held steht in deren Mitte. |
 | Kellertür | Eine Falltür im Boden bei (4, 0, 5). Sie leuchtet unter der Maus und schreibt beim Klick weiter nur eine Logzeile. |
 | Form der Flächen | Ein Kreis auf dem Boden. Die Stauchung aus 2D ist entfallen, `AreaSettings.Contains` rechnet mit einem Kreis. |
 | Aussehen der Effekte | Leuchtende Ringe und Körper aus Grundformen |
@@ -1491,7 +1492,7 @@ Bewusst offen gelassen:
 
 Nachtrag vom 30.09.2026: Seit Etappe 2 von M7 wirken F2, F4 und F5 nur im Debug-Build, im Editor also weiter. Die Zeile oben links mit Ebene, Seed und Bereichslevel steht nur dort. Ob Lichter echte Schatten werfen, ist die Einstellung Real Shadows. F4 schaltet nur zum Testen um und speichert nichts.
 
-### M7: Hub und Abstieg (M, Etappe 1 umgesetzt am 29.09.2026 auf `master_HubAndDescent`, das Pausenmenü aus Etappe 2 am selben Tag auf `master_PauseMenu`, der Rest von Etappe 2 am 30.09.2026 auf `master_SettingsAndLoading`, Etappe 3 am selben Tag auf `master_GoldStashVendor`)
+### M7: Hub und Abstieg (M, Etappe 1 umgesetzt am 29.09.2026 auf `master_HubAndDescent`, das Pausenmenü aus Etappe 2 am selben Tag auf `master_PauseMenu`, der Rest von Etappe 2 am 30.09.2026 auf `master_SettingsAndLoading`, Etappe 3 am selben Tag auf `master_GoldStashVendor`, die Rückmeldungen zu Etappe 3 ebenfalls am selben Tag auf `master_PlaytestFeedback2`)
 
 Ziel: die Spielstruktur steht.
 
@@ -1501,7 +1502,7 @@ M7 läuft in vier Etappen:
 |---|---|---|
 | 1 | Hauptmenü, Hub, Portale, mehrere Ebenen pro Kreis, Treppen, Checkpoints, Town-Portal | Umgesetzt |
 | 2 | Pausenmenü, Ladebildschirm, Einstellungen für Auflösung, Tasten und Lautstärke. UI über Anker statt Code, behebt A6. | Umgesetzt, liegt seit dem 30.09.2026 auf `master` |
-| 3 | Hub-Funktionen: Truhe und Händler. Dafür braucht es eine Währung. | Umgesetzt am 30.09.2026 auf `master_GoldStashVendor` |
+| 3 | Hub-Funktionen: Truhe und Händler. Dafür braucht es eine Währung. | Umgesetzt, liegt seit dem 30.09.2026 auf `master`. Die Rückmeldungen aus dem Spielen liegen auf `master_PlaytestFeedback2`. |
 | 4 | Platzhalter-Boss und Freischaltung des nächsten Kreises | Offen |
 
 Fertig, wenn man vom Hauptmenü in den Hub, in einen Kreis, zurück und wieder hinein kommt.
@@ -1579,7 +1580,7 @@ So funktioniert die Reise:
 - Beim Aufbau einer Ebene spawnen zuerst alle Gegner, danach verschwinden die Gemerkten. So stehen die Übrigen bei jedem Besuch am selben Platz.
 - Damit das gilt, steht der Held beim Spawnen immer am Start der Ebene, und die Zufallsquelle bekommt direkt vor dem Spawnen ihren Seed. Erst danach rückt der Held an die Stelle seiner Ankunft.
 - `CircleDialog` liest den `DescentState` des Kreises und meldet die gewählte Ebene oder den Wunsch nach einem neuen Abstieg. Der `GameController` verbindet ihn mit `Descent`.
-- Der Spielstand hat Version 2. Unter `Journey` stehen die Kreise mit ihren Ebenen und das Town-Portal. Spielstände der Version 1 lädt das Spiel weiter. Seit Etappe 3 hat er Version 3.
+- Der Spielstand hat Version 2. Unter `Journey` stehen die Kreise mit ihren Ebenen und das Town-Portal. Spielstände der Version 1 lädt das Spiel weiter. Seit Etappe 3 hatte er Version 3, seit den Rückmeldungen zu Etappe 3 hat er Version 4.
 - `SaveSlots` kennt die drei Plätze und den Ordner. Das Hauptmenü wählt den Platz, danach lädt `Scenes/game.tscn`.
 
 So entsteht ein neuer Kreis:
@@ -1794,7 +1795,7 @@ Felder am Wurzelknoten von `Scenes/UI/curtain.tscn`:
 | `MinimumShowSec` | 1,5 | So lange steht das Schwarz mindestens, gezählt ab ganz schwarz |
 | `StartsDown` | aus, in der Spielszene an | Der Vorhang steht schon beim Start |
 | `ShowsTips` | an | Tipps an oder aus |
-| `Tips` | zehn Tipps | Die Tipps, `{aktion}` steht für die Taste |
+| `Tips` | zehn Tipps, seit Etappe 3 fünfzehn, seit den Rückmeldungen zu Etappe 3 sechzehn | Die Tipps, `{aktion}` steht für die Taste |
 
 So kommt ein neuer Tipp dazu: In `Scenes/UI/curtain.tscn` unter `Tips` einen Eintrag anhängen. Eine Taste steht als Name der Aktion in geschweiften Klammern, etwa `{open_town_portal}`. Hat die Aktion keine Taste, zeigt der Vorhang den Tipp nicht.
 
@@ -1838,18 +1839,18 @@ Von mir festgelegt, weil es sich aus dem Bau ergab:
 | Gruppe | `Hud/BottomHud`, 2560 breit und unten mittig. Der Lebens-Orb sitzt bei 25 %, der Mana-Orb bei 75 % der Breite. |
 | XP-Balken | 1229 x 38 mit `nine_patch_stretch` statt der Skalierung 0,6. Die Zahl beim Überfahren hat Schrift 28. |
 | Level-up-Knopf | Hängt direkt unter der Hud vor dem Todesbildschirm, unten mittig verankert bei -512 bis -384 und -352 bis -224. So steht er rechts oben am Lebens-Orb. |
-| Charakterbogen | Oben rechts, 918 x 1230, 30 Pixel vom Rand. Seit Etappe 3 ist er mit der Zeile für das Gold 1267 hoch. |
+| Charakterbogen | Oben rechts, 918 x 1230, 30 Pixel vom Rand. Seit Etappe 3 ist er mit der Zeile für das Gold 1267 hoch. Seit den Rückmeldungen zu Etappe 3 stehen Truhe und Händler oben links, ebenfalls 30 Pixel vom Rand. |
 | Level-up-Dialog | Die Wurzel deckt die ganze Fläche und lässt die Maus durch. Das Panel sitzt bei 50 % der Breite und 62,5 % der Höhe. |
-| Tooltip | Steht über dem Element, ist dort kein Platz, darunter. Er bleibt an allen vier Rändern im Bild. |
-| Reihenfolge | Die Orbs haben kein `z_index` 10 mehr. Was über ihnen liegt, bestimmt die Reihenfolge der Knoten unter der Hud. |
+| Tooltip | Steht über dem Element, ist dort kein Platz, darunter. Er bleibt an allen vier Rändern im Bild. Seit den Rückmeldungen zu Etappe 3 rechnet `TooltipPlacement` im Kern die Lage, mit Shift steht links daneben der Vergleich. |
+| Reihenfolge | Die Orbs haben kein `z_index` 10 mehr. Was über ihnen liegt, bestimmt die Reihenfolge der Knoten unter der Hud. Seit den Rückmeldungen zu Etappe 3 steht `MapFrame` mit beiden Karten vor Tooltip und Charakterbogen, die Karte liegt also unter allen Fenstern. |
 
 So funktioniert es:
 
 - Die Leinwand ist 2560 x 1440 mit Stretch `canvas_items` und `expand` aus `project.godot`. Sie wächst mit dem Seitenverhältnis in die Breite oder Höhe, Anker halten jedes Teil an seinem Rand.
 - Orbs, XP-Balken, Charakterbogen, Level-up-Dialog und Knopf haben ihre Rechnung in `_Ready` verloren. Ihre Lage steht nur noch in den Szenen.
-- `CharacterSheet.Covers` kennt alle sichtbaren Teile des Bogens, auch Werteliste und Stufe. Das Inventar fragt es, ob ein Klick neben den Bogen ging. Ein geschlossener Bogen deckt nichts ab.
+- `CharacterSheet.Covers` kennt alle sichtbaren Teile des Bogens, auch Werteliste und Stufe. Das Inventar fragt es, ob ein Klick neben den Bogen ging. Ein geschlossener Bogen deckt nichts ab. Seit den Rückmeldungen zu Etappe 3 liefert `GetCoveredRects` dieselben Teile als Rechtecke, `MapFrame` hält die Karte daraus fern.
 
-So kommt ein neues Teil der Hud dazu: Unter `Hud` oder `Hud/BottomHud` hängen und mit Ankern an einen Rand oder die Mitte binden, ohne Rechnung im Code. Soll es über den Orbs liegen, steht es in der Reihenfolge nach `BottomHud`. Ein Knopf, der nur mit der Maus bedient wird, bekommt `focus_mode` None. Sonst behält er nach einem Klick den Fokus, und die Leertaste drückt ihn, sobald sie nicht mehr auf Close Windows liegt.
+So kommt ein neues Teil der Hud dazu: Unter `Hud` oder `Hud/BottomHud` hängen und mit Ankern an einen Rand oder die Mitte binden, ohne Rechnung im Code. Soll es über den Orbs liegen, steht es in der Reihenfolge nach `BottomHud`. Ein Knopf, der nur mit der Maus bedient wird, bekommt `focus_mode` None. Sonst behält er nach einem Klick den Fokus, und die Leertaste drückt ihn, sobald sie nicht mehr auf Close Windows liegt. Seit den Rückmeldungen zu Etappe 3 gilt für ein neues Fenster: In der Reihenfolge steht es nach `MapFrame`, sonst liegt die Karte darüber. Soll die Karte ihm ausweichen, muss es in `CharacterSheet.GetCoveredRects` vorkommen wie Truhe und Händler.
 
 Befunde:
 
@@ -1905,7 +1906,7 @@ Von mir festgelegt, weil es sich aus dem Bau ergab:
 | Tausch | Kann die andere Aktion die bisherige Taste nicht nehmen, etwa eine Maustaste außerhalb der Skill-Plätze, bleibt alles, wie es war |
 | Belegt wird | Die Lage der Taste, beschriftet mit dem Zeichen, das die Tastatur des Spielers dort hat. Die Datei hält nur Abweichungen vom Standard. |
 | Debug-Build | F1 Look, F2 Kamera, F3 Pixelgröße, F4 Schatten, F5 ganze Karte und F6 Testgelände wirken nur mit `OS.IsDebugBuild()`, im Editor also weiter. F3 und F4 schalten nur zum Testen um und speichern nichts. |
-| Statuszeile | Oben links. Die Bildrate steht dort mit Show FPS, Gegner, Look, Kamera, Ort und Seed nur im Debug-Build. |
+| Statuszeile | Oben links. Die Bildrate steht dort mit Show FPS, Gegner, Look, Kamera, Ort und Seed nur im Debug-Build. Seit den Rückmeldungen zu Etappe 3 verdecken Truhe und Händler sie, solange sie offen sind. |
 | Knöpfe der Hud | Das Plus im Level-up-Dialog, der Level-up-Knopf, der Knopf der Werteliste und die Knöpfe im Dialog am Portal nehmen keinen Tastaturfokus |
 
 So funktioniert es:
@@ -2014,7 +2015,7 @@ Vier Reviews mit je drei Prüfern, jeden Befund haben drei Skeptiker gegengeprü
 
 #### Etappe 3: Gold, Truhe und Händler
 
-Umgesetzt am 30.09.2026 auf `master_GoldStashVendor`.
+Umgesetzt am 30.09.2026 auf `master_GoldStashVendor`. Seit demselben Tag liegt die Etappe auf `master`, der User hat sie über Pull Request #15 zusammengeführt.
 
 - Erledigt: Gold als Währung. Gegner lassen Münzhaufen fallen, der Held hebt sie beim Darüberlaufen auf.
 - Erledigt: Eine Truhe im Hub, je Charakter, mit 14 x 10 Feldern. Sie hält auch Gold.
@@ -2052,18 +2053,18 @@ Von mir festgelegt, weil es sich aus dem Bau ergab:
 | Stufen des Haufens | Neun Stufen mit den Schwellen 1, 2, 3, 4, 5, 6, 20, 50 und 150 Gold: eine bis fünf lose Münzen, ein bis drei Stapel, fünf Stapel |
 | Haufen | Gold, das näher als 1,2 m an einem Haufen fällt, landet auf ihm. Haufen und Beutel liegen nie aufeinander. Frisch gefallenes Gold bleibt 0,35 s liegen, damit man es fallen sieht. Aufgehoben wird ab 1,1 m vom Körperrand des Helden. |
 | Tod | Ein toter Held hebt nichts auf. Das Gold in der Truhe ist sicher. Der Haufen steht nicht im Spielstand: Wer das Spiel beendet, verlässt die Ebene. |
-| Gold in der Truhe | Knöpfe zahlen 10, 100, 1.000 oder alles ein und aus. Beim Händler zählt nur das Gold, das der Held bei sich trägt. |
+| Gold in der Truhe | Knöpfe zahlen 10, 100, 1.000 oder alles ein und aus. Beim Händler zählt nur das Gold, das der Held bei sich trägt. Seit den Rückmeldungen zu Etappe 3 gibt es statt der festen Beträge ein Feld mit Deposit und Withdraw, darunter Deposit all und Withdraw all. |
 | Händlerfenster | Drei Reiter: Consumables, Equipment und Buyback. Jedes Gitter hat 14 x 10 Felder, damit auch zwanzig große Stücke Platz finden. |
 | Kaufen | Ein Klick kauft und legt die Ware direkt ins Inventar, nie in die Hand. Mit Strg kauft ein Klick auf ein Verbrauchsgut einen ganzen Stapel. Fehlt Gold oder Platz, bleibt die Ware, und das Fenster nennt den Grund. |
 | Verkaufen | Strg+Klick im Inventar oder ein Klick mit dem Item an der Maus ins Händlerfenster. Ein Stapel geht als Ganzes. Ausgerüstetes geht nur über die Hand. |
 | Rückkauf | Kostet, was der Händler gezahlt hat. Ist das Gitter voll, weicht das älteste Stück. Er steht nicht im Spielstand. |
-| Fenster | Truhe und Händler liegen links neben dem Charakterbogen und öffnen ihn mit. Es ist immer nur eines von beiden offen. Sie schließen mit dem Bogen, beim Weglaufen und nach einer Reise. Sie halten das Spiel nicht an. |
+| Fenster | Truhe und Händler liegen links neben dem Charakterbogen und öffnen ihn mit. Es ist immer nur eines von beiden offen. Sie schließen mit dem Bogen, beim Weglaufen und nach einer Reise. Sie halten das Spiel nicht an. Seit den Rückmeldungen zu Etappe 3 liegen sie oben links am Bildschirm. |
 | Item an der Maus | Schließt ein Fenster, wandert es ins Inventar, bei der Truhe sonst in die Truhe. Es fällt dabei nicht zu Boden. |
 | Preis im Tooltip | Nur bei offenem Händler: Buy, Buy back und im Inventar Sell oder "Cannot be sold" |
 | Anzeige | Das Gold des Helden steht unter dem Inventar. Aufgehobenes Gold zeigt eine Zahl über dem Helden. |
 | Neuer Charakter | Beginnt mit 0 Gold. Der Händler hat von Anfang an einen Bestand mit dem Bereichslevel der ersten Ebene. |
 | Alter Spielstand | Lädt mit 0 Gold und leerer Truhe. Der erste Bestand hat das Bereichslevel der tiefsten erreichten Ebene. |
-| Spielstand | Version 3 |
+| Spielstand | Version 3. Seit den Rückmeldungen zu Etappe 3 Version 4. |
 | Plätze im Hub | Die Truhe steht links vom Start bei (-3,5 / 9,5), der Händler neben der östlichen Feuerschale bei (5 / 7,5). Beide sind der Kamera zugewandt. |
 | Aussehen | Truhe, Händler und Münzen sind Platzhalter aus Grundkörpern. Unter der Maus leuchtet unter der Truhe eine Platte und unter dem Händler ein Ring. |
 
@@ -2080,7 +2081,7 @@ So funktioniert es:
 - `VendorController` ist ein Knoten in `Scenes/game.tscn`. Er hält `Vendor` und `Trade`, würfelt bei `Descent.LevelReached` und `Hero.LeveledUp` neu und leert den Rückkauf bei jedem Ortswechsel.
 - `Descent.LevelReached` meldet das Bereichslevel, wenn der Held tiefer kommt als `DeepestDepth`. Ein neuer Abstieg behält die Checkpoints, dieselbe Ebene zählt also nur einmal.
 - `ItemGridView` mit der Szene `Scenes/UI/item_grid_view.tscn` zeigt ein beliebiges Gitter. Was ein Klick bewirkt, entscheidet das Fenster. `Inventory`, `StashWindow` und `VendorWindow` benutzen sie. Es gibt weiter nur ein `MouseObject`, es hängt am Inventar.
-- `StashWindow` und `VendorWindow` setzen `ISideWindow` um und hängen im Charakterbogen unter `Side`, einem `HBoxContainer`, der nach links wächst. `StatSpace` hält darin den Platz der Werteliste frei, solange sie offen ist. `CharacterSheet.Covers` kennt beide Fenster, ein Klick hinein lässt das Item an der Maus nicht fallen.
+- `StashWindow` und `VendorWindow` setzen `ISideWindow` um und hängen im Charakterbogen unter `Side`, einem `HBoxContainer`, der nach links wächst. `StatSpace` hält darin den Platz der Werteliste frei, solange sie offen ist. `CharacterSheet.Covers` kennt beide Fenster, ein Klick hinein lässt das Item an der Maus nicht fallen. Seit den Rückmeldungen zu Etappe 3 ist `Side` `top_level`, steht oben links bei 30 / 30 und wächst nach rechts, `StatSpace` ist entfallen.
 - Im Spielstand stehen `CharacterSave.Gold` und `StashGold`, `SaveGame.Stash` und `SaveGame.Vendor` mit Itemlevel und Bestand samt Plätzen. `GameController` speichert nach jeder Änderung an Gold, Truhe und Händler.
 
 Felder im Inspector:
@@ -2100,7 +2101,7 @@ Felder im Inspector:
 | `VendorController`, Gruppe Bestand | `MagicOneIn`, `RareOneIn` | 20 und 30 | Jedes wievielte Stück Magic oder Rare ist. 0 schaltet es ab |
 | `VendorController`, Gruppe Preise | `MagicPriceFactor`, `RarePriceFactor` | 3 und 8 | Vielfaches des Grundpreises |
 | `VendorController`, Gruppe Preise | `SellSharePercent` | 25 | Anteil, den der Händler beim Ankauf zahlt |
-| `StashWindow` | `GoldSteps` | 10, 100, 1000 | Die Knöpfe zum Ein- und Auszahlen, dahinter steht immer einer für alles |
+| `StashWindow` | `GoldSteps` | 10, 100, 1000 | Die Knöpfe zum Ein- und Auszahlen, dahinter steht immer einer für alles. Seit den Rückmeldungen zu Etappe 3 entfallen, siehe dort. |
 | `VendorWindow` | `MessageSec` | 2,5 | So lange steht eine Meldung |
 | Truhe und Händler im Hub | `UseRadius`, `DisplayName`, `Hint`, `TagHeightMeters`, `TagColor` | je Szene | Reichweite und Schild |
 
@@ -2142,6 +2143,115 @@ Bewusst offen gelassen:
 - Ein älterer Build legt einen Spielstand der Version 3 als `.broken` zur Seite. Die Datei lässt sich zurückbenennen.
 - Die Hervorhebung unter der Maus leuchtet auch unter einem offenen Fenster, wie schon bei den Portalen.
 - Ein unabhängiges Review mit Prüfern und Skeptikern wie in Etappe 2 steht aus. Der erste Anlauf für den Kern brach an der Nutzungsgrenze der Sitzung ab und lieferte kein Ergebnis.
+
+#### Rückmeldungen aus dem Spielen von Etappe 3
+
+Umgesetzt am 30.09.2026 auf `master_PlaytestFeedback2`, abgezweigt vom Merge-Commit `67e855b`. Liegt noch nicht auf `master`.
+
+Der User hat Etappe 3 am 30.09.2026 gespielt und sieben Dinge verlangt, im Wortlaut:
+
+1. "Die items im Händlerinventar müssen nach Itemtyp sortiert sein"
+2. "das händerinventar und das Chest inventar müssen oben links andocken und nicht direct am charsheet/statdisplay"
+3. "wenn man ein item, das nicht ausgerüstet ist, mit der Maus hovert soll per shift-key gedrückt halten links neben dem itemtooltip der tooltip des an diesem slot ausgerüsteten items angezeigt werden. ich will in dem vergleichstooltip keine automatischen statvergleiche. Nur das bereits getragene item(falls vorhanden) und einen kleinen vermerk "currently equiped""
+4. "Consumables müssen auf hotkeys in der Skillbar gelegt werden können."
+5. "WaffenSPrites im Mainhand slot sind komisch gestretcht. FIx das"
+6. "DIe karte auf Tab überlagert CharSheet und statdisplay. Das darf nicht sein."
+7. "Gold Deposit und Withdraw muss ein integer-only freitext feld sein. Wenn zu viel deposit eingetragen wird als vorhanden ist, soll alles in die kiste. wenn zu viel rausgeommen werden würde als drin ist, alles rausholen. zusätzlich noch die "deposit all" und "withdraw all" buttons behalten"
+
+Vor dem Bau hat ein Workflow mit sieben Lesern den Code vermessen, danach hat der User vier Fragen per Auswahl beantwortet. Gebaut haben sechs Bauer in eigenen Worktrees, ihre Patches sind zusammengeführt.
+
+| Frage | Antwort |
+|---|---|
+| Karte bei offenem Bogen | Die Karte weicht aus: Sie füllt nur die freie Fläche neben offenen Fenstern, beschnitten, der Held steht in deren Mitte. Bleiben weniger als rund 400 Pixel frei, blendet sie sich aus. |
+| Händler im Gitter | Spaltenweise: Das Gitter füllt sich Spalte für Spalte von oben nach unten, die Gruppen stehen als Bänder von links nach rechts. |
+| Tränke auf die Leiste | Über die Rechtsklick-Liste der Skill-Leiste, darunter ein Abschnitt "Consumables" |
+| Goldfeld | Ein gemeinsames Feld mit Deposit und Withdraw, darunter Deposit all und Withdraw all |
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Reihenfolge im Händler | Waffen nach Art: Schwert, Axt, Flegel, Dolch, Bogen, Stab, Zauberstab, dann andere. Danach Schilde, Rüstung von Kopf bis Fuß (Helm, Schultern, Umhang, Brust, Armschienen, Handschuhe, Gürtel, Hose, Stiefel), Schmuck (Amulett, Ringe) und Verbrauchsgüter (Leben, Mana). Innerhalb einer Art nach Basis, dann Rare, Magic, Normal. Das gilt für Waren und Bestand. Der Rückkauf bleibt in der Reihenfolge des Verkaufs. |
+| Auslegen im Händler | Jede Spalte füllt sich von oben nach unten in der Reihenfolge der Typen, kein Item greift hinter das vorige zurück. Breite Items suchen zuerst Spalten, die gleich weit gefüllt sind, sonst entstünde eine Treppe. Passt so nicht alles, nimmt der Händler eine schlichte Fülllinie und zuletzt dichtes Packen, die Sortierung bringt also nie weniger unter. Nach einem Kauf bleibt eine Lücke. |
+| Alter Spielstand | Ein Spielstand bis Version 3 legt den gespeicherten Bestand beim Laden einmal nach Itemtyp neu aus, ohne neu zu würfeln. Ab Version 4 bleiben die gespeicherten Plätze. |
+| Truhe und Händler | Oben links, 30 Pixel vom Rand wie der Bogen, die Oberkante bündig bei y 30. Ein Klick in die Welt zwischen Fenster und Bogen lässt ein Item an der Maus weiter fallen. Die Fenster fangen Klicks auf Titel und Ränder ab. Solange sie offen sind, verdecken sie die Statuszeile oben links, also Bildrate oder Debug-Zeile. |
+| Vergleich | Fest auf Shift, wie Strg beim Umlagern und Verkaufen, nicht umbelegbar. Gegenstück ist das getragene Item am Platz des Items, der Stab vergleicht also mit der Haupthand. Ein Zweihänder vergleicht nur mit der Haupthand, ein Schild bei getragenem Zweihänder zeigt nichts. Nur in Gitteransichten: Inventar, Truhe und die drei Reiter des Händlers. Nicht an Ausrüstungsplätzen und nicht am Boden. |
+| Aussehen des Vergleichs | Das getragene Item wie in seinem normalen Tooltip, dazu ein kleiner grauer Vermerk "Currently Equipped" über dem Namen. Ohne Preis und ohne Vergleichszahlen. |
+| Lage des Vergleichs | Links neben dem Tooltip mit 8 Pixel Abstand. Ist links kein Platz, rücken beide nach rechts, das Getragene bleibt links. Ob beide über oder unter dem Item stehen, entscheidet der höhere der beiden, damit keiner das Item verdeckt. |
+| Tränke auf der Leiste | Der Platz merkt sich die Trankart, also die Id der Basis, nicht einen Stapel. Oben links steht die Zahl im Inventar. Bei 0 wird das Bild grau, und der Platz bleibt belegt. Erlaubt auf allen zehn Plätzen. |
+| Trinken per Taste | Keine Abklingzeit und kein Schutz bei vollem Leben, wie beim Rechtsklick im Inventar. Die Taste trinkt genau einen Trank aus dem Inventar, den kleinsten Stapel zuerst. Gehalten trinkt sie nur einmal und stört keinen gehaltenen Angriff. Truhe und Item an der Maus zählen nicht. |
+| Liste und Tooltip der Tränke | Die Liste zeigt alle Trankarten mit ihrer Zahl, auch bei 0. Der Tooltip auf dem Platz nennt Name, Wirkung wie im Item-Tooltip ("Recovered Life: 20%"), "In inventory: N" und "Right click to change". |
+| Waffe im Platz | Ein angelegtes Item erscheint in seiner eigenen Zellgröße bei 80 Pixel je Zelle, mittig im Platz, wie die Rüstung daneben. Das Bild eines Schwerts ist 72 x 216 statt 152 x 456 Pixel groß. Vorher füllte es den Platz von 2 x 6 Zellen und war doppelt so breit wie eine Zelle. |
+| Item an der Maus | Hat die Form seiner Zellen, 28 Pixel je Zelle: Schwert 28 x 84, Helm wie bisher 56 x 56, Trank 28 x 28. Vorher wurde jedes Item in 56 x 56 gequetscht. |
+| Karte | Beide Karten, über der Erde und in Ebenen, hängen in `Hud/MapFrame`. Der Knoten steht in der Hud vor Tooltip und Bogen und zeichnet damit unter allen Fenstern. Ob die Karte per Tab offen ist, bleibt beim Ausblenden erhalten. Die Leertaste schließt sie wie bisher mit den Fenstern. |
+| Goldfeld | Nimmt nur Ziffern an, höchstens zehn, eine elfte wird abgewiesen. Eingefügter Text wie "1.000 Gold" wird zu 1000. Zu viel eingetragen heißt alles, ein leeres Feld bucht nichts. Der Betrag bleibt nach dem Buchen stehen. Enter beendet nur die Eingabe. Kein Kontextmenü, denn der Rechtsklick ist ein Platz der Skill-Leiste. Die Knöpfe 10, 100 und 1.000 sind entfallen. |
+| Fokus des Goldfelds | Nach einem Knopf, nach Enter und nach einem Klick daneben gibt das Feld den Fokus ab, damit die Tasten 1 bis 4 wieder Skills auslösen. Solange es den Fokus hat, schalten abgefragte Aktionen nicht: Bogen, Karte und Close Windows. |
+| Anzeige des Town-Portals | Bleibt, wo sie war, und zeichnet über dem Bogen. Ein Umbau hatte sie kurz unter den Bogen gelegt, das Review hat ihn zurückgenommen. |
+| Tipps im Ladebildschirm | Der Tipp zur Skill-Leiste nennt jetzt auch Tränke, ein neuer Tipp erklärt den Vergleich mit Shift. Es sind jetzt 16 Tipps. |
+| Spielstand | Version 4. Neu ist die Liste `LoadoutConsumables` neben `Loadout`, parallel je Platz die Id einer Trankbasis oder null. `Loadout` bleibt eine Liste von Skill-Ids. Spielstände der Version 3 laden weiter, ohne Tränke auf der Leiste. |
+
+So funktioniert es:
+
+- `ItemTypeOrder` unter `Scripts/Core/Items` hält die Rangtabelle. `Sort` ordnet nach Rang, dann nach Name und Id der Basis, dann Rare, Magic, Normal. Die Reihenfolge der Enums spielt dafür keine Rolle.
+- `Vendor.LayOutByType` legt Waren und Bestand damit aus. Es probiert drei Auslagen der Reihe nach auf einem Probegitter (`EvenTopFirst`, `FillLine`, `FirstGap`) und nimmt die erste, in die alles passt, sonst die mit den meisten Stücken. Eine Fülllinie je Spalte merkt sich, wie weit die Spalte belegt ist.
+- `SaveGameMapper.RestoreVendor` legt den Bestand eines Spielstands bis Version 3 über `Vendor.Restock` neu aus. Ab Version 4 setzt `RestoreStock` die gespeicherten Plätze.
+- `Equipment.GetWornCounterpart` liefert das getragene Item am Platz eines Items. `InventoryItem.WornCounterpart` macht daraus einen Inhalt mit `ItemTooltipContent.ShowsEquippedNote`. Nur Items in einem Gitter haben das, deshalb gibt es den Vergleich nur dort.
+- `ItemTooltip` legt beim Start einen zweiten `ItemTooltip` als Begleiter an und fragt in jedem Frame die Umschalttaste ab. `BaseTooltip` teilt sich in `Fill` für den Inhalt und `PlaceBy` für die Lage.
+- `TooltipPlacement` unter `Scripts/Core/Hud` rechnet die Lage mit `ScreenBox`: `Place` für einen Tooltip allein, `PlaceWithCompanion` für Tooltip und Vergleich.
+- `EquippedIconSize` im Kern rechnet die Fläche für das Bild im Ausrüstungsplatz, das Bild behält darin sein Seitenverhältnis. `EquipmentSlot` zeigt das Item im neuen Knoten `%ItemIcon`, `%Icon` trägt nur noch das Bild des leeren Platzes. Rand und Rahmen stehen als 8 Pixel im Code und müssen zu `equipment_slot.tscn` passen.
+- `MouseObject` nimmt die Zellen des Items mal `CellPx` als Größe, das Bild behält sein Seitenverhältnis.
+- `MapFrame` unter `Scripts/UI` fragt in jedem Frame `CharacterSheet.GetCoveredRects`. `FreeSpan.Widest` unter `Scripts/Core/Hud` sucht daraus den breitesten freien Streifen, bei gleicher Breite gewinnt der linke. Gesetzt wird nur eine Änderung, sonst legte der `SubViewport` der Karte jedes Frame sein Bild neu an.
+- `Side` in `character_sheet.tscn` ist `top_level` bei 30 / 30, `StatSpace` ist entfallen. Truhe und Händler haben `mouse_filter` Stop und fangen so Klicks auf Titel und Ränder ab.
+- `StashWindow` baut in `%GoldRow` das Feld `AmountField` mit Deposit und Withdraw, in `%GoldAllRow` Deposit all und Withdraw all. `GoldAmountText` unter `Scripts/Core/Economy` filtert mit `KeepDigits` beim Tippen und liest mit `Parse` den Betrag. Zu viel begrenzt `Purse.Move` auf alles, was da ist.
+- `InputActions.IsTyping` ist wahr, solange ein `LineEdit` den Fokus hat. Charakterbogen, beide Karten und Close Windows fragen es ab. Bei einem Klick daneben nimmt `StashWindow._Input` dem Feld den Fokus, beim Fallenlassen eines Items tut das `Inventory`.
+- `SkillLoadout` hält je Platz die Id eines Skills oder die Id einer Trankbasis, dazu kommen `GetConsumableId` und `AssignConsumable`. `SaveGame.LoadoutConsumables` steht parallel zu `Loadout`. `SaveGameMapper.RestoreLoadout` nimmt einen Trank nur, wenn der Katalog die Basis als Verbrauchsgut kennt.
+- `SkillPicker` zeigt unter "Consumables" alle `ConsumableBaseResource` aus `ItemLibrary` und meldet `ConsumableChosen`. `SkillSlotView.ShowConsumable` zeigt die Zahl in `%CountLabel`, den Tooltip baut `Scripts/UI/Skills/ConsumableTooltip.cs`. `SkillBarView` zeigt die Zahlen nach jeder Änderung an den Items neu.
+- `Hero.UseConsumable` trinkt den Stapel aus `CharacterItems.FindStackToConsume`. Die Taste eines Trankplatzes geht an `heldSlot` vorbei, sonst tränke der Held gehalten jeden Frame. `CharacterItems.CountInInventory` zählt für Leiste und Liste.
+
+Neue Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| `Hud/MapFrame` | `Sheet` | `CharacterSheet` | Der Bogen, dessen Teile und Fenster die Karte meidet |
+| `Hud/MapFrame` | `MinWidthPx` | 400 | Ist der freie Streifen schmaler, blendet sich die Karte aus |
+| `StashWindow` | `GoldFieldWidth` | 220 | Breite des Goldfelds |
+| `StashWindow` | `GoldButtonSize` | 160 x 44 | Größe der Goldknöpfe, vorher 120 x 44 |
+| `ItemTooltip` | `CompanionGapPx` | 8 | Abstand zwischen Vergleich und Tooltip |
+| `SkillSlotView` | `OutOfStockTint` | 0,35 grau | Tönung eines Trankplatzes bei 0 |
+| `MouseObject` | `CellPx` | 28 | Pixel je Zelle für das Item an der Maus |
+
+Entfallen ist `StashWindow.GoldSteps`.
+
+So kommt ein neuer Trank auf die Leiste: Eine `ConsumableBaseResource` unter `Resources/Items` anlegen. Sie steht von selbst in der Liste, nach Namen geordnet.
+
+So kommt ein neuer Typ in die Reihenfolge: Einen neuen Waffentyp, Platz oder Trankeffekt in die Tabellen von `ItemTypeOrder` eintragen. Fehlt er dort, steht eine Waffe hinter den bekannten Waffen, ein Trank hinter den bekannten Tränken und eine Rüstung ganz am Ende.
+
+Befunde:
+
+- Ursache der gestreckten Waffe: Das Bild im Ausrüstungsplatz füllte den ganzen Platz von 2 x 6 Zellen bei gehaltenem Seitenverhältnis. Ein Schwert mit 1 x 3 Zellen wurde so 2,4-fach vergrößert und doppelt so breit wie eine Zelle. Echt verzerrt war nur das Item an der Maus.
+- Ursache der Karte über dem Bogen: Sie stand in der Hud nach dem Bogen, beide mit `z_index` 0, und zeichnete deshalb darüber. Inventar, Truhe und Händler lagen mit `z_index` 10 schon darüber.
+- Ein Review mit sieben Prüfern und je einem Skeptiker fand 17 Befunde, 15 davon bestätigt. Behoben sind alle bis auf zwei, die meinen Festlegungen folgen: die Statuszeile unter der Truhe und die gespeicherten Plätze ab Version 4.
+- Die behobenen Befunde im Einzelnen: Items rutschten im Händler in Lücken früherer Spalten. Der Vergleich verdeckte das Item, wenn das getragene höher war. Das Goldfeld behielt nach dem Fallenlassen eines Items den Fokus. Eine elfte Ziffer ging durch. Abgefragte Tasten schalteten beim Tippen. Dazu der Wortlaut der Tränke, ein graues Quadrat an der Maus, die Anzeige des Town-Portals unter dem Bogen und die Doku.
+- Eine Nachprüfung der Korrekturen fand noch eine Treppe im Händler: Ein späteres Stück landete über der rechten Hälfte eines früheren, zwei Felder breiten Stücks, in 1801 von 2000 Würfen. Seitdem hat jede Spalte eine Fülllinie, und ein Test liest jede Spalte von oben nach unten.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Unit-Tests | 104 neue für Reihenfolge und Auslegen im Händler, Goldfeld, freien Streifen der Karte, Lage der Tooltips, Größe im Ausrüstungsplatz, getragenes Gegenstück, Tränke im Inventar und auf der Leiste und den Spielstand der Version 4. Zusammen 1106. |
+| Mit Fenster | 75 Schritte bei 1600 x 900 |
+| Neustart, headless | 7 Schritte |
+| Start, headless | Spiel und Hauptmenü starten ohne Fehler |
+| Bilder | 19 Bilder angesehen |
+
+Bewusst offen gelassen:
+
+- Der User hat die Änderungen noch nicht gespielt.
+- Truhe und Händler verdecken die Statuszeile oben links, solange sie offen sind. Das Review hat es gemeldet, es folgt meiner Festlegung.
+- Ein Bestand aus einem Spielstand ab Version 4 behält seine gespeicherten Plätze und wird beim Laden nicht neu ausgelegt. Auch das hat das Review gemeldet, auch das folgt meiner Festlegung.
+- Ein älterer Build legt einen Spielstand der Version 4 als `.broken` zur Seite, wie schon beim Schritt auf Version 3.
+- Ringe haben noch keine Basen. Der Vergleich zeigt das Item an dem Platz, den die Basis nennt, bei vier Ringplätzen also nur einen. Siehe die offene Frage unter M4.
 
 ### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L)
 

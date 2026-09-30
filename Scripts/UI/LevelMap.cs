@@ -72,7 +72,7 @@ public partial class LevelMap : Control, IClosableWindow
         if (Descent?.Level is null)
             return;
 
-        if (Input.IsActionJustPressed(InputActions.ToggleOverlayMap))
+        if (Input.IsActionJustPressed(InputActions.ToggleOverlayMap) && !InputActions.IsTyping(GetViewport()))
             Visible = !Visible;
 
         if (Visible)

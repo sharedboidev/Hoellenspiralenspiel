@@ -151,7 +151,7 @@ public partial class GameController : Node
     {
         Hero.RestoreProgress(save.Character);
 
-        SaveGameMapper.RestoreLoadout(save, Hero.Loadout);
+        SaveGameMapper.RestoreLoadout(save, Hero.Loadout, ItemLibrary.Catalog);
 
         foreach (var missingBaseId in SaveGameMapper.RestoreItems(save, Hero.Items, ItemLibrary.Catalog))
             GD.PushWarning($"Die Item-Basis {missingBaseId} aus dem Spielstand gibt es nicht mehr, das Item fehlt.");

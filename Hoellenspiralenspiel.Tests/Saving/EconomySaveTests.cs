@@ -22,8 +22,8 @@ public class EconomySaveTests
     }
 
     [Test]
-    public void DerSpielstandHatVersion3()
-        => Assert.That(SaveGame.CurrentVersion, Is.EqualTo(3));
+    public void DerSpielstandHatVersion4()
+        => Assert.That(SaveGame.CurrentVersion, Is.EqualTo(4));
 
     [Test]
     public void Gold_UeberstehtDasSpeichern()
@@ -251,6 +251,35 @@ public class EconomySaveTests
             Assert.That(SaveGameMapper.RestoreVendor(save, vendor, TestItems.Catalog), Is.True);
             Assert.That(vendor.Stock.Count, Is.EqualTo(1));
             Assert.That(vendor.Stock.GetItemAt(new GridCell(2, 0)).Definition, Is.SameAs(TestItems.Shield));
+        });
+    }
+
+    [Test]
+    public void EinBestandAusVersion3_WirdNachItemtypNeuAusgelegt()
+    {
+        var save = new SaveGame
+        {
+            Version = 3,
+            Vendor = new VendorSave
+            {
+                ItemLevel = 5,
+                Stock =
+                [
+                    new PlacedItemSave { Item = new ItemSave { BaseId = "shield" } },
+                    new PlacedItemSave { X = 6, Y = 2, Item = new ItemSave { BaseId = "sword" } }
+                ]
+            }
+        };
+
+        var vendor = new Vendor();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(SaveGameMapper.RestoreVendor(save, vendor, TestItems.Catalog), Is.True);
+            Assert.That(vendor.Stock.Count, Is.EqualTo(2));
+            Assert.That(vendor.Stock.GetItemAt(new GridCell(0, 0)).Definition, Is.SameAs(TestItems.Sword));
+            Assert.That(vendor.Stock.GetItemAt(new GridCell(6, 2)), Is.Null);
+            Assert.That(vendor.ItemLevel, Is.EqualTo(5));
         });
     }
 }

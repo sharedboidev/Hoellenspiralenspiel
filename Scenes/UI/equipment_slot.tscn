@@ -38,6 +38,15 @@ texture = ExtResource("3_byr6a")
 expand_mode = 1
 stretch_mode = 5
 
+[node name="ItemIcon" type="TextureRect" parent="MarginContainer/PanelContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
 [connection signal="gui_input" from="MarginContainer/PanelContainer/Icon" to="." method="_on_texture_rect_gui_input"]
 [connection signal="mouse_entered" from="MarginContainer/PanelContainer/Icon" to="." method="_on_texture_rect_mouse_entered"]
 [connection signal="mouse_exited" from="MarginContainer/PanelContainer/Icon" to="." method="_on_texture_rect_mouse_exited"]

@@ -10,7 +10,7 @@ using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
-//Das Fenster des Händlers links neben dem Charakterbogen: Verbrauchsgüter, gewürfelte Ausrüstung und der Rückkauf
+//Das Fenster des Händlers oben links: Verbrauchsgüter, gewürfelte Ausrüstung und der Rückkauf
 public partial class VendorWindow
         : PanelContainer,
           ISideWindow

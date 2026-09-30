@@ -1,5 +1,4 @@
 using Godot;
-using Godot.Collections;
 using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Scripts.Core.Economy;
 using Hoellenspiralenspiel.Scripts.Core.Items;
@@ -9,14 +8,14 @@ using Hoellenspiralenspiel.Scripts.Units;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
-//Die Truhe des Charakters. Sie liegt links neben dem Charakterbogen und hält Items und Gold
+//Die Truhe des Charakters. Sie liegt oben links am Bildschirm und hält Items und Gold
 public partial class StashWindow
         : PanelContainer,
           ISideWindow
 {
     private const float ReachSlackPx = 60f;
 
-    private HBoxContainer  depositRow;
+    private LineEdit       amountField;
     private Label          goldLabel;
     private ItemGridView   gridView;
     private IHero          hero;
@@ -24,14 +23,12 @@ public partial class StashWindow
     private CharacterSheet sheet;
     private Fixture        source;
     private BaseUnit       user;
-    private HBoxContainer  withdrawRow;
-
-    //Die Knöpfe zum Ein- und Auszahlen. Dahinter steht immer noch einer für alles
-    [Export]
-    public Array<int> GoldSteps { get; set; } = [10, 100, 1000];
 
     [Export]
-    public Vector2 GoldButtonSize { get; set; } = new(120, 44);
+    public float GoldFieldWidth { get; set; } = 220f;
+
+    [Export]
+    public Vector2 GoldButtonSize { get; set; } = new(160, 44);
 
     [Export]
     public int GoldFontSize { get; set; } = 20;
@@ -40,13 +37,11 @@ public partial class StashWindow
 
     public void Bind(IHero owner, CharacterSheet characterSheet)
     {
-        hero        = owner;
-        items       = owner.Items;
-        sheet       = characterSheet;
-        gridView    = GetNode<ItemGridView>("%GridView");
-        goldLabel   = GetNode<Label>("%StashGoldLabel");
-        depositRow  = GetNode<HBoxContainer>("%DepositRow");
-        withdrawRow = GetNode<HBoxContainer>("%WithdrawRow");
+        hero      = owner;
+        items     = owner.Items;
+        sheet     = characterSheet;
+        gridView  = GetNode<ItemGridView>("%GridView");
+        goldLabel = GetNode<Label>("%StashGoldLabel");
 
         gridView.Bind(items.Stash, items);
 
@@ -56,8 +51,7 @@ public partial class StashWindow
         items.Changed          += gridView.Refresh;
         hero.StashGold.Changed += ShowGold;
 
-        AddGoldButtons(depositRow, hero.Gold, hero.StashGold);
-        AddGoldButtons(withdrawRow, hero.StashGold, hero.Gold);
+        AddGoldControls(GetNode<HBoxContainer>("%GoldRow"), GetNode<HBoxContainer>("%GoldAllRow"));
 
         ShowGold();
         Hide();
@@ -77,6 +71,16 @@ public partial class StashWindow
     {
         if (Visible && (!IsInstanceValid(source) || !IsInstanceValid(user) || !source.IsNear(user, ReachSlackPx)))
             Close();
+    }
+
+    //Klicks in die Welt oder auf Knöpfe ohne Fokus nehmen dem Feld den Fokus nicht ab, die Ziffern 1-4 landeten sonst weiter darin statt bei den Skills
+    public override void _Input(InputEvent @event)
+    {
+        if (@event is not InputEventMouseButton { Pressed: true } click || amountField?.HasFocus() != true)
+            return;
+
+        if (!amountField.GetGlobalRect().HasPoint(click.GlobalPosition))
+            amountField.ReleaseFocus();
     }
 
     public void ShowFor(Fixture chest, BaseUnit opener)
@@ -134,28 +138,63 @@ public partial class StashWindow
     private void ShowGold()
         => goldLabel.Text = $"Stored: {hero.StashGold.Amount:N0} Gold";
 
-    private void AddGoldButtons(HBoxContainer row, Purse from, Purse to)
+    private void AddGoldControls(HBoxContainer amountRow, HBoxContainer allRow)
     {
-        foreach (var step in GoldSteps)
-            row.AddChild(CreateGoldButton($"{step:N0}", from, to, step));
+        amountField = new LineEdit
+        {
+            Name               = "AmountField",
+            PlaceholderText    = "Amount",
+            Alignment          = HorizontalAlignment.Right,
+            SelectAllOnFocus   = true,
+            ContextMenuEnabled = false,
+            EmojiMenuEnabled   = false,
+            CustomMinimumSize  = new Vector2(GoldFieldWidth, GoldButtonSize.Y)
+        };
 
-        row.AddChild(CreateGoldButton("All", from, to, int.MaxValue));
+        amountField.AddThemeFontSizeOverride("font_size", GoldFontSize);
+
+        amountField.TextChanged   += FilterAmount;
+        amountField.TextSubmitted += _ => amountField.ReleaseFocus();
+
+        amountRow.AddChild(amountField);
+
+        AddGoldButton(amountRow, "Deposit", hero.Gold, hero.StashGold, movesAll: false);
+        AddGoldButton(amountRow, "Withdraw", hero.StashGold, hero.Gold, movesAll: false);
+        AddGoldButton(allRow, "Deposit", hero.Gold, hero.StashGold, movesAll: true);
+        AddGoldButton(allRow, "Withdraw", hero.StashGold, hero.Gold, movesAll: true);
     }
 
-    private Button CreateGoldButton(string text, Purse from, Purse to, int amount)
+    private void AddGoldButton(HBoxContainer row, string verb, Purse from, Purse to, bool movesAll)
     {
         var button = new Button
         {
-            Name              = amount == int.MaxValue ? "All" : $"Step{amount}",
-            Text              = text,
+            Name              = movesAll ? $"{verb}All" : verb,
+            Text              = movesAll ? $"{verb} all" : verb,
             CustomMinimumSize = GoldButtonSize,
             FocusMode         = FocusModeEnum.None
         };
 
         button.AddThemeFontSizeOverride("font_size", GoldFontSize);
 
-        button.Pressed += () => Purse.Move(from, to, amount);
+        button.Pressed += () =>
+        {
+            Purse.Move(from, to, movesAll ? int.MaxValue : GoldAmountText.Parse(amountField.Text));
 
-        return button;
+            amountField.ReleaseFocus();
+        };
+
+        row.AddChild(button);
+    }
+
+    //Das Setzen von Text meldet kein TextChanged und stellt den Caret nicht wieder her
+    private void FilterAmount(string text)
+    {
+        var (digits, caret) = GoldAmountText.KeepDigits(text, amountField.CaretColumn);
+
+        if (digits == text)
+            return;
+
+        amountField.Text        = digits;
+        amountField.CaretColumn = caret;
     }
 }

@@ -66,7 +66,7 @@ public partial class PauseMenu : Control
 
             GetViewport().SetInputAsHandled();
         }
-        else if (!Visible && @event.IsActionPressed(InputActions.CloseWindows) && CloseWindows() > 0)
+        else if (!Visible && @event.IsActionPressed(InputActions.CloseWindows) && !InputActions.IsTyping(GetViewport()) && CloseWindows() > 0)
         {
             GetViewport().SetInputAsHandled();
         }
