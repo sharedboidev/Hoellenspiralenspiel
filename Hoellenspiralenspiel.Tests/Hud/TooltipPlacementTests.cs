@@ -38,15 +38,57 @@ public class TooltipPlacementTests
     }
 
     [Test]
-    public void MitBegleiter_StehtDerBegleiterLinksUndSchliesstUntenBuendigAb()
+    public void MitBegleiter_StehtDerBegleiterLinksUndSchliesstObenBuendigAb()
     {
         var (main, companion) = TooltipPlacement.PlaceWithCompanion(ItemInTheMiddle, 500, 300, 500, 360, ScreenWidth, ScreenHeight, Gap);
 
         Assert.Multiple(() =>
         {
-            Assert.That(main, Is.EqualTo(new ScreenBox(982, 400, 500, 300)));
+            Assert.That(main, Is.EqualTo(new ScreenBox(982, 340, 500, 300)));
             Assert.That(companion.Right, Is.EqualTo(main.X - Gap));
-            Assert.That(companion.Bottom, Is.EqualTo(main.Bottom));
+            Assert.That(companion.Y, Is.EqualTo(main.Y));
+            Assert.That(companion.Bottom, Is.EqualTo(ItemInTheMiddle.Y));
+        });
+    }
+
+    [Test]
+    public void EinKleinererBegleiter_SchliesstObenBuendigAb()
+    {
+        var (main, companion) = TooltipPlacement.PlaceWithCompanion(ItemInTheMiddle, 500, 360, 500, 200, ScreenWidth, ScreenHeight, Gap);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(main.Y, Is.EqualTo(ItemInTheMiddle.Y - 360));
+            Assert.That(companion.Y, Is.EqualTo(main.Y));
+        });
+    }
+
+    [Test]
+    public void UnterDemElement_SchliessenBeideObenBuendigAb()
+    {
+        var item = new ScreenBox(1200, 100, 64, 64);
+
+        var (main, companion) = TooltipPlacement.PlaceWithCompanion(item, 500, 300, 500, 200, ScreenWidth, ScreenHeight, Gap);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(main.Y, Is.EqualTo(item.Bottom));
+            Assert.That(companion.Y, Is.EqualTo(item.Bottom));
+        });
+    }
+
+    [Test]
+    public void AmUnterenRand_BleibenBeideImBildUndObenBuendig()
+    {
+        var item = new ScreenBox(1200, 100, 64, 64);
+
+        var (main, companion) = TooltipPlacement.PlaceWithCompanion(item, 500, 300, 500, 600, ScreenWidth, 700, Gap);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(companion.Y, Is.EqualTo(main.Y));
+            Assert.That(companion.Bottom, Is.LessThanOrEqualTo(700));
+            Assert.That(main.Bottom, Is.LessThanOrEqualTo(700));
         });
     }
 

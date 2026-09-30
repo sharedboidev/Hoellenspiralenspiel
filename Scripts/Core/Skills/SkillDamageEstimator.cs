@@ -69,9 +69,10 @@ public static class SkillDamageEstimator
         ArgumentNullException.ThrowIfNull(attacker);
         ArgumentNullException.ThrowIfNull(skill);
 
+        //Ein Zauber kommt erst wieder, wenn seine Abklingzeit um ist und der Held das Wirken beendet hat
         var intervalSec = skill.Kind == SkillKind.Attack
                 ? Math.Max(1.0 / Math.Max(CombatRules.MinAttacksPerSecond, attacker.GetFinal(CombatStat.Attackspeed)), skill.CooldownSec)
-                : Math.Max(CombatRules.MinSpellCooldownSec, skill.CooldownSec);
+                : Math.Max(Math.Max(CombatRules.MinSpellCooldownSec, skill.CooldownSec), skill.CastSec);
 
         return 1.0 / intervalSec;
     }

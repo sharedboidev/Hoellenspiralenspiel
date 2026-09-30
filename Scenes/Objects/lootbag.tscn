@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cc0hfsra13pml"]
 
 [ext_resource type="Script" uid="uid://c6ieb4psqn6s1" path="res://Scripts/Objects/Lootbag.cs" id="1_script"]
-[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="2_ps1"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_object.gdshader" id="2_ps1"]
 [ext_resource type="Texture2D" path="res://Textures/World/skin_speckled.png" id="3_leather"]
 [ext_resource type="Shader" path="res://Shaders/Ps1/glimmer.gdshader" id="4_glimmer"]
 

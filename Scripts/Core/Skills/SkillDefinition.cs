@@ -27,6 +27,9 @@ public sealed record SkillDefinition
     public double        CooldownSec { get; init; }
     public SkillDelivery Delivery    { get; init; }
 
+    //Nur für Zauber des Helden: So lange steht er beim Wirken. Gegner nehmen die Zeiten ihres EnemyResource
+    public double CastSec { get; init; }
+
     public ProjectileSettings Projectile { get; init; }
 
     public AreaSettings Area { get; init; }

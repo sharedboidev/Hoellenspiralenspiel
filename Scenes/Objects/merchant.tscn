@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/Objects/Merchant.cs" id="1_script"]
 [ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="2_ps1"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_object.gdshader" id="5_object"]
 [ext_resource type="Texture2D" path="res://Textures/World/cloth_weave.png" id="3_cloth"]
 [ext_resource type="Texture2D" path="res://Textures/World/skin_speckled.png" id="4_leather"]
 
@@ -67,35 +68,35 @@ radial_segments = 12
 rings = 1
 
 [sub_resource type="ShaderMaterial" id="Mat_robe"]
-shader = ExtResource("2_ps1")
+shader = ExtResource("5_object")
 shader_parameter/albedo = Color(0.36, 0.13, 0.1, 1)
 shader_parameter/albedo_texture = ExtResource("3_cloth")
 shader_parameter/uv_scale = Vector2(3, 3)
 
 [sub_resource type="ShaderMaterial" id="Mat_cloth"]
-shader = ExtResource("2_ps1")
+shader = ExtResource("5_object")
 shader_parameter/albedo = Color(0.22, 0.14, 0.12, 1)
 shader_parameter/albedo_texture = ExtResource("3_cloth")
 shader_parameter/uv_scale = Vector2(3, 3)
 
 [sub_resource type="ShaderMaterial" id="Mat_skin"]
-shader = ExtResource("2_ps1")
+shader = ExtResource("5_object")
 shader_parameter/albedo = Color(0.78, 0.6, 0.48, 1)
 
 [sub_resource type="ShaderMaterial" id="Mat_leather"]
-shader = ExtResource("2_ps1")
+shader = ExtResource("5_object")
 shader_parameter/albedo = Color(0.3, 0.17, 0.09, 1)
 shader_parameter/albedo_texture = ExtResource("4_leather")
 shader_parameter/uv_scale = Vector2(2, 2)
 
 [sub_resource type="ShaderMaterial" id="Mat_roll"]
-shader = ExtResource("2_ps1")
+shader = ExtResource("5_object")
 shader_parameter/albedo = Color(0.45, 0.4, 0.3, 1)
 shader_parameter/albedo_texture = ExtResource("3_cloth")
 shader_parameter/uv_scale = Vector2(2, 2)
 
 [sub_resource type="ShaderMaterial" id="Mat_lantern"]
-shader = ExtResource("2_ps1")
+shader = ExtResource("5_object")
 shader_parameter/albedo = Color(0.2, 0.12, 0.04, 1)
 shader_parameter/emission = Color(1, 0.7, 0.3, 1)
 shader_parameter/emission_energy = 3.0

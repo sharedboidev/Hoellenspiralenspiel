@@ -279,6 +279,31 @@ public class SkillDamageEstimatorTests
         => Assert.That(SkillDamageEstimator.GetUsesPerSecond(Attacker(), Spell(cooldownSec: 0)), Is.EqualTo(1 / CombatRules.MinSpellCooldownSec).Within(0.0001));
 
     [Test]
+    public void Spell_MitLaengererWirkzeit_FolgtDerWirkzeit()
+    {
+        var fireball = Spell(cooldownSec: 0.25) with { CastSec = 0.4 };
+
+        Assert.That(SkillDamageEstimator.GetUsesPerSecond(Attacker(), fireball), Is.EqualTo(2.5).Within(0.0001));
+    }
+
+    [Test]
+    public void Spell_MitKuerzererWirkzeit_FolgtDerAbklingzeit()
+    {
+        var thunderbolt = Spell(cooldownSec: 1) with { CastSec = 0.4 };
+
+        Assert.That(SkillDamageEstimator.GetUsesPerSecond(Attacker(), thunderbolt), Is.EqualTo(1).Within(0.0001));
+    }
+
+    [Test]
+    public void Attack_KenntKeineWirkzeit()
+    {
+        var weapon = Weapon(DamageType.Frost, 2f);
+        var slow   = StandardAttack with { CastSec = 3 };
+
+        Assert.That(SkillDamageEstimator.GetUsesPerSecond(Attacker(weapon), slow), Is.EqualTo(SkillDamageEstimator.GetUsesPerSecond(Attacker(weapon), StandardAttack)).Within(0.0001));
+    }
+
+    [Test]
     public void Fehlschlaege_SenkenDieDps()
     {
         var healthy = SkillDamageEstimator.Estimate(Attacker(), WeaponProfile.Unarmed, Spell());

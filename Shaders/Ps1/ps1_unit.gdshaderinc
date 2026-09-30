@@ -1,8 +1,5 @@
-// Held, Gegner und was sie tragen. Sie markieren sich im Rauheitskanal, daran findet ps1_unit_outline ihre Kanten.
-// Ohne Glanzlicht spielt die Rauheit für das Aussehen keine Rolle. Die Umgebung hat 1, der leere Hintergrund 0
-const float UNIT_MARK = 0.4;
-const float HIGHLIGHT_MARK = 0.7;
-const float NO_MARK = 1.0;
+// Held, Gegner und was sie tragen. Sie markieren sich im Rauheitskanal, daran findet ps1_unit_outline ihre Kanten
+#include "res://Shaders/Ps1/ps1_marks.gdshaderinc"
 
 // Wer weiter vom Helden entfernt steht, als er sieht, bleibt verborgen. Am Rand blendet er mit dem Punktmuster der Mauern ein.
 // Dieselbe Rechnung steht in SightRange. Ein Radius von 0 hebt die Grenze auf

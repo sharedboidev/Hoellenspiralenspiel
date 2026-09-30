@@ -36,9 +36,6 @@ public sealed class ItemTooltipContent : ITooltipObject
     {
         var text = new StringBuilder("[center]");
 
-        if (ShowsEquippedNote)
-            text.Append($"[font_size={NoteFontSize}][color=gray]{EquippedNote}[/color][/font_size]").Append('\n');
-
         switch (item.Rarity)
         {
             case ItemRarity.Magic:
@@ -71,7 +68,13 @@ public sealed class ItemTooltipContent : ITooltipObject
         if (!string.IsNullOrEmpty(priceNote))
             text.AppendLine($"[color={PriceColor}]{priceNote}[/color]");
 
-        return text.Append("[/center]").ToString();
+        text.Append("[/center]");
+
+        //Unten rechts, damit die Werte beider Tooltips auf gleicher Höhe beginnen
+        if (ShowsEquippedNote)
+            text.Append($"[right][font_size={NoteFontSize}][color=gray]{EquippedNote}[/color][/font_size][/right]");
+
+        return text.ToString();
     }
 
     private void AppendBaseStats(StringBuilder text)

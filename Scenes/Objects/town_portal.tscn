@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://Scripts/Environment/TownPortal.cs" id="1_script"]
-[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="2_ps1"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_object.gdshader" id="2_ps1"]
 
 [sub_resource type="BoxShape3D" id="Shape_pick"]
 size = Vector3(1.6, 2.6, 0.8)
@@ -38,6 +38,7 @@ script = ExtResource("1_script")
 Look = NodePath("Look")
 Glow = NodePath("Glow")
 UseRadius = 180.0
+OutlineGlow = Color(0.2, 0.45, 1, 1)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
