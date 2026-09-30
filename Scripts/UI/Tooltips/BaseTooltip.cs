@@ -37,22 +37,21 @@ public abstract partial class BaseTooltip : PanelContainer
         ResetSize();
     }
 
+    //Über dem Element, ist oben kein Platz, darunter. Er bleibt an allen vier Rändern im Bild, bei jeder Größe des Fensters
     private void SetPositionByContainer(ITooltipObjectContainer container)
     {
-        var viewportRectSize = GetViewportRect().Size;
-        var xPosition        = container.TooltipAnchorPoint.X - Size.X / 2 + container.Size.X / 2;
-        var yPosition        = container.TooltipAnchorPoint.Y - Size.Y;
+        var screen = GetViewportRect().Size;
+        var anchor = container.TooltipAnchorPoint;
+        var x      = anchor.X + container.Size.X / 2 - Size.X / 2;
+        var y      = anchor.Y - Size.Y;
 
-        var viewportDeltaX = xPosition + Size.X - viewportRectSize.X;
-        var viewportDeltaY = yPosition;// + Size.Y - viewportRectSize.Y;
+        if (y < 0)
+            y = anchor.Y + container.Size.Y;
 
-        if (viewportDeltaX > 0)
-            xPosition -= viewportDeltaX;
+        x = Mathf.Clamp(x, 0, Mathf.Max(0, screen.X - Size.X));
+        y = Mathf.Clamp(y, 0, Mathf.Max(0, screen.Y - Size.Y));
 
-        if (viewportDeltaY < 0)
-            yPosition += Size.Y + container.Size.Y;
-
-        Position = new Vector2(xPosition, yPosition);
+        GlobalPosition = new Vector2(x, y);
     }
 
     private void FindUIComponents()

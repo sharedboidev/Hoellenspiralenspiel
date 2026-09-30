@@ -16,8 +16,6 @@ public partial class XpBar : Control
         xpDisplayLabel = GetNode<Label>("%XpDisplay");
         hero           = player as IHero;
 
-        SetPositionInViewport();
-
         if (hero is null)
         {
             GD.PushError($"Der XP-Balken braucht einen Helden, {player?.Name} ist keiner.");
@@ -43,16 +41,6 @@ public partial class XpBar : Control
         xpBar.Value    = hero.XpTotal - hero.XpFloorCurrentLevel;
 
         xpDisplayLabel.Text = $"{xpBar.Value:N0}/{xpBar.MaxValue:N0}";
-    }
-
-    private void SetPositionInViewport()
-    {
-        var viewportSize = GetViewportRect().Size;
-
-        var xPositionBar = (viewportSize.X - xpBar.Size.X * Scale.X) / 2;
-        var yPositionBar = viewportSize.Y - xpBar.Size.Y * Scale.Y - 10;
-
-        Position = new Vector2(xPositionBar, yPositionBar);
     }
 
     public void _on_bar_mouse_exited()

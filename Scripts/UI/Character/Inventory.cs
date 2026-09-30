@@ -17,6 +17,7 @@ public partial class Inventory : PanelContainer
     private          MouseObject                             mouseObject;
     private          Control                                 overlay;
     private          IHero                                   player;
+    private          CharacterSheet                          sheet;
     private          Vector2                                 slotSize;
     private          BaseTooltip                             tooltip;
 
@@ -60,7 +61,15 @@ public partial class Inventory : PanelContainer
     }
 
     private bool IsOutsideCharacterSheet(Vector2 globalPosition)
-        => !GetParent<Control>().GetGlobalRect().HasPoint(globalPosition);
+        => FindSheet() is { } characterSheet ? !characterSheet.Covers(globalPosition) : !GetParent<Control>().GetGlobalRect().HasPoint(globalPosition);
+
+    private CharacterSheet FindSheet()
+    {
+        for (var node = GetParent(); sheet is null && node is not null; node = node.GetParent())
+            sheet = node as CharacterSheet;
+
+        return sheet;
+    }
 
     private void BuildSlots()
     {

@@ -17,7 +17,6 @@ public partial class LevelUpDialog : Control, IClosableWindow
             GD.PushError($"Der Level-up-Dialog braucht einen Helden, {player?.Name} ist keiner.");
 
         SubscribeClickEvents();
-        SetPositionInViewport();
     }
 
     public bool IsOpen => Visible;
@@ -34,14 +33,6 @@ public partial class LevelUpDialog : Control, IClosableWindow
         GetNode<RaiseAttributeComponent>("%RaiseIntComponent").AttributeRaisedClicked       += OnAttributeRaisedClicked;
         GetNode<RaiseAttributeComponent>("%RaiseConstiComponent").AttributeRaisedClicked    += OnAttributeRaisedClicked;
         GetNode<RaiseAttributeComponent>("%RaiseAwarenessComponent").AttributeRaisedClicked += OnAttributeRaisedClicked;
-    }
-
-    private void SetPositionInViewport()
-    {
-        var viewportSize = GetViewportRect().Size;
-        var panelSize    = GetNode<PanelContainer>(nameof(PanelContainer)).Size;
-
-        Position = (viewportSize * new Vector2(1f, 1.25f) - panelSize) / 2;
     }
 
     private void OnAttributeRaisedClicked(Attributes attribute)

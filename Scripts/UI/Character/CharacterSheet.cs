@@ -1,3 +1,4 @@
+using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Scripts.UI.Buttons;
@@ -13,8 +14,6 @@ public partial class CharacterSheet : Control, IClosableWindow
     private          LevelDisplay   levelDisplay;
     [Export] private Node           player;
     private          Statdisplay    statdisplay;
-    [Export] private int            viewportMarginHeightPx;
-    [Export] private int            viewportMarginWidthPx;
 
     public override void _Ready()
     {
@@ -27,7 +26,6 @@ public partial class CharacterSheet : Control, IClosableWindow
             return;
         }
 
-        SetPositionRelativeToViewport();
         ConfigureStatDisplay();
         BindItems();
         ConfigureLevelDisplay();
@@ -79,14 +77,9 @@ public partial class CharacterSheet : Control, IClosableWindow
         SetDisplayedLevel();
     }
 
-    private void SetPositionRelativeToViewport()
-    {
-        var viewportSize  = GetViewportRect().Size;
-        var sheetsize     = equipmentPanel.Size;
-        var sheetPosition = new Vector2(viewportSize.X - sheetsize.X - viewportMarginWidthPx, viewportMarginHeightPx);
-
-        Position = sheetPosition;
-    }
+    //Zum Bogen gehören auch die Werteliste links und die Anzeige der Stufe, nicht nur Ausrüstung und Inventar. Ein geschlossener Bogen deckt nichts ab
+    public bool Covers(Vector2 globalPosition)
+        => GetChildren().OfType<Control>().Any(part => part.IsVisibleInTree() && part.GetGlobalRect().HasPoint(globalPosition));
 
     public override void _Process(double delta)
     {

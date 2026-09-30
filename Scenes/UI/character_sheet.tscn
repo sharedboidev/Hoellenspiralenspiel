@@ -11,12 +11,18 @@
 
 [node name="CharacterSheet" type="Control" unique_id=325839181 node_paths=PackedStringArray("equipmentPanel", "inventory")]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -948.0
+offset_top = 30.0
+offset_right = -30.0
+offset_bottom = 1260.0
+grow_horizontal = 0
+mouse_filter = 2
 script = ExtResource("1_kqng3")
 equipmentPanel = NodePath("HBoxContainer/EquipmentPanel")
 inventory = NodePath("HBoxContainer/Inventory")
-viewportMarginHeightPx = 30
-viewportMarginWidthPx = 30
 
 [node name="HBoxContainer" type="VBoxContainer" parent="." unique_id=745077026]
 layout_mode = 0

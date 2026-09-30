@@ -19,11 +19,15 @@ run/main_scene="res://Scenes/main_menu.tscn"
 config/features=PackedStringArray("4.6", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+UserSettings="*res://Scripts/Saving/UserSettings.cs"
+
 [display]
 
 window/size/viewport_width=2560
 window/size/viewport_height=1440
-window/size/mode=4
+window/size/mode=3
 window/size/resizable=false
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
