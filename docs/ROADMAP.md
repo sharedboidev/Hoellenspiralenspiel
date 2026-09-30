@@ -3,7 +3,7 @@
 Stand: 30.09.2026. M0 bis M6 liegen auf `master`, dazu die Nachträge zu M2, M3, M5.5 und M6: Bleed stapelt, Schadenswerte im Tooltip, ausgedünnte Kommentare, die Rückmeldungen aus dem ersten Spielen und die Rückmeldungen zu Mauern und Räumen.
 Die ersten drei von vier Etappen von M7 liegen ebenfalls auf `master`, Etappe 1 und 2 samt den Rückmeldungen aus dem Spielen. Etappe 2 ist seit dem 30.09.2026 vollständig: Pausenmenü, Ladebildschirm, Hud an Ankern und Einstellungen für Anzeige, Ton und Tasten, gebaut auf `master_PauseMenu` und `master_SettingsAndLoading`.
 Etappe 3 liegt seit dem 30.09.2026 auf `master`: Gold, Münzhaufen, eine Truhe je Charakter und ein Händler im Hub. Der User hat sie selbst über Pull Request #15 zusammengeführt, Merge-Commit `67e855b`.
-Die Rückmeldungen aus dem Spielen von Etappe 3 sind am selben Tag auf `master_PlaytestFeedback2` gebaut und liegen noch nicht auf `master`.
+Die Rückmeldungen aus dem Spielen von Etappe 3 sind am selben Tag auf `master_PlaytestFeedback2` gebaut und liegen ebenfalls auf `master`.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
@@ -1502,7 +1502,7 @@ M7 läuft in vier Etappen:
 |---|---|---|
 | 1 | Hauptmenü, Hub, Portale, mehrere Ebenen pro Kreis, Treppen, Checkpoints, Town-Portal | Umgesetzt |
 | 2 | Pausenmenü, Ladebildschirm, Einstellungen für Auflösung, Tasten und Lautstärke. UI über Anker statt Code, behebt A6. | Umgesetzt, liegt seit dem 30.09.2026 auf `master` |
-| 3 | Hub-Funktionen: Truhe und Händler. Dafür braucht es eine Währung. | Umgesetzt, liegt seit dem 30.09.2026 auf `master`. Die Rückmeldungen aus dem Spielen liegen auf `master_PlaytestFeedback2`. |
+| 3 | Hub-Funktionen: Truhe und Händler. Dafür braucht es eine Währung. | Umgesetzt, liegt seit dem 30.09.2026 auf `master`, samt den Rückmeldungen aus dem Spielen. |
 | 4 | Platzhalter-Boss und Freischaltung des nächsten Kreises | Offen |
 
 Fertig, wenn man vom Hauptmenü in den Hub, in einen Kreis, zurück und wieder hinein kommt.
@@ -2146,7 +2146,7 @@ Bewusst offen gelassen:
 
 #### Rückmeldungen aus dem Spielen von Etappe 3
 
-Umgesetzt am 30.09.2026 auf `master_PlaytestFeedback2`, abgezweigt vom Merge-Commit `67e855b`. Liegt noch nicht auf `master`.
+Umgesetzt am 30.09.2026 auf `master_PlaytestFeedback2`, abgezweigt vom Merge-Commit `67e855b`. Liegt seit demselben Tag auf `master`.
 
 Der User hat Etappe 3 am 30.09.2026 gespielt und sieben Dinge verlangt, im Wortlaut:
 
