@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-1106_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-1112_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -139,19 +139,20 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 | Freie Belegung | Rechtsklick auf einen Platz öffnet die Liste aller Skills, darunter im Abschnitt Consumables alle Trankarten mit ihrer Zahl im Inventar |
 | Tränke auf der Leiste | Ein Platz kann statt eines Skills eine Trankart halten. Oben links steht, wie viele davon im Inventar liegen. Bei 0 wird das Bild grau, der Platz bleibt belegt. Die Taste trinkt einen Trank aus dem Inventar, den kleinsten Stapel zuerst, gehalten nur einen. Truhe und Item an der Maus zählen nicht |
 | Gehaltene Taste | Wiederholt den Skill, sobald er wieder bereit ist |
+| Schlag und Zauber binden | Ein Schlag dauert so lange, wie das Angriffstempo vorgibt, ein Zauber seine Wirkzeit, Standard 0,4 s. Beide lösen nach der Hälfte aus. Bis zum Ende steht der Held, dreht sich nicht und beginnt nichts Neues. Wird währenddessen eine Skill-Taste gedrückt und gehalten, folgt ihr Skill danach |
 | Kosten | Mana und Abklingzeit pro Skill, Ton bei leerem Mana |
-| Tooltip mit DPS | Schaden pro Sekunde, mittlerer Treffer, Krit-Chance, Einsätze pro Sekunde und Abklingzeit, gerechnet mit den Werten des Helden |
+| Tooltip mit DPS | Schaden pro Sekunde, mittlerer Treffer, Krit-Chance, Einsätze pro Sekunde, Wirkzeit und Abklingzeit, gerechnet mit den Werten des Helden |
 
 <details>
 <summary>Die Skills im Überblick</summary>
 
-| Skill | Art | Schaden | Mana | Abklingzeit | Wirkung |
-|---|---|---|---|---|---|
-| Attack | ATTACK | 100 % Waffenschaden | 0 | keine | Treffer der Waffe, mit dem Bogen ein Pfeil |
-| Lightning Strike | ATTACK | 180 % Waffenschaden als Lightning | 3 | keine | Schwung mit Blitzprojektil |
-| Fireball | SPELL | 50 bis 75 Fire | 2 | 0,25 s | Projektil, das sich bis zu zweimal aufspaltet |
-| Frost Nova | SPELL | 10 bis 50 Frost | 2 | 0,5 s | Ring um den Helden |
-| Thunderbolt | SPELL | 50 bis 350 Lightning | 4 | 1 s | Einschlag am Mauszeiger nach 0,5 Sekunden |
+| Skill | Art | Schaden | Mana | Dauer | Abklingzeit | Wirkung |
+|---|---|---|---|---|---|---|
+| Attack | ATTACK | 100 % Waffenschaden | 0 | 1 / Angriffstempo | keine | Treffer der Waffe, mit dem Bogen ein Pfeil |
+| Lightning Strike | ATTACK | 180 % Waffenschaden als Lightning | 3 | 1 / Angriffstempo | keine | Schwung mit Blitzprojektil |
+| Fireball | SPELL | 50 bis 75 Fire | 2 | 0,4 s | 0,25 s | Projektil, das sich bis zu zweimal aufspaltet |
+| Frost Nova | SPELL | 10 bis 50 Frost | 2 | 0,4 s | 0,5 s | Ring um den Helden |
+| Thunderbolt | SPELL | 50 bis 350 Lightning | 4 | 0,4 s | 1 s | Einschlag am Mauszeiger nach 0,5 Sekunden |
 
 Alle Werte sind vorläufig und stehen in `Resources/Skills`.
 
@@ -164,7 +165,7 @@ Alle Zahlen gelten für ein einzelnes Ziel ohne Verteidigung.
 
 ```
 Mittlerer Treffer = (Min + Max) / 2 × (1 + Krit-Chance × Krit-Schaden)
-Einsätze pro Sekunde = ATTACK: Angriffstempo, SPELL: 1 / Abklingzeit
+Einsätze pro Sekunde = ATTACK: Angriffstempo, SPELL: 1 / (die längere von Abklingzeit und Wirkzeit)
 DPS = Mittlerer Treffer × Einsätze pro Sekunde × Trefferchance + Schaden des Statuseffekts
 ```
 
@@ -172,7 +173,7 @@ DPS = Mittlerer Treffer × Einsätze pro Sekunde × Trefferchance + Schaden des 
 |---|---|
 | Schaden des Helden | Waffenschaden, Prozentsatz des Skills, Zauberschaden, physischer und elementarer Schaden |
 | Krit-Chance und Krit-Schaden | Erhöhen den mittleren Treffer |
-| Angriffstempo und Abklingzeit | Bestimmen die Einsätze pro Sekunde, das langsamere von beiden zählt |
+| Angriffstempo, Wirkzeit und Abklingzeit | Bestimmen die Einsätze pro Sekunde. Bei einer Attack zählt das langsamere von Angriffstempo und Abklingzeit, bei einem Spell das von Wirkzeit und Abklingzeit |
 | Trefferchance | Pierce trifft nur halb so oft |
 | Schadensart | Crush verursacht 20 % mehr Schaden |
 | Bleed und Burn | Ihr Schaden über Zeit zählt zur DPS. Burn endet bei 10 Stapeln, Bleed hat keine Obergrenze |
@@ -259,7 +260,7 @@ Auslöser und Aktionen lassen sich im Inspector frei kombinieren, zum Beispiel "
 | 16 Ausrüstungsplätze | Inklusive vier Ringe. Ein angelegtes Item hat die Form seiner Felder und steht mittig im Platz |
 | Zweihandwaffen | Bogen und Stab sperren den Schildplatz, der Schild wandert ins Inventar |
 | Tooltips | Werte, Affixe und Anforderungen, farbig nach Seltenheit. Bei offenem Händler steht der Preis dabei |
-| Vergleich | Mit gehaltenem `Shift` zeigt ein zweiter Tooltip links daneben das Item, das am selben Platz getragen wird, mit dem grauen Vermerk "Currently Equipped". Vergleichszahlen gibt es nicht. Das gilt in Inventar, Truhe und Händler, nicht an den Ausrüstungsplätzen und nicht am Boden |
+| Vergleich | Mit gehaltenem `Shift` zeigt ein zweiter Tooltip links daneben das Item, das am selben Platz getragen wird, mit dem grauen Vermerk "Currently Equipped" unten rechts. Beide Tooltips schließen oben bündig ab. Vergleichszahlen gibt es nicht. Das gilt in Inventar, Truhe und Händler, nicht an den Ausrüstungsplätzen und nicht am Boden |
 | Gold | Unter dem Inventar steht das Gold, das der Held bei sich trägt |
 | Truhe | Im Hub, je Charakter, mit 140 Feldern. Sie liegt als Fenster oben links und hält auch Gold |
 | Gold in der Truhe | Ins Feld passen nur Ziffern. Deposit und Withdraw buchen den Betrag, wer mehr einträgt, als da ist, bucht alles. Ein leeres Feld bucht nichts. Deposit all und Withdraw all buchen alles |
@@ -314,7 +315,7 @@ Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints
 | Hub | Ein ummauerter Platz mit neun Portalen, eines je Höllenkreis. Gesperrte Portale sind dunkel. Nahe am Start stehen eine Truhe und ein Händler |
 | Händler | Ein Klick auf ihn öffnet sein Fenster oben links, mit drei Reitern. Consumables: Heil- und Manatrank, sie gehen nie aus. Equipment: zwanzig gewürfelte Basen, davon jedes zwanzigste Magic und jedes dreißigste Rare, der Rest weiß. Buyback: alles, was der Held verkauft hat, in der Reihenfolge des Verkaufs |
 | Ordnung beim Händler | Consumables und Equipment liegen nach Itemtyp: Waffen nach Art, Schilde, Rüstung vom Helm bis zu den Stiefeln, Schmuck, zuletzt Heil- und Manatrank. Innerhalb einer Art nach Basis, dann Rare, Magic, Normal. Das Gitter füllt sich Spalte für Spalte von oben nach unten. Ein Kauf aus dem Equipment lässt eine Lücke |
-| Kaufen und verkaufen | Ein Klick kauft, mit `Strg` einen ganzen Stapel Tränke. `Strg` + Linksklick im Inventar verkauft, ebenso ein Klick mit dem Item an der Maus ins Händlerfenster. Der Händler zahlt ein Viertel des Preises und verkauft zum selben Betrag zurück, bis der Held den Hub verlässt |
+| Kaufen und verkaufen | Ein Rechtsklick auf eine Ware kauft, mit `Strg` einen ganzen Stapel Tränke. `Strg` + Linksklick im Inventar verkauft, ebenso ein Linksklick mit dem Item an der Maus ins Händlerfenster. Der Händler zahlt ein Viertel des Preises und verkauft zum selben Betrag zurück, bis der Held den Hub verlässt |
 | Neue Ware | Der Händler würfelt sein Equipment neu, wenn der Held eine Ebene zum ersten Mal erreicht, mit deren Bereichslevel als Itemlevel, und bei jedem Stufenaufstieg. Gekauftes ist bis dahin weg |
 | Testgelände | Das frühere Testlevel mit Hof und 37 Gegnern, zum Testen im Debug-Build mit `F6` erreichbar |
 | Navigationsnetz | Entsteht beim Start des Levels aus den Wänden, für Gegner und Held |
@@ -406,6 +407,7 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 | Ganzzahlige Pixel | Ein PS1-Pixel deckt immer gleich viele Pixel des Bildschirms: die Fensterhöhe geteilt durch 240, 360 oder 480, gerundet. Ab 600 Zeilen ist jede feinere Stufe echt feiner, notfalls um einen Pixel kleiner als die gröbere. Darunter sind Medium und Fine gleich. Bei 1080 Zeilen sind es 5, 3 und 2 Pixel, bei 1440 Zeilen 6, 4 und 3 |
 | Einstellbar | Pixel Size (Coarse, Medium, Fine), Dithering, Wobbly Vertices, Real Shadows und Brightness stehen im Reiter Display der Einstellungen. Standard: Coarse, alle Schalter an, Brightness 100 % |
 | Umriss | Held und Gegner tragen einen dunklen Rand von einem PS1-Pixel, der Gegner unter der Maus einen roten. Die Breite steht als `OutlineWidth` am Knoten `Ps1Look`. |
+| Umriss für Benutzbares | Truhe, Händler, Beutel, Treppe und Kellertür tragen denselben dunklen Rand. Leuchtende Portale tragen einen Rand in einer hellen Fassung ihrer Farbe: das frei stehende Town-Portal hellblau außen herum, ein offener Kreis hellrot an seiner Portalfläche im Steinrahmen. Der Rahmen selbst und gesperrte Portale tragen keinen. Steht der Held vor einem dieser Dinge, liegt sein Rand darüber |
 | Sichtbare Ausrüstung | Angelegte Waffen, Schilde und Rüstung erscheinen am Helden. Sichtbar sind alle Plätze außer den Ringen. |
 | Skills | Projektile fliegen, Flächen liegen als Kreis auf dem Boden |
 | Level-up | Ein Sternenregen aus Partikeln |
@@ -468,7 +470,8 @@ Die Skill-Leiste zeigt immer die aktuelle Taste.
 
 | Taste | Aktion |
 |---|---|
-| `W` `A` `S` `D` | Bewegen, bricht Hinlaufen und Ausholen ab |
+| `W` `A` `S` `D` | Bewegen, bricht Hinlaufen ab. Während eines Schlags oder Zaubers steht der Held |
+| Maus | Der Held schaut immer zum Mauszeiger, auch beim Laufen. Während eines Schlags oder Zaubers dreht er sich nicht |
 | Linke Maustaste | Attack: auf einen Gegner klicken, der Held läuft hin und greift an |
 | Rechte Maustaste | Lightning Strike in Richtung der Maus |
 | `E` | Frost Nova um den Spieler |
@@ -484,7 +487,8 @@ Die Skill-Leiste zeigt immer die aktuelle Taste.
 | Leertaste | Offene Fenster schließen |
 | Linke Maustaste auf Portal, Treppe oder Kellertür | Der Held läuft hin und benutzt den Durchgang |
 | Linke Maustaste auf Truhe oder Händler | Der Held läuft hin, das Fenster öffnet sich oben links, der Charakterbogen dazu. Wer wegläuft, schließt es |
-| `Strg` + linke Maustaste auf Item | Bei offener Truhe umlagern, bei offenem Händler verkaufen. Auf einen Trank des Händlers: einen ganzen Stapel kaufen |
+| `Strg` + linke Maustaste auf Item | Bei offener Truhe umlagern, bei offenem Händler verkaufen |
+| Rechte Maustaste auf eine Ware des Händlers | Kaufen. Mit `Strg` auf einen Trank: einen ganzen Stapel kaufen |
 | `T` | Town-Portal öffnen, nur in einer Ebene |
 | `Alt` | Schilder der Beute an und aus |
 | Linke Maustaste auf das Schild eines Beutels | Aufheben. Sind die Schilder aus, zählt der Klick auf den Beutel selbst |
@@ -612,7 +616,7 @@ Hoellenspiralenspiel
 │       └── Settings    Reiter des Einstellungsfensters: Display, Audio, Controls
 ├── Scenes              Szenen für Hauptmenü, Spiel, Orte, Räume, Einheiten, Items, Skills, Objekte und Oberfläche
 ├── Models              Modelle als .glb, unter Source die Dateien aus Blender. Godot übergeht Source
-├── Shaders             Shader, unter Ps1 die für den PS1-Look, die Figuren samt Umriss und Sicht auf Gegner und der Stern der Beutel, unter Archive2D die Effekte der 2D-Fassung
+├── Shaders             Shader, unter Ps1 die für den PS1-Look, die Figuren und benutzbaren Dinge samt Umriss, die Sicht auf Gegner und der Stern der Beutel, unter Archive2D die Effekte der 2D-Fassung
 ├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Gegner, Monster-Mods, Themen der Ebenen, Themes
 ├── Interfaces          Schnittstellen, darunter IHero zwischen Held und Oberfläche
 ├── Enums               Gemeinsame Aufzählungen

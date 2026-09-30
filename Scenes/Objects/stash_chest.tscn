@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/Objects/StashChest.cs" id="1_script"]
 [ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="2_ps1"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_object.gdshader" id="5_object"]
 [ext_resource type="Texture2D" path="res://Textures/World/skin_speckled.png" id="3_grain"]
 
 [sub_resource type="BoxShape3D" id="Shape_pick"]
@@ -26,23 +27,23 @@ size = Vector3(0.18, 0.22, 0.06)
 size = Vector3(1.7, 0.03, 1.25)
 
 [sub_resource type="ShaderMaterial" id="Mat_wood"]
-shader = ExtResource("2_ps1")
+shader = ExtResource("5_object")
 shader_parameter/albedo = Color(0.36, 0.22, 0.12, 1)
 shader_parameter/albedo_texture = ExtResource("3_grain")
 shader_parameter/uv_scale = Vector2(2, 2)
 
 [sub_resource type="ShaderMaterial" id="Mat_lid"]
-shader = ExtResource("2_ps1")
+shader = ExtResource("5_object")
 shader_parameter/albedo = Color(0.3, 0.17, 0.09, 1)
 shader_parameter/albedo_texture = ExtResource("3_grain")
 shader_parameter/uv_scale = Vector2(2, 2)
 
 [sub_resource type="ShaderMaterial" id="Mat_iron"]
-shader = ExtResource("2_ps1")
+shader = ExtResource("5_object")
 shader_parameter/albedo = Color(0.2, 0.2, 0.23, 1)
 
 [sub_resource type="ShaderMaterial" id="Mat_lock"]
-shader = ExtResource("2_ps1")
+shader = ExtResource("5_object")
 shader_parameter/albedo = Color(0.95, 0.7, 0.15, 1)
 shader_parameter/emission = Color(1, 0.75, 0.2, 1)
 shader_parameter/emission_energy = 0.4

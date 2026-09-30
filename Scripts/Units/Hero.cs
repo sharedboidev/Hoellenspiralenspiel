@@ -46,7 +46,11 @@ public partial class Hero
 
     private static readonly List<BaseUnit> UnitsNearPoint = new();
 
-    private readonly AttackCycle   attackCycle = new();
+    private          SkillAim      actionAim;
+    private readonly AttackCycle   actionCycle = new();
+    private          bool          actionFailed;
+    private          Tween         actionLook;
+    private          SkillResource actionSkill;
     private          PathFollower  approachPath;
     private          double        approachStuckSec;
     private          Vector3       attackAimPoint;
@@ -64,9 +68,6 @@ public partial class Hero
     private          SkillResource orderedSkill;
     private readonly HeroProgress  progress = new();
     private          Vector3       spawnPosition;
-    private          bool          swingFailed;
-    private          Tween         swingLook;
-    private          SkillResource swingSkill;
     private          IUsable       useTarget;
     private          WeaponProfile weapon = WeaponProfile.Unarmed;
     private          Node3D        weaponPivot;
@@ -337,7 +338,7 @@ public partial class Hero
         UpdateHoveredUsable();
         UpdateHoveredEnemy();
         RepeatHeldSkill();
-        AdvanceAttack(delta);
+        AdvanceAction(delta);
         Move(GetWantedDirection(delta), delta);
     }
 
@@ -431,7 +432,8 @@ public partial class Hero
                 if (UseConsumable(consumableId))
                     GetViewport().SetInputAsHandled();
             }
-            else if (UseSlot(slot))
+            //Während ein Skill läuft, wartet die Taste. Bleibt sie gehalten, folgt ihr Skill danach
+            else if (IsActing || UseSlot(slot))
             {
                 heldSlot = slot;
 
@@ -451,7 +453,7 @@ public partial class Hero
 
     public bool UseSkill(SkillResource skill, SkillAim aim, bool isRepeat = false)
     {
-        if (IsDead || skill is null)
+        if (IsDead || skill is null || IsActing)
             return false;
 
         return skill.Kind == SkillKind.Attack ? OrderAttack(skill, aim, isRepeat) : CastSpell(skill, aim, isRepeat);
@@ -460,21 +462,15 @@ public partial class Hero
     private SkillResource GetSkill(int slot)
         => SkillLibrary.Find(Loadout.GetSkillId(slot));
 
+    //Ein begonnener Schlag oder Zauber läuft bis zum Ende seiner Erholung. So lange steht der Held, dreht sich nicht und beginnt nichts Neues
+    private bool IsActing => !actionCycle.IsReady;
+
     private bool CastSpell(SkillResource skill, SkillAim aim, bool isRepeat)
     {
         if (!Report(TryPayFor(skill, CombatRules.MinSpellCooldownSec), isRepeat))
             return false;
 
-        if (RollActionFailure())
-        {
-            CombatText.Show(this, "Failed", Colors.Yellow, 28);
-
-            return true;
-        }
-
-        Face(aim.CurrentPoint - GlobalPosition);
-
-        SkillExecutor.Execute(this, skill, aim);
+        BeginAction(skill, aim, aim.CurrentPoint - GlobalPosition, skill.Definition.CastSec);
 
         return true;
     }
@@ -528,25 +524,28 @@ public partial class Hero
             return;
         }
 
-        if (orderedSkill is not null || !attackCycle.IsReady)
+        if (orderedSkill is not null || IsActing)
             return;
 
         UseSlot(heldSlot, true);
     }
 
-    private void AdvanceAttack(double delta)
+    private void AdvanceAction(double delta)
     {
-        var wasSwinging = !attackCycle.IsReady;
+        var wasActing = IsActing;
 
-        if (attackCycle.Advance(delta))
-            Strike();
+        if (actionCycle.Advance(delta))
+            Release();
 
-        if (wasSwinging && attackCycle.IsReady)
-            FinishSwing();
+        if (wasActing && !IsActing)
+            FinishAction();
     }
 
     private Vector3 GetWantedDirection(double delta)
     {
+        if (IsActing)
+            return Vector3.Zero;
+
         var inputDirection = GetInputDirection();
 
         if (inputDirection != Vector3.Zero)
@@ -559,7 +558,7 @@ public partial class Hero
         if (useTarget is not null)
             return ApproachUsable(delta);
 
-        if (orderedSkill is null || !attackCycle.IsReady)
+        if (orderedSkill is null)
             return Vector3.Zero;
 
         if (attackTarget is null)
@@ -608,10 +607,11 @@ public partial class Hero
             _                              => float.MaxValue
         };
 
+    //Der Held schaut immer zur Maus, auch beim Laufen. Nur während eines Skills bleibt er, wie er steht
     private void Move(Vector3 direction, double delta)
     {
-        if (direction != Vector3.Zero)
-            Face(direction);
+        if (!IsActing)
+            Face(GetMouseGroundPoint() - GlobalPosition);
 
         MoveOnGround(direction, MovementspeedPx);
 
@@ -651,39 +651,49 @@ public partial class Hero
             return;
         }
 
+        var skill    = orderedSkill;
+        var aim      = new SkillAim(attackAimPoint, attackTarget);
         var swingSec = 1.0 / Math.Max(CombatRules.MinAttacksPerSecond, Stats.GetFinal(CombatStat.Attackspeed));
 
-        swingSkill  = orderedSkill;
-        swingFailed = RollActionFailure();
+        ClearOrder();
 
-        attackCycle.Start(swingSec * ImpactFraction, swingSec * (1 - ImpactFraction));
-
-        Face(toTarget);
-        PlaySwingLook(swingSec);
+        BeginAction(skill, aim, toTarget, swingSec);
     }
 
-    private void Strike()
+    //Schlag und Zauber lösen nach der Hälfte ihrer Dauer aus, danach erholt der Held sich
+    private void BeginAction(SkillResource skill, SkillAim aim, Vector3 toTarget, double durationSec)
     {
-        if (swingFailed)
+        actionSkill  = skill;
+        actionAim    = aim;
+        actionFailed = RollActionFailure();
+
+        actionCycle.Start(durationSec * ImpactFraction, durationSec * (1 - ImpactFraction));
+
+        Face(toTarget);
+        PlayActionLook(durationSec, skill.Kind == SkillKind.Attack);
+    }
+
+    private void Release()
+    {
+        if (actionFailed)
         {
             CombatText.Show(this, "Failed", Colors.Yellow, 28);
 
             return;
         }
 
-        if (swingSkill is not null)
-            SkillExecutor.Execute(this, swingSkill, new SkillAim(attackAimPoint, attackTarget));
+        if (actionSkill is not null)
+            SkillExecutor.Execute(this, actionSkill, actionAim);
     }
 
-    private void FinishSwing()
+    private void FinishAction()
     {
-        EndSwingLook();
+        EndActionLook();
 
-        var previousTarget = attackTarget;
+        var previousTarget = actionAim.Target;
 
-        swingSkill = null;
-
-        ClearOrder();
+        actionSkill = null;
+        actionAim   = default;
 
         if (heldSlot != NoSlot)
             ContinueHeldAttack(previousTarget);
@@ -710,52 +720,61 @@ public partial class Hero
         attackTarget = null;
     }
 
-    private void CancelAttack()
+    //Vergisst, wohin der Held wollte. Ein begonnener Schlag oder Zauber läuft weiter
+    private void DropOrders()
     {
         ClearOrder();
 
         useTarget = null;
-        swingSkill = null;
 
         if (GetSkill(heldSlot)?.Kind == SkillKind.Attack)
             heldSlot = NoSlot;
+    }
 
-        attackCycle.CancelWindup();
+    private void CancelAttack()
+    {
+        DropOrders();
 
-        EndSwingLook();
+        actionSkill = null;
+        actionAim   = default;
+
+        actionCycle.CancelWindup();
+
+        EndActionLook();
     }
 
     private static bool IsValidTarget(BaseUnit unit)
         => IsInstanceValid(unit) && unit.IsTargetable;
 
-    private void PlaySwingLook(double swingSec)
+    //Ein Nahkampfschlag zieht die Waffe quer vor dem Körper durch. Fernkampf und Zauber heben sie
+    private void PlayActionLook(double durationSec, bool isAttack)
     {
         if (weaponPivot is null)
             return;
 
-        swingLook?.Kill();
+        actionLook?.Kill();
 
-        swingLook = CreateTween();
+        actionLook = CreateTween();
 
-        if (Weapon.IsRanged)
+        if (!isAttack || Weapon.IsRanged)
         {
-            swingLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(AimRaiseDegrees, 0, 0), swingSec * ImpactFraction);
+            actionLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(AimRaiseDegrees, 0, 0), durationSec * ImpactFraction);
         }
         else
         {
             weaponPivot.RotationDegrees = new Vector3(SwingRaiseDegrees, -SwingArcDegrees, 0);
 
-            swingLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(SwingRaiseDegrees, SwingArcDegrees, 0), swingSec * ImpactFraction);
+            actionLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(SwingRaiseDegrees, SwingArcDegrees, 0), durationSec * ImpactFraction);
         }
 
-        swingLook.TweenProperty(weaponPivot, "rotation_degrees", Vector3.Zero, swingSec * (1 - ImpactFraction));
+        actionLook.TweenProperty(weaponPivot, "rotation_degrees", Vector3.Zero, durationSec * (1 - ImpactFraction));
     }
 
-    private void EndSwingLook()
+    private void EndActionLook()
     {
-        swingLook?.Kill();
+        actionLook?.Kill();
 
-        swingLook = null;
+        actionLook = null;
 
         if (weaponPivot is not null)
             weaponPivot.RotationDegrees = Vector3.Zero;
@@ -870,15 +889,15 @@ public partial class Hero
     public bool OrderPickUp(Lootbag lootbag)
         => OrderUse(lootbag);
 
-    //Was in Reichweite liegt, benutzt der Held sofort, zu allem anderen läuft er erst hin
+    //Was in Reichweite liegt, benutzt der Held sofort, zu allem anderen läuft er erst hin. Ein begonnener Angriff läuft vorher zu Ende
     public bool OrderUse(IUsable usable)
     {
         if (IsDead || !IsStillThere(usable))
             return false;
 
-        CancelAttack();
+        DropOrders();
 
-        if (usable.IsInReachOf(this))
+        if (!IsActing && usable.IsInReachOf(this))
         {
             usable.Use();
 
@@ -974,7 +993,7 @@ public partial class Hero
         hasDied = true;
 
         CancelAttack();
-        attackCycle.Reset();
+        actionCycle.Reset();
         StatusEffects.Clear();
 
         heldSlot = NoSlot;

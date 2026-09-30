@@ -4,6 +4,7 @@ Stand: 30.09.2026. M0 bis M6 liegen auf `master`, dazu die Nachträge zu M2, M3,
 Die ersten drei von vier Etappen von M7 liegen ebenfalls auf `master`, Etappe 1 und 2 samt den Rückmeldungen aus dem Spielen. Etappe 2 ist seit dem 30.09.2026 vollständig: Pausenmenü, Ladebildschirm, Hud an Ankern und Einstellungen für Anzeige, Ton und Tasten, gebaut auf `master_PauseMenu` und `master_SettingsAndLoading`.
 Etappe 3 liegt seit dem 30.09.2026 auf `master`: Gold, Münzhaufen, eine Truhe je Charakter und ein Händler im Hub. Der User hat sie selbst über Pull Request #15 zusammengeführt, Merge-Commit `67e855b`.
 Die Rückmeldungen aus dem Spielen von Etappe 3 sind am selben Tag auf `master_PlaytestFeedback2` gebaut und liegen ebenfalls auf `master`.
+Eine zweite Runde Rückmeldungen zu Etappe 3 ist am selben Tag auf `master_PlaytestFeedback3` gebaut: Umriss für alles Benutzbare, Blick zur Maus, Schlag und Zauber binden den Helden, Kaufen per Rechtsklick und der Vergleich oben bündig.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
@@ -18,7 +19,8 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | 2D oder 3D | 3D im Look der PlayStation 1, Vorbild Silent Hill. Entschieden am 29.09.2026 nach dem Vergleich. |
 | Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen, auch das Amulett. Nur die Ringe bleiben unsichtbar. Gegner zeigen ihre Ausrüstung, sobald es Gegner mit Armen gibt. Entschieden am 29.09.2026. |
 | Modelle | Held und humanoide Gegner bekommen ein Skelett mit starrer Gewichtung, in Godot `Skeleton3D`. Blobs und einfache Gegner bleiben bei Knoten und Tweens. Entschieden am 29.09.2026, löst "Starre Teile ohne Skelett" vom selben Tag ab. |
-| Kontrast der Figuren | Held und Gegner tragen einen dunklen Umriss, der Gegner unter der Maus einen roten. Randlicht und Helligkeitskontrast sind verworfen. Entschieden am 29.09.2026 nach einem Vergleich im Spiel. |
+| Kontrast der Figuren | Held und Gegner tragen einen dunklen Umriss, der Gegner unter der Maus einen roten. Randlicht und Helligkeitskontrast sind verworfen. Entschieden am 29.09.2026 nach einem Vergleich im Spiel. Seit dem 30.09.2026 trägt auch alles, was der Held benutzen kann, einen Umriss: dunkel, oder wenn es leuchtet, in einer hellen Fassung seiner Farbe an der leuchtenden Fläche. |
+| Blick und Skills | Der Held schaut immer zur Maus, auch beim Laufen. Schlag und Zauber binden ihn bis zu ihrem Ende, so lange läuft und dreht er sich nicht. Zauber haben dafür eine Wirkzeit je Zauber, Standard 0,4 s, und lösen nach der Hälfte aus. Entschieden am 30.09.2026. |
 | Spielstruktur | Hub (Stadt) plus Abstieg in einen Höllenkreis mit mehreren Ebenen |
 | Leveldesign | Etwa 90 % prozedural, dazu handgebaute Räume und Event-Locations, die gezielt eingestreut werden |
 | Multiplayer | Singleplayer zuerst, Koop soll später nachrüstbar bleiben |
@@ -39,7 +41,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | Währung | Gold als Zahl am Charakter. Gegner lassen Münzhaufen fallen, der Held hebt sie beim Darüberlaufen auf. Der Haufen wächst sichtbar mit dem Betrag. Entschieden am 30.09.2026 vor Etappe 3 von M7. |
 | Tod und Gold | Beim Tod fällt das Gold, das der Held bei sich trägt, und bleibt am Ort des Todes liegen. Gold in der Truhe ist sicher. Entschieden am 30.09.2026. |
 | Truhe | Je Charakter, im Hub, für Items und Gold. Entschieden am 30.09.2026. |
-| Händler | Ein Reiter mit Verbrauchsgütern, einer mit zwanzig gewürfelten Basen, davon jedes zwanzigste Magic und jedes dreißigste Rare. Er würfelt neu, wenn der Held eine neue Ebene erreicht oder aufsteigt. Er kauft alles an und verkauft es zum selben Preis zurück, bis der Held den Hub verlässt. Entschieden am 30.09.2026. |
+| Händler | Ein Reiter mit Verbrauchsgütern, einer mit zwanzig gewürfelten Basen, davon jedes zwanzigste Magic und jedes dreißigste Rare. Er würfelt neu, wenn der Held eine neue Ebene erreicht oder aufsteigt. Er kauft alles an und verkauft es zum selben Preis zurück, bis der Held den Hub verlässt. Entschieden am 30.09.2026. Gekauft wird per Rechtsklick, verkauft per Strg + Linksklick, entschieden am selben Tag. |
 
 ## 1. Was schon umgesetzt ist
 
@@ -1288,6 +1290,8 @@ Nachtrag vom 29.09.2026, Merge mit M7 Etappe 1:
 | Aura der Elite | Nimmt seit M7 `ps1_unit`. Der Ring schaltet mit `outlined = false` seine Marke ab, sonst bekäme er einen Umriss. |
 | Szenen | Umriss-Rechteck, `OutlineWidth` und die Anzeige der Kamera sitzen in `Scenes/game.tscn`. `Ps1Look` braucht keine eigenen Felder für die Figuren-Shader mehr, es fragt `UnitSight`. |
 
+Nachtrag vom 30.09.2026: Seit der zweiten Runde Rückmeldungen zu Etappe 3 von M7 tragen auch Truhe, Händler, Beutel, Durchgänge und Portale einen Umriss. Die Marken stehen jetzt in `ps1_marks.gdshaderinc`: Figuren 0,4, der Gegner unter der Maus 0,7, benutzbare Dinge 0,3, Leuchtendes schreibt seinen Farbton zwischen 0,04 und 0,24. Siehe "Zweite Runde Rückmeldungen zu Etappe 3" unter M7.
+
 ### M6: Prozedurale Level mit handgebauten Räumen (L, umgesetzt am 29.09.2026 auf `master_ProceduralLevels`)
 
 Ziel: jeder Abstieg sieht anders aus, und eigene Räume lassen sich einstreuen.
@@ -1492,7 +1496,7 @@ Bewusst offen gelassen:
 
 Nachtrag vom 30.09.2026: Seit Etappe 2 von M7 wirken F2, F4 und F5 nur im Debug-Build, im Editor also weiter. Die Zeile oben links mit Ebene, Seed und Bereichslevel steht nur dort. Ob Lichter echte Schatten werfen, ist die Einstellung Real Shadows. F4 schaltet nur zum Testen um und speichert nichts.
 
-### M7: Hub und Abstieg (M, Etappe 1 umgesetzt am 29.09.2026 auf `master_HubAndDescent`, das Pausenmenü aus Etappe 2 am selben Tag auf `master_PauseMenu`, der Rest von Etappe 2 am 30.09.2026 auf `master_SettingsAndLoading`, Etappe 3 am selben Tag auf `master_GoldStashVendor`, die Rückmeldungen zu Etappe 3 ebenfalls am selben Tag auf `master_PlaytestFeedback2`)
+### M7: Hub und Abstieg (M, Etappe 1 umgesetzt am 29.09.2026 auf `master_HubAndDescent`, das Pausenmenü aus Etappe 2 am selben Tag auf `master_PauseMenu`, der Rest von Etappe 2 am 30.09.2026 auf `master_SettingsAndLoading`, Etappe 3 am selben Tag auf `master_GoldStashVendor`, die Rückmeldungen zu Etappe 3 ebenfalls am selben Tag auf `master_PlaytestFeedback2`, eine zweite Runde Rückmeldungen am selben Tag auf `master_PlaytestFeedback3`)
 
 Ziel: die Spielstruktur steht.
 
@@ -2252,6 +2256,97 @@ Bewusst offen gelassen:
 - Ein Bestand aus einem Spielstand ab Version 4 behält seine gespeicherten Plätze und wird beim Laden nicht neu ausgelegt. Auch das hat das Review gemeldet, auch das folgt meiner Festlegung.
 - Ein älterer Build legt einen Spielstand der Version 4 als `.broken` zur Seite, wie schon beim Schritt auf Version 3.
 - Ringe haben noch keine Basen. Der Vergleich zeigt das Item an dem Platz, den die Basis nennt, bei vier Ringplätzen also nur einen. Siehe die offene Frage unter M4.
+
+#### Zweite Runde Rückmeldungen zu Etappe 3
+
+Umgesetzt am 30.09.2026 auf `master_PlaytestFeedback3`, abgezweigt von `180279c`.
+
+Der User hat am 30.09.2026 weiter gespielt und sieben Dinge verlangt, im Wortlaut:
+
+1. "Interagierbare Objekte brauchen den selben schwarzen rand shader wie der held und monster. dazu zählen u.A. der Merchant und die Truhe"
+2. "Leuchtende interagierbare objekte - wie Portale - brauchen einen rand in ihrer Hauptfarbe nur in  heller."
+3. "Wenn man per Shift items vergleicht, soll das "currently equipped" label unten rechts im vergleichstooltip sein"
+4. "der hotkey zum einkaufen beim vendor muss rechtsklick aufs item sein, verkauf bleibt strg-linksklick"
+5. "Tooltips müssen im Vergleich IMMER oben bündig sein"
+6. "der Held soll immer in richtung des Mauszeigers gucken"
+7. "Wenn ein Skill ausgelöst wird, kann man sich nicht bewegen oder drehen bis der angriff oder cast durch ist"
+
+Nach dem ersten Stand kam eine Korrektur zum Kreisportal: Der helle Rand lag um den Steinrahmen, er gehört an die Portalfläche. Im Wortlaut: "der helle rand muss an die klickbare Portalfläche ran".
+
+Eine Frage hat der User per Auswahl beantwortet:
+
+| Frage | Antwort |
+|---|---|
+| Zauber wirkten sofort und hatten keine Dauer. Wie lange steht der Held beim Zaubern? | Eine Wirkzeit je Zauber, Standard 0,4 s, im Inspector einstellbar. Der Zauber löst nach der Hälfte aus, wie ein Schlag. |
+
+Von mir festgelegt:
+
+| Punkt | Festlegung |
+|---|---|
+| Was einen Rand trägt | Truhe, Händler, Beutel, Treppe und Kellertür einen dunklen, Town-Portal und offene Kreisportale einen hellen in ihrer Farbe. Münzhaufen keinen, sie werden beim Darüberlaufen aufgehoben und nicht angeklickt. Ringe und Platten, die unter Truhe und Händler beim Überfahren leuchten, tragen keinen. |
+| Gesperrte Kreisportale | Kein Rand, sie lassen sich nicht benutzen. Der Rand kommt mit dem Freischalten. |
+| Kreisportal | Nur die rote Fläche trägt die Marke, Steinrahmen und die goldenen Leisten beim Überfahren gehören zum Mauerwerk. Liegt vor der Fläche etwas ohne Marke, läuft der helle Rand innen an ihrer sichtbaren Kante entlang, also am Rahmen und unten am Boden. Das frei stehende Town-Portal behält den Rand außen herum. |
+| Helligkeit | Der Farbton der Hauptfarbe bei voller Helligkeit, zu 65 % mit Weiß gemischt. Bei der Hälfte ging der Rand des Town-Portals im Leuchten des Portals unter. |
+| Held vor einem Ding | Sein dunkler Rand liegt über dem Ding, wie vorher, als die Dinge noch keinen hatten |
+| Blick zur Maus | Gilt auch beim Laufen mit WASD und beim Hinlaufen zu einem Ziel. Über offenen Fenstern schaut der Held zum Punkt am Boden unter der Maus. |
+| Dauer eines Schlags | Wie bisher 1 / Angriffstempo, der Treffer nach der Hälfte. Neu ist, dass der Held bis zum Ende der Erholung steht. |
+| Tasten während eines Skills | Ein neuer Skill beginnt erst nach dem laufenden. Bleibt seine Taste gehalten, folgt er danach, ein kurzer Druck verfällt. Tränke gehen auch währenddessen. |
+| Klick auf Truhe, Händler, Beutel oder Durchgang während eines Skills | Der Skill läuft zu Ende, danach geht der Held hin oder benutzt es gleich. Vorher brach der Klick den Schlag ab. |
+| WASD während eines Skills | Zählt erst danach. Vorher brach WASD das Ausholen ab. Hinlaufen zu einem Ziel bricht WASD weiter ab. |
+| Zauber und Befehle | Ein Zauber vergisst keinen Befehl: Wer auf dem Weg zu einem Gegner zaubert, läuft danach weiter |
+| Aussehen beim Zaubern | Der Held hebt die Waffe wie beim Schuss mit dem Bogen |
+| Kaufen mit Strg | Strg + Rechtsklick kauft einen ganzen Stapel Tränke, wie vorher Strg + Klick. Ein Linksklick auf eine Ware tut nichts mehr, mit einem Item an der Maus verkauft er wie bisher. |
+| Tooltip der Skills | Nennt bei Zaubern "Cast Time". Die Einsätze pro Sekunde rechnen die Wirkzeit ein, der Fireball kommt damit auf 2,5 statt 4 pro Sekunde. |
+| Tipps im Ladebildschirm | Ein neuer Tipp erklärt das Kaufen per Rechtsklick. Es sind jetzt 17 Tipps. |
+
+So funktioniert es:
+
+- Eine Probe vorab hat gezeigt, dass der Rauheitskanal 8 Bit hält und die Werte unverändert durchreicht, auch bei bewegten Körpern. Das reicht, um einen Farbton mit Schritten von etwa 7 Grad zu speichern.
+- `Shaders/Ps1/ps1_marks.gdshaderinc` hält alle Marken und ihre Rangfolge: nichts, Leuchtendes, Ding, Figur, Gegner unter der Maus. `ps1_unit.gdshaderinc` und `ps1_unit_outline` binden es ein.
+- `Shaders/Ps1/ps1_object.gdshader` sieht aus wie `ps1_surface` und schreibt die Marke eines Dings. `outline` (0 kein Rand, 1 dunkel, 2 leuchtend) und `glow_hue` sind Instanz-Uniforms, ohne Aufruf ist der Rand dunkel. `Ps1Look` stimmt den Shader ab wie `ps1_surface`.
+- `ObjectOutline` unter `Scripts/World` setzt beide Werte für alle Teile unter einem Knoten, `Show` mit einer Farbe, `Hide` für keinen Rand. Teile mit `ps1_surface` übergehen sie.
+- `Passage.OutlineGlow`: ohne Deckkraft ein dunkler Rand, sonst ein leuchtender im Farbton dieser Farbe. `IsOutlined` ist beim Kreisportal `IsOpen`, `SetUnlocked` ruft `ShowOutline`.
+- `ps1_unit_outline` zieht auf ein Pixel nur den Rand eines Nachbarn höheren Rangs, der davor liegt. Figuren bekommen nie einen Rand über sich. Liegt vor einem leuchtenden Pixel etwas ohne Marke, färbt es sich selbst hell. So entsteht der Rand innen an der Portalfläche.
+- `Hero.IsActing` ist wahr, solange der gemeinsame Takt `actionCycle` von Schlag und Zauber läuft. `BeginAction` hält Skill und Ziel in `actionAim` fest, damit ein neuer Befehl den laufenden Schlag nicht umlenkt. `Release` löst nach der Hälfte aus, `FinishAction` setzt einen gehaltenen Angriff fort.
+- `DropOrders` vergisst Befehle, ohne den Skill abzubrechen. `CancelAttack` bricht zusätzlich das Ausholen ab, das brauchen nur noch Teleport und Tod.
+- `Move` dreht die Darstellung zur Maus, außer während eines Skills. `GetWantedDirection` liefert währenddessen keinen Weg.
+- `SkillDefinition.CastSec` im Kern, `SpellSkillResource.CastSec` im Inspector. Gegner nehmen weiter die Zeiten ihres `EnemyResource`.
+- `TooltipPlacement.PlaceWithCompanion` legt beide Tooltips auf eine Zeile mit der Höhe des höheren. Ob sie über oder unter dem Item stehen, entscheidet weiter der höhere.
+- `ItemTooltipContent` hängt den Vermerk "Currently Equipped" rechtsbündig hinter die Beschreibung, der Titel beginnt wieder mit dem Namen.
+- `VendorWindow.IsPurchase`: Ein Rechtsklick ohne Item an der Maus kauft, ein Linksklick verkauft das Item an der Maus.
+
+Neue Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| Town-Portal und Kreisportal (`Passage`) | `OutlineGlow` | Blau (0,2 / 0,45 / 1) und Rot (1 / 0,25 / 0,08) | Farbe des hellen Rands, ohne Deckkraft ein dunkler |
+| `SpellSkillResource` | `CastSec` | 0,4 | Wirkzeit des Zaubers beim Helden, von 0 bis 3 s |
+| `ps1_unit_outline` | `glow_saturation` | 0,35 | Wie viel Farbe der helle Rand behält, 0 ist Weiß |
+
+So bekommt ein neues Ding einen Rand: Seine Materialien nehmen `ps1_object` statt `ps1_surface`. Leuchtet es, setzt sein Skript `ObjectOutline.Show` mit seiner Farbe, ein Durchgang nimmt dafür `OutlineGlow`.
+
+Befunde:
+
+- Der erste Lauf mit Fenster fand einen Namenskonflikt im neuen Shader: `glow_hue` war zugleich Instanz-Uniform und Funktion. Behoben.
+- Bei halber Sättigung war der Rand des Town-Portals kaum vom Portal zu unterscheiden, es leuchtet selbst schon hellblau.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Unit-Tests | 6 neue: Tooltips oben bündig über und unter dem Element und am unteren Rand, Einsätze pro Sekunde mit Wirkzeit, Zauber ohne Wirkzeit. Zusammen 1112. |
+| Mit Fenster, 1280 x 720 | Blick zur Maus ohne Skill und beim Laufen. Der Fireball sperrt 24 Frames bei 60 Hz und fliegt nach 13, der Held macht trotz gedrückter Taste keinen Schritt und dreht sich nicht. Ein Schlag sperrt 41 Frames bei 1,43 Angriffen pro Sekunde, danach läuft der Held. Beim Händler kauft ein Linksklick nicht, ein Rechtsklick einen Trank für 12 Gold, ohne dass der Skill auf der rechten Maustaste auslöst, Strg + Rechtsklick einen Stapel von 5. Der Vergleich steht oben bündig, der Vermerk unten rechts. |
+| Bilder | Truhe, Händler, Beutel, der Held vor dem Händler, Town-Portal, offene und gesperrte Kreisportale mit und ohne Überfahren, Figuren im Testgelände und der Vergleich |
+| Spielstand | Die Proben liefen mit eigenem Spielstand und eigenen Einstellungen, die des Users blieben unberührt |
+
+Bewusst offen gelassen:
+
+- Die Korrektur am Kreisportal und die übrigen Punkte hat der User noch nicht gespielt.
+- Mit dem Stab und seinen 0,33 Angriffen pro Sekunde steht der Held nach jedem Schlag 3 Sekunden. Die Angriffstempi kommen mit der Balance in M8.
+- Steht ein leuchtendes Portal hinter einer gepunkteten, halb durchsichtigen Mauer, färben sich seine sichtbaren Pixel hell, denn jedes grenzt an Mauerwerk davor.
+- Tasten während eines Skills puffert der Held nicht: Nur eine gehaltene Taste zählt danach.
+- Gegner kennen die Wirkzeit nicht, ihre Zauber folgen den Zeiten ihres `EnemyResource`.
 
 ### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L)
 

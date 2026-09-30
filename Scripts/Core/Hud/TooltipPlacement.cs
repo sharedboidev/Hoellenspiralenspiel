@@ -8,7 +8,7 @@ public readonly record struct ScreenBox(float X, float Y, float Width, float Hei
     public float Bottom => Y + Height;
 }
 
-//Über dem Element, ist oben kein Platz, darunter, und immer ganz im Bild. Ein Begleiter steht links daneben, ist dort kein Platz, rücken beide nach rechts
+//Über dem Element, ist oben kein Platz, darunter, und immer ganz im Bild. Ein Begleiter steht links daneben, oben bündig, ist dort kein Platz, rücken beide nach rechts
 public static class TooltipPlacement
 {
     public static ScreenBox Place(ScreenBox item, float width, float height, float screenWidth, float screenHeight)
@@ -23,11 +23,11 @@ public static class TooltipPlacement
                                                                             float screenHeight,
                                                                             float gap)
     {
-        //Der höhere entscheidet die Seite, sonst ragte er über das Element
-        var isAbove = IsRoomAbove(item, Math.Max(mainHeight, companionHeight));
-        var main    = PlaceBeside(item, mainWidth, mainHeight, isAbove, screenWidth, screenHeight);
+        //Der höhere entscheidet die Seite, sonst ragte er über das Element. Beide schließen oben bündig ab
+        var tallest = Math.Max(mainHeight, companionHeight);
+        var row     = PlaceBeside(item, mainWidth, tallest, IsRoomAbove(item, tallest), screenWidth, screenHeight);
+        var main    = row with { Height = mainHeight };
         var x       = main.X - gap - companionWidth;
-        var y       = isAbove ? item.Y - companionHeight : main.Y;
 
         if (x < 0)
         {
@@ -35,7 +35,7 @@ public static class TooltipPlacement
             main = main with { X = Clamp(companionWidth + gap, screenWidth - mainWidth) };
         }
 
-        return (main, new ScreenBox(x, Clamp(y, screenHeight - companionHeight), companionWidth, companionHeight));
+        return (main, new ScreenBox(x, row.Y, companionWidth, companionHeight));
     }
 
     private static bool IsRoomAbove(ScreenBox item, float height)

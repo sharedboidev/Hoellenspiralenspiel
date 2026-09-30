@@ -2,6 +2,7 @@ using System;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.Units;
+using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.Environment;
 
@@ -21,11 +22,18 @@ public partial class Passage
     [Export]
     public float UseRadius { get; set; } = 150f;
 
+    //Leuchtet der Durchgang, hat sein Rand einen hellen Ton dieser Farbe. Ohne Deckkraft ist der Rand dunkel
+    [Export]
+    public Color OutlineGlow { get; set; } = Colors.Transparent;
+
     public bool IsHovered { get; private set; }
 
     public int TimesUsed { get; private set; }
 
     public virtual bool IsOpen => true;
+
+    //Ein gesperrter Durchgang trägt keinen Rand. Wer das ändert, ruft danach ShowOutline
+    protected virtual bool IsOutlined => true;
 
     //Hier steht, wer durch den Durchgang ankommt
     public Vector3 ArrivalPoint => GetNodeOrNull<Node3D>(ArrivalName)?.GlobalPosition ?? GlobalPosition + GlobalBasis * ArrivalOffset;
@@ -33,7 +41,10 @@ public partial class Passage
     public event Action<Passage> Used;
 
     public override void _Ready()
-        => SetHighlight(false);
+    {
+        SetHighlight(false);
+        ShowOutline();
+    }
 
     public bool IsInReachOf(BaseUnit unit)
         => unit.DistancePxTo(GlobalPosition) <= UseRadius;
@@ -54,5 +65,13 @@ public partial class Passage
 
         if (Glow is not null)
             Glow.Visible = IsHovered;
+    }
+
+    protected void ShowOutline()
+    {
+        if (IsOutlined)
+            ObjectOutline.Show(this, OutlineGlow);
+        else
+            ObjectOutline.Hide(this);
     }
 }

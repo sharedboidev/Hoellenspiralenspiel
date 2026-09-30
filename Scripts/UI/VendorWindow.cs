@@ -160,7 +160,7 @@ public partial class VendorWindow
         levelLabel.Text = $"Item level {keeper.Vendor.ItemLevel}";
     }
 
-    //Mit Strg kauft ein Klick einen ganzen Stapel
+    //Mit Strg kauft ein Rechtsklick einen ganzen Stapel
     private void OnWareClicked(InventoryItem view, InputEventMouseButton click)
     {
         if (IsPurchase(click))
@@ -179,9 +179,14 @@ public partial class VendorWindow
             Report(Trade.BuyBack(view.Item));
     }
 
-    //Mit einem Item an der Maus ist jeder Klick ins Fenster ein Verkauf
+    //Der Rechtsklick kauft. Mit einem Item an der Maus ist ein Linksklick ins Fenster ein Verkauf
     private bool IsPurchase(InputEventMouseButton click)
-        => click.ButtonIndex == MouseButton.Left && !SellHeld();
+    {
+        if (click.ButtonIndex == MouseButton.Left)
+            SellHeld();
+
+        return click.ButtonIndex == MouseButton.Right && items.HeldItem is null;
+    }
 
     private bool SellHeld()
     {

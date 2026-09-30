@@ -48,6 +48,7 @@ public class SkillDefinitionTests
         {
             Assert.That(skill.Kind, Is.EqualTo(SkillKind.Spell));
             Assert.That(skill.Attack, Is.Null);
+            Assert.That(skill.CastSec, Is.Zero, "ohne Angabe wirkt der Zauber sofort");
         });
     }
 

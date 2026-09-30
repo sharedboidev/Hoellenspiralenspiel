@@ -26,6 +26,8 @@ public partial class CirclePortal : Passage
 
     public override bool IsOpen => isUnlocked && Circle is not null;
 
+    protected override bool IsOutlined => IsOpen;
+
     public void SetUnlocked(bool unlocked)
     {
         isUnlocked = unlocked;
@@ -36,6 +38,7 @@ public partial class CirclePortal : Passage
         if (!IsOpen)
             SetHighlight(false);
 
+        ShowOutline();
         ShowTag();
     }
 
