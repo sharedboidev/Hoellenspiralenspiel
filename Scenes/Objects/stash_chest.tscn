@@ -1,0 +1,117 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Objects/StashChest.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="2_ps1"]
+[ext_resource type="Texture2D" path="res://Textures/World/skin_speckled.png" id="3_grain"]
+
+[sub_resource type="BoxShape3D" id="Shape_pick"]
+size = Vector3(1.8, 1.5, 1.4)
+
+[sub_resource type="BoxShape3D" id="Shape_body"]
+size = Vector3(1.26, 0.9, 0.81)
+
+[sub_resource type="BoxMesh" id="Mesh_body"]
+size = Vector3(1.2, 0.55, 0.75)
+
+[sub_resource type="BoxMesh" id="Mesh_lid"]
+size = Vector3(1.26, 0.3, 0.81)
+
+[sub_resource type="BoxMesh" id="Mesh_band"]
+size = Vector3(0.1, 0.88, 0.85)
+
+[sub_resource type="BoxMesh" id="Mesh_lock"]
+size = Vector3(0.18, 0.22, 0.06)
+
+[sub_resource type="BoxMesh" id="Mesh_rim"]
+size = Vector3(1.7, 0.03, 1.25)
+
+[sub_resource type="ShaderMaterial" id="Mat_wood"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.36, 0.22, 0.12, 1)
+shader_parameter/albedo_texture = ExtResource("3_grain")
+shader_parameter/uv_scale = Vector2(2, 2)
+
+[sub_resource type="ShaderMaterial" id="Mat_lid"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.3, 0.17, 0.09, 1)
+shader_parameter/albedo_texture = ExtResource("3_grain")
+shader_parameter/uv_scale = Vector2(2, 2)
+
+[sub_resource type="ShaderMaterial" id="Mat_iron"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.2, 0.2, 0.23, 1)
+
+[sub_resource type="ShaderMaterial" id="Mat_lock"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.95, 0.7, 0.15, 1)
+shader_parameter/emission = Color(1, 0.75, 0.2, 1)
+shader_parameter/emission_energy = 0.4
+
+[sub_resource type="ShaderMaterial" id="Mat_rim"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/emission = Color(1, 0.8, 0.45, 1)
+shader_parameter/emission_energy = 5.0
+
+[node name="StashChest" type="Area3D" node_paths=PackedStringArray("Glow")]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_script")
+Glow = NodePath("Glow")
+UseRadius = 200.0
+DisplayName = "Stash"
+Hint = "Items and gold stay safe here"
+TagHeightMeters = 1.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+shape = SubResource("Shape_pick")
+
+[node name="Body" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Body"]
+shape = SubResource("Shape_body")
+debug_fill = false
+
+[node name="Box" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.275, 0)
+mesh = SubResource("Mesh_body")
+surface_material_override/0 = SubResource("Mat_wood")
+
+[node name="Lid" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+mesh = SubResource("Mesh_lid")
+surface_material_override/0 = SubResource("Mat_lid")
+
+[node name="BandWest" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.38, 0.44, 0)
+mesh = SubResource("Mesh_band")
+surface_material_override/0 = SubResource("Mat_iron")
+
+[node name="BandEast" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38, 0.44, 0)
+mesh = SubResource("Mesh_band")
+surface_material_override/0 = SubResource("Mat_iron")
+
+[node name="Lock" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.52, 0.41)
+mesh = SubResource("Mesh_lock")
+surface_material_override/0 = SubResource("Mat_lock")
+
+[node name="Glow" type="Node3D" parent="."]
+
+[node name="Plate" type="MeshInstance3D" parent="Glow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_rim")
+surface_material_override/0 = SubResource("Mat_rim")
+
+[node name="Light" type="OmniLight3D" parent="Glow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0.6)
+light_color = Color(1, 0.8, 0.45, 1)
+light_energy = 2.5
+omni_range = 4.0

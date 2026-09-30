@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Scripts.Core.Items;
@@ -10,7 +11,7 @@ public partial class InventoryItem
         : PanelContainer,
           ITooltipObjectContainer
 {
-    public delegate void ClickedEventHandler(InventoryItem view, MouseButton button, Vector2 localPosition);
+    public delegate void ClickedEventHandler(InventoryItem view, InputEventMouseButton click);
 
     public delegate void HoverChangedEventHandler(InventoryItem view, bool isHovered);
 
@@ -26,7 +27,10 @@ public partial class InventoryItem
 
     public ItemInstance Item { get; private set; }
 
-    public ITooltipObject ContainedItem      => new ItemTooltipContent(Item, items.GetUnmetRequirements(Item));
+    //Nennt den Preis, solange ein Händler offen ist. Sonst steht im Tooltip keiner
+    public Func<ItemInstance, string> PriceNote { get; set; }
+
+    public ITooltipObject ContainedItem      => new ItemTooltipContent(Item, items.GetUnmetRequirements(Item), PriceNote?.Invoke(Item));
     public Vector2        TooltipAnchorPoint => GlobalPosition;
 
     public event ClickedEventHandler      Clicked;
@@ -68,7 +72,7 @@ public partial class InventoryItem
     public void _on_gui_input(InputEvent inputEvent)
     {
         if (inputEvent is InputEventMouseButton { Pressed: true } click)
-            Clicked?.Invoke(this, click.ButtonIndex, click.Position);
+            Clicked?.Invoke(this, click);
     }
 
     public void _on_mouse_entered()

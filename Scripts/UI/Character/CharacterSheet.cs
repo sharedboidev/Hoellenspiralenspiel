@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Interfaces;
+using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.UI.Buttons;
 using Hoellenspiralenspiel.Scripts.Utils;
 
@@ -13,7 +15,17 @@ public partial class CharacterSheet : Control, IClosableWindow
     [Export] private Inventory      inventory;
     private          LevelDisplay   levelDisplay;
     [Export] private Node           player;
+    private          Control        side;
     private          Statdisplay    statdisplay;
+    private          Control        statSpace;
+
+    public StashWindow Stash { get; private set; }
+
+    public VendorWindow Vendor { get; private set; }
+
+    private IEnumerable<ISideWindow> SideWindows => side?.GetChildren().OfType<ISideWindow>() ?? [];
+
+    private ISideWindow OpenSideWindow => SideWindows.FirstOrDefault(window => window.IsOpen);
 
     public override void _Ready()
     {
@@ -54,6 +66,14 @@ public partial class CharacterSheet : Control, IClosableWindow
     {
         inventory.Bind(hero);
         equipmentPanel.Bind(hero.Items);
+
+        side      = GetNode<Control>("Side");
+        statSpace = side.GetNode<Control>("StatSpace");
+        Stash     = side.GetNode<StashWindow>(nameof(StashWindow));
+        Vendor    = side.GetNode<VendorWindow>(nameof(VendorWindow));
+
+        Stash.Bind(hero, this);
+        Vendor.Bind(hero, this);
     }
 
     private void ConfigureLevelDisplay()
@@ -64,10 +84,12 @@ public partial class CharacterSheet : Control, IClosableWindow
 
     private void SetDisplayedLevel() => levelDisplay?.SetDisplayedValue(hero.Level);
 
+    //Der Platzhalter schiebt Truhe und Händler nach links, solange die Werteliste neben dem Bogen liegt
     private void OnPressed(bool isToggledOpen)
     {
         statdisplay.Render(hero.Stats);
         statdisplay.Visible = isToggledOpen;
+        statSpace.Visible   = isToggledOpen;
     }
 
     private void ShowCurrentValues()
@@ -77,9 +99,12 @@ public partial class CharacterSheet : Control, IClosableWindow
         SetDisplayedLevel();
     }
 
-    //Zum Bogen gehören auch die Werteliste links und die Anzeige der Stufe, nicht nur Ausrüstung und Inventar. Ein geschlossener Bogen deckt nichts ab
+    //Zum Bogen gehören auch die Werteliste links, die Anzeige der Stufe und die Fenster von Truhe und Händler. Ein geschlossener Bogen deckt nichts ab
     public bool Covers(Vector2 globalPosition)
-        => GetChildren().OfType<Control>().Any(part => part.IsVisibleInTree() && part.GetGlobalRect().HasPoint(globalPosition));
+        => GetChildren().OfType<Control>().Any(part => part == side ? SideWindows.OfType<Control>().Any(window => IsHit(window, globalPosition)) : IsHit(part, globalPosition));
+
+    private static bool IsHit(Control part, Vector2 globalPosition)
+        => part.IsVisibleInTree() && part.GetGlobalRect().HasPoint(globalPosition);
 
     public override void _Process(double delta)
     {
@@ -89,14 +114,42 @@ public partial class CharacterSheet : Control, IClosableWindow
 
     public bool IsOpen => Visible;
 
-    public void Close() => Hide();
+    public void Close()
+    {
+        foreach (var window in SideWindows)
+            window.Close();
+
+        Hide();
+    }
+
+    //Truhe und Händler stehen nie allein: Mit ihnen geht der Bogen auf, und es ist immer nur eines von beiden offen
+    public void OpenFor(ISideWindow window)
+    {
+        foreach (var other in SideWindows.Where(other => other != window))
+            other.Close();
+
+        if (!Visible)
+            ToggleVisibility();
+    }
+
+    public bool OfferQuick(ItemInstance item)
+        => OpenSideWindow?.OfferQuick(item) ?? false;
+
+    public string GetPriceNote(ItemInstance item)
+        => OpenSideWindow?.GetPriceNote(item);
 
     private void ToggleVisibility()
     {
-        Visible = !Visible;
+        if (Visible)
+        {
+            Close();
 
-        if(Visible)
-            statdisplay.Render(hero.Stats);
+            return;
+        }
+
+        Show();
+
+        statdisplay.Render(hero.Stats);
     }
 
     private void ModifyVisibilityThroughSelfModulate(Control control)

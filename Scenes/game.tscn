@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/Units/hero.tscn" id="5_hero"]
 [ext_resource type="Script" uid="uid://k2gb16ifn72b" path="res://Scripts/Controllers/EnemyController.cs" id="6_enemies"]
 [ext_resource type="Script" uid="uid://rq55bipqlvcq" path="res://Scripts/Controllers/GameController.cs" id="7_game"]
+[ext_resource type="Script" path="res://Scripts/Controllers/VendorController.cs" id="50_vendor"]
 [ext_resource type="Script" uid="uid://v5paruy0b76n" path="res://Scripts/UI/OverlayMapViewport.cs" id="8_map"]
 [ext_resource type="Script" uid="uid://c7orotexs54nd" path="res://Scripts/World/Ps1Look.cs" id="12_look"]
 [ext_resource type="Shader" uid="uid://c2lknp40isk5w" path="res://Shaders/Ps1/ps1_surface.gdshader" id="13_surface"]
@@ -246,6 +247,7 @@ unique_name_in_owner = true
 visible = false
 
 [node name="CharacterSheet" parent="Hud" node_paths=PackedStringArray("player") instance=ExtResource("20_sheet")]
+unique_name_in_owner = true
 visible = false
 player = NodePath("../../Hero")
 
@@ -354,10 +356,17 @@ Hero = NodePath("../Hero")
 EnemyContainer = NodePath("../Enemies")
 Lootsystem = NodePath("../Lootsystem")
 
-[node name="GameController" type="Node" parent="." node_paths=PackedStringArray("Hero", "Descent")]
+[node name="VendorController" type="Node" parent="." node_paths=PackedStringArray("Hero", "Descent", "Lootsystem")]
+script = ExtResource("50_vendor")
+Hero = NodePath("../Hero")
+Descent = NodePath("../Descent")
+Lootsystem = NodePath("../Lootsystem")
+
+[node name="GameController" type="Node" parent="." node_paths=PackedStringArray("Hero", "Descent", "Vendors")]
 script = ExtResource("7_game")
 Hero = NodePath("../Hero")
 Descent = NodePath("../Descent")
+Vendors = NodePath("../VendorController")
 
 [node name="Descent" type="Node" parent="." node_paths=PackedStringArray("Hero", "Enemies", "Navigation", "LevelRoot", "Surroundings", "Moonlight", "Curtain")]
 script = ExtResource("32_descent")

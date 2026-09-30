@@ -6,18 +6,28 @@ namespace Hoellenspiralenspiel.Scripts.Core.Items;
 
 public sealed class CharacterItems
 {
+    public const int DefaultStashWidth  = 14;
+    public const int DefaultStashHeight = 10;
+
     private readonly Func<Requirement, int> getCharacterValue;
 
-    public CharacterItems(int inventoryWidth, int inventoryHeight, Func<Requirement, int> getCharacterValue)
+    public CharacterItems(int                    inventoryWidth,
+                          int                    inventoryHeight,
+                          Func<Requirement, int> getCharacterValue,
+                          int                    stashWidth  = DefaultStashWidth,
+                          int                    stashHeight = DefaultStashHeight)
     {
         ArgumentNullException.ThrowIfNull(getCharacterValue);
 
         this.getCharacterValue = getCharacterValue;
 
         Inventory = new InventoryGrid(inventoryWidth, inventoryHeight);
+        Stash     = new InventoryGrid(stashWidth, stashHeight);
     }
 
     public InventoryGrid Inventory { get; }
+
+    public InventoryGrid Stash { get; }
 
     public Equipment Equipment { get; } = new();
 
@@ -38,13 +48,32 @@ public sealed class CharacterItems
            ItemRequirements.AreMet(item.Definition, getCharacterValue) &&
            !IsBlockedByTwoHander(item);
 
+    public bool HasRoomFor(ItemInstance item)
+    {
+        if (item is null)
+            return false;
+
+        if (Inventory.FindFreeCellFor(item) is not null)
+            return true;
+
+        var freeStackSpace = 0;
+
+        foreach (var existing in Inventory.GetItemsInReadingOrder())
+        {
+            if (existing.CanStackWith(item))
+                freeStackSpace += existing.FreeStackSpace;
+        }
+
+        return item.Definition.IsStackable && freeStackSpace >= item.StackSize;
+    }
+
     public bool PickUp(ItemInstance item)
     {
         if (item is null)
             return false;
 
         var stackBefore = item.StackSize;
-        var wasTaken    = Store(item);
+        var wasTaken    = Store(Inventory, item);
 
         if (wasTaken || item.StackSize != stackBefore)
             RaiseChanged();
@@ -53,8 +82,11 @@ public sealed class CharacterItems
     }
 
     public bool TakeFromInventory(ItemInstance item)
+        => TakeFrom(Inventory, item);
+
+    public bool TakeFrom(InventoryGrid grid, ItemInstance item)
     {
-        if (HeldItem is not null || !Inventory.Remove(item))
+        if (HeldItem is not null || !Owns(grid) || !grid.Remove(item))
             return false;
 
         HeldItem = item;
@@ -65,19 +97,22 @@ public sealed class CharacterItems
     }
 
     public bool PlaceHeldAt(GridCell cell)
+        => PlaceHeldAt(Inventory, cell);
+
+    public bool PlaceHeldAt(InventoryGrid grid, GridCell cell)
     {
-        if (HeldItem is null)
+        if (HeldItem is null || !Owns(grid))
             return false;
 
-        var target  = Inventory.ClampIntoGrid(HeldItem, cell);
-        var covered = Inventory.GetItemsUnder(HeldItem, target);
+        var target  = grid.ClampIntoGrid(HeldItem, cell);
+        var covered = grid.GetItemsUnder(HeldItem, target);
 
         if (covered.Count > 1)
             return false;
 
         if (covered.Count == 0)
         {
-            Inventory.TryPlace(HeldItem, target);
+            grid.TryPlace(HeldItem, target);
 
             HeldItem = null;
         }
@@ -92,11 +127,69 @@ public sealed class CharacterItems
         {
             var swapped = covered[0];
 
-            Inventory.Remove(swapped);
-            Inventory.TryPlace(HeldItem, target);
+            grid.Remove(swapped);
+            grid.TryPlace(HeldItem, target);
 
             HeldItem = swapped;
         }
+
+        RaiseChanged();
+
+        return true;
+    }
+
+    //Der schnelle Weg zwischen Inventar und Truhe. Von einem Stapel wandert, was drüben Platz findet
+    public bool Transfer(ItemInstance item, InventoryGrid from, InventoryGrid to)
+    {
+        if (item is null || from == to || !Owns(from) || !Owns(to) || !from.Contains(item))
+            return false;
+
+        var stackBefore = item.StackSize;
+
+        if (Store(to, item))
+            from.Remove(item);
+        else if (item.StackSize == stackBefore)
+            return false;
+
+        RaiseChanged();
+
+        return true;
+    }
+
+    //Wer ein Fenster schließt, soll das Item an der Maus nicht aus Versehen fallen lassen
+    public bool ReturnHeld()
+        => StowHeld(Inventory);
+
+    public bool StowHeld(InventoryGrid grid)
+    {
+        if (HeldItem is null)
+            return true;
+
+        if (!Owns(grid))
+            return false;
+
+        var stackBefore = HeldItem.StackSize;
+
+        if (Store(grid, HeldItem))
+            HeldItem = null;
+        else if (HeldItem.StackSize == stackBefore)
+            return false;
+
+        RaiseChanged();
+
+        return HeldItem is null;
+    }
+
+    //Gibt ein Item aus Inventar oder Hand ganz ab, etwa beim Verkauf
+    public bool Release(ItemInstance item)
+    {
+        if (item is null)
+            return false;
+
+        if (HeldItem == item)
+            HeldItem = null;
+        else if (!Inventory.Remove(item))
+            return false;
 
         RaiseChanged();
 
@@ -189,10 +282,14 @@ public sealed class CharacterItems
         return true;
     }
 
-    public void Restore(IEnumerable<(ItemInstance Item, GridCell Cell)> inventory, IEnumerable<ItemInstance> equipment, IEnumerable<ItemInstance> unplaced)
+    public void Restore(IEnumerable<(ItemInstance Item, GridCell Cell)> inventory,
+                        IEnumerable<ItemInstance>                       equipment,
+                        IEnumerable<ItemInstance>                       unplaced,
+                        IEnumerable<(ItemInstance Item, GridCell Cell)> stash = null)
     {
         Equipment.Clear();
         Inventory.Clear();
+        Stash.Clear();
 
         HeldItem = null;
 
@@ -213,6 +310,13 @@ public sealed class CharacterItems
         }
 
         homeless.AddRange(unplaced);
+
+        //Die Truhe hat keinen Boden. Was dort keinen Platz mehr findet, wandert ins Inventar
+        foreach (var (item, cell) in stash ?? [])
+        {
+            if (!Stash.TryPlace(item, cell) && !Stash.TryAdd(item))
+                homeless.Add(item);
+        }
 
         foreach (var item in homeless)
             StoreOrDrop(item);
@@ -244,18 +348,21 @@ public sealed class CharacterItems
         return Inventory.TryAdd(offhandItem);
     }
 
+    private bool Owns(InventoryGrid grid)
+        => grid is not null && (grid == Inventory || grid == Stash);
+
     private void StoreOrDrop(ItemInstance item)
     {
-        if (!Store(item))
+        if (!Store(Inventory, item))
             Dropped?.Invoke(item);
     }
 
-    private bool Store(ItemInstance item)
+    private static bool Store(InventoryGrid grid, ItemInstance item)
     {
         if (!item.Definition.IsStackable)
-            return Inventory.TryAdd(item);
+            return grid.TryAdd(item);
 
-        foreach (var existing in Inventory.GetItemsInReadingOrder())
+        foreach (var existing in grid.GetItemsInReadingOrder())
         {
             if (existing.CanStackWith(item))
                 MoveStack(item, existing);
@@ -264,7 +371,7 @@ public sealed class CharacterItems
                 return true;
         }
 
-        return Inventory.TryAdd(item);
+        return grid.TryAdd(item);
     }
 
     private static void MoveStack(ItemInstance from, ItemInstance to)

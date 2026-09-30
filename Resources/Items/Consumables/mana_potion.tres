@@ -9,4 +9,5 @@ Id = "mana_potion"
 DisplayName = "Mana Potion"
 Icon = ExtResource("2_icon")
 SlotSize = Vector2i(1, 1)
+Price = 12
 Effect = 1

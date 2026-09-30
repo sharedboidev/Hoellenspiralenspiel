@@ -36,6 +36,10 @@ public sealed class AffixRoller
         };
 
     public void RollAffixesFor(ItemInstance item, IRandomSource random)
+        => RollAffixesFor(item, random, 0, GetAffixCountCeiling(item?.ItemLevel ?? 1));
+
+    //Für Ware mit vorgegebener Seltenheit: ein bis zwei Affixe ergeben Magic, ab drei ist das Item Rare
+    public void RollAffixesFor(ItemInstance item, IRandomSource random, int minCount, int maxCount)
     {
         ArgumentNullException.ThrowIfNull(item);
         ArgumentNullException.ThrowIfNull(random);
@@ -43,7 +47,7 @@ public sealed class AffixRoller
         if (!item.Definition.IsEquippable)
             return;
 
-        var wantedCount = Math.Min(random.NextInt(0, GetAffixCountCeiling(item.ItemLevel) + 1), maxAffixesPerItem);
+        var wantedCount = Math.Min(random.NextInt(minCount, Math.Max(minCount, maxCount) + 1), maxAffixesPerItem);
         var nextType    = random.NextInt(0, 2) == 0 ? AffixType.Prefix : AffixType.Suffix;
 
         for (var i = 0; i < wantedCount; i++)

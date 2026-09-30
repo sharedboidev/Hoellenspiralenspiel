@@ -155,6 +155,9 @@ public partial class Descent : Node
 
     public event Action<CirclePortal> CirclePortalUsed;
 
+    //Der Held betritt eine Ebene zum ersten Mal. Genannt wird ihr Bereichslevel
+    public event Action<int> LevelReached;
+
     public override void _Ready()
     {
         surfaceLook = SurfaceLook.From(Surroundings, Moonlight);
@@ -396,6 +399,8 @@ public partial class Descent : Node
 
         Circle = circle;
 
+        var isNewlyReached = depth > state.DeepestDepth;
+
         state.GoTo(depth);
         GameRandom.Reseed(seed);
 
@@ -418,6 +423,9 @@ public partial class Descent : Node
         Navigation?.Rebuild();
 
         LevelEntered?.Invoke();
+
+        if (isNewlyReached)
+            LevelReached?.Invoke(settings.AreaLevel);
 
         Populate(Level, arrival);
     }
@@ -461,6 +469,9 @@ public partial class Descent : Node
 
         foreach (var lootbag in Lootbag.Lying.ToList())
             Remove(lootbag);
+
+        foreach (var pile in CoinPile.Lying.ToList())
+            Remove(pile);
 
         foreach (var effect in Hero.GetParent().GetChildren().Where(child => child is SkillArea or SkillProjectile).ToList())
             Remove(effect);

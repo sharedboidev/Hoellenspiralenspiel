@@ -6,7 +6,7 @@ namespace Hoellenspiralenspiel.Scripts.Core.Saving;
 
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 2;
+    public const int CurrentVersion = 3;
 
     public int                    Version   { get; set; } = CurrentVersion;
     public CharacterSave          Character { get; set; } = new();
@@ -14,7 +14,11 @@ public sealed class SaveGame
     public List<PlacedItemSave>   Inventory { get; set; } = new();
     public List<EquippedItemSave> Equipment { get; set; } = new();
     public List<ItemSave>         Unplaced  { get; set; } = new();
+    public List<PlacedItemSave>   Stash     { get; set; } = new();
     public JourneySave            Journey   { get; set; }
+
+    //Fehlt in Spielständen vor Version 3. Der Händler würfelt dann beim Laden einen Bestand
+    public VendorSave             Vendor    { get; set; }
 
     //Nur in Spielständen der Version 1. Seit Version 2 steht der Abstieg je Kreis unter Journey
     public DescentSave            Descent   { get; set; }
@@ -63,6 +67,8 @@ public sealed class CharacterSave
     public int    Level           { get; set; } = 1;
     public long   XpTotal         { get; set; }
     public int    AttributePoints { get; set; }
+    public int    Gold            { get; set; }
+    public int    StashGold       { get; set; }
     public int    Strength        { get; set; } = 1;
     public int    Dexterity       { get; set; } = 1;
     public int    Intelligence    { get; set; } = 1;
@@ -87,6 +93,12 @@ public sealed class AffixSave
     public float            Value        { get; set; }
     public string           NameAddition { get; set; }
     public bool             IsLocal      { get; set; }
+}
+
+public sealed class VendorSave
+{
+    public int                  ItemLevel { get; set; } = 1;
+    public List<PlacedItemSave> Stock     { get; set; } = new();
 }
 
 public sealed class PlacedItemSave

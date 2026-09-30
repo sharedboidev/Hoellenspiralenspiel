@@ -21,9 +21,12 @@ public partial class DeathScreen : Control
         Hide();
     }
 
-    public void ShowFor(long experienceLost)
+    public void ShowFor(long experienceLost, int goldDropped = 0)
     {
         lossLabel.Text = experienceLost > 0 ? $"You lost {experienceLost:N0} experience." : "You lost no experience.";
+
+        if (goldDropped > 0)
+            lossLabel.Text += $"\nYou dropped {goldDropped:N0} gold where you fell.";
 
         Show();
 

@@ -4,6 +4,7 @@ using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
+using Hoellenspiralenspiel.Scripts.Core.Economy;
 using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Stats;
@@ -17,6 +18,10 @@ public interface IHero
     StatusEffectTracker StatusEffects { get; }
 
     CharacterItems Items { get; }
+
+    Purse Gold { get; }
+
+    Purse StashGold { get; }
 
     WeaponProfile Weapon { get; }
 

@@ -1,6 +1,8 @@
 using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Saving;
+using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Items;
+using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.Saving;
 using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.UI.Buttons;
@@ -18,6 +20,8 @@ public partial class GameController : Node
     private LevelUpDialog           levelUpDialog;
     private OpenLevelUpDialogButton openLevelUpDialogButton;
     private double                  secUntilSave;
+    private StashWindow             stashWindow;
+    private VendorWindow            vendorWindow;
 
     [Export]
     public Hero Hero { get; set; }
@@ -35,6 +39,9 @@ public partial class GameController : Node
 
     [Export]
     public Descent Descent { get; set; }
+
+    [Export]
+    public VendorController Vendors { get; set; }
 
     public override void _Ready()
     {
@@ -87,6 +94,9 @@ public partial class GameController : Node
             SaveGameMapper.CaptureJourney(Descent.Journey, save);
         }
 
+        if (Vendors is not null)
+            SaveGameMapper.CaptureVendor(Vendors.Vendor, save);
+
         SaveGameStore.Save(save);
     }
 
@@ -101,6 +111,9 @@ public partial class GameController : Node
 
         if (SavingEnabled)
             WatchForChanges();
+
+        //Ein Spielstand aus der Zeit vor dem Händler bekommt hier seinen ersten Bestand, und der wird gleich gespeichert
+        Vendors?.EnsureStocked();
 
         if (SavingEnabled && save is null)
             RequestSave();
@@ -150,6 +163,9 @@ public partial class GameController : Node
 
         if (Descent is not null)
             SaveGameMapper.RestoreJourney(save, Descent.Journey, Descent.FirstCircle?.Id);
+
+        if (Vendors is not null)
+            SaveGameMapper.RestoreVendor(save, Vendors.Vendor, ItemLibrary.Catalog);
     }
 
     private void WatchForChanges()
@@ -158,6 +174,11 @@ public partial class GameController : Node
         Hero.Loadout.SlotChanged += _ => RequestSave();
         Hero.XpChanged           += RequestSave;
         Hero.Died                += _ => RequestSave();
+        Hero.Gold.Changed        += RequestSave;
+        Hero.StashGold.Changed   += RequestSave;
+
+        if (Vendors is not null)
+            Vendors.Vendor.Changed += RequestSave;
 
         if (Descent is null)
             return;
@@ -184,9 +205,12 @@ public partial class GameController : Node
     private void SubscribeToEvents()
     {
         Hero.LeveledUp                            += ShowSpendablePoints;
-        Hero.Died                                 += _ => deathScreen.ShowFor(Hero.LastXpLoss);
+        Hero.Died                                 += _ => deathScreen.ShowFor(Hero.LastXpLoss, Hero.LastGoldLoss);
         deathScreen.RespawnRequested              += Hero.Respawn;
         openLevelUpDialogButton.OpenDialogPressed += levelUpDialog.ShowDialog;
+
+        if (Descent is not null)
+            Descent.PlaceEntered += ConnectFixtures;
 
         if (Descent is null || circleDialog is null)
             return;
@@ -194,6 +218,19 @@ public partial class GameController : Node
         Descent.CirclePortalUsed         += portal => circleDialog.ShowFor(portal, Descent.Journey.GetDescent(portal.Circle.Id), Hero);
         circleDialog.LevelChosen         += Descent.EnterCircle;
         circleDialog.NewDescentRequested += Descent.BeginAnew;
+    }
+
+    //Truhe und Händler stehen im Ort und entstehen mit ihm neu
+    private void ConnectFixtures()
+    {
+        if (Descent.Place is null)
+            return;
+
+        foreach (var chest in Descent.Place.GetAllChildren<StashChest>())
+            chest.Used += used => stashWindow?.ShowFor(used, Hero);
+
+        foreach (var merchant in Descent.Place.GetAllChildren<Merchant>())
+            merchant.Used += used => vendorWindow?.ShowFor(used, Hero);
     }
 
     private void ShowSpendablePoints()
@@ -209,5 +246,12 @@ public partial class GameController : Node
         deathScreen             = GetNode<DeathScreen>($"%{nameof(DeathScreen)}");
         levelUpDialog           = GetNode<LevelUpDialog>($"%{nameof(LevelUpDialog)}");
         openLevelUpDialogButton = GetNode<OpenLevelUpDialogButton>($"%{nameof(OpenLevelUpDialogButton)}");
+
+        var sheet = GetNodeOrNull<CharacterSheet>($"%{nameof(CharacterSheet)}");
+
+        stashWindow  = sheet?.Stash;
+        vendorWindow = sheet?.Vendor;
+
+        vendorWindow?.Connect(Vendors);
     }
 }

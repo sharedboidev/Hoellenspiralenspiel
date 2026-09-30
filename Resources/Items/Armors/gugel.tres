@@ -10,6 +10,7 @@ Id = "gugel"
 DisplayName = "Gugel"
 Icon = ExtResource("2_icon")
 SlotSize = Vector2i(2, 2)
+Price = 16
 Requirements = Dictionary[int, int]({
 0: 1,
 5: 1

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hoellenspiralenspiel.Scripts.Core.Economy;
 using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Core.Levels;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
@@ -54,14 +55,8 @@ public static class SaveGameMapper
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(save);
 
-        save.Inventory = items.Inventory.GetItemsInReadingOrder()
-                              .Select(item =>
-                              {
-                                  var cell = items.Inventory.GetPositionOf(item);
-
-                                  return new PlacedItemSave { X = cell.X, Y = cell.Y, Item = ToSave(item) };
-                              })
-                              .ToList();
+        save.Inventory = ToSave(items.Inventory);
+        save.Stash     = ToSave(items.Stash);
 
         save.Equipment = items.Equipment.Items
                               .OrderBy(entry => entry.Key)
@@ -70,6 +65,16 @@ public static class SaveGameMapper
 
         save.Unplaced = items.HeldItem is null ? [] : [ToSave(items.HeldItem)];
     }
+
+    private static List<PlacedItemSave> ToSave(InventoryGrid grid)
+        => grid.GetItemsInReadingOrder()
+               .Select(item =>
+               {
+                   var cell = grid.GetPositionOf(item);
+
+                   return new PlacedItemSave { X = cell.X, Y = cell.Y, Item = ToSave(item) };
+               })
+               .ToList();
 
     //Liefert die Ids der Item-Basen, die es nicht mehr gibt. Ihre Items fehlen nach dem Laden.
     public static IReadOnlyList<string> RestoreItems(SaveGame save, CharacterItems items, IItemCatalog catalog)
@@ -89,17 +94,49 @@ public static class SaveGameMapper
             return item;
         }
 
-        var inventory = (save.Inventory ?? [])
-                       .Select(placed => (Item: Load(placed.Item), Cell: new GridCell(placed.X, placed.Y)))
-                       .Where(placed => placed.Item is not null)
-                       .ToList();
+        List<(ItemInstance Item, GridCell Cell)> LoadPlaced(List<PlacedItemSave> placedItems)
+            => (placedItems ?? [])
+              .Where(placed => placed is not null)
+              .Select(placed => (Item: Load(placed.Item), Cell: new GridCell(placed.X, placed.Y)))
+              .Where(placed => placed.Item is not null)
+              .ToList();
 
+        var inventory = LoadPlaced(save.Inventory);
+        var stash     = LoadPlaced(save.Stash);
         var equipment = (save.Equipment ?? []).Select(equipped => Load(equipped.Item)).Where(item => item is not null).ToList();
         var unplaced  = (save.Unplaced ?? []).Select(Load).Where(item => item is not null).ToList();
 
-        items.Restore(inventory, equipment, unplaced);
+        items.Restore(inventory, equipment, unplaced, stash);
 
         return missingBaseIds;
+    }
+
+    public static void CaptureVendor(Vendor vendor, SaveGame save)
+    {
+        ArgumentNullException.ThrowIfNull(vendor);
+        ArgumentNullException.ThrowIfNull(save);
+
+        save.Vendor = vendor.IsStocked ? new VendorSave { ItemLevel = vendor.ItemLevel, Stock = ToSave(vendor.Stock) } : null;
+    }
+
+    //Ohne gespeicherten Bestand bleibt der Händler leer, und wer ihn führt, würfelt neu
+    public static bool RestoreVendor(SaveGame save, Vendor vendor, IItemCatalog catalog)
+    {
+        ArgumentNullException.ThrowIfNull(save);
+        ArgumentNullException.ThrowIfNull(vendor);
+
+        if (save.Vendor is null)
+            return false;
+
+        var stock = (save.Vendor.Stock ?? [])
+                   .Where(placed => placed is not null)
+                   .Select(placed => (Item: ToItem(placed.Item, catalog), Cell: new GridCell(placed.X, placed.Y)))
+                   .Where(placed => placed.Item is not null)
+                   .ToList();
+
+        vendor.RestoreStock(stock, save.Vendor.ItemLevel);
+
+        return true;
     }
 
     public static void CaptureLoadout(SkillLoadout loadout, SaveGame save)

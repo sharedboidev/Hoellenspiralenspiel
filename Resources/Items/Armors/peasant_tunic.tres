@@ -10,6 +10,7 @@ Id = "peasant_tunic"
 DisplayName = "Peasant Tunic"
 Icon = ExtResource("2_icon")
 SlotSize = Vector2i(2, 3)
+Price = 30
 Requirements = Dictionary[int, int]({
 5: 1
 })

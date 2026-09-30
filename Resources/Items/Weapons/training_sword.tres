@@ -10,6 +10,7 @@ Id = "training_sword"
 DisplayName = "Training Sword"
 Icon = ExtResource("2_icon")
 SlotSize = Vector2i(1, 3)
+Price = 20
 Requirements = Dictionary[int, int]({
 0: 1,
 5: 1

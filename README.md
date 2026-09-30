@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-844_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-1002_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -38,7 +38,7 @@ Gegner erschlagen, Beute sammeln, Charakter ausbauen.
 
 ## ✨ Feature-Umfang
 
-Das ist der Stand vom 30.09.2026. Das Spiel beginnt im Hauptmenü. Vom Hub führen Portale in die Höllenkreise, bisher in einen Testkreis mit vier erzeugten Ebenen.
+Das ist der Stand vom 30.09.2026. Das Spiel beginnt im Hauptmenü. Vom Hub führen Portale in die Höllenkreise, bisher in einen Testkreis mit vier erzeugten Ebenen. Im Hub stehen eine Truhe und ein Händler, bezahlt wird mit Gold.
 Das Spiel läuft in 3D, mehr dazu im Abschnitt [3D im PS1-Look](#-3d-im-ps1-look).
 
 ### 🧙 Charakter
@@ -239,6 +239,9 @@ Auslöser und Aktionen lassen sich im Inspector frei kombinieren, zum Beispiel "
 | Loot-Tabellen | Gewichtete Einträge, Mengen, verschachtelte Tabellen |
 | Beute mit Seed | Derselbe Seed ergibt dieselbe Beute |
 | Anforderungen | Level und Attribute, unerfüllte Anforderungen erscheinen rot |
+| Gold | Gegner lassen Münzhaufen fallen, der Held hebt sie beim Darüberlaufen auf. Ein normaler Gegner trägt mit 50 % Gold bei sich, Elite und Rare Elite immer und deutlich mehr. Beschworene Gegner tragen keins |
+| Münzhaufen | Der Haufen wächst mit dem Betrag in neun Stufen: eine bis fünf lose Münzen, ein bis drei Stapel, zuletzt fünf Stapel. Gold, das neben einem Haufen fällt, landet auf ihm |
+| Preise | Jede Item-Basis hat einen Grundpreis im Inspector. Magic kostet das Dreifache, Rare das Achtfache. Alle Beträge sind vorläufig |
 
 ### 🧰 Inventar und Ausrüstung
 
@@ -254,7 +257,10 @@ Auslöser und Aktionen lassen sich im Inspector frei kombinieren, zum Beispiel "
 | Stapel | Tränke stapeln sich bis 5, aufgehobene Tränke füllen vorhandene Stapel |
 | 16 Ausrüstungsplätze | Inklusive vier Ringe |
 | Zweihandwaffen | Bogen und Stab sperren den Schildplatz, der Schild wandert ins Inventar |
-| Tooltips | Werte, Affixe und Anforderungen, farbig nach Seltenheit |
+| Tooltips | Werte, Affixe und Anforderungen, farbig nach Seltenheit. Bei offenem Händler steht der Preis dabei |
+| Gold | Unter dem Inventar steht das Gold, das der Held bei sich trägt |
+| Truhe | Im Hub, je Charakter, mit 140 Feldern. Sie liegt als Fenster links neben dem Charakterbogen und hält auch Gold: Knöpfe zahlen 10, 100, 1.000 oder alles ein und aus |
+| Umlagern | `Strg` + Linksklick legt ein Item aus dem Inventar in die offene Truhe und zurück. Der Weg über die Maus geht auch: greifen und im anderen Fenster ablegen |
 
 ### 💾 Speichern
 
@@ -262,7 +268,7 @@ Auslöser und Aktionen lassen sich im Inspector frei kombinieren, zum Beispiel "
 |---|---|
 | Automatisch | Das Spiel speichert beim Beenden und kurz nach jeder Änderung am Charakter |
 | Laden beim Start | Der Charakter ist nach dem Neustart derselbe, mit Inventar, Ausrüstung und Skill-Leiste |
-| Inhalt | Name, Level, XP, Attribute, offene Punkte, jedes Item mit Affixen, Namen und Platz, dazu die Reise: je Kreis Seed, Checkpoints, erkundete Karten und gefallene Gegner, außerdem das offene Town-Portal |
+| Inhalt | Name, Level, XP, Attribute, offene Punkte, jedes Item mit Affixen, Namen und Platz, dazu die Reise: je Kreis Seed, Checkpoints, erkundete Karten und gefallene Gegner, außerdem das offene Town-Portal. Seit der Truhe auch Gold, Truhe samt ihrem Gold und der Bestand des Händlers |
 | Drei Plätze | Das Hauptmenü bietet drei Plätze für Charaktere, jeder mit eigener Datei |
 | Einstellungen | Anzeige, Look, Lautstärke und Tasten stehen in einer eigenen Datei `settings.json` und gelten für alle Plätze. Sie entsteht bei der ersten Änderung. Eine unlesbare Datei wird als `settings.json.broken` beiseitegelegt, dann gelten die Standards |
 | Sicher | Ein Absturz beim Schreiben zerstört den alten Spielstand nicht |
@@ -284,7 +290,8 @@ Die Einstellungen liegen als `settings.json` eine Ebene darüber, direkt in `%AP
 | Mit eigenen Einstellungen testen | Godot mit `-- --settings-file=user://test_settings.json` starten |
 | Ohne Spielstand testen | Im Inspector am `GameController` den Schalter `SavingEnabled` ausschalten |
 
-Leben, Mana, Position und Beute am Boden stehen nicht im Spielstand.
+Leben, Mana, Position, Beute und Gold am Boden und der Rückkauf des Händlers stehen nicht im Spielstand.
+Der Spielstand hat Version 3. Ältere Spielstände lädt das Spiel weiter, sie beginnen mit 0 Gold und leerer Truhe. Eine ältere Fassung des Spiels legt einen Spielstand der Version 3 als `.broken` zur Seite.
 Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints und das Town-Portal.
 
 </details>
@@ -301,7 +308,10 @@ Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints
 | Hud an Ankern | Orbs, Skill-Leiste und XP-Balken hängen als Gruppe unten mittig, der Level-up-Knopf neben dem Lebens-Orb, der Charakterbogen oben rechts. Alles sitzt bei jedem Seitenverhältnis richtig, auch nach einem Wechsel im laufenden Spiel. Fenster wie der Charakterbogen liegen über den Orbs |
 | Statuszeile | Oben links. Die Bildrate zeigt sie mit Show FPS aus den Einstellungen, Gegner, Look, Kamera, Ort und Seed nur im Debug-Build |
 | Neuer Charakter | Alle Attribute auf 1, ein weißes Training Sword in der Haupthand, das Inventar ist leer |
-| Hub | Ein ummauerter Platz mit neun Portalen, eines je Höllenkreis. Gesperrte Portale sind dunkel |
+| Hub | Ein ummauerter Platz mit neun Portalen, eines je Höllenkreis. Gesperrte Portale sind dunkel. Nahe am Start stehen eine Truhe und ein Händler |
+| Händler | Ein Klick auf ihn öffnet sein Fenster neben dem Charakterbogen, mit drei Reitern. Consumables: Heil- und Manatrank, sie gehen nie aus. Equipment: zwanzig gewürfelte Basen, davon jedes zwanzigste Magic und jedes dreißigste Rare, der Rest weiß. Buyback: alles, was der Held verkauft hat |
+| Kaufen und verkaufen | Ein Klick kauft, mit `Strg` einen ganzen Stapel Tränke. `Strg` + Linksklick im Inventar verkauft, ebenso ein Klick mit dem Item an der Maus ins Händlerfenster. Der Händler zahlt ein Viertel des Preises und verkauft zum selben Betrag zurück, bis der Held den Hub verlässt |
+| Neue Ware | Der Händler würfelt sein Equipment neu, wenn der Held eine Ebene zum ersten Mal erreicht, mit deren Bereichslevel als Itemlevel, und bei jedem Stufenaufstieg. Gekauftes ist bis dahin weg |
 | Testgelände | Das frühere Testlevel mit Hof und 37 Gegnern, zum Testen im Debug-Build mit `F6` erreichbar |
 | Navigationsnetz | Entsteht beim Start des Levels aus den Wänden, für Gegner und Held |
 | Licht und Schatten | Der Held trägt sein Licht mit sich, die Umgebung ist dunkel und neblig. Lichter werfen echte Schatten, nur das Licht des Helden nicht von ihm selbst. Er steht dafür auf einem blassen Kreis |
@@ -352,9 +362,9 @@ Ein Klick auf ein Portal im Hub öffnet die Checkpoints seines Kreises. Jede Ebe
 | Checkpoints | Jede betretene Ebene schaltet ihren Start frei. Das Portal im Hub bietet alle freigeschalteten Ebenen an |
 | Town-Portal | Town Portal, zu Beginn `T`, öffnet neben dem Helden ein Portal in den Hub, nach einer Sekunde ist es offen. Im Hub steht das Gegenstück und führt zurück an dieselbe Stelle, danach schließt es sich. Abklingzeit 60 Sekunden |
 | Bestand | Die Ebenen eines Kreises bleiben, wie der Held sie verließ, auch über einen Neustart des Spiels |
-| Tot bleibt tot | Gefallene Gegner stehen nicht wieder auf. Beute am Boden verfällt beim Verlassen der Ebene |
+| Tot bleibt tot | Gefallene Gegner stehen nicht wieder auf. Beute und Gold am Boden verfallen beim Verlassen der Ebene |
 | Neuer Abstieg | Im Dialog des Portals würfelt "New Descent" alle Ebenen des Kreises neu. Die Checkpoints bleiben |
-| Tod | Der Held steht am Start der Ebene wieder auf |
+| Tod | Der Held steht am Start der Ebene wieder auf. Das Gold, das er bei sich trug, liegt am Ort seines Todes und lässt sich zurückholen, solange er die Ebene nicht verlässt. Gold in der Truhe ist sicher |
 
 <div align="center">
 <img src="docs/images/ebene_m6_3d.webp" alt="Oben links der Held hinter einer Mauer, deren Mauerwerk die Sicht freigibt, oben rechts vor einer Mauer, unten links der Schrein, unten rechts die ganze Karte einer Ebene" width="720">
@@ -429,7 +439,8 @@ Das Mausrad wirkt immer.
 
 ### 🚧 Noch nicht enthalten
 
-- Truhe, Händler und Währung im Hub
+- Balance für Gold und Preise, alle Beträge sind geschätzt
+- Töne für Gold, Truhe und Händler
 - Boss und Freischaltung des nächsten Kreises
 - Ein Höllenkreis mit eigenem Thema, bisher gibt es nur das Testthema
 - Eigene Modelle für den Held und die übrigen Gegner, bisher hat nur das Skelett eins
@@ -445,7 +456,7 @@ Das Mausrad wirkt immer.
 Die Tabelle zeigt die Standardbelegung. Die Skills liegen zu Beginn wie unten auf den Tasten. Jeder Platz der Leiste lässt sich im Spiel mit einem anderen Skill belegen.
 
 Unter Settings im Reiter Controls lassen sich 19 Aktionen umbelegen: Bewegen, die zehn Skill-Plätze, Charakterbogen, Karte, Schilder der Beute, Town-Portal und Close Windows.
-Fest bleiben `Esc`, das Mausrad, die Klicks auf Items, Schilder, Beutel und Durchgänge und der Rechtsklick auf die Leiste.
+Fest bleiben `Esc`, das Mausrad, die Klicks auf Items, Schilder, Beutel, Durchgänge, Truhe und Händler, `Strg` beim Klick auf ein Item und der Rechtsklick auf die Leiste.
 Jede Aktion hat eine Taste, Kombinationen gibt es nicht. Maustasten (links, rechts, Mitte, Seitentasten) gibt es nur für die Skill-Plätze.
 Hält eine andere Aktion die Taste schon, tauschen beide, sofern die andere die bisherige Taste nehmen darf. Sonst bleibt die Belegung, wie sie war. `F1` bis `F6` und das Mausrad lassen sich keiner Aktion geben.
 Die Skill-Leiste zeigt immer die aktuelle Taste.
@@ -466,6 +477,8 @@ Die Skill-Leiste zeigt immer die aktuelle Taste.
 | `Esc` | Offene Fenster schließen. Ohne offenes Fenster Pausenmenü öffnen und wieder schließen |
 | Leertaste | Offene Fenster schließen |
 | Linke Maustaste auf Portal, Treppe oder Kellertür | Der Held läuft hin und benutzt den Durchgang |
+| Linke Maustaste auf Truhe oder Händler | Der Held läuft hin, das Fenster öffnet sich neben dem Charakterbogen. Wer wegläuft, schließt es |
+| `Strg` + linke Maustaste auf Item | Bei offener Truhe umlagern, bei offenem Händler verkaufen. Auf einen Trank des Händlers: einen ganzen Stapel kaufen |
 | `T` | Town-Portal öffnen, nur in einer Ebene |
 | `Alt` | Schilder der Beute an und aus |
 | Linke Maustaste auf das Schild eines Beutels | Aufheben. Sind die Schilder aus, zählt der Klick auf den Beutel selbst |
@@ -484,7 +497,7 @@ flowchart LR
     M2 --> M3(["M3 Skills"]):::done
     M2 --> M4(["M4 Items und Speichern"]):::done
     M4 --> M5(["M5 Gegner-KI"]):::done --> D{"3D im PS1-Look"}:::done
-    D --> U(["M5.5 Umstellung auf 3D"]):::done --> M6(["M6 Level"]):::done --> M7(["M7 Hub, Etappe 2 von 4"]):::next --> M8(["M8 Höllenkreis"]):::open
+    D --> U(["M5.5 Umstellung auf 3D"]):::done --> M6(["M6 Level"]):::done --> M7(["M7 Hub, Etappe 3 von 4"]):::next --> M8(["M8 Höllenkreis"]):::open
     M8 --> M9(["M9 Inhalt"]):::open --> M10(["M10 Koop"]):::optional
 
     classDef done fill:#2e7d32,color:#ffffff,stroke:#1b5e20
@@ -505,7 +518,7 @@ flowchart LR
 | ✅ | **Entscheidung** | 3D im Look der PlayStation 1, entschieden nach dem [Vergleich](docs/VERGLEICH_2D_3D.md) | klein |
 | ✅ | **M5.5** Umstellung auf 3D | Die 3D-Fassung kann alles, was die 2D-Fassung konnte, und hat sie abgelöst | mittel |
 | ✅ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
-| ⏭️ | **M7** Hub | Stand 30.09.2026: Etappe 1 und 2 von 4 stehen. Etappe 1: Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal. Etappe 2: Pausenmenü, Ladebildschirm, Einstellungen für Anzeige, Look, Ton und Tasten, Hud an Ankern. Offen: Etappe 3 mit Truhe, Händler und Währung, Etappe 4 mit Platzhalter-Boss und Freischaltung des nächsten Kreises | mittel |
+| ⏭️ | **M7** Hub | Stand 30.09.2026: Etappe 1 bis 3 von 4 stehen. Etappe 1: Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal. Etappe 2: Pausenmenü, Ladebildschirm, Einstellungen für Anzeige, Look, Ton und Tasten, Hud an Ankern. Etappe 3: Gold, Truhe und Händler. Offen: Etappe 4 mit Platzhalter-Boss und Freischaltung des nächsten Kreises | mittel |
 | ⬜ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
 | 💤 | **M10** Koop | Optional, baut auf Kern und Seeds auf | groß |
@@ -565,7 +578,8 @@ Hoellenspiralenspiel
 │   │   ├── Stats       Stat-Blatt, Rechenregeln, abgeleitete Werte
 │   │   ├── Combat      Trefferauflösung, Schadensarten, Statuseffekte, Angriffstakt
 │   │   ├── Skills      Skill-Definition, Abklingzeiten, Kosten, Belegung der Leiste
-│   │   ├── Items       Item-Basis und Instanz, Inventar-Raster, Ausrüstung, Affixe, Beute
+│   │   ├── Items       Item-Basis und Instanz, Inventar-Raster, Ausrüstung, Truhe, Affixe, Beute
+│   │   ├── Economy     Gold, Gold von Gegnern, Stufen des Münzhaufens, Preise, Händler und Handel
 │   │   ├── Enemies     Zustandsmaschine, Seltenheit, Wahl der Mods, Wachstum mit dem Level
 │   │   ├── Navigation  Takt für die Pfadsuche
 │   │   ├── Spatial     Raster für die Suche nach Einheiten, freie Plätze für Gegner und Beutel, Stapeln der Schilder
@@ -581,12 +595,12 @@ Hoellenspiralenspiel
 │   ├── Enemies         Bibliothek aller Monster-Mods
 │   ├── World           Navigationsnetz, Kamera, PS1-Look, Spawn-Marker
 │   │   └── Levels      Wechsel zwischen Hub und Ebenen, Aufbau einer Ebene, Raumvorlagen, Orte, Mauerstücke
-│   ├── Objects         Beutel am Boden, Suche nach Benutzbarem unter der Maus
+│   ├── Objects         Beutel und Münzhaufen am Boden, Truhe und Händler, Suche nach Benutzbarem unter der Maus
 │   ├── Environment     Durchgänge: Kellertür, Treppe, Portal eines Kreises, Town-Portal
 │   ├── Saving          Dateien der Spielstände, drei Plätze, Datei der Einstellungen (SettingsStore), Autoload UserSettings
-│   ├── Controllers     Gegnersteuerung, Beute, Spielablauf, Speichern
+│   ├── Controllers     Gegnersteuerung, Beute, Händler, Spielablauf, Speichern
 │   ├── Utils           Namen der Aktionen, Tastenbelegung in der InputMap (KeyBindings), Namen der Busse (AudioBuses), kleine Helfer
-│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder, Schilder der Beute, Karte der Ebene, Hauptmenü, Pausenmenü, Dialog am Portal, Ladebildschirm, Einstellungsfenster
+│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder, Schilder der Beute, Karte der Ebene, Hauptmenü, Pausenmenü, Dialog am Portal, Ladebildschirm, Einstellungsfenster, Gitteransicht, Fenster von Truhe und Händler
 │       └── Settings    Reiter des Einstellungsfensters: Display, Audio, Controls
 ├── Scenes              Szenen für Hauptmenü, Spiel, Orte, Räume, Einheiten, Items, Skills, Objekte und Oberfläche
 ├── Models              Modelle als .glb, unter Source die Dateien aus Blender. Godot übergeht Source

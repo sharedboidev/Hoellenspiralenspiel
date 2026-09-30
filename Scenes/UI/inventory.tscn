@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cj22xlufpgeqx" path="res://Scripts/UI/Character/Inventory.cs" id="1_dt15g"]
 [ext_resource type="PackedScene" uid="uid://devwjm5t1shxy" path="res://Scenes/UI/mouse_object.tscn" id="2_dt15g"]
-[ext_resource type="PackedScene" uid="uid://bmhe4oqmcd326" path="res://Scenes/UI/inventory_slot.tscn" id="2_osrsm"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/item_grid_view.tscn" id="3_grid"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dt15g"]
 content_margin_left = 0.0
@@ -29,7 +29,6 @@ offset_right = 40.0
 offset_bottom = 40.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_dt15g")
 script = ExtResource("1_dt15g")
-SlotScene = ExtResource("2_osrsm")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=365297740]
 layout_mode = 2
@@ -38,18 +37,23 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="OverlayLayer" type="Control" parent="MarginContainer" unique_id=2144532379]
-custom_minimum_size = Vector2(896, 320)
+[node name="Rows" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="GridView" parent="MarginContainer/Rows" instance=ExtResource("3_grid")]
+unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ItemGrid" type="GridContainer" parent="MarginContainer/OverlayLayer" unique_id=1934794965]
+[node name="GoldLabel" type="Label" parent="MarginContainer/Rows"]
 unique_name_in_owner = true
-layout_mode = 0
-offset_right = 20.0
-offset_bottom = 20.0
-theme_override_constants/h_separation = 0
-theme_override_constants/v_separation = 0
-columns = 14
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
+text = "0 Gold"
+horizontal_alignment = 2
 
 [node name="MouseObject" parent="." unique_id=145715296 instance=ExtResource("2_dt15g")]
 top_level = true

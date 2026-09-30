@@ -2,12 +2,13 @@
 
 Stand: 30.09.2026. M0 bis M6 liegen auf `master`, dazu die Nachträge zu M2, M3, M5.5 und M6: Bleed stapelt, Schadenswerte im Tooltip, ausgedünnte Kommentare, die Rückmeldungen aus dem ersten Spielen und die Rückmeldungen zu Mauern und Räumen.
 Die ersten beiden von vier Etappen von M7 liegen ebenfalls auf `master`, samt den Rückmeldungen aus dem Spielen. Etappe 2 ist seit dem 30.09.2026 vollständig: Pausenmenü, Ladebildschirm, Hud an Ankern und Einstellungen für Anzeige, Ton und Tasten, gebaut auf `master_PauseMenu` und `master_SettingsAndLoading`.
+Etappe 3 ist am 30.09.2026 auf `master_GoldStashVendor` gebaut und liegt noch nicht auf `master`: Gold, Münzhaufen, eine Truhe je Charakter und ein Händler im Hub.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code samt Szenen. Die Zeilenzahl aus der ersten Analyse, rund 5.500, galt für die 2D-Fassung.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 und 2 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 auch mit Fenster.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 bis 3 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 und 3 auch mit Fenster.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -34,6 +35,10 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | Ortswechsel | Ein Ladebildschirm zeigt auf Schwarz das Ziel und einen Tipp mit der aktuellen Taste und steht eine Mindestdauer. Alle Werte sind Felder im Inspector. Entschieden am 30.09.2026. |
 | Hud | Orbs, Skill-Leiste und XP-Balken sind eine feste Gruppe unten mittig. Fenster liegen über den Orbs. Eine Größe der Oberfläche gibt es nicht. Entschieden am 30.09.2026. |
 | Einstellungen | Eine Datei für alle Charaktere, erreichbar aus Haupt- und Pausenmenü. Randloses Vollbild ist Standard. Alle Tasten außer Escape lassen sich umbelegen, Tasten zum Testen gibt es nur im Debug-Build. Entschieden am 30.09.2026. |
+| Währung | Gold als Zahl am Charakter. Gegner lassen Münzhaufen fallen, der Held hebt sie beim Darüberlaufen auf. Der Haufen wächst sichtbar mit dem Betrag. Entschieden am 30.09.2026 vor Etappe 3 von M7. |
+| Tod und Gold | Beim Tod fällt das Gold, das der Held bei sich trägt, und bleibt am Ort des Todes liegen. Gold in der Truhe ist sicher. Entschieden am 30.09.2026. |
+| Truhe | Je Charakter, im Hub, für Items und Gold. Entschieden am 30.09.2026. |
+| Händler | Ein Reiter mit Verbrauchsgütern, einer mit zwanzig gewürfelten Basen, davon jedes zwanzigste Magic und jedes dreißigste Rare. Er würfelt neu, wenn der Held eine neue Ebene erreicht oder aufsteigt. Er kauft alles an und verkauft es zum selben Preis zurück, bis der Held den Hub verlässt. Entschieden am 30.09.2026. |
 
 ## 1. Was schon umgesetzt ist
 
@@ -46,10 +51,10 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | Waffen | Schadensspanne, Angriffe pro Sekunde, Swingtimer, Typ, Schadensart, Krit, Anforderungen | Seit M2 bestimmen die Werte den Nahkampf, seit M3 gibt es Fernkampfwaffen mit Projektil. Seit M4 sind Waffen Resources und bringen Parry oder Block mit. Klassen-Anforderung fehlt. |
 | Rüstung | Helm, Torso, Handschuhe und Schild mit Rüstungswert | 4 von 16 Slots haben Item-Basen |
 | Affixe | 17 Affixe mit Tiers, Gewichten, Itemlevel-Grenze, Prefix/Suffix, lokale und globale Mods | Slot-Tabelle aus dem PDF nur teilweise abgedeckt |
-| Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen. Seit dem Nachtrag zu M5.5 liegt Beute in einem Gitter und trägt Schilder mit dem Namen des Items. | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle. Seit M5 bestimmt das Monsterlevel das Itemlevel. |
-| Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. Seit M5.5 hängt sie an der Schnittstelle `IHero` und läuft auch in 3D. |
+| Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen. Seit dem Nachtrag zu M5.5 liegt Beute in einem Gitter und trägt Schilder mit dem Namen des Items. Seit Etappe 3 von M7 lassen Gegner auch Gold fallen. | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle. Seit M5 bestimmt das Monsterlevel das Itemlevel. |
+| Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. Seit M5.5 hängt sie an der Schnittstelle `IHero` und läuft auch in 3D. Seit Etappe 3 von M7 kennt das Modell eine Truhe, und eine Gitteransicht zeigt Inventar, Truhe und Händler. |
 | Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. Seit M5.5 ist sie in 3D am Helden zu sehen. |
-| Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch. Seit M6 auch der Abstieg mit Seed, Tiefe und erkundeter Karte. Seit M7 drei Plätze für Charaktere, dazu je Kreis Checkpoints und gefallene Gegner und das Town-Portal. | Nicht im PDF |
+| Speichern | Seit M4: Charakter, Inventar, Ausrüstung und Skill-Leiste, automatisch. Seit M6 auch der Abstieg mit Seed, Tiefe und erkundeter Karte. Seit M7 drei Plätze für Charaktere, dazu je Kreis Checkpoints und gefallene Gegner und das Town-Portal. Seit Etappe 3 auch Gold, Truhe und der Bestand des Händlers, das Format hat Version 3. | Nicht im PDF |
 | Leveling | XP-Tabelle bis Level 100, Level-up-Effekt, Attributspunkte, XP-Balken. Seit M5.5 liegt die Regel für XP, Level und Punkte im Kern und treibt den 3D-Helden. | Nicht im PDF, funktioniert |
 | Skills | Seit M3 als Daten: Attack, Lightning Strike, Fireball mit Fork, Frost Nova, Thunderbolt. Leiste mit zehn frei belegbaren Plätzen, Tooltip mit DPS | Das PDF kennt keine Skill-Arten. Klassen und Skill-Erwerb sind offen. |
 | Kampf | Zentrale Trefferauflösung, Nahkampf, Schadensarten mit Effekten, Statuseffekte, Tod und Respawn | Seit M2. Frost-Effekt war im PDF leer und ist jetzt Verlangsamung. |
@@ -59,7 +64,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | Atmosphäre | Der Held trägt sein Licht, die Umgebung ist dunkel und neblig, dazu der PS1-Look und die Overlay-Karte. Seit M6 zeigt unter der Erde eine gezeichnete Karte, was der Held erkundet hat. Seit M7 werfen Lichter echte Schatten, der Held steht auf einem blassen Kreis. | Passt zum düsteren Vibe |
 | 3D | Seit dem 29.09.2026 läuft das ganze Spiel in 3D auf dem unveränderten Kern. Bis auf das Skelett sind alle Modelle Platzhalter aus Grundkörpern. | Offene Frage aus dem PDF, entschieden für 3D |
 | Level | Seit M6: Ebenen aus handgebauten Räumen und erzeugten Gängen, gesteuert über einen Seed. Ein Thema legt Räume, Aussehen und Gegnerpool fest. | Das PDF nennt nur die Kreise. Es gibt ein Testthema, noch keinen Höllenkreis. |
-| Spielstruktur | Seit M7, Etappe 1: Hauptmenü, Hub mit einem Portal je Kreis, mehrere Ebenen pro Kreis, Treppen, Checkpoints und Town-Portal. Seit Etappe 2 ein Pausenmenü, ein Ladebildschirm bei jedem Ortswechsel und Einstellungen für Anzeige, Ton und Tasten | Das PDF fragt nach "Town-Portal mechanic mit zwischenversorgen" und lässt die Struktur offen |
+| Spielstruktur | Seit M7, Etappe 1: Hauptmenü, Hub mit einem Portal je Kreis, mehrere Ebenen pro Kreis, Treppen, Checkpoints und Town-Portal. Seit Etappe 2 ein Pausenmenü, ein Ladebildschirm bei jedem Ortswechsel und Einstellungen für Anzeige, Ton und Tasten. Seit Etappe 3 Gold, eine Truhe und ein Händler im Hub | Das PDF fragt nach "Town-Portal mechanic mit zwischenversorgen" und lässt die Struktur offen |
 
 ## 2. Was an kritischen Systemen fehlt
 
@@ -69,7 +74,7 @@ Ohne diese Systeme gibt es kein spielbares Spiel, nur eine Testszene.
 2. **Nahkampf.** Erledigt in M2. Vorher existierten Waffenwerte nur im Tooltip.
 3. **Gegnerangriffe.** Erledigt in M2. Vorher schadeten die Blobs nur durch Berührung.
 4. **Speichern und Laden.** Erledigt in M4. Vorher gab es keine Persistenz für Charakter, Inventar oder Fortschritt.
-5. **Spielstruktur.** Seit der ersten Etappe von M7 gibt es Hauptmenü, Hub, Treppen in beide Richtungen, Checkpoints und Town-Portal, seit der zweiten ein Pausenmenü und einen Ladebildschirm. Truhe, Händler und Freischaltung fehlen.
+5. **Spielstruktur.** Seit der ersten Etappe von M7 gibt es Hauptmenü, Hub, Treppen in beide Richtungen, Checkpoints und Town-Portal, seit der zweiten ein Pausenmenü und einen Ladebildschirm, seit der dritten Gold, Truhe und Händler. Die Freischaltung des nächsten Kreises fehlt.
 6. **Levelgenerierung.** Erledigt in M6. Vorher gab es nur das handgebaute Testlevel.
 7. **Wegfindung.** Erledigt in M5. Vorher liefen Gegner in gerader Linie und blieben an Wänden hängen.
 8. **Statuseffekte.** Erledigt in M2: Bleed, Burn, Shock und Chill. Bleed und Burn stapeln. Die leeren Schadensart-Klassen sind durch eine Aufzählung im Kern ersetzt.
@@ -562,6 +567,8 @@ Eine neue Item-Basis in zwei Schritten:
 
 1. Resource vom Typ `WeaponBaseResource`, `ArmorBaseResource` oder `ConsumableBaseResource` unter `Resources/Items` anlegen. Id, Name, Icon, Größe und Anforderungen eintragen, bei Bedarf Parry und Block.
 2. Die Resource in eine Loot-Tabelle unter `Resources/LootTables` eintragen.
+
+Nachtrag vom 30.09.2026: Seit Etappe 3 von M7 hat jede Basis das Feld `Price`, den Grundpreis beim Händler. Eine Basis mit Preis steht von selbst in seinem Angebot, siehe "Etappe 3: Gold, Truhe und Händler".
 
 Vorläufige Werte der Item-Basen, alle in [Resources/Items](../Resources/Items):
 
@@ -1484,7 +1491,7 @@ Bewusst offen gelassen:
 
 Nachtrag vom 30.09.2026: Seit Etappe 2 von M7 wirken F2, F4 und F5 nur im Debug-Build, im Editor also weiter. Die Zeile oben links mit Ebene, Seed und Bereichslevel steht nur dort. Ob Lichter echte Schatten werfen, ist die Einstellung Real Shadows. F4 schaltet nur zum Testen um und speichert nichts.
 
-### M7: Hub und Abstieg (M, Etappe 1 umgesetzt am 29.09.2026 auf `master_HubAndDescent`, das Pausenmenü aus Etappe 2 am selben Tag auf `master_PauseMenu`, der Rest von Etappe 2 am 30.09.2026 auf `master_SettingsAndLoading`)
+### M7: Hub und Abstieg (M, Etappe 1 umgesetzt am 29.09.2026 auf `master_HubAndDescent`, das Pausenmenü aus Etappe 2 am selben Tag auf `master_PauseMenu`, der Rest von Etappe 2 am 30.09.2026 auf `master_SettingsAndLoading`, Etappe 3 am selben Tag auf `master_GoldStashVendor`)
 
 Ziel: die Spielstruktur steht.
 
@@ -1494,12 +1501,12 @@ M7 läuft in vier Etappen:
 |---|---|---|
 | 1 | Hauptmenü, Hub, Portale, mehrere Ebenen pro Kreis, Treppen, Checkpoints, Town-Portal | Umgesetzt |
 | 2 | Pausenmenü, Ladebildschirm, Einstellungen für Auflösung, Tasten und Lautstärke. UI über Anker statt Code, behebt A6. | Umgesetzt, liegt seit dem 30.09.2026 auf `master` |
-| 3 | Hub-Funktionen: Truhe und Händler. Dafür braucht es eine Währung. | Offen |
+| 3 | Hub-Funktionen: Truhe und Händler. Dafür braucht es eine Währung. | Umgesetzt am 30.09.2026 auf `master_GoldStashVendor` |
 | 4 | Platzhalter-Boss und Freischaltung des nächsten Kreises | Offen |
 
 Fertig, wenn man vom Hauptmenü in den Hub, in einen Kreis, zurück und wieder hinein kommt.
 
-Stand des Fertig-Kriteriums: erfüllt seit Etappe 1, geprüft im laufenden Spiel. Seit Etappe 2 führt das Pausenmenü auch zurück ins Hauptmenü, und jeder Ortswechsel zeigt einen Ladebildschirm. Es stehen die Etappen 3 und 4 aus.
+Stand des Fertig-Kriteriums: erfüllt seit Etappe 1, geprüft im laufenden Spiel. Seit Etappe 2 führt das Pausenmenü auch zurück ins Hauptmenü, und jeder Ortswechsel zeigt einen Ladebildschirm. Seit Etappe 3 stehen Truhe und Händler im Hub. Es steht Etappe 4 aus.
 
 #### Etappe 1: Struktur
 
@@ -1572,7 +1579,7 @@ So funktioniert die Reise:
 - Beim Aufbau einer Ebene spawnen zuerst alle Gegner, danach verschwinden die Gemerkten. So stehen die Übrigen bei jedem Besuch am selben Platz.
 - Damit das gilt, steht der Held beim Spawnen immer am Start der Ebene, und die Zufallsquelle bekommt direkt vor dem Spawnen ihren Seed. Erst danach rückt der Held an die Stelle seiner Ankunft.
 - `CircleDialog` liest den `DescentState` des Kreises und meldet die gewählte Ebene oder den Wunsch nach einem neuen Abstieg. Der `GameController` verbindet ihn mit `Descent`.
-- Der Spielstand hat Version 2. Unter `Journey` stehen die Kreise mit ihren Ebenen und das Town-Portal. Spielstände der Version 1 lädt das Spiel weiter.
+- Der Spielstand hat Version 2. Unter `Journey` stehen die Kreise mit ihren Ebenen und das Town-Portal. Spielstände der Version 1 lädt das Spiel weiter. Seit Etappe 3 hat er Version 3.
 - `SaveSlots` kennt die drei Plätze und den Ordner. Das Hauptmenü wählt den Platz, danach lädt `Scenes/game.tscn`.
 
 So entsteht ein neuer Kreis:
@@ -1655,6 +1662,8 @@ Bewusst offen gelassen:
 - Das Town-Portal und die Portale der Kreise tragen keinen Ton.
 
 Nachtrag vom 30.09.2026: Seit Etappe 2 wirkt `F6` nur im Debug-Build. Der Vorhang ist ein Ladebildschirm mit Mindestdauer, siehe "Etappe 2: Ladebildschirm und Reise". `T` und die übrigen Tasten lassen sich in den Einstellungen umbelegen, die Projekteinstellungen halten nur noch den Standard.
+
+Nachtrag vom 30.09.2026: Seit Etappe 3 stehen Truhe und Händler im Hub, siehe "Etappe 3: Gold, Truhe und Händler". Musik hat er weiter keine.
 
 #### Etappe 2: Pausenmenü
 
@@ -1829,7 +1838,7 @@ Von mir festgelegt, weil es sich aus dem Bau ergab:
 | Gruppe | `Hud/BottomHud`, 2560 breit und unten mittig. Der Lebens-Orb sitzt bei 25 %, der Mana-Orb bei 75 % der Breite. |
 | XP-Balken | 1229 x 38 mit `nine_patch_stretch` statt der Skalierung 0,6. Die Zahl beim Überfahren hat Schrift 28. |
 | Level-up-Knopf | Hängt direkt unter der Hud vor dem Todesbildschirm, unten mittig verankert bei -512 bis -384 und -352 bis -224. So steht er rechts oben am Lebens-Orb. |
-| Charakterbogen | Oben rechts, 918 x 1230, 30 Pixel vom Rand |
+| Charakterbogen | Oben rechts, 918 x 1230, 30 Pixel vom Rand. Seit Etappe 3 ist er mit der Zeile für das Gold 1267 hoch. |
 | Level-up-Dialog | Die Wurzel deckt die ganze Fläche und lässt die Maus durch. Das Panel sitzt bei 50 % der Breite und 62,5 % der Höhe. |
 | Tooltip | Steht über dem Element, ist dort kein Platz, darunter. Er bleibt an allen vier Rändern im Bild. |
 | Reihenfolge | Die Orbs haben kein `z_index` 10 mehr. Was über ihnen liegt, bestimmt die Reihenfolge der Knoten unter der Hud. |
@@ -2002,6 +2011,137 @@ Vier Reviews mit je drei Prüfern, jeden Befund haben drei Skeptiker gegengeprü
 | Hud und Grundlage der Einstellungen | Der Level-up-Knopf lag mit `z_index` 10 über dem Todesbildschirm. Ein geschlossener Charakterbogen fing Klicks ab. Die Titelleiste konnte aus dem Bild rutschen. Die Fenstergröße stand doppelt in der Datei. |
 | Einstellungsfenster und Ton | Im Hauptmenü wanderte der Fokus mit Tab auf Knöpfe hinter dem Fenster. Ein Schritt am Regler mit Tastatur oder Mausrad ging beim Beenden verloren. Das Speichern des Tons setzte ein verschobenes Fenster in die Mitte. Der Nachklang des Donners überstand die Reise. |
 | Anzeige und Tasten | `BindingRules.Resolve` verlor nach bestimmten Tauschen beim Laden eine Belegung. Alt+Tab belegte Alt. Eine umbelegte Leertaste drückte Knöpfe der Hud. Das Mausrad meldete beim Abfangen "M4 is reserved". Fine war bei 720 und 1200 Zeilen gleich Medium. Show FPS wirkte erst nach der Pause. Ein Frame Limit außerhalb der Liste erschien als Unlimited. |
+
+#### Etappe 3: Gold, Truhe und Händler
+
+Umgesetzt am 30.09.2026 auf `master_GoldStashVendor`.
+
+- Erledigt: Gold als Währung. Gegner lassen Münzhaufen fallen, der Held hebt sie beim Darüberlaufen auf.
+- Erledigt: Eine Truhe im Hub, je Charakter, mit 14 x 10 Feldern. Sie hält auch Gold.
+- Erledigt: Ein Händler im Hub mit Verbrauchsgütern, gewürfelter Ausrüstung und Rückkauf. Er kauft alles an, was einen Preis hat.
+- Zusätzlich: Beim Tod fällt das Gold, das der Held bei sich trägt. Der Todesbildschirm nennt den Betrag.
+- Zusätzlich: Strg+Linksklick lagert zwischen Inventar und Truhe um und verkauft beim Händler.
+- Zusätzlich: Fünf neue Tipps im Ladebildschirm.
+
+Getroffene Designentscheidungen vom 30.09.2026. Vor dem Bau hat ein Workflow den Code vermessen, danach hat der User drei Runden Fragen per Auswahl beantwortet.
+
+| Frage | Entscheidung |
+|---|---|
+| Währung | Gold als Zahl am Charakter, je Platz |
+| Quelle | Münzhaufen am Boden, automatisch aufgehoben beim Darüberlaufen. Dazu der Verkauf. |
+| Angebot des Händlers | Im Wortlaut: "Tab 1 Consumables, Tab 2 Gewürfelte und ausrüstbare Bases. von den bases darf nur jede 20ste ein bis zwei Random Affixe haben und jede 30ste ist rare(3+ Affixe)." |
+| Ankauf | Verkauf von allem mit Rückkauf, bis der Held den Hub verlässt |
+| Neuer Bestand | Im Wortlaut: "Beim erreichen einer neuen Ebene. Dann haben die items das ilvl des neuen Bereichslevels. AUßerdem auch bei Stufenaufstieg des Helden. Dann haben die items das ilvl des zuletzt freigeschalteten kreises/ebene." |
+| Truhe | Je Charakter |
+| Schnellweg | Strg+Linksklick lagert um oder verkauft. Der Rechtsklick bleibt, wie er ist. |
+| Händler | Eine stehende Figur als Platzhalter, nahe am Start bei den Feuerschalen |
+| Tod | Das Gold bleibt am Ort des Todes liegen und lässt sich zurückholen. Verlässt der Held die Ebene, ist es weg. Dazu im Wortlaut: "es wird nur das GOld fallengelassen, dass der Held bei sich hat. Man muss es auch in der Truhe ablegen können. Außerdem muss ein GOldhaufen visuell größer werden bis zu einem Limit. DIe Abstufungen sind visuell: 1 Münze bis 5Münzen lose aufeinander, ein bis drei kleine saubere stapel Münzen und als letzte Stufe fünf stapel münzen." |
+| Größe des Angebots | 20 Stück im gewürfelten Reiter, die Zahl ist ein Feld im Inspector. Gekauftes ist weg bis zum nächsten Würfeln. |
+| Bauweise | Alles in einem Zug |
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Chancen | "Jede 20ste" und "jede 30ste" sind Chancen je Stück: 1 zu 20 für Magic mit ein bis zwei Affixen, 1 zu 30 für Rare mit drei oder mehr, der Rest ist weiß |
+| Preis | Grundpreis je Item-Basis im Inspector. Magic kostet das Dreifache, Rare das Achtfache. Der Händler zahlt 25 % davon, abgerundet, mindestens 1 Gold. Ein Item ohne Grundpreis kauft er nicht. |
+| Vorläufige Preise | Training Sword 20, Short Bow 28, Wooden Staff 32, Gugel 16, Wool Gloves 14, Wooden Shield 22, Peasant Tunic 30, beide Tränke 12 |
+| Gold von Gegnern | Jeder Gegner trägt auf Monsterlevel 1 zwischen 1 und 4 Gold, je Level darüber 15 % mehr. Ein normaler Gegner lässt es mit 50 % fallen. Elite gibt immer das Dreifache, Rare Elite immer das Achtfache. |
+| Beschworene Gegner | Tragen kein Gold, sonst wäre ein Beschwörer eine Quelle ohne Ende. Beute und XP geben sie wie bisher. |
+| Zufall | Das Gold würfelt mit der gemeinsamen Zufallsquelle, nach der Beute. Der Bestand des Händlers würfelt mit einer eigenen Quelle, denn er steht im Spielstand und hängt nicht am Seed der Ebenen. |
+| Stufen des Haufens | Neun Stufen mit den Schwellen 1, 2, 3, 4, 5, 6, 20, 50 und 150 Gold: eine bis fünf lose Münzen, ein bis drei Stapel, fünf Stapel |
+| Haufen | Gold, das näher als 1,2 m an einem Haufen fällt, landet auf ihm. Haufen und Beutel liegen nie aufeinander. Frisch gefallenes Gold bleibt 0,35 s liegen, damit man es fallen sieht. Aufgehoben wird ab 1,1 m vom Körperrand des Helden. |
+| Tod | Ein toter Held hebt nichts auf. Das Gold in der Truhe ist sicher. Der Haufen steht nicht im Spielstand: Wer das Spiel beendet, verlässt die Ebene. |
+| Gold in der Truhe | Knöpfe zahlen 10, 100, 1.000 oder alles ein und aus. Beim Händler zählt nur das Gold, das der Held bei sich trägt. |
+| Händlerfenster | Drei Reiter: Consumables, Equipment und Buyback. Jedes Gitter hat 14 x 10 Felder, damit auch zwanzig große Stücke Platz finden. |
+| Kaufen | Ein Klick kauft und legt die Ware direkt ins Inventar, nie in die Hand. Mit Strg kauft ein Klick auf ein Verbrauchsgut einen ganzen Stapel. Fehlt Gold oder Platz, bleibt die Ware, und das Fenster nennt den Grund. |
+| Verkaufen | Strg+Klick im Inventar oder ein Klick mit dem Item an der Maus ins Händlerfenster. Ein Stapel geht als Ganzes. Ausgerüstetes geht nur über die Hand. |
+| Rückkauf | Kostet, was der Händler gezahlt hat. Ist das Gitter voll, weicht das älteste Stück. Er steht nicht im Spielstand. |
+| Fenster | Truhe und Händler liegen links neben dem Charakterbogen und öffnen ihn mit. Es ist immer nur eines von beiden offen. Sie schließen mit dem Bogen, beim Weglaufen und nach einer Reise. Sie halten das Spiel nicht an. |
+| Item an der Maus | Schließt ein Fenster, wandert es ins Inventar, bei der Truhe sonst in die Truhe. Es fällt dabei nicht zu Boden. |
+| Preis im Tooltip | Nur bei offenem Händler: Buy, Buy back und im Inventar Sell oder "Cannot be sold" |
+| Anzeige | Das Gold des Helden steht unter dem Inventar. Aufgehobenes Gold zeigt eine Zahl über dem Helden. |
+| Neuer Charakter | Beginnt mit 0 Gold. Der Händler hat von Anfang an einen Bestand mit dem Bereichslevel der ersten Ebene. |
+| Alter Spielstand | Lädt mit 0 Gold und leerer Truhe. Der erste Bestand hat das Bereichslevel der tiefsten erreichten Ebene. |
+| Spielstand | Version 3 |
+| Plätze im Hub | Die Truhe steht links vom Start bei (-3,5 / 9,5), der Händler neben der östlichen Feuerschale bei (5 / 7,5). Beide sind der Kamera zugewandt. |
+| Aussehen | Truhe, Händler und Münzen sind Platzhalter aus Grundkörpern. Unter der Maus leuchtet unter der Truhe eine Platte und unter dem Händler ein Ring. |
+
+So funktioniert es:
+
+- Der Kern liegt unter `Scripts/Core/Economy`: `Purse` ist Gold als Zahl mit dem Ereignis `Changed`, `GoldDropRule` rechnet das Gold eines Gegners, `CoinPileTiers` die Stufe eines Haufens, `PriceRule` die Preise. `Vendor` hält Waren, Bestand und Rückkauf als drei `InventoryGrid`. `Trade` wickelt Kauf, Verkauf und Rückkauf ab, jeder Handel ist ein Aufruf. `VendorStockRoller` würfelt den Bestand.
+- `CharacterItems` hat ein zweites Gitter `Stash`. `TakeFrom` und `PlaceHeldAt` nehmen ein Gitter, `Transfer` ist der schnelle Weg zwischen beiden, `ReturnHeld` und `StowHeld` legen das Item an der Maus ab, `Release` gibt ein Item beim Verkauf ab, `HasRoomFor` prüft den Platz vor einem Kauf. Ein fremdes Gitter lehnt das Modell ab.
+- `AffixRoller.RollAffixesFor` hat eine Fassung mit Mindest- und Höchstzahl. Der alte Weg würfelt unverändert, Beute bleibt bei gleichem Seed gleich.
+- `ItemDefinition.Price` kommt aus dem Feld `Price` der Item-Basis.
+- `Hero` trägt `Gold` und `StashGold`. `Die` leert `Gold` und legt den Haufen ab.
+- `CoinPile` mit der Szene `Scenes/Objects/coin_pile.tscn` hat unter `Tiers` je Stufe ein Kind. `DropAround` sucht den Platz über `Lootbag.FindFreeSpot`, dasselbe Gitter wie für Beutel. Der Haufen prüft in jedem Schritt der Physik den Abstand zum Helden.
+- `EnemyController.DropGold` läuft nach `SpawnLootbags`. `Descent.LeaveCurrent` räumt die Haufen mit den Beuteln ab.
+- `Fixture` unter `Scripts/Objects` ist die Grundlage von `StashChest` und `Merchant`: ein `IUsable` mit `Glow`, `UseRadius`, Schild und dem Ereignis `Used`. `GameController.ConnectFixtures` verbindet sie bei jedem `PlaceEntered` mit ihren Fenstern.
+- `VendorController` ist ein Knoten in `Scenes/game.tscn`. Er hält `Vendor` und `Trade`, würfelt bei `Descent.LevelReached` und `Hero.LeveledUp` neu und leert den Rückkauf bei jedem Ortswechsel.
+- `Descent.LevelReached` meldet das Bereichslevel, wenn der Held tiefer kommt als `DeepestDepth`. Ein neuer Abstieg behält die Checkpoints, dieselbe Ebene zählt also nur einmal.
+- `ItemGridView` mit der Szene `Scenes/UI/item_grid_view.tscn` zeigt ein beliebiges Gitter. Was ein Klick bewirkt, entscheidet das Fenster. `Inventory`, `StashWindow` und `VendorWindow` benutzen sie. Es gibt weiter nur ein `MouseObject`, es hängt am Inventar.
+- `StashWindow` und `VendorWindow` setzen `ISideWindow` um und hängen im Charakterbogen unter `Side`, einem `HBoxContainer`, der nach links wächst. `StatSpace` hält darin den Platz der Werteliste frei, solange sie offen ist. `CharacterSheet.Covers` kennt beide Fenster, ein Klick hinein lässt das Item an der Maus nicht fallen.
+- Im Spielstand stehen `CharacterSave.Gold` und `StashGold`, `SaveGame.Stash` und `SaveGame.Vendor` mit Itemlevel und Bestand samt Plätzen. `GameController` speichert nach jeder Änderung an Gold, Truhe und Händler.
+
+Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| Item-Basis | `Price` | je Basis | Grundpreis in Gold für ein Stück ohne Affixe. 0 heißt unverkäuflich |
+| Gegner-Resource | `GoldMin`, `GoldMax` | 1 und 4 | Gold auf Monsterlevel 1. 0 und 0 heißt, der Gegner trägt keins |
+| `EnemyController`, Gruppe Gold | `GoldChancePercent` | 50 | Chance bei normalen Gegnern |
+| `EnemyController`, Gruppe Gold | `GoldGrowthPerLevel` | 0,15 | Zuwachs je Monsterlevel über 1 |
+| `EnemyController`, Gruppen Elite und Rare Elite | `EliteGoldFactor`, `RareEliteGoldFactor` | 3 und 8 | Vielfaches des Betrags |
+| `Scenes/Objects/coin_pile.tscn` | `PickupRadius` | 110 | Reichweite zum Aufheben in Pixeln, ab dem Körperrand |
+| `Scenes/Objects/coin_pile.tscn` | `MergeRadius` | 120 | So nah an einem Haufen landet Gold auf ihm |
+| `Scenes/Objects/coin_pile.tscn` | `PickupDelaySec` | 0,35 | So lange bleibt frisch gefallenes Gold liegen |
+| `Scenes/Objects/coin_pile.tscn` | `TierThresholds` | 1, 2, 3, 4, 5, 6, 20, 50, 150 | Ab welchem Betrag welche Stufe zu sehen ist |
+| `VendorController`, Gruppe Bestand | `StockSize` | 20 | Stück im gewürfelten Reiter |
+| `VendorController`, Gruppe Bestand | `MagicOneIn`, `RareOneIn` | 20 und 30 | Jedes wievielte Stück Magic oder Rare ist. 0 schaltet es ab |
+| `VendorController`, Gruppe Preise | `MagicPriceFactor`, `RarePriceFactor` | 3 und 8 | Vielfaches des Grundpreises |
+| `VendorController`, Gruppe Preise | `SellSharePercent` | 25 | Anteil, den der Händler beim Ankauf zahlt |
+| `StashWindow` | `GoldSteps` | 10, 100, 1000 | Die Knöpfe zum Ein- und Auszahlen, dahinter steht immer einer für alles |
+| `VendorWindow` | `MessageSec` | 2,5 | So lange steht eine Meldung |
+| Truhe und Händler im Hub | `UseRadius`, `DisplayName`, `Hint`, `TagHeightMeters`, `TagColor` | je Szene | Reichweite und Schild |
+
+So kommt ein neues Objekt dieser Art in einen Ort:
+
+1. Eine Szene mit einem `Area3D` auf der Ebene Interactive anlegen und ein Skript anhängen, das von `Fixture` erbt.
+2. Hat das Objekt einen Körper auf der Ebene der Mauern, muss die Fläche zum Anklicken größer sein als er.
+3. Die Szene in den Ort hängen.
+4. In `GameController.ConnectFixtures` das Ereignis `Used` mit einem Fenster verbinden.
+
+So kommt eine neue Ware dazu: Eine Item-Basis mit `Price` über 0 anlegen. Ein Verbrauchsgut steht von selbst im ersten Reiter, eine ausrüstbare Basis kommt in den Topf des zweiten.
+
+Befunde:
+
+- Die Oberfläche des Inventars war fest an den Helden und an 14 x 5 Felder gebunden, die Regeln im Modell an genau ein Gitter. Beides ist verallgemeinert, die alten Tests zu `CharacterItems` laufen unverändert.
+- Zwanzig Stück passen im ungünstigsten Fall nicht in 14 x 8 Felder: Zwanzig Tuniken brauchen 120 Felder. Deshalb hat das Gitter des Händlers 14 x 10.
+- Der Charakterbogen ist mit der Zeile für das Gold 37 Pixel höher, 918 x 1267. Die Werteliste ist mitgewachsen.
+- Auf den ersten Bildern überdeckte die Truhe die westliche Feuerschale, weil die Kamera diagonal blickt. Sie steht jetzt frei links vom Start.
+- Ein Gitter, das ohne Ereignis gefüllt wurde, zeigte seine Items erst nach der nächsten Änderung. Truhe und Händler zeichnen deshalb beim Öffnen neu.
+- Bei 225 Bildzeilen sind eine bis fünf lose Münzen nur wenige Pixel groß. Die Stufen unterscheiden sich vor allem in der Größe des Haufens.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Unit-Tests | 158 neue für Geldbeutel, Gold von Gegnern, Stufen des Haufens, Preise, Handel, Bestand, Truhe im Modell und Spielstand. Zusammen 1002. |
+| Laufendes Spiel, headless | 115 Schritte in drei Läufen: spielen mit 105 Schritten, Neustart mit 4, ein Spielstand der Version 2 mit 6 |
+| Bilder mit Fenster | Hub mit Truhe und Händler, alle neun Stufen des Haufens, Truhe, Truhe neben der Werteliste, die drei Reiter des Händlers, Preis im Inventar, Münzen in einer Ebene |
+
+Bewusst offen gelassen:
+
+- Alle Beträge und Preise sind geschätzt, der Balance-Durchgang steht in M8. Ein neuer Abstieg stellt alle Gegner wieder auf, Gold lässt sich also beliebig sammeln.
+- Der Haufen am Ort des Todes steht nicht im Spielstand.
+- Items, die im Hub am Boden liegen, verfallen weiter beim Verlassen.
+- Gold, Truhe und Händler haben keinen Ton, der Hub hat weiter keine Musik. Beides gehört zu M8.
+- Münzhaufen tragen kein Schild.
+- Das Gold steht nur unter dem Inventar, nicht dauerhaft in der Hud, und das Hauptmenü zeigt es nicht.
+- Stapel lassen sich nicht teilen.
+- Ein älterer Build legt einen Spielstand der Version 3 als `.broken` zur Seite. Die Datei lässt sich zurückbenennen.
+- Die Hervorhebung unter der Maus leuchtet auch unter einem offenen Fenster, wie schon bei den Portalen.
+- Ein unabhängiges Review mit Prüfern und Skeptikern wie in Etappe 2 steht aus. Der erste Anlauf für den Kern brach an der Nutzungsgrenze der Sitzung ab und lieferte kein Ergebnis.
 
 ### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L)
 

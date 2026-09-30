@@ -11,6 +11,7 @@ internal static class TestItems
         Width        = 1,
         Height       = 3,
         Guard        = new GuardStats(MeleeParry: 5),
+        Price        = 20,
         Requirements = new Dictionary<Requirement, int> { [Requirement.Strength] = 2 }
     };
 
@@ -18,7 +19,8 @@ internal static class TestItems
     {
         Width  = 1,
         Height = 4,
-        Guard  = new GuardStats(10, 5)
+        Guard  = new GuardStats(10, 5),
+        Price  = 24
     };
 
     public static readonly ItemDefinition Bow = ItemDefinition.ForWeapon("bow",
@@ -39,16 +41,18 @@ internal static class TestItems
     {
         Width  = 2,
         Height = 2,
-        Guard  = new GuardStats(15, 8)
+        Guard  = new GuardStats(15, 8),
+        Price  = 16
     };
 
     public static readonly ItemDefinition Helmet = ItemDefinition.ForArmor("helmet", "Helmet", ItemSlot.Helmet, 10) with
     {
         Width  = 2,
-        Height = 2
+        Height = 2,
+        Price  = 12
     };
 
-    public static readonly ItemDefinition Potion = ItemDefinition.ForConsumable("potion", "Potion", new ConsumableEffect(ConsumableEffectKind.RestoreLife, 20), 5);
+    public static readonly ItemDefinition Potion = ItemDefinition.ForConsumable("potion", "Potion", new ConsumableEffect(ConsumableEffectKind.RestoreLife, 20), 5) with { Price = 10 };
 
     public static readonly ItemDefinition Pebble = ItemDefinition.ForArmor("pebble", "Pebble", ItemSlot.Neck, 0);
 

@@ -8,6 +8,8 @@
 [ext_resource type="Texture2D" uid="uid://bvrchl6rqwbnk" path="res://Textures/UI/Buttons/Mini_arrow_left2_t.png" id="6_nfwpk"]
 [ext_resource type="Script" uid="uid://f2ew6yv6qad" path="res://Scripts/UI/Buttons/StatdisplayButton.cs" id="7_gx1ge"]
 [ext_resource type="PackedScene" uid="uid://bmjbmby5mg4jb" path="res://Scenes/UI/Character/level_display.tscn" id="8_nfwpk"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/stash_window.tscn" id="9_stash"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/vendor_window.tscn" id="10_vendor"]
 
 [node name="CharacterSheet" type="Control" unique_id=325839181 node_paths=PackedStringArray("equipmentPanel", "inventory")]
 layout_mode = 3
@@ -17,15 +19,38 @@ anchor_right = 1.0
 offset_left = -948.0
 offset_top = 30.0
 offset_right = -30.0
-offset_bottom = 1260.0
+offset_bottom = 1297.0
 grow_horizontal = 0
 mouse_filter = 2
 script = ExtResource("1_kqng3")
 equipmentPanel = NodePath("HBoxContainer/EquipmentPanel")
 inventory = NodePath("HBoxContainer/Inventory")
 
+[node name="Side" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = -8.0
+offset_right = -8.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="VendorWindow" parent="Side" instance=ExtResource("10_vendor")]
+visible = false
+layout_mode = 2
+
+[node name="StashWindow" parent="Side" instance=ExtResource("9_stash")]
+visible = false
+layout_mode = 2
+
+[node name="StatSpace" type="Control" parent="Side"]
+visible = false
+custom_minimum_size = Vector2(436, 0)
+layout_mode = 2
+mouse_filter = 2
+
 [node name="Statdisplay" parent="." unique_id=322490862 node_paths=PackedStringArray("equipmentPanel") instance=ExtResource("4_dwqj4")]
 visible = false
+custom_minimum_size = Vector2(450, 1267)
 layout_mode = 0
 offset_left = -444.0
 offset_right = 6.0
