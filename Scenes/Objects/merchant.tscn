@@ -1,0 +1,204 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Objects/Merchant.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="2_ps1"]
+[ext_resource type="Texture2D" path="res://Textures/World/cloth_weave.png" id="3_cloth"]
+[ext_resource type="Texture2D" path="res://Textures/World/skin_speckled.png" id="4_leather"]
+
+[sub_resource type="CapsuleShape3D" id="Shape_pick"]
+radius = 0.75
+height = 2.5
+
+[sub_resource type="CapsuleShape3D" id="Shape_body"]
+radius = 0.42
+height = 1.9
+
+[sub_resource type="CylinderMesh" id="Mesh_robe"]
+top_radius = 0.24
+bottom_radius = 0.46
+height = 1.35
+radial_segments = 8
+rings = 2
+
+[sub_resource type="BoxMesh" id="Mesh_shoulders"]
+size = Vector3(0.72, 0.18, 0.36)
+
+[sub_resource type="BoxMesh" id="Mesh_arm"]
+size = Vector3(0.14, 0.58, 0.14)
+
+[sub_resource type="SphereMesh" id="Mesh_head"]
+radius = 0.19
+height = 0.38
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="Mesh_brim"]
+top_radius = 0.4
+bottom_radius = 0.42
+height = 0.05
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="Mesh_crown"]
+top_radius = 0.04
+bottom_radius = 0.24
+height = 0.36
+radial_segments = 8
+rings = 1
+
+[sub_resource type="BoxMesh" id="Mesh_pack"]
+size = Vector3(0.52, 0.62, 0.3)
+
+[sub_resource type="CylinderMesh" id="Mesh_roll"]
+top_radius = 0.13
+bottom_radius = 0.13
+height = 0.62
+radial_segments = 8
+rings = 1
+
+[sub_resource type="BoxMesh" id="Mesh_lantern"]
+size = Vector3(0.14, 0.2, 0.14)
+
+[sub_resource type="CylinderMesh" id="Mesh_ring"]
+top_radius = 0.8
+bottom_radius = 0.8
+height = 0.03
+radial_segments = 12
+rings = 1
+
+[sub_resource type="ShaderMaterial" id="Mat_robe"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.36, 0.13, 0.1, 1)
+shader_parameter/albedo_texture = ExtResource("3_cloth")
+shader_parameter/uv_scale = Vector2(3, 3)
+
+[sub_resource type="ShaderMaterial" id="Mat_cloth"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.22, 0.14, 0.12, 1)
+shader_parameter/albedo_texture = ExtResource("3_cloth")
+shader_parameter/uv_scale = Vector2(3, 3)
+
+[sub_resource type="ShaderMaterial" id="Mat_skin"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.78, 0.6, 0.48, 1)
+
+[sub_resource type="ShaderMaterial" id="Mat_leather"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.3, 0.17, 0.09, 1)
+shader_parameter/albedo_texture = ExtResource("4_leather")
+shader_parameter/uv_scale = Vector2(2, 2)
+
+[sub_resource type="ShaderMaterial" id="Mat_roll"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.45, 0.4, 0.3, 1)
+shader_parameter/albedo_texture = ExtResource("3_cloth")
+shader_parameter/uv_scale = Vector2(2, 2)
+
+[sub_resource type="ShaderMaterial" id="Mat_lantern"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.2, 0.12, 0.04, 1)
+shader_parameter/emission = Color(1, 0.7, 0.3, 1)
+shader_parameter/emission_energy = 3.0
+
+[sub_resource type="ShaderMaterial" id="Mat_ring"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/emission = Color(1, 0.8, 0.45, 1)
+shader_parameter/emission_energy = 5.0
+
+[node name="Merchant" type="Area3D" node_paths=PackedStringArray("Glow")]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_script")
+Glow = NodePath("Glow")
+UseRadius = 220.0
+DisplayName = "Merchant"
+Hint = "Buys and sells"
+TagHeightMeters = 2.35
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+shape = SubResource("Shape_pick")
+
+[node name="Body" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Body"]
+shape = SubResource("Shape_body")
+debug_fill = false
+
+[node name="Figure" type="Node3D" parent="."]
+
+[node name="Robe" type="MeshInstance3D" parent="Figure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.675, 0)
+mesh = SubResource("Mesh_robe")
+surface_material_override/0 = SubResource("Mat_robe")
+
+[node name="Shoulders" type="MeshInstance3D" parent="Figure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.41, 0)
+mesh = SubResource("Mesh_shoulders")
+surface_material_override/0 = SubResource("Mat_cloth")
+
+[node name="ArmLeft" type="MeshInstance3D" parent="Figure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 1.13, 0.04)
+mesh = SubResource("Mesh_arm")
+surface_material_override/0 = SubResource("Mat_cloth")
+
+[node name="ArmRight" type="MeshInstance3D" parent="Figure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 1.13, 0.04)
+mesh = SubResource("Mesh_arm")
+surface_material_override/0 = SubResource("Mat_cloth")
+
+[node name="Head" type="MeshInstance3D" parent="Figure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.67, 0)
+mesh = SubResource("Mesh_head")
+surface_material_override/0 = SubResource("Mat_skin")
+
+[node name="Brim" type="MeshInstance3D" parent="Figure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+mesh = SubResource("Mesh_brim")
+surface_material_override/0 = SubResource("Mat_cloth")
+
+[node name="Crown" type="MeshInstance3D" parent="Figure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+mesh = SubResource("Mesh_crown")
+surface_material_override/0 = SubResource("Mat_cloth")
+
+[node name="Pack" type="MeshInstance3D" parent="Figure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, -0.36)
+mesh = SubResource("Mesh_pack")
+surface_material_override/0 = SubResource("Mat_leather")
+
+[node name="Bedroll" type="MeshInstance3D" parent="Figure"]
+transform = Transform3D(6.12323e-17, -1, 0, 1, 6.12323e-17, 0, 0, 0, 1, 0, 1.47, -0.36)
+mesh = SubResource("Mesh_roll")
+surface_material_override/0 = SubResource("Mat_roll")
+
+[node name="Lantern" type="MeshInstance3D" parent="Figure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.42, 0.74, 0.16)
+cast_shadow = 0
+mesh = SubResource("Mesh_lantern")
+surface_material_override/0 = SubResource("Mat_lantern")
+
+[node name="LanternLight" type="OmniLight3D" parent="Figure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.42, 0.9, 0.4)
+light_color = Color(1, 0.7, 0.35, 1)
+light_energy = 1.5
+omni_range = 4.5
+
+[node name="Glow" type="Node3D" parent="."]
+
+[node name="Ring" type="MeshInstance3D" parent="Glow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_ring")
+surface_material_override/0 = SubResource("Mat_ring")
+
+[node name="Light" type="OmniLight3D" parent="Glow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0.9)
+light_color = Color(1, 0.8, 0.45, 1)
+light_energy = 2.5
+omni_range = 4.0

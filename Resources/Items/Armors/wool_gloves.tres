@@ -13,6 +13,7 @@ Id = "wool_gloves"
 DisplayName = "Wool Gloves"
 Icon = ExtResource("2_icon")
 SlotSize = Vector2i(2, 2)
+Price = 14
 Requirements = Dictionary[int, int]({
 5: 1
 })

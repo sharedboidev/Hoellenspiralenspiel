@@ -28,6 +28,9 @@ public sealed record ItemDefinition
     public int Height       { get; init; } = 1;
     public int MaxStackSize { get; init; } = 1;
 
+    //Grundpreis beim Händler für ein Stück ohne Affixe. 0 heißt unverkäuflich
+    public int Price { get; init; }
+
     public IReadOnlyDictionary<Requirement, int> Requirements { get; init; } = NoRequirements;
 
     public WeaponStats      Weapon     { get; private init; }

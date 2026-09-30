@@ -111,6 +111,8 @@ public partial class Enemy : BaseUnit
 
     public int LootRolls => look.LootRolls;
 
+    public float GoldFactor => look.GoldFactor;
+
     public string LootTableId => Definition?.LootTableId;
 
     public string DisplayName => Definition?.NameOrId ?? Name;

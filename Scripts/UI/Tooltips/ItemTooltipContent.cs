@@ -14,14 +14,17 @@ public sealed class ItemTooltipContent : ITooltipObject
     private const string AffixColor = "dodger_blue";
     private const string RareColor  = "yellow";
     private const string UnmetColor = "firebrick";
+    private const string PriceColor = "gold";
 
     private readonly ItemInstance               item;
+    private readonly string                     priceNote;
     private readonly IReadOnlyList<Requirement> unmetRequirements;
 
-    public ItemTooltipContent(ItemInstance item, IReadOnlyList<Requirement> unmetRequirements)
+    public ItemTooltipContent(ItemInstance item, IReadOnlyList<Requirement> unmetRequirements, string priceNote = null)
     {
         this.item              = item;
         this.unmetRequirements = unmetRequirements ?? [];
+        this.priceNote         = priceNote;
     }
 
     public string GetTooltipTitle()
@@ -56,6 +59,9 @@ public sealed class ItemTooltipContent : ITooltipObject
         AppendGuard(text);
         AppendRequirements(text);
         AppendAffixes(text);
+
+        if (!string.IsNullOrEmpty(priceNote))
+            text.AppendLine($"[color={PriceColor}]{priceNote}[/color]");
 
         return text.Append("[/center]").ToString();
     }

@@ -1,50 +1,48 @@
-using System.Collections.Generic;
-using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Scripts.Core.Items;
-using Hoellenspiralenspiel.Scripts.UI.Tooltips;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Character;
 
 public partial class Inventory : PanelContainer
 {
-    private readonly PackedScene                             itemScene = GD.Load<PackedScene>("res://Scenes/UI/inventory_item.tscn");
-    private readonly Dictionary<ItemInstance, InventoryItem> itemViews = new();
-    private          InventoryItem                           hoveredView;
-    private          GridContainer                           itemGrid;
-    private          CharacterItems                          items;
-    private          MouseObject                             mouseObject;
-    private          Control                                 overlay;
-    private          IHero                                   player;
-    private          CharacterSheet                          sheet;
-    private          Vector2                                 slotSize;
-    private          BaseTooltip                             tooltip;
+    private Label          goldLabel;
+    private ItemGridView   gridView;
+    private CharacterItems items;
+    private MouseObject    mouseObject;
+    private IHero          player;
+    private CharacterSheet sheet;
 
-    [Export]
-    public PackedScene SlotScene { get; set; }
-
-    private BaseTooltip Tooltip => tooltip ??= GetTree().CurrentScene.GetNode<ItemTooltip>("%" + nameof(ItemTooltip));
+    public ItemGridView GridView => gridView;
 
     public void Bind(IHero owner)
     {
         player      = owner;
         items       = owner.Items;
-        itemGrid    = GetNode<GridContainer>("%ItemGrid");
-        overlay     = GetNode<Control>("MarginContainer/OverlayLayer");
+        gridView    = GetNode<ItemGridView>("%GridView");
+        goldLabel   = GetNode<Label>("%GoldLabel");
         mouseObject = GetNode<MouseObject>(nameof(MouseObject));
 
-        BuildSlots();
+        gridView.Bind(items.Inventory, items);
 
-        items.Changed += Refresh;
+        gridView.PriceNote   =  item => FindSheet()?.GetPriceNote(item);
+        gridView.ItemClicked += OnItemClicked;
+        gridView.SlotClicked += cell => items.PlaceHeldAt(cell);
+
+        items.Changed       += Refresh;
+        player.Gold.Changed += ShowGold;
 
         Refresh();
+        ShowGold();
     }
 
     public override void _ExitTree()
     {
-        if (items is not null)
-            items.Changed -= Refresh;
+        if (items is null)
+            return;
+
+        items.Changed       -= Refresh;
+        player.Gold.Changed -= ShowGold;
     }
 
     public override void _Input(InputEvent @event)
@@ -71,91 +69,29 @@ public partial class Inventory : PanelContainer
         return sheet;
     }
 
-    private void BuildSlots()
-    {
-        itemGrid.Columns = items.Inventory.Width;
-
-        for (var y = 0; y < items.Inventory.Height; y++)
-        {
-            for (var x = 0; x < items.Inventory.Width; x++)
-            {
-                var slot = SlotScene.Instantiate<InventorySlot>();
-
-                slot.Cell    =  new GridCell(x, y);
-                slot.Clicked += OnSlotClicked;
-
-                itemGrid.AddChild(slot);
-
-                slotSize = slot.CustomMinimumSize;
-            }
-        }
-    }
-
     private void Refresh()
     {
-        foreach (var (item, view) in itemViews.ToArray())
-        {
-            if (!items.Inventory.Contains(item))
-                RemoveView(item, view);
-        }
-
-        foreach (var item in items.Inventory.GetItemsInReadingOrder())
-        {
-            if (!itemViews.TryGetValue(item, out var view))
-                view = AddView(item);
-
-            view.ShowAt(items.Inventory.GetPositionOf(item));
-        }
+        gridView.Refresh();
 
         mouseObject.ShowItem(items.HeldItem);
-
-        if (hoveredView is not null)
-            Tooltip.Show(hoveredView);
     }
 
-    private InventoryItem AddView(ItemInstance item)
+    private void ShowGold()
+        => goldLabel.Text = $"{player.Gold.Amount:N0} Gold";
+
+    private void OnItemClicked(InventoryItem view, InputEventMouseButton click)
     {
-        var view = itemScene.Instantiate<InventoryItem>();
-
-        view.Init(item, items, slotSize);
-
-        view.Clicked      += OnItemClicked;
-        view.HoverChanged += OnHoverChanged;
-
-        itemViews[item] = view;
-
-        overlay.AddChild(view);
-
-        return view;
-    }
-
-    private void RemoveView(ItemInstance item, InventoryItem view)
-    {
-        itemViews.Remove(item);
-
-        if (hoveredView == view)
+        switch (click.ButtonIndex)
         {
-            hoveredView = null;
-
-            Tooltip.Hide();
-        }
-
-        view.QueueFree();
-    }
-
-    private void OnSlotClicked(InventorySlot slot)
-        => items.PlaceHeldAt(slot.Cell);
-
-    private void OnItemClicked(InventoryItem view, MouseButton button, Vector2 localPosition)
-    {
-        switch (button)
-        {
+            //Mit Strg wandert das Item in die offene Truhe oder zum offenen Händler
+            case MouseButton.Left when items.HeldItem is null && click.CtrlPressed && FindSheet()?.OfferQuick(view.Item) == true:
+                break;
             case MouseButton.Left when items.HeldItem is null:
                 items.TakeFromInventory(view.Item);
 
                 break;
             case MouseButton.Left:
-                items.PlaceHeldAt(view.GetCellAt(items.Inventory.GetPositionOf(view.Item), localPosition));
+                items.PlaceHeldAt(gridView.GetCellAt(view, click.Position));
 
                 break;
             case MouseButton.Right when view.Item.Definition.Consumable is not null:
@@ -166,22 +102,6 @@ public partial class Inventory : PanelContainer
                 items.EquipFromInventory(view.Item);
 
                 break;
-        }
-    }
-
-    private void OnHoverChanged(InventoryItem view, bool isHovered)
-    {
-        if (isHovered)
-        {
-            hoveredView = view;
-
-            Tooltip.Show(view);
-        }
-        else if (hoveredView == view)
-        {
-            hoveredView = null;
-
-            Tooltip.Hide();
         }
     }
 }

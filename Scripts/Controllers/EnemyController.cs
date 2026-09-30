@@ -4,6 +4,7 @@ using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Resources.Enemies;
 using Hoellenspiralenspiel.Resources.MonsterMods;
+using Hoellenspiralenspiel.Scripts.Core.Economy;
 using Hoellenspiralenspiel.Scripts.Core.Enemies;
 using Hoellenspiralenspiel.Scripts.Core.Levels;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
@@ -74,6 +75,9 @@ public partial class EnemyController : Node
     [Export]
     public Color EliteNameColor { get; set; } = new(0.45f, 0.68f, 1f);
 
+    [Export]
+    public float EliteGoldFactor { get; set; } = 3f;
+
     [ExportGroup("Rare Elite")]
     [Export(PropertyHint.Range, "0,100,0.1")]
     public float RareEliteChancePercent { get; set; } = 4f;
@@ -89,6 +93,18 @@ public partial class EnemyController : Node
 
     [Export]
     public Color RareEliteNameColor { get; set; } = new(1f, 0.82f, 0.25f);
+
+    [Export]
+    public float RareEliteGoldFactor { get; set; } = 8f;
+
+    [ExportGroup("Gold")]
+    //Elite und Rare Elite lassen immer Gold fallen
+    [Export(PropertyHint.Range, "0,100,0.1")]
+    public float GoldChancePercent { get; set; } = 50f;
+
+    //Jedes Monsterlevel über 1 hebt den Betrag um diesen Anteil
+    [Export(PropertyHint.Range, "0,1,0.01,or_greater")]
+    public float GoldGrowthPerLevel { get; set; } = 0.15f;
 
     [ExportGroup("Sicht")]
     //Gegner zeigen sich bis zu diesem Vielfachen des Lichtradius. 0 hebt die Grenze auf
@@ -388,8 +404,8 @@ public partial class EnemyController : Node
     private EnemyRarityLook GetLookOf(EnemyRarity rarity)
         => rarity switch
         {
-            EnemyRarity.Elite     => new EnemyRarityLook(EliteScale, EliteXpFactor, EliteLootRolls, EliteNameColor),
-            EnemyRarity.RareElite => new EnemyRarityLook(RareEliteScale, RareEliteXpFactor, RareEliteLootRolls, RareEliteNameColor),
+            EnemyRarity.Elite     => new EnemyRarityLook(EliteScale, EliteXpFactor, EliteLootRolls, EliteNameColor, EliteGoldFactor),
+            EnemyRarity.RareElite => new EnemyRarityLook(RareEliteScale, RareEliteXpFactor, RareEliteLootRolls, RareEliteNameColor, RareEliteGoldFactor),
             _                     => EnemyRarityLook.Normal
         };
 
@@ -408,6 +424,20 @@ public partial class EnemyController : Node
 
         //Died feuert genau einmal pro Gegner, daher entsteht der Loot hier und nicht bei jeder Lebensänderung
         SpawnLootbags(enemy);
+        DropGold(enemy);
+    }
+
+    //Beschworene Gegner tragen kein Gold, sonst wäre ein Beschwörer eine Quelle ohne Ende
+    private void DropGold(Enemy enemy)
+    {
+        if (enemy.SpawnIndex < 0 || enemy.Definition is null)
+            return;
+
+        var chance = enemy.Rarity == EnemyRarity.Normal ? GoldChancePercent : 100f;
+        var amount = GoldDropRule.Roll(enemy.Definition.GoldMin, enemy.Definition.GoldMax, enemy.Level, GoldGrowthPerLevel, enemy.GoldFactor, chance, GameRandom.Shared);
+
+        if (amount > 0)
+            CoinPile.DropAround(Hero.GetParent<Node3D>(), enemy.GlobalPosition, amount, Hero);
     }
 
     private void CallGroupToArms(Enemy caller)

@@ -7,6 +7,7 @@ using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Resources.Items;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Economy;
 using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Core.Progression;
 using Hoellenspiralenspiel.Scripts.Core.Saving;
@@ -88,6 +89,10 @@ public partial class Hero
 
     public CharacterItems Items { get; }
 
+    public Purse Gold { get; } = new();
+
+    public Purse StashGold { get; } = new();
+
     public string CharacterName { get; set; } = string.Empty;
 
     public SkillLoadout Loadout { get; } = new(InputActions.SkillSlots.Length);
@@ -102,6 +107,8 @@ public partial class Hero
     public int  AttributePoints     => progress.AttributePoints;
 
     public long LastXpLoss { get; private set; }
+
+    public int LastGoldLoss { get; private set; }
 
     public WornItems WornItems => wornItems;
 
@@ -959,10 +966,21 @@ public partial class Hero
 
         LastXpLoss = progress.LoseForDeath();
 
+        DropCarriedGold();
+
         if (Visual is not null)
             Visual.RotationDegrees = new Vector3(90, Visual.RotationDegrees.Y, 0);
 
         RaiseDied();
+    }
+
+    //Was der Held bei sich trägt, bleibt am Ort seines Todes liegen. Das Gold in der Truhe ist sicher
+    private void DropCarriedGold()
+    {
+        LastGoldLoss = Gold.TakeAll();
+
+        if (LastGoldLoss > 0 && IsInsideTree())
+            CoinPile.DropAround(GetParent<Node3D>(), GlobalPosition, LastGoldLoss, this);
     }
 
     public void Respawn()
@@ -1017,6 +1035,8 @@ public partial class Hero
             Level           = progress.Level,
             XpTotal         = progress.XpTotal,
             AttributePoints = progress.AttributePoints,
+            Gold            = Gold.Amount,
+            StashGold       = StashGold.Amount,
             Strength        = (int)Stats.GetBase(CombatStat.Strength),
             Dexterity       = (int)Stats.GetBase(CombatStat.Dexterity),
             Intelligence    = (int)Stats.GetBase(CombatStat.Intelligence),
@@ -1029,6 +1049,9 @@ public partial class Hero
         CharacterName = CharacterNames.Clean(save.Name);
 
         progress.Restore(save.Level, save.XpTotal, save.AttributePoints);
+
+        Gold.Restore(save.Gold);
+        StashGold.Restore(save.StashGold);
 
         Stats.Update(sheet =>
         {

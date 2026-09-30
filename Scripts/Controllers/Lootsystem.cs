@@ -24,11 +24,15 @@ public partial class Lootsystem : Node
     [Export]
     public string AffixesPath { get; set; } = "res://Resources/Affixes";
 
+    //Auch der Händler würfelt seine Ware mit diesen Affixen
+    public AffixRoller AffixRoller { get; private set; }
+
     public override void _Ready()
     {
         LoadTables();
 
-        roller = new LootRoller(ItemLibrary.Catalog, new AffixRoller(LoadAffixes(), MaximumAffixesPerItem));
+        AffixRoller = new AffixRoller(LoadAffixes(), MaximumAffixesPerItem);
+        roller      = new LootRoller(ItemLibrary.Catalog, AffixRoller);
     }
 
     public IReadOnlyList<ItemInstance> GenerateLoot(Enemy enemy)

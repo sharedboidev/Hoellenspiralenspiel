@@ -102,6 +102,10 @@ public partial class Lootbag
 
     //Der Beutel landet auf dem nächsten freien Punkt eines Gitters um die Mitte, nie auf einem anderen Beutel
     public static Lootbag DropAround(Node3D parent, Vector3 center, float minDistancePx, ItemInstance item, CharacterItems collector)
+        => Drop(parent, FindFreeSpot(parent, center, minDistancePx), item, collector);
+
+    //Auch Münzhaufen suchen sich hier ihren Platz, damit Beutel und Gold nie aufeinander liegen
+    public static Vector3 FindFreeSpot(Node3D parent, Vector3 center, float minDistancePx)
     {
         var onGround = WorldScale.OnGround(center);
         var space    = parent.GetWorld3D().DirectSpaceState;
@@ -113,18 +117,24 @@ public partial class Lootbag
                            spot => IsFree(ToWorld(spot), onGround, space),
                            out var found);
 
-        return Drop(parent, ToWorld(found), item, collector);
+        return ToWorld(found);
     }
 
     private static Vector3 ToWorld(Spot spot)
         => new(WorldScale.ToMeters(spot.X), 0f, WorldScale.ToMeters(spot.Y));
 
-    //Frei ist ein Punkt ohne Beutel in der Nähe, den man von der Mitte aus sieht. Hinter einer Mauer käme niemand mehr an das Item
+    //Frei ist ein Punkt ohne Beutel und ohne Gold in der Nähe, den man von der Mitte aus sieht. Hinter einer Mauer käme niemand mehr an das Item
     private static bool IsFree(Vector3 point, Vector3 center, PhysicsDirectSpaceState3D space)
     {
         foreach (var lootbag in LyingBags)
         {
             if (!lootbag.IsQueuedForDeletion() && WorldScale.GroundDistancePx(lootbag.GlobalPosition, point) < FreeDistancePx)
+                return false;
+        }
+
+        foreach (var pile in CoinPile.Lying)
+        {
+            if (!pile.IsQueuedForDeletion() && WorldScale.GroundDistancePx(pile.GlobalPosition, point) < FreeDistancePx)
                 return false;
         }
 

@@ -8,6 +8,8 @@
 [ext_resource type="Texture2D" path="res://Textures/World/wall_brick.png" id="6_brick"]
 [ext_resource type="PackedScene" path="res://Scenes/Objects/circle_portal.tscn" id="7_portal"]
 [ext_resource type="Texture2D" path="res://Textures/World/floor_stone.png" id="8_floor"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/stash_chest.tscn" id="9_chest"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/merchant.tscn" id="10_merchant"]
 
 [sub_resource type="BoxShape3D" id="Shape_floor"]
 size = Vector3(40, 1, 26)
@@ -202,6 +204,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 light_color = Color(1, 0.55, 0.3, 1)
 light_energy = 4.0
 omni_range = 13.0
+
+[node name="Fixtures" type="Node3D" parent="."]
+
+[node name="StashChest" parent="Fixtures" instance=ExtResource("9_chest")]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -3.5, 0, 9.5)
+
+[node name="Merchant" parent="Fixtures" instance=ExtResource("10_merchant")]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 5, 0, 7.5)
 
 [node name="HeroStart" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)

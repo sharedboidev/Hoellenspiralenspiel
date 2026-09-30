@@ -29,6 +29,13 @@ public partial class EnemyResource : Resource
     [Export]
     public int Xp { get; set; } = 100;
 
+    //Gold auf Monsterlevel 1, vor den Aufschlägen für Level und Seltenheit. 0 und 0 heißt, der Gegner trägt kein Gold
+    [Export]
+    public int GoldMin { get; set; } = 1;
+
+    [Export]
+    public int GoldMax { get; set; } = 4;
+
     [Export]
     public string LootTableId { get; set; } = string.Empty;
 
