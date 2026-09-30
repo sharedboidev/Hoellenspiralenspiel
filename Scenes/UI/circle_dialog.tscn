@@ -76,6 +76,7 @@ theme_override_constants/separation = 16
 alignment = 1
 
 [node name="NewDescentButton" type="Button" parent="CenterContainer/Panel/Margin/Rows/Buttons"]
+focus_mode = 0
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 60)
 layout_mode = 2
@@ -83,6 +84,7 @@ theme_override_font_sizes/font_size = 26
 text = "New Descent"
 
 [node name="CloseButton" type="Button" parent="CenterContainer/Panel/Margin/Rows/Buttons"]
+focus_mode = 0
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 60)
 layout_mode = 2

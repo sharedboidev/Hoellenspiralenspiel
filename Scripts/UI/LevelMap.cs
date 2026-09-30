@@ -81,7 +81,7 @@ public partial class LevelMap : Control, IClosableWindow
 
     public override void _UnhandledKeyInput(InputEvent @event)
     {
-        if (@event is InputEventKey { Pressed: true, Echo: false, Keycode: Key.F5 })
+        if (OS.IsDebugBuild() && @event is InputEventKey { Pressed: true, Echo: false, Keycode: Key.F5 })
             ToggleShowsEverything();
     }
 

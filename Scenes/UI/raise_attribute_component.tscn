@@ -29,6 +29,7 @@ theme_override_constants/margin_bottom = 5
 layout_mode = 2
 
 [node name="RaiseAttributeButton" type="TextureButton" parent="MarginContainer/VBoxContainer" unique_id=1885311527]
+focus_mode = 0
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 texture_normal = ExtResource("1_0y025")

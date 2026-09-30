@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://bkggweg84ei0q" path="res://Textures/UI/Buttons/double_border.png" id="3_raysm"]
 
 [node name="OpenLevelUpDialogButton" type="TextureButton" unique_id=328365873]
+focus_mode = 0
 custom_minimum_size = Vector2(128, 128)
 offset_right = 40.0
 offset_bottom = 40.0

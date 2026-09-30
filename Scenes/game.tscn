@@ -114,13 +114,14 @@ extra_cull_margin = 16384.0
 mesh = SubResource("Mesh_unit_outline")
 material_override = SubResource("Mat_unit_outline")
 
-[node name="Ps1Look" type="Node" parent="." node_paths=PackedStringArray("Screen", "World", "UnitOutline")]
+[node name="Ps1Look" type="Node" parent="." node_paths=PackedStringArray("Screen", "World", "UnitOutline", "Surroundings")]
 script = ExtResource("12_look")
 OutlineWidth = 1
 SurfaceShader = ExtResource("13_surface")
 UnitOutline = NodePath("../Camera/UnitOutline")
 Screen = NodePath("../Ps1Screen/Picture")
 World = NodePath("..")
+Surroundings = NodePath("../WorldEnvironment")
 
 [node name="Ps1Screen" type="CanvasLayer" parent="."]
 layer = -1
@@ -165,14 +166,6 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "FPS"
-
-[node name="Controls" type="Label" parent="Hud/Margin/Rows"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "WASD laufen · Skills über die Leiste · Rechtsklick auf einen Platz belegt ihn
-B Inventar und Ausrüstung · Rechtsklick auf ein Item legt es an · Tab Karte · Alt Namen der Beute
-T Town-Portal · Portale, Treppen und Kellertüren per Klick
-F1 PS1-Look · F2 Kamera · F3 Bildzeilen · F4 Schatten · F5 ganze Karte · F6 Testgelände · Mausrad Abstand der Kamera"
 
 [node name="BottomHud" type="Control" parent="Hud"]
 layout_mode = 3

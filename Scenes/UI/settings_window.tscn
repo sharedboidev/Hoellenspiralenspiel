@@ -3,6 +3,9 @@
 [ext_resource type="Script" path="res://Scripts/UI/SettingsWindow.cs" id="1_window"]
 [ext_resource type="StyleBox" uid="uid://d0lsfuyas70d8" path="res://Resources/Themes/boxes_stylebox.tres" id="2_box"]
 [ext_resource type="AudioStream" path="res://Audio/no mana.mp3" id="3_preview"]
+[ext_resource type="Script" path="res://Scripts/UI/Settings/DisplayTab.cs" id="4_display"]
+[ext_resource type="Script" path="res://Scripts/UI/Settings/AudioTab.cs" id="5_audio"]
+[ext_resource type="Script" path="res://Scripts/UI/Settings/ControlsTab.cs" id="6_controls"]
 
 [node name="SettingsWindow" type="Control"]
 process_mode = 3
@@ -33,7 +36,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(1000, 0)
+custom_minimum_size = Vector2(1180, 0)
 layout_mode = 2
 theme_override_styles/panel = ExtResource("2_box")
 
@@ -58,14 +61,244 @@ text = "Settings"
 horizontal_alignment = 1
 
 [node name="Tabs" type="TabContainer" parent="CenterContainer/Panel/Margin/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(1108, 700)
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 current_tab = 0
 
+[node name="Display" type="VBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs"]
+layout_mode = 2
+theme_override_constants/separation = 14
+script = ExtResource("4_display")
+metadata/_tab_index = 0
+
+[node name="ModeRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/ModeRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Window Mode"
+
+[node name="ModeOption" type="OptionButton" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/ModeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(460, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+
+[node name="SizeRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/SizeRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Window Size"
+
+[node name="SizeOption" type="OptionButton" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/SizeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(460, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+
+[node name="ApplyButton" type="Button" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/SizeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+text = "Apply"
+
+[node name="ConfirmRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="ConfirmLabel" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/ConfirmRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Keep these display settings?"
+theme_override_colors/font_color = Color(1, 0.75, 0.45, 1)
+
+[node name="KeepButton" type="Button" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/ConfirmRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+text = "Keep"
+
+[node name="RevertButton" type="Button" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/ConfirmRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+text = "Revert"
+
+[node name="VSyncRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/VSyncRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "VSync"
+
+[node name="VSyncCheck" type="CheckButton" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/VSyncRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+
+[node name="FpsRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/FpsRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Frame Limit"
+
+[node name="FpsOption" type="OptionButton" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/FpsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(460, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+
+[node name="ShowFpsRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/ShowFpsRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Show FPS"
+
+[node name="ShowFpsCheck" type="CheckButton" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/ShowFpsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+
+[node name="BrightnessRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/BrightnessRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Brightness"
+
+[node name="BrightnessSlider" type="HSlider" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/BrightnessRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(460, 48)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+size_flags_horizontal = 3
+min_value = 50.0
+max_value = 150.0
+value = 100.0
+
+[node name="BrightnessValue" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/BrightnessRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "100 %"
+horizontal_alignment = 2
+
+[node name="GrainRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/GrainRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Pixel Size"
+
+[node name="GrainOption" type="OptionButton" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/GrainRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(460, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+
+[node name="DitherRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/DitherRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Dithering"
+
+[node name="DitherCheck" type="CheckButton" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/DitherRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+
+[node name="WobbleRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/WobbleRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Wobbly Vertices"
+
+[node name="WobbleCheck" type="CheckButton" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/WobbleRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+
+[node name="ShadowRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/ShadowRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Real Shadows"
+
+[node name="ShadowCheck" type="CheckButton" parent="CenterContainer/Panel/Margin/Rows/Tabs/Display/ShadowRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+
 [node name="Audio" type="VBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs"]
+visible = false
 layout_mode = 2
 theme_override_constants/separation = 18
-metadata/_tab_index = 0
+script = ExtResource("5_audio")
+metadata/_tab_index = 1
 
 [node name="MasterRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio"]
 layout_mode = 2
@@ -74,22 +307,23 @@ theme_override_constants/separation = 24
 [node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/MasterRow"]
 custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 28
 text = "Master"
 
 [node name="MasterSlider" type="HSlider" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/MasterRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(480, 48)
 layout_mode = 2
-size_flags_horizontal = 3
 size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+size_flags_horizontal = 3
 value = 100.0
 
 [node name="MasterValue" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/MasterRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 28
 text = "100 %"
 horizontal_alignment = 2
 
@@ -100,22 +334,23 @@ theme_override_constants/separation = 24
 [node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/MusicRow"]
 custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 28
 text = "Music"
 
 [node name="MusicSlider" type="HSlider" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/MusicRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(480, 48)
 layout_mode = 2
-size_flags_horizontal = 3
 size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+size_flags_horizontal = 3
 value = 100.0
 
 [node name="MusicValue" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/MusicRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 28
 text = "100 %"
 horizontal_alignment = 2
 
@@ -126,24 +361,62 @@ theme_override_constants/separation = 24
 [node name="Label" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/EffectsRow"]
 custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 28
 text = "Effects"
 
 [node name="EffectsSlider" type="HSlider" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/EffectsRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(480, 48)
 layout_mode = 2
-size_flags_horizontal = 3
 size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+size_flags_horizontal = 3
 value = 100.0
 
 [node name="EffectsValue" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Audio/EffectsRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 28
 text = "100 %"
 horizontal_alignment = 2
+
+[node name="Controls" type="VBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 14
+script = ExtResource("6_controls")
+metadata/_tab_index = 2
+
+[node name="Scroll" type="ScrollContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Controls"]
+custom_minimum_size = Vector2(0, 480)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="BindingRows" type="VBoxContainer" parent="CenterContainer/Panel/Margin/Rows/Tabs/Controls/Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BindingStatus" type="Label" parent="CenterContainer/Panel/Margin/Rows/Tabs/Controls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = ""
+autowrap_mode = 3
+theme_override_colors/font_color = Color(1, 0.75, 0.45, 1)
+
+[node name="ResetButton" type="Button" parent="CenterContainer/Panel/Margin/Rows/Tabs/Controls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 52)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 28
+size_flags_horizontal = 0
+text = "Reset to Defaults"
 
 [node name="BackButton" type="Button" parent="CenterContainer/Panel/Margin/Rows"]
 unique_name_in_owner = true

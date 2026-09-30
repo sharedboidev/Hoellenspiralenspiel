@@ -47,6 +47,7 @@ unique_name_in_owner = true
 layout_mode = 2
 
 [node name="StatdisplayButton" type="TextureButton" parent="." unique_id=1686612181]
+focus_mode = 0
 layout_mode = 0
 offset_left = 5.0
 offset_top = 845.0

@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-735_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-844_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -38,7 +38,7 @@ Gegner erschlagen, Beute sammeln, Charakter ausbauen.
 
 ## ✨ Feature-Umfang
 
-Das ist der Stand, der heute im Spiel steckt. Das Spiel beginnt im Hauptmenü. Vom Hub führen Portale in die Höllenkreise, bisher in einen Testkreis mit vier erzeugten Ebenen.
+Das ist der Stand vom 30.09.2026. Das Spiel beginnt im Hauptmenü. Vom Hub führen Portale in die Höllenkreise, bisher in einen Testkreis mit vier erzeugten Ebenen.
 Das Spiel läuft in 3D, mehr dazu im Abschnitt [3D im PS1-Look](#-3d-im-ps1-look).
 
 ### 🧙 Charakter
@@ -264,6 +264,7 @@ Auslöser und Aktionen lassen sich im Inspector frei kombinieren, zum Beispiel "
 | Laden beim Start | Der Charakter ist nach dem Neustart derselbe, mit Inventar, Ausrüstung und Skill-Leiste |
 | Inhalt | Name, Level, XP, Attribute, offene Punkte, jedes Item mit Affixen, Namen und Platz, dazu die Reise: je Kreis Seed, Checkpoints, erkundete Karten und gefallene Gegner, außerdem das offene Town-Portal |
 | Drei Plätze | Das Hauptmenü bietet drei Plätze für Charaktere, jeder mit eigener Datei |
+| Einstellungen | Anzeige, Look, Lautstärke und Tasten stehen in einer eigenen Datei `settings.json` und gelten für alle Plätze. Sie entsteht bei der ersten Änderung. Eine unlesbare Datei wird als `settings.json.broken` beiseitegelegt, dann gelten die Standards |
 | Sicher | Ein Absturz beim Schreiben zerstört den alten Spielstand nicht |
 
 <details>
@@ -272,6 +273,7 @@ Auslöser und Aktionen lassen sich im Inspector frei kombinieren, zum Beispiel "
 Die Dateien heißen `slot1.json` bis `slot3.json` und liegen im Benutzerordner von Godot.
 Unter Windows ist das `%APPDATA%\Godot\app_userdata\Hoellenspiralenspiel\saves`.
 Ein Spielstand aus der Zeit vor dem Hauptmenü, `character.json`, zieht beim ersten Start von selbst auf Platz 1.
+Die Einstellungen liegen als `settings.json` eine Ebene darüber, direkt in `%APPDATA%\Godot\app_userdata\Hoellenspiralenspiel`.
 
 | Wunsch | Weg |
 |---|---|
@@ -279,6 +281,7 @@ Ein Spielstand aus der Zeit vor dem Hauptmenü, `character.json`, zieht beim ers
 | Mit einem zweiten Charakter spielen | Im Hauptmenü einen freien Platz wählen |
 | Mit einer eigenen Datei spielen | Godot mit `-- --save-file=user://saves/zweiter.json` starten |
 | Die Plätze woanders ablegen | Godot mit `-- --save-dir=user://saves/test` starten |
+| Mit eigenen Einstellungen testen | Godot mit `-- --settings-file=user://test_settings.json` starten |
 | Ohne Spielstand testen | Im Inspector am `GameController` den Schalter `SavingEnabled` ausschalten |
 
 Leben, Mana, Position und Beute am Boden stehen nicht im Spielstand.
@@ -290,29 +293,48 @@ Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints
 
 | Feature | Beschreibung |
 |---|---|
-| Hauptmenü | Drei Plätze für Charaktere: spielen, neu anlegen mit Namen, löschen |
-| Pausenmenü | `Esc` hält das Spiel an. "Main Menu" und "Quit Game" speichern vorher, "Settings" folgt mit den Einstellungen |
-| Fenster schließen | `Esc` und die Leertaste schließen alle offenen Fenster auf einmal. Erst `Esc` ohne offenes Fenster öffnet das Pausenmenü |
+| Hauptmenü | Drei Plätze für Charaktere: spielen, neu anlegen mit Namen, löschen. "Settings" öffnet die Einstellungen |
+| Pausenmenü | `Esc` hält das Spiel an. "Settings" öffnet die Einstellungen, `Esc` führt von dort zurück ins Menü. "Main Menu" und "Quit Game" speichern vorher. Während eines Ortswechsels bleibt das Menü zu |
+| Fenster schließen | `Esc` und Close Windows, zu Beginn die Leertaste, schließen alle offenen Fenster auf einmal. Erst `Esc` ohne offenes Fenster öffnet das Pausenmenü |
+| Ladebildschirm | Jeder Ortswechsel blendet ab und zeigt auf Schwarz das Ziel: den Kreis mit "Level n of m" oder den Namen des Orts. Darunter steht ein Tipp. Nennt er eine Aktion, zeigt er die Taste, die der Spieler ihr gegeben hat. Der Vorhang steht mindestens 1,5 Sekunden. Vom Hauptmenü ins Spiel steht dort "Loading..." |
+| Einstellungen | Ein Fenster mit den Reitern Display, Audio und Controls, erreichbar aus Haupt- und Pausenmenü. Es ist bei jedem Reiter gleich groß |
+| Hud an Ankern | Orbs, Skill-Leiste und XP-Balken hängen als Gruppe unten mittig, der Level-up-Knopf neben dem Lebens-Orb, der Charakterbogen oben rechts. Alles sitzt bei jedem Seitenverhältnis richtig, auch nach einem Wechsel im laufenden Spiel. Fenster wie der Charakterbogen liegen über den Orbs |
+| Statuszeile | Oben links. Die Bildrate zeigt sie mit Show FPS aus den Einstellungen, Gegner, Look, Kamera, Ort und Seed nur im Debug-Build |
 | Neuer Charakter | Alle Attribute auf 1, ein weißes Training Sword in der Haupthand, das Inventar ist leer |
 | Hub | Ein ummauerter Platz mit neun Portalen, eines je Höllenkreis. Gesperrte Portale sind dunkel |
-| Testgelände | Das frühere Testlevel mit Hof und 37 Gegnern, zum Testen mit `F6` erreichbar |
+| Testgelände | Das frühere Testlevel mit Hof und 37 Gegnern, zum Testen im Debug-Build mit `F6` erreichbar |
 | Navigationsnetz | Entsteht beim Start des Levels aus den Wänden, für Gegner und Held |
 | Licht und Schatten | Der Held trägt sein Licht mit sich, die Umgebung ist dunkel und neblig. Lichter werfen echte Schatten, nur das Licht des Helden nicht von ihm selbst. Er steht dafür auf einem blassen Kreis |
 | Lebens- und Mana-Orb | Mit Flüssigkeits-Shader |
 | Erfahrungsbalken | Unterteilt, mit Anzeige beim Überfahren |
-| Overlay-Karte | Das Level aus dem Winkel der Kamera, nur von weiter weg, mit `Tab` ein- und ausgeblendet. Unter der Erde ist sie gezeichnet und zeigt nur, was der Held schon erkundet hat |
+| Overlay-Karte | Das Level aus dem Winkel der Kamera, nur von weiter weg, mit Map, zu Beginn `Tab`, ein- und ausgeblendet. Unter der Erde ist sie gezeichnet und zeigt nur, was der Held schon erkundet hat |
 | Mauern | Jede Mauer hat einen Sockel und Mauerwerk darüber. Steht der Held hinter ihr, wird das Mauerwerk durchsichtig, so weit sein Licht reicht. Was dahinter liegt, lässt sich dann anklicken |
 | Räume | Ein Raum bleibt verschlossen, solange der Held nicht drin steht: Seine vorderen Mauern bleiben zu, seine hinteren werden nur halb durchsichtig |
 | Licht und Sicht | Kein Licht scheint durch Mauern, weder das des Helden noch Altar, Aura oder Feuerball. Gegner und ihre Wirkungen zeigen sich erst mit Sichtkontakt |
 | Sichtweite | Gegner zeigen sich bis 120 % des Lichtradius und blenden am Rand mit demselben Punktmuster ein wie die Mauern. Faktor und Rand stehen im Inspector am `EnemyController` |
 | Elite | Größer als ihre Art, mit Namensschild und einer Aura in der Farbe ihres Namens |
 | Beutel | Beute liegt als Beutel aus dunklem Leder am Boden, ein weißer Stern glimmt daran. Beutel liegen in einem Gitter mit 1 m Abstand und nie aufeinander |
-| Schilder der Beute | Jeder Beutel trägt ein Schild mit dem Namen des Items in der Farbe der Seltenheit. Ein neues Schild weicht den anderen nach oben aus und bleibt danach starr bei seinem Beutel. Beim Laufen können Schilder deshalb zusammenrücken, `Alt` zweimal richtet sie neu aus. `Alt` schaltet sie an und aus |
+| Schilder der Beute | Jeder Beutel trägt ein Schild mit dem Namen des Items in der Farbe der Seltenheit. Ein neues Schild weicht den anderen nach oben aus und bleibt danach starr bei seinem Beutel. Beim Laufen können Schilder deshalb zusammenrücken, zweimal Item Names richtet sie neu aus. Item Names, zu Beginn `Alt`, schaltet sie an und aus |
 | Aufheben | Mit Schildern ein Klick auf das Schild, ohne Schilder ein Klick auf den Beutel. Aus der Ferne läuft der Held erst hin. Unter der Maus wird der Beutel heller |
 
 <div align="center">
 <img src="docs/images/beute_schilder_3d.webp" alt="Oben links 16 abgeworfene Items mit Schildern, oben rechts dieselben nach dem Aufheben eines Bogens, unten links nach Aus und An neu ausgerichtet, unten rechts die Beute von vier Gegnern im Gitter" width="720">
 </div>
+
+<details>
+<summary>Was die Einstellungen bieten</summary>
+
+| Reiter | Inhalt |
+|---|---|
+| Display | Window Mode: Borderless Fullscreen als Standard, Exclusive Fullscreen oder Windowed. Window Size gilt nur im Fenster und bietet feste Größen von 1280 x 720 bis 3840 x 2160, soweit sie samt Rahmen auf den Bildschirm passen. Dazu VSync, Frame Limit (Unlimited, 30, 60, 120, 144, 240), Show FPS, Brightness von 50 bis 150 %, Pixel Size, Dithering, Wobbly Vertices und Real Shadows |
+| Audio | Master, Music und Effects von 0 bis 100 %. 50 % sind rund -12 dB, 0 % ist stumm. Die Musik läuft in der Pause weiter, Effekte halten an |
+| Controls | Belegung der 19 Aktionen. Klick auf die Belegung, dann die neue Taste drücken, bei Skill-Plätzen auch eine Maustaste. `Esc` bricht ab. Reset to Defaults stellt den Standard wieder her. Aktionen und Regeln stehen unter [Steuerung](#-steuerung) |
+
+Alles wirkt sofort und wird gespeichert, nur Modus und Größe des Fensters nicht.
+Sie greifen erst mit Apply und springen nach 10 Sekunden zurück, wenn Keep nicht gedrückt ist. `Esc` und Revert nehmen sie sofort zurück.
+Die Frist steht als `ConfirmSec` am Reiter Display im Inspector, Blenden, Mindestdauer und Tipps des Ladebildschirms an `Scenes/UI/curtain.tscn`.
+
+</details>
 
 ### 🕳️ Abstieg und Ebenen
 
@@ -326,8 +348,9 @@ Ein Klick auf ein Portal im Hub öffnet die Checkpoints seines Kreises. Jede Ebe
 |---|---|
 | Kreis | Ein Höllenkreis hat mehrere Ebenen, der Testkreis vier |
 | Treppen | Die Kellertür im Ausgang führt hinab, die Treppe im Startraum hinauf, aus Ebene 1 in den Hub |
+| Ortswechsel | Jeder Wechsel zeigt den Ladebildschirm. Solange er steht, hält die Welt an und der Held nimmt keine Eingaben an. Gebaut wird erst hinter dem schwarzen Vorhang, die Gegner stehen bei gleichem Seed am selben Ort. Die Musik eines Kreises spielt über die Treppen weiter, statt neu zu beginnen |
 | Checkpoints | Jede betretene Ebene schaltet ihren Start frei. Das Portal im Hub bietet alle freigeschalteten Ebenen an |
-| Town-Portal | `T` öffnet neben dem Helden ein Portal in den Hub, nach einer Sekunde ist es offen. Im Hub steht das Gegenstück und führt zurück an dieselbe Stelle, danach schließt es sich. Abklingzeit 60 Sekunden |
+| Town-Portal | Town Portal, zu Beginn `T`, öffnet neben dem Helden ein Portal in den Hub, nach einer Sekunde ist es offen. Im Hub steht das Gegenstück und führt zurück an dieselbe Stelle, danach schließt es sich. Abklingzeit 60 Sekunden |
 | Bestand | Die Ebenen eines Kreises bleiben, wie der Held sie verließ, auch über einen Neustart des Spiels |
 | Tot bleibt tot | Gefallene Gegner stehen nicht wieder auf. Beute am Boden verfällt beim Verlassen der Ebene |
 | Neuer Abstieg | Im Dialog des Portals würfelt "New Descent" alle Ebenen des Kreises neu. Die Checkpoints bleiben |
@@ -347,7 +370,7 @@ Ein Klick auf ein Portal im Hub öffnet die Checkpoints seines Kreises. Jede Ebe
 | Thema | Eine Resource legt Räume, Texturen, Licht, Musik und Gegnerpool fest |
 | Tiefe | Mit jeder Ebene steigt das Bereichslevel um 1, und die Ebene bekommt einen Raum mehr. Die erste Ebene des Testkreises hat Bereichslevel 1 |
 | Gegner | Räume bringen ihre Spawn-Marker mit, in Gängen stehen vereinzelt kleine Gruppen aus dem Gegnerpool |
-| Karte | Deckt sich beim Erkunden auf und steht im Spielstand. Sie zeigt Kellertür, Treppe und Town-Portal. `F5` zeigt zum Testen die ganze Ebene |
+| Karte | Deckt sich beim Erkunden auf und steht im Spielstand. Sie zeigt Kellertür, Treppe und Town-Portal. `F5` zeigt im Debug-Build zum Testen die ganze Ebene |
 
 <div align="center">
 <img src="docs/images/raeume_und_mauern_3d.webp" alt="Oben links der Held im Hof mit durchsichtigen südlichen Mauern, oben rechts vor dem Tor mit verschlossenem Hof, unten links nördlich des Hofs hinter der halb durchsichtigen Mauer, unten rechts an einer Gangecke hinter offenem Mauerwerk" width="720">
@@ -364,7 +387,9 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 
 | Feature | Beschreibung |
 |---|---|
-| PS1-Look | Wackelnde Eckpunkte, verzogene Texturen, 240 Bildzeilen, 15 Bit Farbtiefe mit Punktmuster |
+| PS1-Look | Wackelnde Eckpunkte, verzogene Texturen, grobe Pixel, 15 Bit Farbtiefe mit Punktmuster |
+| Ganzzahlige Pixel | Ein PS1-Pixel deckt immer gleich viele Pixel des Bildschirms: die Fensterhöhe geteilt durch 240, 360 oder 480, gerundet. Ab 600 Zeilen ist jede feinere Stufe echt feiner, notfalls um einen Pixel kleiner als die gröbere. Darunter sind Medium und Fine gleich. Bei 1080 Zeilen sind es 5, 3 und 2 Pixel, bei 1440 Zeilen 6, 4 und 3 |
+| Einstellbar | Pixel Size (Coarse, Medium, Fine), Dithering, Wobbly Vertices, Real Shadows und Brightness stehen im Reiter Display der Einstellungen. Standard: Coarse, alle Schalter an, Brightness 100 % |
 | Umriss | Held und Gegner tragen einen dunklen Rand von einem PS1-Pixel, der Gegner unter der Maus einen roten. Die Breite steht als `OutlineWidth` am Knoten `Ps1Look`. |
 | Sichtbare Ausrüstung | Angelegte Waffen, Schilde und Rüstung erscheinen am Helden. Sichtbar sind alle Plätze außer den Ringen. |
 | Skills | Projektile fliegen, Flächen liegen als Kreis auf dem Boden |
@@ -384,36 +409,46 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 </div>
 
 <details>
-<summary>Tasten für den Look</summary>
+<summary>Debug-Tasten und Mausrad</summary>
+
+`F1` bis `F6` wirken nur im Debug-Build, etwa beim Start aus dem Editor.
+Sie schalten nur zum Testen um und ändern die Einstellungen nicht.
+Das Mausrad wirkt immer.
 
 | Taste | Aktion |
 |---|---|
 | `F1` | PS1-Look an und aus |
 | `F2` | Kamera perspektivisch oder orthogonal, das Spiel startet perspektivisch |
-| `F3` | 240, 360 oder 480 Bildzeilen |
-| `F4` | Dunkle Scheiben statt Schatten aus Lichtern, das Spiel startet mit Schatten. Der Held behält seinen Kreis in beiden Fällen |
+| `F3` | Pixel Size im Wechsel Coarse, Medium, Fine. Es beginnt mit der Stufe aus den Einstellungen |
+| `F4` | Dunkle Scheiben statt Schatten aus Lichtern und zurück. Es beginnt wie unter Real Shadows eingestellt. Der Held behält seinen Kreis in beiden Fällen |
 | `F5` | Ganze Karte der Ebene zeigen und zurück zum Erkundeten |
 | `F6` | Ins Testgelände und zurück in den Hub |
-| Mausrad | Kamera in Schritten näher heranholen und zurück. Weiter weg als zum Start geht es nicht. Die Statuszeile zeigt, wie viele Meter das Bild zeigt und wie weit die Kamera entfernt ist. Der Nebel rückt mit. |
+| Mausrad | Kamera in Schritten näher heranholen und zurück. Weiter weg als zum Start geht es nicht. Im Debug-Build zeigt die Statuszeile, wie viele Meter das Bild zeigt und wie weit die Kamera entfernt ist. Der Nebel rückt mit. |
 
 </details>
 
 ### 🚧 Noch nicht enthalten
 
-- Ladebildschirm und Einstellungen für Auflösung, Tasten und Lautstärke
 - Truhe, Händler und Währung im Hub
 - Boss und Freischaltung des nächsten Kreises
 - Ein Höllenkreis mit eigenem Thema, bisher gibt es nur das Testthema
 - Eigene Modelle für den Held und die übrigen Gegner, bisher hat nur das Skelett eins
 - Item-Basen für die übrigen zwölf Ausrüstungsplätze
-- Tasten im Spiel umbelegen
 - Klassen und Erwerb von Skills, der Held kennt vorerst alle
+- Ein eigenes Theme für die Oberfläche, Schalter und Regler sind noch die kleinen aus dem Standard-Theme von Godot
+- Renderskalierung, bisher rendert die 3D-Welt in voller Fenstergröße
 
 ---
 
 ## 🎮 Steuerung
 
-Die Skills liegen zu Beginn wie unten auf den Tasten. Jeder Platz der Leiste lässt sich im Spiel neu belegen.
+Die Tabelle zeigt die Standardbelegung. Die Skills liegen zu Beginn wie unten auf den Tasten. Jeder Platz der Leiste lässt sich im Spiel mit einem anderen Skill belegen.
+
+Unter Settings im Reiter Controls lassen sich 19 Aktionen umbelegen: Bewegen, die zehn Skill-Plätze, Charakterbogen, Karte, Schilder der Beute, Town-Portal und Close Windows.
+Fest bleiben `Esc`, das Mausrad, die Klicks auf Items, Schilder, Beutel und Durchgänge und der Rechtsklick auf die Leiste.
+Jede Aktion hat eine Taste, Kombinationen gibt es nicht. Maustasten (links, rechts, Mitte, Seitentasten) gibt es nur für die Skill-Plätze.
+Hält eine andere Aktion die Taste schon, tauschen beide, sofern die andere die bisherige Taste nehmen darf. Sonst bleibt die Belegung, wie sie war. `F1` bis `F6` und das Mausrad lassen sich keiner Aktion geben.
+Die Skill-Leiste zeigt immer die aktuelle Taste.
 
 | Taste | Aktion |
 |---|---|
@@ -436,6 +471,8 @@ Die Skills liegen zu Beginn wie unten auf den Tasten. Jeder Platz der Leiste lä
 | Linke Maustaste auf das Schild eines Beutels | Aufheben. Sind die Schilder aus, zählt der Klick auf den Beutel selbst |
 | Linke Maustaste auf Item im Inventar | Greifen und ablegen, außerhalb des Inventars abwerfen |
 | Rechte Maustaste im Inventar | Item anlegen oder Trank trinken |
+| Mausrad | Kamera näher heranholen und zurück |
+| `F1` bis `F6` | Tasten zum Testen, nur im Debug-Build. Mehr unter [3D im PS1-Look](#-3d-im-ps1-look) |
 
 ---
 
@@ -447,7 +484,7 @@ flowchart LR
     M2 --> M3(["M3 Skills"]):::done
     M2 --> M4(["M4 Items und Speichern"]):::done
     M4 --> M5(["M5 Gegner-KI"]):::done --> D{"3D im PS1-Look"}:::done
-    D --> U(["M5.5 Umstellung auf 3D"]):::done --> M6(["M6 Level"]):::done --> M7(["M7 Hub, Etappe 1 von 4"]):::next --> M8(["M8 Höllenkreis"]):::open
+    D --> U(["M5.5 Umstellung auf 3D"]):::done --> M6(["M6 Level"]):::done --> M7(["M7 Hub, Etappe 2 von 4"]):::next --> M8(["M8 Höllenkreis"]):::open
     M8 --> M9(["M9 Inhalt"]):::open --> M10(["M10 Koop"]):::optional
 
     classDef done fill:#2e7d32,color:#ffffff,stroke:#1b5e20
@@ -468,7 +505,7 @@ flowchart LR
 | ✅ | **Entscheidung** | 3D im Look der PlayStation 1, entschieden nach dem [Vergleich](docs/VERGLEICH_2D_3D.md) | klein |
 | ✅ | **M5.5** Umstellung auf 3D | Die 3D-Fassung kann alles, was die 2D-Fassung konnte, und hat sie abgelöst | mittel |
 | ✅ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
-| ⏭️ | **M7** Hub | Etappe 1 von 4 steht: Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal. Von Etappe 2 steht das Pausenmenü. Offen: Ladebildschirm und Einstellungen, Truhe und Händler, Boss mit Freischaltung | mittel |
+| ⏭️ | **M7** Hub | Stand 30.09.2026: Etappe 1 und 2 von 4 stehen. Etappe 1: Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal. Etappe 2: Pausenmenü, Ladebildschirm, Einstellungen für Anzeige, Look, Ton und Tasten, Hud an Ankern. Offen: Etappe 3 mit Truhe, Händler und Währung, Etappe 4 mit Platzhalter-Boss und Freischaltung des nächsten Kreises | mittel |
 | ⬜ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
 | 💤 | **M10** Koop | Optional, baut auf Kern und Seeds auf | groß |
@@ -534,6 +571,8 @@ Hoellenspiralenspiel
 │   │   ├── Spatial     Raster für die Suche nach Einheiten, freie Plätze für Gegner und Beutel, Stapeln der Schilder
 │   │   ├── Levels      Generator für Ebenen, Grundriss, Raumvorlagen, Erkundung, Reise durch die Kreise, Regel für freie Sicht durch Mauern
 │   │   ├── Saving      Format des Spielstands, Lesen und Schreiben als JSON
+│   │   ├── Settings    Einstellungen für Anzeige, Look, Ton und Tasten, tolerantes Lesen, Fenstergrößen, Lautstärkekurve, Pixelraster, Regeln der Tastenbelegung
+│   │   ├── Loading     Tipps des Ladebildschirms mit der aktuellen Taste
 │   │   ├── Rng         Zufallsquelle mit Seed
 │   │   └── Progression XP-Tabelle, Level und Attributspunkte, XP-Verlust beim Tod
 │   ├── Units           Held, Gegner, Pfadfolger, sichtbare Ausrüstung, Animationen mit Skelett
@@ -544,9 +583,11 @@ Hoellenspiralenspiel
 │   │   └── Levels      Wechsel zwischen Hub und Ebenen, Aufbau einer Ebene, Raumvorlagen, Orte, Mauerstücke
 │   ├── Objects         Beutel am Boden, Suche nach Benutzbarem unter der Maus
 │   ├── Environment     Durchgänge: Kellertür, Treppe, Portal eines Kreises, Town-Portal
-│   ├── Saving          Dateien der Spielstände, drei Plätze
+│   ├── Saving          Dateien der Spielstände, drei Plätze, Datei der Einstellungen (SettingsStore), Autoload UserSettings
 │   ├── Controllers     Gegnersteuerung, Beute, Spielablauf, Speichern
-│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder, Schilder der Beute, Karte der Ebene, Hauptmenü, Pausenmenü, Dialog am Portal
+│   ├── Utils           Namen der Aktionen, Tastenbelegung in der InputMap (KeyBindings), Namen der Busse (AudioBuses), kleine Helfer
+│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder, Schilder der Beute, Karte der Ebene, Hauptmenü, Pausenmenü, Dialog am Portal, Ladebildschirm, Einstellungsfenster
+│       └── Settings    Reiter des Einstellungsfensters: Display, Audio, Controls
 ├── Scenes              Szenen für Hauptmenü, Spiel, Orte, Räume, Einheiten, Items, Skills, Objekte und Oberfläche
 ├── Models              Modelle als .glb, unter Source die Dateien aus Blender. Godot übergeht Source
 ├── Shaders             Shader, unter Ps1 die für den PS1-Look, die Figuren samt Umriss und Sicht auf Gegner und der Stern der Beutel, unter Archive2D die Effekte der 2D-Fassung
@@ -554,8 +595,12 @@ Hoellenspiralenspiel
 ├── Interfaces          Schnittstellen, darunter IHero zwischen Held und Oberfläche
 ├── Enums               Gemeinsame Aufzählungen
 ├── Hoellenspiralenspiel.Tests   Unit-Tests mit NUnit
+├── default_bus_layout.tres      Busse für den Ton: Master, Music, Effects
 └── docs                Roadmap, Analyse und der Vergleich von 2D und 3D
 ```
+
+Die Einstellungen lädt der Autoload `UserSettings`, eingetragen in `project.godot` unter `[autoload]`.
+Er hängt vor jeder Szene im Baum, damit Fenster, Ton und Tasten schon stimmen, wenn das Hauptmenü startet.
 
 ### Leitlinien
 

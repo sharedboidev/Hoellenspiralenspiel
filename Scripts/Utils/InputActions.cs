@@ -32,6 +32,30 @@ public static class InputActions
         "skill_slot_10"
     ];
 
+    //Was sich in den Einstellungen umbelegen lässt, in der Reihenfolge der Liste. Escape bleibt fest
+    public static readonly (StringName Action, string Label)[] Rebindable =
+    [
+        (MoveUp, "Move Up"),
+        (MoveLeft, "Move Left"),
+        (MoveDown, "Move Down"),
+        (MoveRight, "Move Right"),
+        (SkillSlots[0], "Skill 1"),
+        (SkillSlots[1], "Skill 2"),
+        (SkillSlots[2], "Skill 3"),
+        (SkillSlots[3], "Skill 4"),
+        (SkillSlots[4], "Skill 5"),
+        (SkillSlots[5], "Skill 6"),
+        (SkillSlots[6], "Skill 7"),
+        (SkillSlots[7], "Skill 8"),
+        (SkillSlots[8], "Skill 9"),
+        (SkillSlots[9], "Skill 10"),
+        (ToggleCharacterSheet, "Character & Inventory"),
+        (ToggleOverlayMap, "Map"),
+        (ToggleLootLabels, "Item Names"),
+        (OpenTownPortal, "Town Portal"),
+        (CloseWindows, "Close Windows")
+    ];
+
     public static string GetKeyLabel(StringName action)
     {
         if (!InputMap.HasAction(action))
@@ -39,25 +63,32 @@ public static class InputActions
 
         foreach (var inputEvent in InputMap.ActionGetEvents(action))
         {
-            switch (inputEvent)
-            {
-                case InputEventMouseButton mouseButton:
-                    return GetMouseButtonLabel(mouseButton.ButtonIndex);
-                case InputEventKey key:
-                    return OS.GetKeycodeString(GetKeycode(key));
-            }
+            var label = GetLabel(inputEvent);
+
+            if (label.Length > 0)
+                return label;
         }
 
         return string.Empty;
     }
 
+    public static string GetLabel(InputEvent inputEvent)
+        => inputEvent switch
+        {
+            InputEventMouseButton mouseButton => GetMouseButtonLabel(mouseButton.ButtonIndex),
+            InputEventKey key                 => OS.GetKeycodeString(GetKeycode(key)),
+            _                                 => string.Empty
+        };
+
     private static string GetMouseButtonLabel(MouseButton button)
         => button switch
         {
-            MouseButton.Left   => "LMB",
-            MouseButton.Right  => "RMB",
-            MouseButton.Middle => "MMB",
-            _                  => $"M{(int)button}"
+            MouseButton.Left     => "LMB",
+            MouseButton.Right    => "RMB",
+            MouseButton.Middle   => "MMB",
+            MouseButton.Xbutton1 => "M4",
+            MouseButton.Xbutton2 => "M5",
+            _                    => $"M{(int)button}"
         };
 
     //Aktionen speichern die Lage der Taste. Beschriftet wird mit dem Zeichen, das die Tastatur des Spielers dort hat

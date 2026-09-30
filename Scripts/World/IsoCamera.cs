@@ -66,7 +66,7 @@ public partial class IsoCamera : Camera3D
 
     public override void _UnhandledKeyInput(InputEvent @event)
     {
-        if (@event is not InputEventKey { Pressed: true, Echo: false, Keycode: Key.F2 })
+        if (!OS.IsDebugBuild() || @event is not InputEventKey { Pressed: true, Echo: false, Keycode: Key.F2 })
             return;
 
         UsePerspective = !UsePerspective;

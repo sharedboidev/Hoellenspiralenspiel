@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -6,11 +7,13 @@ namespace Hoellenspiralenspiel.Scripts.Core.Settings;
 
 public static class SettingsSerializer
 {
+    private const int MaxFps = 1000;
+
     //Ein unbekannter Name in der Datei, etwa aus einer späteren Fassung, fällt auf den Standard statt die ganze Datei zu verwerfen
     private static readonly JsonSerializerOptions Options = new()
     {
         WriteIndented = true,
-        Converters    = { new LenientEnumConverter<DisplayMode>() }
+        Converters    = { new LenientEnumConverter<DisplayMode>(), new LenientEnumConverter<PixelGrain>(), new LenientEnumConverter<BindingKind>() }
     };
 
     public static string Serialize(GameSettings settings)
@@ -58,10 +61,23 @@ public static class SettingsSerializer
         settings.Display.WindowWidth  = size.Width;
         settings.Display.WindowHeight = size.Height;
 
+        settings.Display.MaxFps = Math.Clamp(settings.Display.MaxFps, 0, MaxFps);
+
+        settings.Look ??= new LookSettings();
+
+        if (!Enum.IsDefined(settings.Look.Grain))
+            settings.Look.Grain = PixelGrain.Coarse;
+
+        settings.Look.Brightness = float.IsFinite(settings.Look.Brightness) ? Math.Clamp(settings.Look.Brightness, LookSettings.MinBrightness, LookSettings.MaxBrightness) : 1f;
+
         settings.Audio         ??= new AudioSettings();
         settings.Audio.Master  =   ToShare(settings.Audio.Master);
         settings.Audio.Music   =   ToShare(settings.Audio.Music);
         settings.Audio.Effects =   ToShare(settings.Audio.Effects);
+
+        settings.Input          ??= new InputSettings();
+        settings.Input.Bindings =   (settings.Input.Bindings ?? new()).Where(pair => !string.IsNullOrWhiteSpace(pair.Key) && pair.Value.IsValid)
+                                                                     .ToDictionary(pair => pair.Key, pair => pair.Value);
     }
 
     private static float ToShare(float value)

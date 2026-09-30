@@ -1,25 +1,16 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using Godot;
-using Hoellenspiralenspiel.Scripts.Core.Settings;
-using Hoellenspiralenspiel.Scripts.Saving;
+using Hoellenspiralenspiel.Scripts.UI.Settings;
 using Hoellenspiralenspiel.Scripts.Utils;
 
 namespace Hoellenspiralenspiel.Scripts.UI;
 
-//Einstellungen aus dem Pausen- und dem Hauptmenü. Regler wirken sofort. Gespeichert wird beim Loslassen, bei jedem Schritt mit Tastatur oder Mausrad und beim Schließen.
-//Escape schließt nur dieses Fenster und führt zurück ins Menü
+//Einstellungen aus dem Pausen- und dem Hauptmenü, ein Reiter je Bereich.
+//Escape schließt nur dieses Fenster und führt zurück ins Menü. Vorher dürfen die Reiter eine Eingabe für sich nehmen
 public partial class SettingsWindow : Control, IClosableWindow
 {
-    private readonly Dictionary<Slider, Label> valueLabels = new();
-
-    private AudioSettings     audio = new();
-    private bool              isDirty;
-    private bool              isDragging;
-    private Slider            effectsSlider;
-    private Slider            masterSlider;
-    private Slider            musicSlider;
-    private AudioStreamPlayer previewSound;
+    private ISettingsTab[] tabs = [];
 
     public event Action Closed;
 
@@ -29,10 +20,7 @@ public partial class SettingsWindow : Control, IClosableWindow
     {
         ProcessMode = ProcessModeEnum.Always;
 
-        previewSound  = GetNode<AudioStreamPlayer>("%PreviewSound");
-        masterSlider  = BindSlider("Master", share => audio.Master = share, true);
-        musicSlider   = BindSlider("Music", share => audio.Music = share, false);
-        effectsSlider = BindSlider("Effects", share => audio.Effects = share, true);
+        tabs = GetNode<TabContainer>("%Tabs").GetChildren().OfType<ISettingsTab>().ToArray();
 
         GetNode<Button>("%BackButton").Pressed += Close;
 
@@ -41,7 +29,17 @@ public partial class SettingsWindow : Control, IClosableWindow
 
     public override void _Input(InputEvent @event)
     {
-        if (!Visible || !@event.IsActionPressed(InputActions.TogglePauseMenu))
+        if (!Visible)
+            return;
+
+        if (tabs.Any(tab => tab.TakesInput(@event)))
+        {
+            GetViewport().SetInputAsHandled();
+
+            return;
+        }
+
+        if (!@event.IsActionPressed(InputActions.TogglePauseMenu))
             return;
 
         Close();
@@ -54,16 +52,12 @@ public partial class SettingsWindow : Control, IClosableWindow
         if (Visible)
             return;
 
-        audio   = (UserSettings.Instance?.Current.Audio ?? new AudioSettings()).Copy();
-        isDirty = false;
-
-        ShowShare(masterSlider, audio.Master);
-        ShowShare(musicSlider, audio.Music);
-        ShowShare(effectsSlider, audio.Effects);
+        foreach (var tab in tabs)
+            tab.ShowCurrent();
 
         Show();
 
-        masterSlider.GrabFocus();
+        GetNode<TabContainer>("%Tabs").GetTabBar().GrabFocus();
     }
 
     public void Close()
@@ -71,70 +65,11 @@ public partial class SettingsWindow : Control, IClosableWindow
         if (!Visible)
             return;
 
-        Save();
+        foreach (var tab in tabs)
+            tab.Commit();
+
         Hide();
 
         Closed?.Invoke();
-    }
-
-    private Slider BindSlider(string name, Action<float> store, bool playsPreview)
-    {
-        var slider = GetNode<Slider>($"%{name}Slider");
-        var label  = GetNode<Label>($"%{name}Value");
-
-        valueLabels[slider] = label;
-
-        slider.ValueChanged += value =>
-        {
-            store((float)(value / slider.MaxValue));
-
-            label.Text = FormatShare(value);
-            isDirty    = true;
-
-            UserSettings.Instance?.ApplyAudio(audio);
-
-            //Tastatur und Mausrad kennen kein Loslassen
-            if (!isDragging)
-                Save();
-        };
-
-        slider.DragStarted += () => isDragging = true;
-
-        slider.DragEnded += hasChanged =>
-        {
-            isDragging = false;
-
-            if (!hasChanged)
-                return;
-
-            Save();
-
-            if (playsPreview)
-                previewSound.Play();
-        };
-
-        return slider;
-    }
-
-    private void ShowShare(Slider slider, float share)
-    {
-        slider.SetValueNoSignal(Mathf.Round(share * slider.MaxValue));
-
-        valueLabels[slider].Text = FormatShare(slider.Value);
-    }
-
-    private static string FormatShare(double value)
-        => $"{value:0} %";
-
-    private void Save()
-    {
-        if (!isDirty || UserSettings.Instance is null)
-            return;
-
-        isDirty = false;
-
-        var chosen = audio.Copy();
-
-        UserSettings.Instance.Change(settings => settings.Audio = chosen);
     }
 }

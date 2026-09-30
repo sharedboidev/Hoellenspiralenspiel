@@ -51,7 +51,7 @@ public partial class PauseMenu : Control
         Hide();
     }
 
-    //Vor der Oberfläche, damit die Leertaste keinen Knopf drückt, der noch den Fokus hat
+    //Vor der Oberfläche, damit die Taste für Close Windows (Standard Leertaste) keinen Knopf drückt, der noch den Fokus hat
     public override void _Input(InputEvent @event)
     {
         if (Descent?.IsTravelling == true)

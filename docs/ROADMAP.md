@@ -2,12 +2,13 @@
 
 Stand: 30.09.2026. M0 bis M6 liegen auf `master`, dazu die Nachträge zu M2, M3, M5.5 und M6: Bleed stapelt, Schadenswerte im Tooltip, ausgedünnte Kommentare, die Rückmeldungen aus dem ersten Spielen und die Rückmeldungen zu Mauern und Räumen.
 Die erste von vier Etappen von M7 liegt ebenfalls auf `master`, samt den Rückmeldungen aus dem ersten Spielen. Von Etappe 2 liegt dort das Pausenmenü, dazu Kamera und Schatten nach dem Spielen.
+Etappe 2 ist seit dem 30.09.2026 vollständig umgesetzt, der Rest liegt auf dem Branch `master_SettingsAndLoading` und noch nicht auf `master`: Ladebildschirm, Hud an Ankern und Einstellungen für Anzeige, Ton und Tasten.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code samt Szenen. Die Zeilenzahl aus der ersten Analyse, rund 5.500, galt für die 2D-Fassung.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die erste Etappe von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 und 2 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 auch mit Fenster.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -31,6 +32,9 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | Hub und Charaktere | Ein Portal je Kreis, drei feste Plätze für Charaktere. Entschieden am 29.09.2026. |
 | Pausenmenü | Hält das Spiel an. Escape schließt zuerst offene Fenster, die Leertaste auch. Inventar und Charakterbogen halten das Spiel nicht an. Entschieden am 29.09.2026. |
 | Schatten | Lichter werfen echte Schatten, das ist der Standard. Das Licht des Helden wirft keinen Schatten von Held und Ausrüstung, er steht dafür auf einem blassen Kreis. Entschieden am 29.09.2026 nach dem Spielen des Pausenmenüs. |
+| Ortswechsel | Ein Ladebildschirm zeigt auf Schwarz das Ziel und einen Tipp mit der aktuellen Taste und steht eine Mindestdauer. Alle Werte sind Felder im Inspector. Entschieden am 30.09.2026. |
+| Hud | Orbs, Skill-Leiste und XP-Balken sind eine feste Gruppe unten mittig. Fenster liegen über den Orbs. Eine Größe der Oberfläche gibt es nicht. Entschieden am 30.09.2026. |
+| Einstellungen | Eine Datei für alle Charaktere, erreichbar aus Haupt- und Pausenmenü. Randloses Vollbild ist Standard. Alle Tasten außer Escape lassen sich umbelegen, Tasten zum Testen gibt es nur im Debug-Build. Entschieden am 30.09.2026. |
 
 ## 1. Was schon umgesetzt ist
 
@@ -56,7 +60,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | Atmosphäre | Der Held trägt sein Licht, die Umgebung ist dunkel und neblig, dazu der PS1-Look und die Overlay-Karte. Seit M6 zeigt unter der Erde eine gezeichnete Karte, was der Held erkundet hat. Seit M7 werfen Lichter echte Schatten, der Held steht auf einem blassen Kreis. | Passt zum düsteren Vibe |
 | 3D | Seit dem 29.09.2026 läuft das ganze Spiel in 3D auf dem unveränderten Kern. Bis auf das Skelett sind alle Modelle Platzhalter aus Grundkörpern. | Offene Frage aus dem PDF, entschieden für 3D |
 | Level | Seit M6: Ebenen aus handgebauten Räumen und erzeugten Gängen, gesteuert über einen Seed. Ein Thema legt Räume, Aussehen und Gegnerpool fest. | Das PDF nennt nur die Kreise. Es gibt ein Testthema, noch keinen Höllenkreis. |
-| Spielstruktur | Seit M7, Etappe 1: Hauptmenü, Hub mit einem Portal je Kreis, mehrere Ebenen pro Kreis, Treppen, Checkpoints und Town-Portal. Seit Etappe 2 ein Pausenmenü | Das PDF fragt nach "Town-Portal mechanic mit zwischenversorgen" und lässt die Struktur offen |
+| Spielstruktur | Seit M7, Etappe 1: Hauptmenü, Hub mit einem Portal je Kreis, mehrere Ebenen pro Kreis, Treppen, Checkpoints und Town-Portal. Seit Etappe 2 ein Pausenmenü, ein Ladebildschirm bei jedem Ortswechsel und Einstellungen für Anzeige, Ton und Tasten | Das PDF fragt nach "Town-Portal mechanic mit zwischenversorgen" und lässt die Struktur offen |
 
 ## 2. Was an kritischen Systemen fehlt
 
@@ -66,7 +70,7 @@ Ohne diese Systeme gibt es kein spielbares Spiel, nur eine Testszene.
 2. **Nahkampf.** Erledigt in M2. Vorher existierten Waffenwerte nur im Tooltip.
 3. **Gegnerangriffe.** Erledigt in M2. Vorher schadeten die Blobs nur durch Berührung.
 4. **Speichern und Laden.** Erledigt in M4. Vorher gab es keine Persistenz für Charakter, Inventar oder Fortschritt.
-5. **Spielstruktur.** Seit der ersten Etappe von M7 gibt es Hauptmenü, Hub, Treppen in beide Richtungen, Checkpoints und Town-Portal, seit der zweiten ein Pausenmenü. Truhe, Händler und Freischaltung fehlen.
+5. **Spielstruktur.** Seit der ersten Etappe von M7 gibt es Hauptmenü, Hub, Treppen in beide Richtungen, Checkpoints und Town-Portal, seit der zweiten ein Pausenmenü und einen Ladebildschirm. Truhe, Händler und Freischaltung fehlen.
 6. **Levelgenerierung.** Erledigt in M6. Vorher gab es nur das handgebaute Testlevel.
 7. **Wegfindung.** Erledigt in M5. Vorher liefen Gegner in gerader Linie und blieben an Wänden hängen.
 8. **Statuseffekte.** Erledigt in M2: Bleed, Burn, Shock und Chill. Bleed und Burn stapeln. Die leeren Schadensart-Klassen sind durch eine Aufzählung im Kern ersetzt.
@@ -74,7 +78,7 @@ Ohne diese Systeme gibt es kein spielbares Spiel, nur eine Testszene.
 10. **Skill-Erwerb.** Seit M3 sind Skills Daten und die Leiste ist frei belegbar. Der Held kennt vorerst alle Skills. Klassen und Skill-Fortschritt fehlen.
 11. **Skalierung.** Seit M5 hat jede Karte ein Bereichslevel, jedes Monster ein Level, und das Monsterlevel bestimmt das Itemlevel. Das Testlevel hat Bereichslevel 1. Seit M6 steigt das Bereichslevel mit jeder Ebene um 1.
 12. **Inhalt.** Kein einziger Höllenkreis, kein Boss, kein Intro.
-13. **Einstellungen.** Auflösung, Tastenbelegung und Lautstärke sind nicht einstellbar.
+13. **Einstellungen.** Erledigt in M7, Etappe 2. Vorher waren Auflösung, Tastenbelegung und Lautstärke nicht einstellbar.
 14. **Tests.** Vom Testprojekt existiert nur ein `obj`-Ordner ohne Quellcode.
 
 ## 3. Was schlecht oder imperformant umgesetzt ist
@@ -138,7 +142,7 @@ Hinweise zu den Korrekturen:
 | A3 | Für Skills behoben in M3, für das Inventar in M4. Der Skillbar-Button zauberte und zog Mana ab, das Inventar rechnete in seinen Knoten. Jetzt zeigen Leiste und Inventar nur noch an. | Logik ist ohne UI nicht nutzbar und nicht testbar |
 | A4 | Behoben in M4. Items waren Szenen-Knoten, die nie im Baum hingen. Jetzt sind sie reine Daten. | Speicherleck und nicht serialisierbar |
 | A5 | Behoben in M3. Es gab zwei parallele Skill-Hierarchien, Skills und Manakosten standen fest im Code. Beide Hierarchien sind durch Skill-Resources ersetzt. | Neue Skills brauchen Codeänderungen an mehreren Stellen |
-| A6 | UI wird per Code anhand der Fenstergröße platziert. Das Fenster ist fest 2560x1440 im exklusiven Vollbild. | Bricht bei anderen Auflösungen |
+| A6 | Behoben in M7, Etappe 2. Die Beschreibung lautete: UI wird per Code anhand der Fenstergröße platziert, das Fenster ist fest 2560x1440 im exklusiven Vollbild. Das traf so nicht zu. 2560x1440 ist nur die Leinwand, Stretch `canvas_items` mit `expand` passt sie an jede Auflösung an, beim Start lag alles richtig. Fünf Teile rechneten ihre Lage nur in `_Ready` und standen nach einem Wechsel des Seitenverhältnisses zur Laufzeit falsch: die Orbs, der XP-Balken, der Charakterbogen, der Level-up-Dialog und sein Knopf. Die Skill-Leiste hing schon an Ankern. Jetzt hängt alles an Ankern, Standard ist das randlose Vollbild. | Bricht bei anderen Auflösungen |
 | A7 | Behoben in M4. Lootbag-Code existierte dreimal mit unterschiedlichem Verhalten. Jetzt gibt es einen Aufruf für alle. | Quelle von F9 |
 | A8 | Behoben am 28.09.2026. `.idea`, `*.user` und `obj` waren eingecheckt. Shader und Testszenen lagen im Projektwurzelordner. Leere Klassen wie `SceneDispenser` und `StaticMemory` existierten. | Unübersichtlich |
 | A9 | Behoben am 28.09.2026. Eingabeaktionen hießen wie Tasten (`F`, `B`, `Tab`) statt nach ihrer Funktion. Die Namen stehen jetzt zentral in `InputActions`. Seit M3 hat jeder Platz der Skill-Leiste eine eigene Aktion. | Tastenbelegung lässt sich nicht sauber ändern |
@@ -407,13 +411,13 @@ Vorläufige Werte der Skills, alle in [Resources/Skills](../Resources/Skills):
 Bewusst offen gelassen:
 
 - Klassen und Skill-Erwerb. Die Frage muss vor dem Meilenstein beantwortet sein, der Skills freischaltet.
-- Die Tasten lassen sich nur in den Projekteinstellungen ändern. Eine Einstellung im Spiel kommt in M7.
+- Die Tasten ließen sich nur in den Projekteinstellungen ändern. Seit Etappe 2 von M7 lassen sie sich im Spiel umbelegen.
 - Die Belegung der Leiste wurde nicht gespeichert. Seit M4 steht sie im Spielstand.
 - Gegner zahlten für Skills weder Mana noch Abklingzeit. Seit M5 gilt die Abklingzeit, Mana bleibt frei. Ihr Takt kommt weiter aus Windup und Recovery.
 - Gegner fanden den Spieler über den festen Namen in der Szene. Seit M5 bekommen sie ihr Ziel vom `EnemyController`.
 - Zauber haben keine Zauberzeit und keine Animation am Helden.
 - Der Bogen ist ein Platzhalter mit gezeichnetem Icon und fällt bei Blue Blobs. Die Angriffsanimation bleibt die Einhand-Animation.
-- Die Leiste wird weiter per Code platziert. Das gehört zu A6.
+- Die Leiste wird weiter per Code platziert. Das gehört zu A6. Berichtigt am 30.09.2026: In 2D setzte `Player2D` ihre Anker per Code auf unten mittig, seit M5.5 stehen die Anker in der Szene. Mit A6 hatte die Leiste nichts zu tun. Seit Etappe 2 von M7 gehört sie zur Gruppe `BottomHud`.
 - Icons der Skills stammen aus dem vorhandenen Archiv unter `Textures/Spells/Archive/icons`.
 
 #### Nachtrag vom 28.09.2026: Schadenswerte im Tooltip
@@ -960,6 +964,8 @@ Bewusst offen gelassen:
 - Die Beschreibungen unter M2 bis M5 sind für 2D geschrieben. Regeln und Kern gelten unverändert, Szenen und Knoten sind jetzt die aus diesem Abschnitt.
 - Sprites, Tilesets, die Texturen der 2D-Effekte und die Addons für 2D liegen ungenutzt im Repo.
 
+Nachtrag vom 30.09.2026: Seit Etappe 2 von M7 schalten F1 den PS1-Look und F2 die Kamera nur noch im Debug-Build um. Pixelgröße, Dithering, wackelnde Eckpunkte und Schatten stehen in den Einstellungen. Die 240 Bildzeilen sind dort die Stufe Coarse. Das Raster rechnet in ganzen Pixeln des Fensters und trifft 240 Zeilen nur ungefähr, siehe M7, Etappe 2: Einstellungen.
+
 #### Nachtrag vom 29.09.2026: Rückmeldung aus dem ersten Spielen
 
 Umgesetzt auf dem Branch `master_PlaytestFeedback`. Der User hat die 3D-Fassung zum ersten Mal selbst gespielt. Aura und Karte bleiben, wie sie sind.
@@ -1041,6 +1047,8 @@ Bewusst offen gelassen:
 - Der Todeseffekt zieht den Körper flach und 1,4-mal breiter. Er ragt dabei kurz unter die Nachbarn.
 - Ein Gegner mit Blinking springt dem Helden alle vier Sekunden hinterher, auch außer Reichweite. Das Verhalten stammt aus M5.
 - Bei 0,3 m Größe ist der Stern bei 240 Bildzeilen zwei bis drei Pixel groß. Auf dem dunklen Leder ist er als Kreuz zu erkennen.
+
+Nachtrag vom 30.09.2026: Seit Etappe 2 von M7 ist `Alt` nur der Standard der Aktion `toggle_loot_labels`. Sie heißt in den Einstellungen Item Names und lässt sich dort umbelegen.
 
 ### Eigene Modelle (läuft neben den Meilensteinen)
 
@@ -1207,6 +1215,8 @@ Bekannte Einschränkungen:
 
 Nachtrag: `Ps1Look` stimmte `ps1_cutout` nicht ab. Das Skelett rastete deshalb immer auf 240 Zeilen ein, auch mit F1 oder F3. Behoben auf `master_Skeleton3D`.
 
+Nachtrag vom 30.09.2026: F1 und F3 wirken seit Etappe 2 von M7 nur im Debug-Build. F3 schaltet die Pixelgröße Coarse, Medium und Fine statt 240, 360 und 480 Bildzeilen.
+
 ### Kontrast der Figuren (umgesetzt am 29.09.2026 auf `master_UnitContrast`)
 
 Ziel: Held und Gegner heben sich von der Umgebung ab.
@@ -1249,6 +1259,8 @@ Zum Testen der Kameradistanz verstellt das Mausrad die Sichthöhe der Kamera in 
 Der Nebel zählt ab der Kamera, in `game.tscn` von 38 bis 62 m. Ohne Ausgleich versank die Welt ab etwa 30 m Sichthöhe im Nebel. Die Kamera verschiebt Beginn und Ende deshalb um genau so viel, wie sie selbst näher oder weiter rückt. Der Nebel bleibt so gleich weit hinter dem Helden, bei 18 m Sichthöhe gelten die Werte aus der Szene. Das gilt auch für die orthogonale Sicht mit F2. Dort steht die Kamera 40 m entfernt, der Nebel beginnt damit bei 49,5 m statt bei 38 m.
 
 Nachtrag vom 29.09.2026: Nach dem Spielen des Pausenmenüs startet die Kamera bei 14 m Sichthöhe aus 22,2 m Abstand, und das ist zugleich die Obergrenze. Der Nebel in `game.tscn` reicht jetzt von 31,7 bis 55,7 m und gilt für 14 m. Mehr unter M7, Etappe 2.
+
+Nachtrag vom 30.09.2026: Die Statuszeile mit Sichthöhe und Abstand steht seit Etappe 2 von M7 nur noch im Debug-Build, F2 wirkt nur dort. Das Mausrad verstellt den Abstand weiter in jedem Build und lässt sich nicht belegen.
 
 Stand: Die Laufzeitprüfung mit 14 Schritten lief fehlerfrei. Sie deckt das Mausrad samt Grenzen und Statuszeile ab, dazu die Breiten 0 bis 3 im Material und die Sichtbarkeit des Rechtecks. Die 692 Unit-Tests sind grün. Dazu kamen Bildschirmfotos aller Breiten und dreier Kameradistanzen.
 
@@ -1471,7 +1483,9 @@ Bewusst offen gelassen:
 - Ein Mauerstück in einer Raumvorlage zeigt im Editor die Textur aus dem Testthema, bis das Thema ihm seine gibt.
 - Mit "einmal pro Kreis" ist vorerst einmal pro Ebene gemeint. Seit M7 hat ein Kreis mehrere Ebenen, ein Pflichtraum erscheint weiter in jeder von ihnen.
 
-### M7: Hub und Abstieg (M, Etappe 1 umgesetzt am 29.09.2026 auf `master_HubAndDescent`, das Pausenmenü aus Etappe 2 am selben Tag auf `master_PauseMenu`)
+Nachtrag vom 30.09.2026: Seit Etappe 2 von M7 wirken F2, F4 und F5 nur im Debug-Build, im Editor also weiter. Die Zeile oben links mit Ebene, Seed und Bereichslevel steht nur dort. Ob Lichter echte Schatten werfen, ist die Einstellung Real Shadows. F4 schaltet nur zum Testen um und speichert nichts.
+
+### M7: Hub und Abstieg (M, Etappe 1 umgesetzt am 29.09.2026 auf `master_HubAndDescent`, das Pausenmenü aus Etappe 2 am selben Tag auf `master_PauseMenu`, der Rest von Etappe 2 am 30.09.2026 auf `master_SettingsAndLoading`)
 
 Ziel: die Spielstruktur steht.
 
@@ -1480,13 +1494,13 @@ M7 läuft in vier Etappen:
 | Etappe | Inhalt | Stand |
 |---|---|---|
 | 1 | Hauptmenü, Hub, Portale, mehrere Ebenen pro Kreis, Treppen, Checkpoints, Town-Portal | Umgesetzt |
-| 2 | Pausenmenü, Ladebildschirm, Einstellungen für Auflösung, Tasten und Lautstärke. UI über Anker statt Code, behebt A6. | Pausenmenü umgesetzt, der Rest offen |
+| 2 | Pausenmenü, Ladebildschirm, Einstellungen für Auflösung, Tasten und Lautstärke. UI über Anker statt Code, behebt A6. | Umgesetzt. Alles nach dem Pausenmenü liegt auf `master_SettingsAndLoading`, noch nicht auf `master`. |
 | 3 | Hub-Funktionen: Truhe und Händler. Dafür braucht es eine Währung. | Offen |
 | 4 | Platzhalter-Boss und Freischaltung des nächsten Kreises | Offen |
 
 Fertig, wenn man vom Hauptmenü in den Hub, in einen Kreis, zurück und wieder hinein kommt.
 
-Stand des Fertig-Kriteriums: erfüllt seit Etappe 1, geprüft im laufenden Spiel. Seit Etappe 2 führt das Pausenmenü auch zurück ins Hauptmenü. Von Etappe 2 stehen Ladebildschirm, Einstellungen und die UI über Anker aus, dazu die Etappen 3 und 4.
+Stand des Fertig-Kriteriums: erfüllt seit Etappe 1, geprüft im laufenden Spiel. Seit Etappe 2 führt das Pausenmenü auch zurück ins Hauptmenü, und jeder Ortswechsel zeigt einen Ladebildschirm. Es stehen die Etappen 3 und 4 aus.
 
 #### Etappe 1: Struktur
 
@@ -1641,11 +1655,13 @@ Bewusst offen gelassen:
 - Wer das Spiel in einer Ebene beendet, beginnt im Hub und geht über den Checkpoint an den Start der Ebene. An die alte Stelle führt nur ein offenes Town-Portal.
 - Das Town-Portal und die Portale der Kreise tragen keinen Ton.
 
+Nachtrag vom 30.09.2026: Seit Etappe 2 wirkt `F6` nur im Debug-Build. Der Vorhang ist ein Ladebildschirm mit Mindestdauer, siehe "Etappe 2: Ladebildschirm und Reise". `T` und die übrigen Tasten lassen sich in den Einstellungen umbelegen, die Projekteinstellungen halten nur noch den Standard.
+
 #### Etappe 2: Pausenmenü
 
 - Erledigt: Pausenmenü. `Esc` hält das Spiel an und bietet Resume, Settings, Main Menu und Quit Game.
 - Erledigt: `Esc` und die Leertaste schließen alle offenen Fenster.
-- Offen: Ladebildschirm, Einstellungen für Auflösung, Tasten und Lautstärke, UI über Anker statt Code.
+- Erledigt am 30.09.2026: Ladebildschirm, Einstellungen für Auflösung, Tasten und Lautstärke, UI über Anker statt Code. Sie stehen in eigenen Abschnitten unten.
 
 Getroffene Designentscheidungen vom 29.09.2026, auf meinen Vorschlag:
 
@@ -1661,13 +1677,13 @@ Von mir festgelegt, weil es sich aus dem Bau ergab:
 | Punkt | Festlegung |
 |---|---|
 | Einträge | Resume, Settings, Main Menu, Quit Game. Englisch wie die übrige Oberfläche. |
-| Settings | Gesperrt mit dem Hinweis "Coming soon", bis es die Einstellungen gibt |
+| Settings | Gesperrt mit dem Hinweis "Coming soon", bis es die Einstellungen gibt. Seit dem 30.09.2026 öffnet der Knopf das Einstellungsfenster. |
 | Speichern | Main Menu und Quit Game speichern vorher, ohne Nachfrage. Es geht nichts verloren. |
 | Fenster | Charakterbogen samt Inventar, die Karte über und unter der Erde, der Level-up-Dialog und der Dialog am Portal. Sie schließen alle auf einmal. |
 | Dialog am Portal | Hat kein eigenes Escape mehr, das Pausenmenü schließt ihn mit |
 | Leertaste im Menü | Drückt den Knopf mit dem Fokus, nach dem Öffnen ist das Resume |
 | Aussehen | Ein Kasten wie der Dialog am Portal, Titel "Paused", das Bild dahinter abgedunkelt |
-| Tasten | Aktionen `toggle_pause_menu` auf Escape und `close_windows` auf der Leertaste |
+| Tasten | Aktionen `toggle_pause_menu` auf Escape und `close_windows` auf der Leertaste. Seit dem 30.09.2026 ist die Leertaste nur der Standard, Close Windows lässt sich in den Einstellungen umbelegen. Escape bleibt fest. |
 
 So funktioniert es:
 
@@ -1677,7 +1693,7 @@ So funktioniert es:
 - Angehalten wird über `GetTree().Paused`. Das Menü selbst läuft mit `ProcessMode` Always weiter.
 - Vor dem Weg ins Hauptmenü oder aus dem Spiel ruft es `GameController.SaveCharacter` auf.
 
-So kommt ein neues Fenster dazu: `IClosableWindow` umsetzen und das Fenster unter die Hud hängen. Escape und Leertaste finden es von selbst.
+So kommt ein neues Fenster dazu: `IClosableWindow` umsetzen und das Fenster unter die Hud hängen. Escape und `close_windows` (Standard Leertaste) finden es von selbst.
 
 #### Rückmeldung aus dem Spielen des Pausenmenüs
 
@@ -1716,10 +1732,277 @@ Geprüft, alles fehlerfrei:
 
 Bewusst offen gelassen:
 
-- Ladebildschirm, Einstellungen und UI über Anker stehen aus. Settings bleibt bis dahin gesperrt.
-- Escape mitten im Ortswechsel, solange der Vorhang unten ist, habe ich nicht geprüft.
+- Ladebildschirm, Einstellungen und UI über Anker standen aus, Settings war bis dahin gesperrt. Erledigt am 30.09.2026.
+- Escape mitten im Ortswechsel, solange der Vorhang unten ist, hatte ich nicht geprüft. Es öffnete ein unsichtbares Pausenmenü unter dem Vorhang. Behoben am 30.09.2026: Während einer Reise bleibt das Menü zu.
 - Die Scheibe des Helden habe ich nur im Hub angesehen, nicht in einer erzeugten Ebene.
 - Die Scheiben der Gegner sind klein geblieben. Wie gut man sie mit F4 sieht, habe ich nicht geprüft.
+
+Nachtrag vom 30.09.2026: `RealShadows` an `Ps1Look` ist kein Feld im Inspector mehr. Echte Schatten sind die Einstellung Real Shadows, Standard an. F4 schaltet nur noch im Debug-Build auf Scheiben um und speichert nichts.
+
+#### Etappe 2: Ladebildschirm und Reise
+
+Umgesetzt am 30.09.2026 auf `master_SettingsAndLoading`.
+
+- Erledigt: Ein Ortswechsel blendet ab und zeigt auf Schwarz das Ziel und einen Tipp. Das Ziel ist der Kreis mit "Level n of m" darunter oder der Name des Orts.
+- Erledigt: Während einer Reise steht die Welt still. Escape öffnet kein Pausenmenü mehr unter dem Vorhang.
+- Zusätzlich: Das Hauptmenü zeigt beim Start des Spiels denselben Vorhang mit "Loading...".
+
+Getroffene Designentscheidungen vom 30.09.2026. Der User hat vier Fragen mit "1b, aber die parameter müssen im inspector exposed werden / 2a / 3a / 4a" beantwortet. 1b betrifft den Ladebildschirm, die übrigen stehen in den Abschnitten unten.
+
+| Frage | Entscheidung |
+|---|---|
+| Ortswechsel | Kurzes Abblenden, auf Schwarz das Ziel, dazu ein Tipp mit der aktuellen Taste und eine Mindestdauer |
+| Werte | Abblenden, Aufblenden, Mindestdauer, Tipps an und aus und die Tipps selbst sind Felder im Inspector |
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Dauer | 0,25 s Abblenden, 0,35 s Aufblenden, mindestens 1,5 s Schwarz. Das Laden zählt zur Mindestdauer. |
+| Tipps | Zehn Tipps, englisch wie die übrige Oberfläche. Derselbe Tipp kommt nie zweimal hintereinander. Ein Tipp zu einer Aktion ohne Taste entfällt. |
+| Hauptmenü | Tipp und Beginn der Mindestdauer gehen an die Spielszene weiter. Dort steht der Vorhang schon beim Start und hebt sich erst, wenn der Held im Hub ankommt. Ein zweiter Klick auf Play wirkt nicht mehr. |
+| Stillstand | `Descent` hält den Baum an. Für das Spawnen tut nur die Physik einen Schritt, der Held nimmt keine Eingaben an. |
+| Musik | Läuft hinter dem Vorhang und im Pausenmenü weiter. Dieselbe Musik beginnt nach einer Reise nicht von vorn. |
+
+So funktioniert es:
+
+- `Curtain` ist die Szene `Scenes/UI/curtain.tscn` mit dem Skript `Scripts/UI/Curtain.cs`. Sie hängt in `Scenes/game.tscn` unter der Hud mit `StartsDown` und im Hauptmenü. Beide nehmen die Tipps aus der Szene.
+- `Descent.Travel` hält den Baum an, lässt den Vorhang fallen und wartet mit `WaitUntilShown`, bis das schwarze Bild zwei Frames lang stand. Erst dann baut es den neuen Ort.
+- `Populate` wartet mit `StepPhysics` zwei Physik-Frames. Dafür schaltet es nur den Physikserver an (`PhysicsServer3D.SetActive`), die Knoten bleiben angehalten. So liegt wie früher ein Schritt zwischen Bau und Spawn.
+- `Arrive` wartet mit `WaitForMinimum` auf die Mindestdauer, löst die Pause, hebt den Vorhang und meldet `Arrived`.
+- Die Mindestdauer zählt Frame für Frame mit `Time.GetTicksMsec`, den Rest rechnet `LoadingTips.RemainingSec`.
+- `LoadingTips` unter `Scripts/Core/Loading` setzt die Tasten in die Tipps und wählt einen. `{aktion}` steht für den Namen einer Eingabeaktion, eingesetzt wird die Taste, die gerade gilt.
+- `HandOver` merkt sich vor dem Wechsel der Szene Tipp und Beginn, der Vorhang der Spielszene zeigt beides weiter.
+- `PauseMenu` kennt `Descent` und hört während einer Reise auf keine Taste (`IsTravelling`).
+- Der Player der Musik hängt am `Descent`, spielt auf dem Bus Music und läuft mit `ProcessMode` Always.
+- Nachklingende Töne aus `SkillArea` liegen in der Gruppe `lingering_sounds`. `Descent.LeaveCurrent` räumt sie mit dem Ort ab.
+
+Felder am Wurzelknoten von `Scenes/UI/curtain.tscn`:
+
+| Feld | Wert | Bedeutung |
+|---|---|---|
+| `FadeOutSec` | 0,25 | Abblenden in Sekunden |
+| `FadeInSec` | 0,35 | Aufblenden in Sekunden |
+| `MinimumShowSec` | 1,5 | So lange steht das Schwarz mindestens, gezählt ab ganz schwarz |
+| `StartsDown` | aus, in der Spielszene an | Der Vorhang steht schon beim Start |
+| `ShowsTips` | an | Tipps an oder aus |
+| `Tips` | zehn Tipps | Die Tipps, `{aktion}` steht für die Taste |
+
+So kommt ein neuer Tipp dazu: In `Scenes/UI/curtain.tscn` unter `Tips` einen Eintrag anhängen. Eine Taste steht als Name der Aktion in geschweiften Klammern, etwa `{open_town_portal}`. Hat die Aktion keine Taste, zeigt der Vorhang den Tipp nicht.
+
+Befunde:
+
+- Früher baute `CallDeferred` den neuen Ort noch in der Physik der Tür. Der schwarze Vorhang war nie zu sehen, und Escape während der Reise öffnete ein unsichtbares Pausenmenü unter dem Vorhang.
+- Ein `SceneTreeTimer` zählte headless 10 bis 30 % zu schnell, am stärksten nach langen Frames. Deshalb zählt die Mindestdauer mit der Uhr.
+- Gemessen headless: Hauptmenü bis Spielszene rund 0,9 s, Bau einer Ebene 80 bis 230 ms. Die Mindestdauer bestimmt die Länge, ein Gang über die Treppe dauert rund 2,1 s.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Unit-Tests | 21 neue für `LoadingTips` |
+| Laufendes Spiel, headless | 57 Schritte, mehrfach gelaufen. Die Gegner stehen bei den Seeds 4242, 777 und 99 genau wie auf `master`, verglichen in einem Worktree. |
+
+Bewusst offen gelassen:
+
+- Scheitert der Weg in den Hub beim Start, bleibt der Vorhang schwarz. Das geschieht nur, wenn `Hub` am `Descent` fehlt oder keine Szene mit `Place` an der Wurzel ist.
+
+#### Etappe 2: Hud an Ankern
+
+Umgesetzt am 30.09.2026 auf `master_SettingsAndLoading`.
+
+- Erledigt: Die Oberfläche hängt an Ankern, kein Code rechnet mehr ihre Lage. Behebt A6.
+- Erledigt: Fenster liegen über den Orbs.
+- Zusätzlich: Ein gehaltenes Item fällt nicht mehr, wenn man auf die offene Werteliste klickt.
+
+Getroffene Designentscheidungen vom 30.09.2026, Antworten "2a" aus der ersten Runde und "1 ja" aus der zweiten:
+
+| Frage | Entscheidung |
+|---|---|
+| Hud | Orbs, Skill-Leiste und XP-Balken sind eine feste Gruppe unten mittig. Der Level-up-Knopf hängt am Lebens-Orb. |
+| Größe der Oberfläche | Keine Einstellung dafür |
+| Fenster und Orbs | Fenster liegen über den Orbs |
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Gruppe | `Hud/BottomHud`, 2560 breit und unten mittig. Der Lebens-Orb sitzt bei 25 %, der Mana-Orb bei 75 % der Breite. |
+| XP-Balken | 1229 x 38 mit `nine_patch_stretch` statt der Skalierung 0,6. Die Zahl beim Überfahren hat Schrift 28. |
+| Level-up-Knopf | Hängt direkt unter der Hud vor dem Todesbildschirm, unten mittig verankert bei -512 bis -384 und -352 bis -224. So steht er rechts oben am Lebens-Orb. |
+| Charakterbogen | Oben rechts, 918 x 1230, 30 Pixel vom Rand |
+| Level-up-Dialog | Die Wurzel deckt die ganze Fläche und lässt die Maus durch. Das Panel sitzt bei 50 % der Breite und 62,5 % der Höhe. |
+| Tooltip | Steht über dem Element, ist dort kein Platz, darunter. Er bleibt an allen vier Rändern im Bild. |
+| Reihenfolge | Die Orbs haben kein `z_index` 10 mehr. Was über ihnen liegt, bestimmt die Reihenfolge der Knoten unter der Hud. |
+
+So funktioniert es:
+
+- Die Leinwand ist 2560 x 1440 mit Stretch `canvas_items` und `expand` aus `project.godot`. Sie wächst mit dem Seitenverhältnis in die Breite oder Höhe, Anker halten jedes Teil an seinem Rand.
+- Orbs, XP-Balken, Charakterbogen, Level-up-Dialog und Knopf haben ihre Rechnung in `_Ready` verloren. Ihre Lage steht nur noch in den Szenen.
+- `CharacterSheet.Covers` kennt alle sichtbaren Teile des Bogens, auch Werteliste und Stufe. Das Inventar fragt es, ob ein Klick neben den Bogen ging. Ein geschlossener Bogen deckt nichts ab.
+
+So kommt ein neues Teil der Hud dazu: Unter `Hud` oder `Hud/BottomHud` hängen und mit Ankern an einen Rand oder die Mitte binden, ohne Rechnung im Code. Soll es über den Orbs liegen, steht es in der Reihenfolge nach `BottomHud`. Ein Knopf, der nur mit der Maus bedient wird, bekommt `focus_mode` None. Sonst behält er nach einem Klick den Fokus, und die Leertaste drückt ihn, sobald sie nicht mehr auf Close Windows liegt.
+
+Befunde:
+
+- A6 traf so nicht zu, siehe die Tabelle unter 3.3. Beim Start lag alles richtig, falsch standen fünf Teile erst nach einem Wechsel des Seitenverhältnisses zur Laufzeit. Der Monitor des Users hat 3200 x 2000, also 16:10, ein Fenster in 16:9 löste das aus.
+- Bei 16:9 ist die Hud pixelgleich zu `master`. Bei 16:10 sitzt der Level-up-Knopf 32 Pixel tiefer als vorher, dafür am Orb.
+- Ein gehaltenes Item fiel beim Klick auf die offene Werteliste, weil das Inventar nur die Spalte mit Ausrüstung und Inventar als Bogen kannte.
+- Auf `master` lagen die Orbs mit `z_index` 10 aus `resource_orb.tscn` über den Fenstern. Bei 16:9 überdeckte der Mana-Orb schon das Inventar.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Mit Fenster | 69 Schritte bei 16:9, 16:10 und 21:9, auch nach einem Wechsel im laufenden Spiel |
+| Bilder | Hauptmenü, Pausenmenü und der Charakterbogen über dem Mana-Orb |
+
+#### Etappe 2: Einstellungen
+
+Umgesetzt am 30.09.2026 auf `master_SettingsAndLoading`.
+
+- Erledigt: Einstellungsfenster mit den Reitern Display, Audio und Controls, erreichbar aus Haupt- und Pausenmenü.
+- Erledigt: Fenstermodus und Fenstergröße mit Rückfrage, dazu VSync, Frame Limit, Show FPS, Helligkeit, Pixelgröße, Dithering, wackelnde Eckpunkte und echte Schatten.
+- Erledigt: Lautstärke für Gesamt, Musik und Effekte.
+- Erledigt: Alle Tasten außer Escape lassen sich im Spiel umbelegen.
+- Erledigt: Die Tasten zum Testen gibt es nur noch im Debug-Build, die Statuszeile dort ganz und sonst nur mit Show FPS für die Bildrate. Der deutsche Hilfetext ist aus der Hud, `Scenes/UI/hotkey_info.tscn` ist entfallen.
+
+Getroffene Designentscheidungen vom 30.09.2026 in drei Runden. Die Antworten des Users im Wortlaut: "3a" und "4a" aus der ersten Runde, "2a" aus der zweiten ("1 ja, 2a"), dann "3b, 4a, 5a".
+
+| Frage | Entscheidung |
+|---|---|
+| Ort der Einstellungen | Eine Datei für alle Charaktere, erreichbar aus Pausen- und Hauptmenü, geladen per Autoload. Antwort "3a". |
+| Fenstermodi | Randloses Vollbild als Standard, dazu exklusives Vollbild und Fenster mit festen Größen bis zur Bildschirmgröße. Übernehmen mit 10 s Rückfrage. Antwort "4a" der ersten Runde. |
+| Lautstärke | Gesamt, Musik und Effekte. Die Musik läuft in der Pause weiter, Effekte halten an. Antwort "2a". |
+| Anzeige | Helligkeit, VSync und eine Grenze der Bildrate, dazu wenige Schalter für den PS1-Look: Pixelgröße grob, mittel und fein in ganzen Pixeln, Dithering, wackelnde Eckpunkte, Schatten echt oder als Scheiben. Antwort "3b". |
+| Tasten zum Testen | F1 bis F6 und die Statuszeile nur in Debug-Builds, der Hilfetext wird aus der Hud entfernt, dazu die Einstellung Show FPS. Antwort "4a" der dritten Runde. |
+| Tastenbelegung | Alles außer Escape umbelegbar, eine Taste je Aktion, keine Kombinationen, Maustasten nur für Skill-Plätze. Bei einem Konflikt tauschen die Aktionen. F1 bis F6 und das Mausrad sind gesperrt. Antwort "5a". |
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Datei | `user://settings.json`, unter Windows in `%APPDATA%\Godot\app_userdata\Hoellenspiralenspiel`. Sie entsteht bei der ersten Änderung. Eine unlesbare Datei liegt danach als `.broken` daneben, es gelten die Standards. |
+| Standards | Randloses Vollbild, Fenster 1600 x 900, VSync an, Bildrate ohne Grenze, Show FPS aus, Pixelgröße Coarse, Dithering, wackelnde Eckpunkte und echte Schatten an, Helligkeit und alle Lautstärken 100 % |
+| Fenstergrößen | Zehn übliche Größen von 1280 x 720 bis 3840 x 2160. Angeboten wird, was samt Titelleiste und Rahmen auf den Bildschirm passt. Im Vollbild läuft das Spiel in der Auflösung des Bildschirms. |
+| Rückfrage | Apply übernimmt Modus und Größe. Keep behält sie, Revert, Escape und der Ablauf der Frist nehmen sie zurück. Die Frist ist das Feld `ConfirmSec` im Inspector am Reiter Display, 10 s. Solange sind die übrigen Schalter gesperrt und die Reiterleiste ausgeblendet. |
+| Frame Limit | Unlimited, 30, 60, 120, 144 und 240. Ein anderer Wert aus der Datei bekommt einen eigenen Eintrag, höchstens 1000. |
+| Helligkeit | 50 bis 150 %, über die Adjustments der Umgebung der Welt. Sie wirkt vor dem Vergröbern. |
+| Pixelgröße | Coarse, Medium und Fine. Eine Zelle ist round(Fensterhöhe / 240, 360 oder 480) echte Pixel groß. Jede feinere Stufe ist echt kleiner, solange es geht. |
+| Lautstärke | Der Regler geht quadratisch ein, 50 % sind rund -12 dB, 0 ist stumm. Beim Loslassen der Regler Master und Effects spielt der Ton bei leerem Mana. |
+| Speichern | Schalter speichern sofort. Regler wirken beim Ziehen und speichern beim Loslassen, ein Schritt mit Tastatur oder Mausrad sofort. Beim Schließen wird gespeichert, was noch offen ist. |
+| Liste der Tasten | 19 Aktionen: Move Up, Left, Down und Right, Skill 1 bis 10, Character & Inventory, Map, Item Names, Town Portal, Close Windows. Dazu Reset to Defaults. |
+| Abfangen | Klick auf die Belegung, dann eine Taste, bei Skill-Plätzen auch eine Maustaste. Escape und der Verlust des Fokus brechen ab. Alt, Strg, Umschalt und Win gelten erst beim Loslassen, eine Kombination bricht ab. Das Mausrad scrollt dabei weiter die Liste. |
+| Maustasten | Links, rechts, Mitte und die beiden Seitentasten |
+| Tausch | Kann die andere Aktion die bisherige Taste nicht nehmen, etwa eine Maustaste außerhalb der Skill-Plätze, bleibt alles, wie es war |
+| Belegt wird | Die Lage der Taste, beschriftet mit dem Zeichen, das die Tastatur des Spielers dort hat. Die Datei hält nur Abweichungen vom Standard. |
+| Debug-Build | F1 Look, F2 Kamera, F3 Pixelgröße, F4 Schatten, F5 ganze Karte und F6 Testgelände wirken nur mit `OS.IsDebugBuild()`, im Editor also weiter. F3 und F4 schalten nur zum Testen um und speichern nichts. |
+| Statuszeile | Oben links. Die Bildrate steht dort mit Show FPS, Gegner, Look, Kamera, Ort und Seed nur im Debug-Build. |
+| Knöpfe der Hud | Das Plus im Level-up-Dialog, der Level-up-Knopf, der Knopf der Werteliste und die Knöpfe im Dialog am Portal nehmen keinen Tastaturfokus |
+
+So funktioniert es:
+
+- Der Kern liegt unter `Scripts/Core/Settings`. `GameSettings` hat die Abschnitte `Display`, `Look`, `Audio` und `Input`. Dazu kommen `SettingsSerializer`, `WindowSizes`, `VolumeCurve`, `PixelGrid` und `InputBinding` mit `BindingRules`.
+- `SettingsSerializer` liest tolerant. Ein unbekannter Name fällt auf den Standard, statt die Datei zu verwerfen, `Repair` rückt verbogene Werte auf gültige. Ein fehlender Abschnitt behält seinen Standard.
+- Der Kern kennt Godot nicht. Die Codes von Escape, F1 bis F6 und den Maustasten sind in `BindingRules` aus Godot gespiegelt.
+- `UserSettings` unter `Scripts/Saving` ist ein Autoload aus `project.godot`. Es hängt vor jeder Szene im Baum und wendet Fenster, Bildrate, Ton und Tasten an, bevor Hauptmenü oder Skill-Leiste sie lesen.
+- `Change` ändert, speichert und wendet an. `Preview` wendet an, ohne zu speichern, `Save` schreibt, was gilt. `Rebind` und `ResetBindings` sind für die Tasten. Wer auf Änderungen hören will, hängt sich an `Changed`.
+- Das Fenster fasst `UserSettings` nur an, wenn sich Modus oder Größe ändern (`DisplaySettings.SameWindowAs`). Sonst spränge ein verschobenes Fenster in die Mitte.
+- `SettingsStore` schreibt über eine Zwischendatei mit der Endung `.tmp`. Prüfläufe geben mit `-- --settings-file=user://...` eine eigene Datei an, sonst träfen sie die Einstellungen des Spielers.
+- `Ps1Look` holt Pixelgröße, Dithering, wackelnde Eckpunkte, Schatten und Helligkeit aus den Einstellungen. Das Raster rechnet es aus der Größe des Fensters in echten Pixeln, nicht aus der Leinwand. Die Helligkeit setzt es über das Feld `Surroundings`.
+- Im Inspector an `Ps1Look` sind dadurch Felder entfallen. `Lines`, vorher 240, ist nur noch ein errechneter Wert. `SnapVertices` und `RealShadows` kommen aus den Einstellungen. Aus `Dither` wurde `DitherStrength`, die Stärke des Musters bei eingeschaltetem Dithering.
+- `GameScene` zeigt die Statuszeile und hört dafür auch auf `Changed`. Im Pausenmenü steht `_Process` still, Show FPS wirkt trotzdem sofort.
+- Die Busse stehen in `default_bus_layout.tres`: Master, darunter Music und Effects, alle mit 0 dB. `AudioBuses` nennt ihre Namen. Effekte halten in der Pause mit dem Baum an, die Musik läuft mit `ProcessMode` Always.
+- `KeyBindings` unter `Scripts/Utils` liest die Standardbelegung beim ersten Zugriff aus der InputMap, also aus `project.godot`. Tasten legt es nach ihrer Lage für alle Geräte an. Eine gehaltene Aktion gilt danach als losgelassen.
+- `BindingRules.Resolve` legt die Abweichungen des Spielers über den Standard. Sie werden gesetzt, nicht als Tausch nachgespielt. Fällt ein geänderter Standard auf eine Taste des Spielers, bekommt die Aktion die Standardtaste der anderen.
+- `InputActions.Rebindable` nennt Reihenfolge und Beschriftung der Liste. `toggle_pause_menu` auf Escape steht nicht darin.
+- Das Fenster ist `Scenes/UI/settings_window.tscn` mit `Scripts/UI/SettingsWindow.cs`, die Reiter liegen unter `Scripts/UI/Settings`. Jeder Reiter setzt `ISettingsTab` um: `ShowCurrent` beim Öffnen, `Commit` beim Schließen, `TakesInput` sieht jede Eingabe vor dem Fenster.
+- Haupt- und Pausenmenü haben je ein Einstellungsfenster als Kind. Das Menü tritt zurück, solange es offen ist, Escape führt zurück ins Menü.
+- Der Bereich der Reiter hat eine feste Mindestgröße von 1108 x 700, die Liste der Tasten scrollt darin. So springt das Fenster beim Wechsel der Reiter nicht.
+- Die Skill-Leiste beschriftet ihre Plätze nach jeder Änderung neu. Ladebildschirm und die Anzeige des Town-Portals fragen die Taste, die gerade gilt.
+
+So kommt eine neue Einstellung dazu:
+
+1. Eigenschaft mit Standard im passenden Abschnitt von `GameSettings` anlegen und in dessen `Copy` aufnehmen. Beim Look gehört sie auch in `SameAs`, bei Modus oder Größe des Fensters in `SameWindowAs`.
+2. Gültige Werte in `SettingsSerializer.Repair` sichern. Eine neue Aufzählung bekommt dort einen `LenientEnumConverter`.
+3. Anwenden: in `UserSettings.Apply` oder dort, wo sie wirkt, über `UserSettings.Instance.Current` und `Changed`, wie `Ps1Look` und `GameScene`.
+4. Den Schalter mit eindeutigem Namen in `settings_window.tscn` legen, im Skript des Reiters mit `Change` verbinden und in `ShowCurrent` den Wert zeigen. Im Reiter Display gehört er in die Liste von `SetConfirming`, damit er während der Rückfrage gesperrt ist.
+5. Tests unter `Hoellenspiralenspiel.Tests/Settings`.
+
+Ein neuer Reiter ist ein Kind von `Tabs` mit einem Skript, das `ISettingsTab` umsetzt. Das Fenster findet ihn von selbst.
+
+So kommt eine neue belegbare Aktion dazu:
+
+1. In den Projekteinstellungen eine Aktion mit Standardtaste anlegen, als physische Taste wie die übrigen.
+2. Den Namen in `InputActions` eintragen und mit Beschriftung in `InputActions.Rebindable` aufnehmen. Die Reihenfolge dort ist die Reihenfolge der Liste.
+3. Mehr braucht es nicht. `KeyBindings` liest den Standard, der Reiter Controls zeigt die Aktion, Tausch und Datei laufen über `BindingRules`.
+
+Maustasten nimmt nur eine Aktion, deren Name mit `skill_slot_` beginnt. Aktionen, die mit `ui_` beginnen, und `toggle_pause_menu` lassen sich nicht umbelegen. Wer die Taste anzeigt, fragt `InputActions.GetKeyLabel` und hört auf `UserSettings.Changed` wie die Skill-Leiste. Ein Tipp im Ladebildschirm schreibt sie als `{name}`.
+
+So kommt ein neuer Ton dazu:
+
+- In einer Szene bekommt jeder `AudioStreamPlayer`, auch in 2D und 3D, den Bus Effects, Musik den Bus Music. Ohne Bus spielt er auf Master, die Regler für Musik und Effekte wirken dann nicht, und der Unit-Test `JederTonInEinerSzeneHatEinenBekanntenBus` schlägt fehl.
+- Ein Player aus dem Code setzt `Bus = AudioBuses.Effects` oder `AudioBuses.Music`. Diese Player sieht der Test nicht.
+- Soll ein Ton in der Pause weiterspielen, bekommt er `ProcessMode` Always wie die Musik und der Probeton im Reiter Audio.
+- Überlebt ein Ton seinen Ort, gehört er in die Gruppe `lingering_sounds`. Sonst nimmt die Reise ihn nicht mit.
+- Musik eines Kreises steht im Feld `Music` am Thema, `Descent` spielt sie auf Music.
+- Ein neuer Bus kommt mit 0 dB in `default_bus_layout.tres`, dazu sein Name in `AudioBuses`, ein Anteil in `AudioSettings` samt `Copy` und `Repair`, ein Aufruf in `UserSettings.ApplyAudio`, ein Regler im Reiter Audio und ein Eintrag in `KnownBuses` der `AudioSettingsTests`.
+
+Befunde:
+
+- Godot 4 schaltet die Auflösung des Bildschirms nie um. Größen gibt es deshalb nur im Fenster.
+- Beim Start im Fenster meldet Godot im `_EnterTree` des Autoloads ein fast bildschirmfüllendes Fenster. Eine Größe von dort aus landete 4 Pixel daneben, der Umweg über das Vollbild trifft genau. Aus dem Vollbild ins Fenster muss ein Frame zwischen Modus und Größe liegen.
+- Größe und Lage gelten für die Fläche im Fenster. Titelleiste und Rahmen, beim User 6 x 51 Pixel, müssen mit auf den Bildschirm.
+- Vorher galten feste 240 Bildzeilen, gerechnet auf der Leinwand. Die Zellen waren ungleich, bei 2000 Zeilen abwechselnd 8 und 9 Pixel. Jetzt sind sie gleich groß, in echten Pixeln:
+
+| Fensterhöhe | Coarse | Medium | Fine |
+|---|---|---|---|
+| 2000 | 8, also 250 Zeilen | 6, also 333 Zeilen | 4, also 500 Zeilen |
+| 1440 | 6 | 4 | 3 |
+| 1080 | 5 | 3 | 2 |
+| 720 | 3 | 2 | 1 |
+
+- Vor der Etappe gab es nur zwei Geräusche, keine Musik und nur den Bus Master. Beide Geräusche spielen jetzt auf Effects: der Einschlag von Thunderbolt und `NoManaSound` am Helden.
+
+Rückmeldung des Users:
+
+| Rückmeldung | Änderung |
+|---|---|
+| Der User setzte im Editor `LevelUpEffect` in `hero.tscn` auf y 0,037 statt 1 | Absicht des Users, übernommen in `d374a59` |
+| Das Fenster springt beim Wechsel der Reiter | Jeder Reiter war anders hoch. Der Bereich der Reiter ist jetzt fest 1108 x 700, die Liste der Tasten scrollt im Rest. Das Fenster ist bei jedem Reiter 1184 x 957 groß und steht an derselben Stelle. |
+| Was tun die Einstellungen? | Erklärt. Die Schalter zeigen im Standard-Theme von Godot nur eine kleine Pille, rechts heißt an. Ein eigenes Theme steht in M9. |
+
+Danach fand er: "Sieht alles gut aus".
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Unit-Tests | 88 neue für Datei, Fenstergrößen, Lautstärke, Busse, Pixelgröße und Belegung, darunter ein Zufallstest mit 500 Folgen. Zusammen mit den 21 für `LoadingTips` kamen 109 dazu, insgesamt sind es 844. |
+| Grundlage der Einstellungen | 34 Schritte headless und mit Fenster, darunter der Start randlos, exklusiv und im Fenster samt Wechsel |
+| Einstellungsfenster | 25 Schritte |
+| Anzeige und Tasten | 47 Schritte: 32 headless, 4 nach einem Neustart, 11 mit Fenster |
+| Größe der Reiter | 1 Schritt mit Fenster |
+| Bilder | Pixelgröße 4, 3 und 2 Pixel bei 1600 x 900 |
+
+Vor der Rückmeldung zu den Reitern liefen alle 232 Schritte der Etappe zusammen fehlerfrei.
+
+Bewusst offen gelassen:
+
+- Schalter und Regler sind im Standard-Theme klein und schwer zu lesen. Ein eigenes Theme steht in M9.
+- Die 3D-Welt rendert in voller Fenstergröße und wird erst danach vergröbert. Renderskalierung steht in M9.
+- Einmal meldete ein früher Prüflauf beim Beenden "Fatal error." und ein Leck von vier `GodotShape3D`. In 18 weiteren Läufen kam das nicht wieder.
+
+#### Etappe 2: Reviews
+
+Vier Reviews mit je drei Prüfern, jeden Befund haben drei Skeptiker gegengeprüft. Alle bestätigten Befunde sind behoben:
+
+| Review | Bestätigte Befunde |
+|---|---|
+| Ladebildschirm und Reise | Die Musik eines Kreises begann bei jeder Treppe neu, weil die Reise den Player anhielt |
+| Hud und Grundlage der Einstellungen | Der Level-up-Knopf lag mit `z_index` 10 über dem Todesbildschirm. Ein geschlossener Charakterbogen fing Klicks ab. Die Titelleiste konnte aus dem Bild rutschen. Die Fenstergröße stand doppelt in der Datei. |
+| Einstellungsfenster und Ton | Im Hauptmenü wanderte der Fokus mit Tab auf Knöpfe hinter dem Fenster. Ein Schritt am Regler mit Tastatur oder Mausrad ging beim Beenden verloren. Das Speichern des Tons setzte ein verschobenes Fenster in die Mitte. Der Nachklang des Donners überstand die Reise. |
+| Anzeige und Tasten | `BindingRules.Resolve` verlor nach bestimmten Tauschen beim Laden eine Belegung. Alt+Tab belegte Alt. Eine umbelegte Leertaste drückte Knöpfe der Hud. Das Mausrad meldete beim Abfangen "M4 is reserved". Fine war bei 720 und 1200 Zeilen gleich Medium. Show FPS wirkte erst nach der Pause. Ein Frame Limit außerhalb der Liste erschien als Unlimited. |
 
 ### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L)
 
@@ -1738,6 +2021,8 @@ Fertig, wenn ein Durchlauf des Kreises 30 bis 60 Minuten dauert und Spaß macht.
 - Die übrigen acht Kreise nach dem Muster aus M8.
 - Humoristisches Intro.
 - Objekt-Pooling für Schadenszahlen und Projektile, falls Messungen es nötig machen.
+- Ein eigenes Theme für die Oberfläche. Schalter und Regler sind im Standard-Theme von Godot klein, ob ein Schalter an ist, zeigt nur eine kleine Pille.
+- Renderskalierung. Die 3D-Welt rendert in voller Fenstergröße und wird erst danach auf das Raster der PS1 vergröbert. Beim User sind das 3200 x 2000 Pixel, auf seinem Bild mit rund 40 Bildern pro Sekunde.
 
 ### M10: Koop (L, optional)
 

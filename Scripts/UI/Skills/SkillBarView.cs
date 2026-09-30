@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Godot;
 using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Resources.Skills;
+using Hoellenspiralenspiel.Scripts.Saving;
 using Hoellenspiralenspiel.Scripts.Skills;
 using Hoellenspiralenspiel.Scripts.Utils;
 
@@ -40,10 +41,17 @@ public partial class SkillBarView : HBoxContainer
         picker.SkillChosen          += OnSkillChosen;
         hero.Loadout.SlotChanged    += OnSlotChanged;
         hero.SkillCooldowns.Started += OnCooldownStarted;
+
+        //Nach einer Neubelegung in den Einstellungen stehen die neuen Tasten auf den Plätzen
+        if (UserSettings.Instance is { } settings)
+            settings.Changed += ShowKeys;
     }
 
     public override void _ExitTree()
     {
+        if (UserSettings.Instance is { } settings)
+            settings.Changed -= ShowKeys;
+
         if (hero is null)
             return;
 
@@ -63,6 +71,12 @@ public partial class SkillBarView : HBoxContainer
         slotView.PickerRequested += OpenPicker;
 
         slots.Add(slotView);
+    }
+
+    private void ShowKeys()
+    {
+        foreach (var slotView in slots)
+            slotView.ShowKey(InputActions.GetKeyLabel(InputActions.SkillSlots[slotView.Slot]));
     }
 
     private void OpenPicker(SkillSlotView slotView)

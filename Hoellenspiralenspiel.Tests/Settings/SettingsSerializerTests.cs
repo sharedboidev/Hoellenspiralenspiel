@@ -103,14 +103,15 @@ public class SettingsSerializerTests
     }
 
     [Test]
-    public void GleicheAnzeigeErkenntSich()
+    public void GleichesFensterErkenntSich()
     {
         var display = new DisplaySettings { Mode = DisplayMode.Windowed, WindowWidth = 1280, WindowHeight = 720 };
 
-        Assert.That(display.SameAs(display.Copy()), Is.True);
-        Assert.That(display.SameAs(new DisplaySettings { Mode = DisplayMode.Windowed, WindowWidth = 1280, WindowHeight = 721 }), Is.False);
-        Assert.That(display.SameAs(new DisplaySettings { Mode = DisplayMode.Exclusive, WindowWidth = 1280, WindowHeight = 720 }), Is.False);
-        Assert.That(display.SameAs(null), Is.False);
+        Assert.That(display.SameWindowAs(display.Copy()), Is.True);
+        Assert.That(display.SameWindowAs(new DisplaySettings { Mode = DisplayMode.Windowed, WindowWidth = 1280, WindowHeight = 721 }), Is.False);
+        Assert.That(display.SameWindowAs(new DisplaySettings { Mode = DisplayMode.Exclusive, WindowWidth = 1280, WindowHeight = 720 }), Is.False);
+        Assert.That(display.SameWindowAs(null), Is.False);
+        Assert.That(display.SameWindowAs(new DisplaySettings { Mode = DisplayMode.Windowed, WindowWidth = 1280, WindowHeight = 720, VSync = false, MaxFps = 60 }), Is.True);
     }
 
     [Test]

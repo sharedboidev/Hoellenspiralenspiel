@@ -195,7 +195,7 @@ public partial class Descent : Node
 
     public override void _UnhandledKeyInput(InputEvent @event)
     {
-        if (@event is InputEventKey { Pressed: true, Echo: false, Keycode: Key.F6 } && TestGrounds is not null)
+        if (OS.IsDebugBuild() && @event is InputEventKey { Pressed: true, Echo: false, Keycode: Key.F6 } && TestGrounds is not null)
             Show(IsInTestGrounds ? Hub : TestGrounds, Arrival.AtStart);
     }
 

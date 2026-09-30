@@ -37,6 +37,9 @@ public partial class SkillSlotView : Control
         SetProcess(false);
     }
 
+    public void ShowKey(string keyText)
+        => keyLabel.Text = keyText;
+
     public void ShowSkill(SkillResource newSkill)
     {
         skill        = newSkill;

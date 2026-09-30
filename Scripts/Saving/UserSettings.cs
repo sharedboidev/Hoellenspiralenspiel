@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Settings;
 using Hoellenspiralenspiel.Scripts.Utils;
@@ -11,11 +13,17 @@ public partial class UserSettings : Node
 {
     private const string HeadlessDisplayServer = "headless";
 
+    //Außerhalb des Fensters kennt Godot Titelleiste und Rahmen nicht. So viel Platz halten die Größen zur Auswahl dann frei
+    private static readonly Vector2I EstimatedDecoration = new(16, 64);
+
     public static UserSettings Instance { get; private set; }
 
     private bool hasAppliedDisplay;
 
     public GameSettings Current { get; private set; } = new();
+
+    //Die Belegung, die gerade gilt: der Standard mit den Abweichungen des Spielers darüber
+    public IReadOnlyDictionary<string, InputBinding> Bindings { get; private set; } = new Dictionary<string, InputBinding>();
 
     public event Action Changed;
 
@@ -28,8 +36,7 @@ public partial class UserSettings : Node
 
         Current = SettingsStore.Load();
 
-        ApplyDisplay(Current.Display);
-        ApplyAudio(Current.Audio);
+        Apply(null);
     }
 
     public override void _ExitTree()
@@ -38,31 +45,101 @@ public partial class UserSettings : Node
             Instance = null;
     }
 
-    //Ändert eine Kopie, speichert sie und wendet sie an. Das Fenster fasst sie nur an, wenn sich die Anzeige ändert, sonst spränge ein verschobenes Fenster in die Mitte
+    //Ändert eine Kopie, speichert sie und wendet sie an
     public void Change(Action<GameSettings> change)
+        => Update(change, true);
+
+    //Wirkt sofort, speichert aber nicht. So hört und sieht man einen Regler schon beim Ziehen, Save schreibt dann, was gilt
+    public void Preview(Action<GameSettings> change)
+        => Update(change, false);
+
+    public void Save()
+        => SettingsStore.Save(Current);
+
+    //Belegt eine Aktion nach den Regeln des Kerns und speichert nur, was angenommen wurde
+    public BindingResult Rebind(string action, InputBinding binding)
     {
-        var next = Current.Copy();
+        var bindings = Bindings.ToDictionary(pair => pair.Key, pair => pair.Value);
+        var result   = BindingRules.Assign(bindings, action, binding);
+
+        if (result.Outcome is BindingOutcome.Bound or BindingOutcome.Swapped)
+            Change(settings => settings.Input.Bindings = BindingRules.Overrides(KeyBindings.Defaults, bindings));
+
+        return result;
+    }
+
+    public void ResetBindings()
+        => Change(settings => settings.Input.Bindings = new Dictionary<string, InputBinding>());
+
+    //Wie groß ein Fenster samt Titelleiste und Rahmen höchstens werden kann
+    public PixelSize GetWindowRoom()
+    {
+        if (DisplayServer.GetName() == HeadlessDisplayServer)
+            return WindowSizes.Maximum;
+
+        var usable     = DisplayServer.ScreenGetUsableRect(DisplayServer.WindowGetCurrentScreen());
+        var decoration = DisplayServer.WindowGetMode() == DisplayServer.WindowMode.Windowed ? DisplayServer.WindowGetSizeWithDecorations() - DisplayServer.WindowGetSize() : EstimatedDecoration;
+        var room       = usable.Size - decoration;
+
+        return new PixelSize(room.X, room.Y);
+    }
+
+    private void Update(Action<GameSettings> change, bool isSaved)
+    {
+        var previous = Current;
+        var next     = Current.Copy();
 
         change(next);
 
         SettingsSerializer.Repair(next);
 
-        var isDisplayChanged = !next.Display.SameAs(Current.Display);
-
         Current = next;
 
-        SettingsStore.Save(Current);
+        if (isSaved)
+            Save();
 
-        if (isDisplayChanged)
-            ApplyDisplay(Current.Display);
-
-        ApplyAudio(Current.Audio);
+        Apply(previous);
 
         Changed?.Invoke();
     }
 
-    //Wirkt sofort, speichert aber nicht. Die Regler hören so ihre Wirkung schon beim Ziehen
-    public void ApplyAudio(AudioSettings audio)
+    //Das Fenster fasst sie nur an, wenn sich Modus oder Größe ändern, sonst spränge ein verschobenes Fenster in die Mitte
+    private void Apply(GameSettings previous)
+    {
+        if (previous is null || !Current.Display.SameWindowAs(previous.Display))
+            ApplyWindow(Current.Display);
+
+        ApplyFrames(Current.Display);
+        ApplyAudio(Current.Audio);
+
+        if (previous is null || !IsSame(previous.Input.Bindings, Current.Input.Bindings))
+            ApplyBindings();
+    }
+
+    private void ApplyBindings()
+    {
+        Bindings = BindingRules.Resolve(KeyBindings.Defaults, Current.Input.Bindings);
+
+        KeyBindings.Apply(Bindings);
+    }
+
+    private static bool IsSame(IReadOnlyDictionary<string, InputBinding> first, IReadOnlyDictionary<string, InputBinding> second)
+        => first.Count == second.Count && first.All(pair => second.TryGetValue(pair.Key, out var other) && other == pair.Value);
+
+    private static void ApplyFrames(DisplaySettings display)
+    {
+        Engine.MaxFps = display.MaxFps;
+
+        if (DisplayServer.GetName() == HeadlessDisplayServer)
+            return;
+
+        var vsync = display.VSync ? DisplayServer.VSyncMode.Enabled : DisplayServer.VSyncMode.Disabled;
+
+        if (DisplayServer.WindowGetVsyncMode() != vsync)
+            DisplayServer.WindowSetVsyncMode(vsync);
+    }
+
+    private static void ApplyAudio(AudioSettings audio)
     {
         SetBus(AudioBuses.Master, audio.Master);
         SetBus(AudioBuses.Music, audio.Music);
@@ -87,7 +164,7 @@ public partial class UserSettings : Node
     }
 
     //Ohne Fenster gibt es nichts anzuwenden
-    public async void ApplyDisplay(DisplaySettings display)
+    private async void ApplyWindow(DisplaySettings display)
     {
         if (DisplayServer.GetName() == HeadlessDisplayServer)
             return;

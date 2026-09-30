@@ -117,7 +117,8 @@ public partial class CircleDialog : Control, IClosableWindow
             Name              = $"Level{depth}",
             Text              = isReached ? $"Level {depth}" : $"Level {depth} · not reached",
             Disabled          = !isReached,
-            CustomMinimumSize = LevelButtonSize
+            CustomMinimumSize = LevelButtonSize,
+            FocusMode         = FocusModeEnum.None
         };
 
         button.AddThemeFontSizeOverride("font_size", LevelFontSize);
