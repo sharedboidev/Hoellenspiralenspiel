@@ -7,7 +7,7 @@ Die Rückmeldungen aus dem Spielen von Etappe 3 sind am selben Tag auf `master_P
 Eine zweite Runde Rückmeldungen zu Etappe 3 ist am selben Tag auf `master_PlaytestFeedback3` gebaut: Umriss für alles Benutzbare, Blick zur Maus, Schlag und Zauber binden den Helden, Kaufen per Rechtsklick und der Vergleich oben bündig.
 Etappe 4 ist am 01.10.2026 auf `master_BossAndUnlock` gebaut und liegt seit demselben Tag auf `master`: der Skeleton King als Platzhalter-Boss mit Krone und Boss-Raum, die Freischaltung des nächsten Kreises und das Schlachthaus als Platzhalter für Kreis 2 mit neuen Texturen und Blutspuren. Auf demselben Branch kamen nach dem Spielen das ruhigere Bild des PS1-Looks und die Sichtlinie der Mauern dazu, beide ebenfalls auf `master`.
 Die Renderskalierung ist aus M9 vorgezogen und am 01.10.2026 als M7.5 auf `master_RenderScaling` gebaut und liegt seit demselben Tag auf `master`: Die Welt rendert im Raster der PS1 statt in voller Fenstergröße.
-M8 ist am 02.10.2026 geplant und läuft in 20 Etappen, siehe dort. Etappe 1 ist am selben Tag auf `master_CirclesAndTestPortal` gebaut und liegt noch nicht auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal des Hubs, der Inhaltsstand eines Kreises im Spielstand.
+M8 ist am 02.10.2026 geplant und läuft in 20 Etappen, siehe dort. Etappe 1 ist am selben Tag auf `master_CirclesAndTestPortal` gebaut und liegt seit demselben Tag auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal des Hubs, der Inhaltsstand eines Kreises im Spielstand.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
@@ -2556,7 +2556,7 @@ M8 läuft in 20 Etappen, jede für sich mergefähig, jede lässt `master` spielb
 
 | Etappe | Inhalt | Größe | Stand |
 |---|---|---|---|
-| 1 | Kreise umsortieren: Schlachthaus als Testkreis am zehnten Portal, Wollust als Kreis 2, Inhaltsstand im Spielstand | S | Umgesetzt am 02.10.2026 auf `master_CirclesAndTestPortal` |
+| 1 | Kreise umsortieren: Schlachthaus als Testkreis am zehnten Portal, Wollust als Kreis 2, Inhaltsstand im Spielstand | S | Umgesetzt am 02.10.2026 auf `master_CirclesAndTestPortal`, liegt seit demselben Tag auf `master` |
 | 2 | Kern-Definitionen für Gegner und Held, Kampfsimulation in den Tests | S | Offen |
 | 3a | Freie Flächen I: der Generator im Kern | M | Offen |
 | 3b | Freie Flächen II: Aufbau in Godot, Kette der Flächen, Karte, Spielstand | M | Offen |
