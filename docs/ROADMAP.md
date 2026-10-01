@@ -1578,7 +1578,7 @@ So funktioniert die Reise:
 - `JourneyState` im Kern ist der Weg eines Charakters: wie viele Kreise offen sind, ein `DescentState` je Kreis und die Stelle des Town-Portals.
 - `DescentState` hält je Kreis den Seed, die aktuelle und die tiefste erreichte Tiefe, dazu je Ebene die erkundete Karte und die Gefallenen.
 - `Descent` hängt in `Scenes/game.tscn` und wechselt den Ort. Ein Ort ist entweder eine erzeugte Ebene oder eine handgebaute Szene mit `Place` an der Wurzel. Beides hängt unter dem Knoten `Environment`, Held, Oberfläche und Steuerung bleiben.
-- Die Kreise stehen im Feld `Circles` am Knoten `Descent`. Ein Kreis ist die Resource `LevelThemeResource` mit Nummer, Zahl der Ebenen und Bereichslevel der ersten Ebene.
+- Die Kreise sind die Themen im Ordner `CirclesPath` am Knoten `Descent`, Standard `Resources/Levels`. `Descent` lädt jedes Thema für sich und sortiert nach Nummer. Ein Kreis ist die Resource `LevelThemeResource` mit Nummer, Zahl der Ebenen und Bereichslevel der ersten Ebene.
 - `Passage` ist die gemeinsame Grundlage aller Durchgänge: `CellarDoor`, `StairsUp`, `CirclePortal` und `TownPortal`. Ein Durchgang meldet `Used`, wohin er führt, entscheidet `Descent`.
 - Der Marker `Arrival` unter einem Durchgang ist die Stelle, an der ankommt, wer durch ihn kommt.
 - Jeder Gegner aus einem Spawn-Marker bekommt beim Spawnen eine laufende Nummer, `SpawnIndex`. Stirbt er, merkt sich `DescentState` die Nummer zur Ebene.
@@ -1591,7 +1591,7 @@ So funktioniert die Reise:
 So entsteht ein neuer Kreis:
 
 1. Ein Thema unter `Resources/Levels` anlegen: `Id`, `DisplayName`, `Number`, `LevelCount`, `FirstAreaLevel`, dazu Räume, Aussehen und Gegnerpool wie in M6.
-2. Das Thema in `Scenes/game.tscn` am Knoten `Descent` unter `Circles` eintragen.
+2. Mehr ist nicht nötig, `Descent` liest den Ordner beim Start. Ein Thema ohne Id oder mit doppelter Nummer wird mit einer Warnung übersprungen.
 3. Das Portal mit derselben Nummer steht schon im Hub. Es öffnet sich, sobald der Held so viele Kreise freigeschaltet hat. Bis Etappe 4 ist das nur der erste.
 
 So entsteht ein neuer Ort:
@@ -2440,6 +2440,8 @@ Bewusst offen gelassen:
 - Ein Fleck und seine Spritzer können sich überlappen, so sieht ein Spritzer aus.
 - Der Boss im Schlachthaus schaltet Kreis 3 frei, den es noch nicht gibt. Das Portal im Hub bleibt dunkel und heißt "not yet built".
 - Die älteren Bilder der README zeigen den Hub noch mit einem offenen Portal.
+
+Nachtrag vom 01.10.2026: Auf dem PC des Users blieb nach dem Pull auch das Portal zum Testkreis dunkel und hieß "not yet built". Das Spiel startete dort von der Kommandozeile ohne Editor, darum waren die neuen Texturen des Schlachthauses nicht importiert. `slaughterhouse.tres` lud nicht, und Godot verwarf damit die ganze Liste `Circles` in `game.tscn`, den Testkreis eingeschlossen. Seitdem liest `Descent` die Kreise einzeln aus dem Ordner `CirclesPath`, Standard `Resources/Levels`, die Liste in `game.tscn` entfällt. Ein Thema, das nicht lädt, kostet nur sein eigenes Portal und steht als Warnung im Log, der Rest bleibt offen. Die README nennt den Import `godot --headless --path . --import` für den Start ohne Editor.
 
 ### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L)
 

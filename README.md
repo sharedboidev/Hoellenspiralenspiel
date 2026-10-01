@@ -582,6 +582,12 @@ git clone https://github.com/sharedboidev/Hoellenspiralenspiel.git
 Danach den Ordner in Godot als Projekt importieren und mit `F5` starten.
 Die Hauptszene ist das Hauptmenü `Scenes/main_menu.tscn`. Das Spiel selbst ist `Scenes/game.tscn` und lässt sich auch direkt starten, dann spielt der Charakter auf Platz 1.
 
+Godot importiert neue Texturen nur im Editor. Wer das Spiel ohne Editor von der Kommandozeile startet, lässt sie nach einem Pull einmal importieren, sonst fehlen sie dem Spiel:
+
+```bash
+godot --headless --path . --import
+```
+
 **Tests ausführen**
 
 ```bash

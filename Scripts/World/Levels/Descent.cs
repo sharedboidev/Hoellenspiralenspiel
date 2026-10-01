@@ -1,8 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-using Godot.Collections;
 using Hoellenspiralenspiel.Resources.Levels;
 using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Core.Levels;
@@ -51,11 +51,13 @@ public partial class Descent : Node
     private const int   TownPortalDirections = 8;
     private const float SouthDegrees         = 90f;
 
-    private Cell?             lastCell;
-    private float             lastRevealRadius;
-    private AudioStreamPlayer music;
-    private TownPortal        openPortal;
-    private SurfaceLook       surfaceLook;
+    private readonly List<LevelThemeResource> circles = new();
+    private          bool                     areCirclesLoaded;
+    private          Cell?                    lastCell;
+    private          float                    lastRevealRadius;
+    private          AudioStreamPlayer        music;
+    private          TownPortal               openPortal;
+    private          SurfaceLook              surfaceLook;
 
     [Export]
     public Hero Hero { get; set; }
@@ -87,8 +89,9 @@ public partial class Descent : Node
     [Export]
     public PackedScene TestGrounds { get; set; }
 
-    [Export]
-    public Array<LevelThemeResource> Circles { get; set; } = new();
+    //Jedes Thema in diesem Ordner ist ein Kreis. Der Abstieg lädt sie einzeln, ein Thema, das nicht lädt, nimmt die anderen nicht mit
+    [Export(PropertyHint.Dir)]
+    public string CirclesPath { get; set; } = "res://Resources/Levels";
 
     [ExportGroup("Town-Portal")]
     [Export]
@@ -143,7 +146,18 @@ public partial class Descent : Node
 
     public bool IsInTestGrounds => Place is not null && TestGrounds is not null && Place.SceneFilePath == TestGrounds.ResourcePath;
 
-    public LevelThemeResource FirstCircle => Circles.Where(circle => circle is not null).OrderBy(circle => circle.Number).FirstOrDefault();
+    //Nach Nummer sortiert. Ein Kreis, dessen Thema nicht lädt, fehlt hier, sein Portal im Hub bleibt dunkel
+    public IReadOnlyList<LevelThemeResource> Circles
+    {
+        get
+        {
+            EnsureCirclesLoaded();
+
+            return circles;
+        }
+    }
+
+    public LevelThemeResource FirstCircle => Circles.FirstOrDefault();
 
     public event Action LevelEntered;
     public event Action PlaceEntered;
@@ -209,10 +223,10 @@ public partial class Descent : Node
     }
 
     public LevelThemeResource FindCircle(string circleId)
-        => Circles.FirstOrDefault(circle => circle is not null && circle.Id == circleId);
+        => Circles.FirstOrDefault(circle => circle.Id == circleId);
 
     public LevelThemeResource FindCircle(int number)
-        => Circles.FirstOrDefault(circle => circle is not null && circle.Number == number);
+        => Circles.FirstOrDefault(circle => circle.Number == number);
 
     public void ShowHub()
         => Show(Hub, Arrival.AtStart);
@@ -370,6 +384,48 @@ public partial class Descent : Node
         PlaceEntered?.Invoke();
 
         Populate(place, arrival);
+    }
+
+    //Lädt jedes Thema für sich. Scheitert eines, etwa weil eine Textur noch nicht importiert ist, bleibt nur dieser Kreis dunkel
+    private void EnsureCirclesLoaded()
+    {
+        if (areCirclesLoaded)
+            return;
+
+        areCirclesLoaded = true;
+
+        foreach (var path in ResourceFiles.ListIn(CirclesPath))
+        {
+            var resource = ResourceLoader.Load(path);
+
+            if (resource is null)
+                GD.PushWarning($"Der Kreis {path} ließ sich nicht laden, sein Portal im Hub bleibt dunkel.");
+            else if (resource is LevelThemeResource circle)
+                AddCircle(circle, path);
+        }
+
+        circles.Sort((left, right) => left.Number.CompareTo(right.Number));
+
+        GD.Print($"Loaded {circles.Count} circles");
+    }
+
+    private void AddCircle(LevelThemeResource circle, string path)
+    {
+        if (string.IsNullOrWhiteSpace(circle.Id))
+        {
+            GD.PushWarning($"Der Kreis {path} hat keine Id und wird übersprungen.");
+
+            return;
+        }
+
+        if (circles.Any(other => other.Id == circle.Id || other.Number == circle.Number))
+        {
+            GD.PushWarning($"Der Kreis {path} teilt Id oder Nummer mit einem anderen Kreis und wird übersprungen.");
+
+            return;
+        }
+
+        circles.Add(circle);
     }
 
     private void BuildLevel(LevelThemeResource circle, int wantedDepth, Arrival arrival)
