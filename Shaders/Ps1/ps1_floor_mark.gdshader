@@ -1,7 +1,10 @@
 shader_type spatial;
 render_mode blend_mix, cull_back, diffuse_lambert, specular_disabled;
 
-// Eine Spur auf dem Boden, etwa ein Pentagramm. Sieht aus wie ps1_surface, der Alphakanal des Bilds schneidet sie aus
+// Eine Spur auf dem Boden, etwa ein Pentagramm. Sieht aus wie ps1_surface, der Alphakanal des Bilds schneidet sie aus.
+// LIFTED rückt sie vor die Fläche, siehe ps1_common
+
+#define LIFTED
 
 #include "res://Shaders/Ps1/ps1_common.gdshaderinc"
 

@@ -11,7 +11,7 @@ render_mode unshaded, blend_mix, depth_draw_never, depth_test_disabled, cull_dis
 uniform sampler2D depth_texture : hint_depth_texture, filter_nearest, repeat_disable;
 uniform sampler2D normal_roughness_texture : hint_normal_roughness_texture, filter_nearest, repeat_disable;
 
-uniform vec2 snap_resolution = vec2(426.0, 240.0);
+uniform vec2 screen_resolution = vec2(426.0, 240.0);
 
 // Breite in Zellen des PS1-Rasters, gesetzt von Ps1Look
 uniform int outline_width : hint_range(1, 4) = 1;
@@ -39,8 +39,8 @@ vec3 glow_color(float hue) {
 }
 
 void fragment() {
-	vec2 cell = floor(SCREEN_UV * snap_resolution);
-	vec2 center = (cell + 0.5) / snap_resolution;
+	vec2 cell = floor(SCREEN_UV * screen_resolution);
+	vec2 center = (cell + 0.5) / screen_resolution;
 	int own = mark_kind(roughness_at(center));
 
 	// Über eine Figur zieht kein Rand. Sonst liefe er innen um jeden Arm
@@ -61,7 +61,7 @@ void fragment() {
 				continue;
 			}
 
-			vec2 uv = (cell + vec2(float(x), float(y)) + 0.5) / snap_resolution;
+			vec2 uv = (cell + vec2(float(x), float(y)) + 0.5) / screen_resolution;
 
 			// Nur wo der Nachbar vor dem liegt, was hier zu sehen ist. Eine Mauer vor der Figur bekommt keinen Rand
 			if (texture(depth_texture, uv).r <= depth) {

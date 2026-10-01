@@ -2443,6 +2443,28 @@ Bewusst offen gelassen:
 
 Nachtrag vom 01.10.2026: Auf dem PC des Users blieb nach dem Pull auch das Portal zum Testkreis dunkel und hieß "not yet built". Das Spiel startete dort von der Kommandozeile ohne Editor, darum waren die neuen Texturen des Schlachthauses nicht importiert. `slaughterhouse.tres` lud nicht, und Godot verwarf damit die ganze Liste `Circles` in `game.tscn`, den Testkreis eingeschlossen. Seitdem liest `Descent` die Kreise einzeln aus dem Ordner `CirclesPath`, Standard `Resources/Levels`, die Liste in `game.tscn` entfällt. Ein Thema, das nicht lädt, kostet nur sein eigenes Portal und steht als Warnung im Log, der Rest bleibt offen. Die README nennt den Import `godot --headless --path . --import` für den Start ohne Editor.
 
+Nachtrag vom 01.10.2026, ruhigeres Bild: Der User meldete nach dem Spielen, dass bei grober Körnung alles, was sich bewegt, extrem zappelt, dass die neuen Blutflecken beim Vorbeilaufen blinken und dass die Wandtextur stellenweise durchscheint. Seine Vermutung waren die Texturen der Materialien. Gebaut am selben Tag auf `master_BossAndUnlock`.
+
+| Befund | Ursache | Abhilfe |
+|---|---|---|
+| Blinkende Spuren, durchscheinende Wand | Das Einrasten der Eckpunkte verschiebt die Ecken einer Spur anders als die der Kachel darunter. Die Tiefe wird über die verschobenen Dreiecke interpoliert, der Fehler reicht bis zu einem Rasterpixel mal Tiefensteigung der Fläche, bei 30° Neigung rund 10 cm auf dem Boden. Die 2 cm Abstand der Quads reichten nicht, die Fläche gewann je Bild anders. | `ps1_wall_mark` und `ps1_floor_mark` setzen `#define LIFTED`. `ps1_common` rückt ihre Eckpunkte längs des Blicks zur Kamera: 2 cm plus ein Rasterpixel mal Steigung, gerechnet aus der Normale im Kamerasystem. Im Bild bleibt die Spur, wo sie ist, und der Held behält mitten in einer Lache seine Füße. |
+| Zappeln der Figuren | Die Eckpunkte rasteten auf dem Raster der Pixelgröße ein, bei Coarse auf 8 Bildschirmpixeln. Dazu Textur-Aliasing: Ein Pixel des Rasters deckte mehrere Texel, ohne Mipmaps griff es sich je Bild ein anderes. | `SnapGrain` an `Ps1Look`, Standard Fine: Eckpunkte rasten immer auf dem feinen Raster ein, `snap_resolution` und `screen_resolution` sind getrennte Uniforms. Texturen mit Mipmaps und `filter_nearest_mipmap`, die Stufe kommt als Varying `texel_lod` aus der Zellgröße, weil die Welt in voller Fenstergröße rendert und die Mipmap sonst nie griffe. |
+| Dunkles Skelett, dunkler Saum an Spuren nach den Mipmaps | Unter durchsichtigen Texeln lag Schwarz, die Mipmaps mischten es in die Knochen und Ränder. | Alpha-Bleeding: Jeder durchsichtige Texel trägt die Farbe des nächsten undurchsichtigen, der Alphakanal ist unverändert. Betrifft `skeleton_albedo.webp` und die sechs Blutbilder. Beim nächsten Export aus Blender wieder nötig. |
+
+Gemessen mit Fenster 1600 x 900 auf Kreis 2 mit Seed 4242: Die Kamera fuhr vom Helden gelöst 24 Schritte je 1 cm, je Bild wurden die Zellen gezählt, die sich im Rechteck eines Dings ändern, und die roten Zellen einer Spur.
+
+| Ding bei Coarse | Geänderte Zellen je Bild vorher | nachher | Rote Zellen mindestens vorher | nachher |
+|---|---|---|---|---|
+| Lache | 15,6 % | 8,8 % | 262 von rund 480 | 453 |
+| Spur an der Mauer | 12,1 % | 3,6 % | 241 von rund 400 | 391 |
+| Skelett | 10,2 % | 4,9 % | | |
+| Held | 12,3 % | 7,0 % | | |
+| Blob | 6,2 % | 2,1 % | | |
+
+Fallen: Godot spiegelt im Vulkan-Renderer die Y-Achse der Projektionsmatrix, `PROJECTION_MATRIX[1][1]` ist im Shader negativ, deshalb der Betrag. Built-ins wie `VIEWPORT_SIZE` sind in Hilfsfunktionen des Shaders nicht erlaubt, deshalb das Varying. `UnprojectPosition` rechnet in der Leinwand von 2560 x 1440, ein Bild aus `GetViewport().GetTexture()` hat die Fenstergröße.
+
+Bewusst offen gelassen: Die Welt rendert weiter in voller Fenstergröße, siehe Renderskalierung unter M9. Wer das alte, starke Wackeln will, stellt `SnapGrain` auf Coarse.
+
 ### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L)
 
 Ziel: ein Kreis in Endqualität als Vorlage für alle weiteren.

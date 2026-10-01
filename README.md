@@ -414,6 +414,7 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 | Feature | Beschreibung |
 |---|---|
 | PS1-Look | Wackelnde Eckpunkte, verzogene Texturen, grobe Pixel, 15 Bit Farbtiefe mit Punktmuster |
+| Ruhiges Bild | Die Eckpunkte rasten bei jeder Pixelgröße auf dem feinen Raster ein (`SnapGrain` am Knoten `Ps1Look`), Texturen tragen Mipmaps in der Stufe der Pixelgröße, und Spuren an Mauern und Boden rücken längs des Blicks vor ihre Fläche, damit sie nicht flackern. Texturen mit Alphakanal brauchen Alpha-Bleeding, sonst mischen die Mipmaps Schwarz in die Ränder |
 | Ganzzahlige Pixel | Ein PS1-Pixel deckt immer gleich viele Pixel des Bildschirms: die Fensterhöhe geteilt durch 240, 360 oder 480, gerundet. Ab 600 Zeilen ist jede feinere Stufe echt feiner, notfalls um einen Pixel kleiner als die gröbere. Darunter sind Medium und Fine gleich. Bei 1080 Zeilen sind es 5, 3 und 2 Pixel, bei 1440 Zeilen 6, 4 und 3 |
 | Einstellbar | Pixel Size (Coarse, Medium, Fine), Dithering, Wobbly Vertices, Real Shadows und Brightness stehen im Reiter Display der Einstellungen. Standard: Coarse, alle Schalter an, Brightness 100 % |
 | Umriss | Held und Gegner tragen einen dunklen Rand von einem PS1-Pixel, der Gegner unter der Maus einen roten. Die Breite steht als `OutlineWidth` am Knoten `Ps1Look`. |

@@ -2,7 +2,9 @@ shader_type spatial;
 render_mode blend_mix, cull_back, diffuse_lambert, specular_disabled;
 
 // Eine Spur auf dem Mauerwerk, etwa ein blutiger Handabdruck. Sie öffnet sich mit dem Mauerstück, an dem sie klebt,
-// und der Alphakanal ihres Bilds schneidet sie aus
+// und der Alphakanal ihres Bilds schneidet sie aus. LIFTED rückt sie vor die Fläche, siehe ps1_common
+
+#define LIFTED
 
 #include "res://Shaders/Ps1/ps1_common.gdshaderinc"
 #include "res://Shaders/Ps1/ps1_wall.gdshaderinc"

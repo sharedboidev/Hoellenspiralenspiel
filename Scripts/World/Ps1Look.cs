@@ -18,6 +18,7 @@ public partial class Ps1Look : Node
 
     private static readonly StringName Snap            = "snap";
     private static readonly StringName SnapResolution  = "snap_resolution";
+    private static readonly StringName ScreenResolution = "screen_resolution";
     private static readonly StringName Affine          = "affine";
     private static readonly StringName Resolution      = "resolution";
     private static readonly StringName ColorLevelsKey  = "color_levels";
@@ -40,6 +41,10 @@ public partial class Ps1Look : Node
 
     [Export(PropertyHint.Range, "0,1,0.05")]
     public float AffineTextures { get; set; } = 1f;
+
+    //Auf diesem Raster rasten die Eckpunkte ein, unabhängig von der Pixelgröße. Auf dem groben Raster zappelt alles, was sich bewegt
+    [Export]
+    public PixelGrain SnapGrain { get; set; } = PixelGrain.Fine;
 
     //Breite des Rands um Held und Gegner in Pixeln der PS1, 0 schaltet ihn ab. Lässt sich im laufenden Spiel verstellen
     [Export(PropertyHint.Range, "0,4,1")]
@@ -150,7 +155,7 @@ public partial class Ps1Look : Node
             }
         }
 
-        TuneTree(World ?? GetParent(), resolution);
+        TuneTree(World ?? GetParent(), resolution, GetResolution(SnapGrain));
         ApplyOutline();
 
         Changed?.Invoke();
@@ -195,18 +200,22 @@ public partial class Ps1Look : Node
             return;
 
         material.SetShaderParameter(OutlineWidthKey, Math.Max(1, OutlineWidth));
-        material.SetShaderParameter(SnapResolution, GetResolution());
+        material.SetShaderParameter(ScreenResolution, GetResolution());
     }
 
-    //Gerechnet in echten Pixeln des Fensters, damit jede Zelle gleich groß ist. Die Leinwand der Oberfläche wäre gestreckt
+    //Das Raster des Bildes
     private Vector2 GetResolution()
+        => GetResolution(Grain);
+
+    //Gerechnet in echten Pixeln des Fensters, damit jede Zelle gleich groß ist. Die Leinwand der Oberfläche wäre gestreckt
+    private Vector2 GetResolution(PixelGrain grain)
     {
         var pixels = GetWindow()?.Size ?? Vector2I.Zero;
 
         if (pixels.X <= 0 || pixels.Y <= 0)
-            return new Vector2(PixelGrid.TargetLines(Grain) * 16f / 9f, PixelGrid.TargetLines(Grain));
+            return new Vector2(PixelGrid.TargetLines(grain) * 16f / 9f, PixelGrid.TargetLines(grain));
 
-        var cell = PixelGrid.CellSize(pixels.Y, Grain);
+        var cell = PixelGrid.CellSize(pixels.Y, grain);
 
         return new Vector2((float)pixels.X / cell, (float)pixels.Y / cell);
     }
@@ -219,19 +228,19 @@ public partial class Ps1Look : Node
         Callable.From(() =>
         {
             if (IsInstanceValid(node) && node.IsInsideTree())
-                Tune(node, GetResolution());
+                Tune(node, GetResolution(), GetResolution(SnapGrain));
         }).CallDeferred();
     }
 
-    private void TuneTree(Node node, Vector2 resolution)
+    private void TuneTree(Node node, Vector2 resolution, Vector2 snapResolution)
     {
-        Tune(node, resolution);
+        Tune(node, resolution, snapResolution);
 
         foreach (var child in node.GetChildren())
-            TuneTree(child, resolution);
+            TuneTree(child, resolution, snapResolution);
     }
 
-    private void Tune(Node node, Vector2 resolution)
+    private void Tune(Node node, Vector2 resolution, Vector2 snapResolution)
     {
         if (node.IsInGroup(BlobShadowGroup) && node is Node3D blobShadow)
             blobShadow.Visible = Enabled && !RealShadows;
@@ -240,7 +249,7 @@ public partial class Ps1Look : Node
         {
             case MeshInstance3D mesh:
                 for (var surface = 0; surface < mesh.GetSurfaceOverrideMaterialCount(); surface++)
-                    Tune(mesh.GetActiveMaterial(surface), resolution);
+                    Tune(mesh.GetActiveMaterial(surface), resolution, snapResolution);
 
                 break;
             case Light3D light:
@@ -255,13 +264,14 @@ public partial class Ps1Look : Node
         }
     }
 
-    private void Tune(Material material, Vector2 resolution)
+    private void Tune(Material material, Vector2 resolution, Vector2 snapResolution)
     {
         if (material is not ShaderMaterial surface || !IsPs1Shader(surface.Shader))
             return;
 
         surface.SetShaderParameter(Snap, Enabled && SnapVertices ? 1f : 0f);
-        surface.SetShaderParameter(SnapResolution, resolution);
+        surface.SetShaderParameter(SnapResolution, snapResolution);
+        surface.SetShaderParameter(ScreenResolution, resolution);
         surface.SetShaderParameter(Affine, Enabled ? AffineTextures : 0f);
     }
 
