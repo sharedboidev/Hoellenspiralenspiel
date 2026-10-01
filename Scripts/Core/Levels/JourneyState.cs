@@ -8,6 +8,9 @@ public readonly record struct TownPortalSpot(string CircleId, int Depth, float X
 //Der Weg eines Charakters durch die Hölle: welche Kreise offen sind, wie weit er in jedem kam und wo sein Town-Portal steht
 public sealed class JourneyState
 {
+    //Neun Höllenkreise, mehr gibt es nicht
+    public const int LastCircle = 9;
+
     private readonly Dictionary<string, DescentState> descents = new();
 
     public int UnlockedCircles { get; private set; } = 1;
@@ -30,7 +33,7 @@ public sealed class JourneyState
         => circleNumber >= 1 && circleNumber <= UnlockedCircles;
 
     public void Unlock(int circleNumber)
-        => UnlockedCircles = Math.Max(UnlockedCircles, circleNumber);
+        => UnlockedCircles = Math.Clamp(Math.Max(UnlockedCircles, circleNumber), 1, LastCircle);
 
     //Mit den Ebenen verschwindet auch das Portal, das in ihnen stand
     public void BeginAnew(string circleId, int seed)
@@ -54,7 +57,7 @@ public sealed class JourneyState
     {
         descents.Clear();
 
-        UnlockedCircles = Math.Max(1, unlockedCircles);
+        UnlockedCircles = Math.Clamp(unlockedCircles, 1, LastCircle);
         TownPortal      = null;
     }
 }

@@ -74,6 +74,7 @@ public partial class Enemy : BaseUnit
     private Vector3                           spawnPoint;
     private WeaponProfile                     weapon = WeaponProfile.Unarmed;
     private PackedScene                       weaponProjectileScene;
+    private EnemyRarity                       rarity;
 
     [Export]
     public EnemyResource Definition { get; set; }
@@ -99,7 +100,7 @@ public partial class Enemy : BaseUnit
 
     public IReadOnlyList<MonsterModResource> Mods => mods;
 
-    public EnemyRarity Rarity => EnemyRarityRules.FromModCount(mods.Count);
+    public EnemyRarity Rarity => rarity;
 
     public EnemyState State => brain.State;
 
@@ -119,6 +120,8 @@ public partial class Enemy : BaseUnit
 
     public NameTag NameTag => nameTag;
 
+    public Color NameColor => look.NameColor;
+
     public EliteAura Aura => aura;
 
     public override Faction Faction      => Faction.Monster;
@@ -135,13 +138,14 @@ public partial class Enemy : BaseUnit
     public event EngagedEventHandler  Engaged;
     public event ProvokedEventHandler Provoked;
 
-    //Vor dem Einhängen in den Szenenbaum aufrufen
-    public void Configure(EnemyResource definition, int level, IReadOnlyList<MonsterModResource> rolledMods = null, EnemyRarityLook rarityLook = null)
+    //Vor dem Einhängen in den Szenenbaum aufrufen. Ohne Stufe folgt sie der Zahl der Mods
+    public void Configure(EnemyResource definition, int level, IReadOnlyList<MonsterModResource> rolledMods = null, EnemyRarityLook rarityLook = null, EnemyRarity? rank = null)
     {
         Definition = definition;
         Level      = level;
         mods       = rolledMods ?? [];
         look       = rarityLook ?? EnemyRarityLook.Normal;
+        rarity     = rank ?? EnemyRarityRules.FromModCount(mods.Count);
     }
 
     public override void _Ready()

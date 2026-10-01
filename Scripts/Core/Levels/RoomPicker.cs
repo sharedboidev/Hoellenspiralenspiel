@@ -11,7 +11,7 @@ public static class RoomPicker
     {
         var allowed = blueprints.Where(blueprint => blueprint.MinAreaLevel <= settings.AreaLevel).ToList();
         var start   = PickByWeight(allowed.Where(blueprint => blueprint.Role == RoomRole.Start).ToList(), random);
-        var exit    = PickByWeight(allowed.Where(blueprint => blueprint.Role == RoomRole.Exit).ToList(), random);
+        var exit    = PickByWeight(allowed.Where(blueprint => blueprint.Role == ExitRoleFor(settings, allowed)).ToList(), random);
 
         if (start is null || exit is null)
             throw new LevelGenerationException($"Für das Bereichslevel {settings.AreaLevel} fehlt eine Vorlage für den Start oder den Ausgang.");
@@ -33,6 +33,10 @@ public static class RoomPicker
 
         return [start, .. between, exit];
     }
+
+    //Auf der letzten Ebene steht der Boss-Raum an der Stelle des Ausgangs, falls das Thema einen hat
+    private static RoomRole ExitRoleFor(LevelSettings settings, List<RoomBlueprint> allowed)
+        => settings.IsLastLevel && allowed.Exists(blueprint => blueprint.Role == RoomRole.Boss) ? RoomRole.Boss : RoomRole.Exit;
 
     private static bool IsFiller(RoomBlueprint blueprint)
         => blueprint.Role is RoomRole.Normal or RoomRole.Event;

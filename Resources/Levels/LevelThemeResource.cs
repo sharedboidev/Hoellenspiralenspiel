@@ -35,6 +35,11 @@ public partial class LevelThemeResource : Resource
     [Export]
     public AudioStream Music { get; set; }
 
+    //Bilder an Mauern und auf dem Boden, etwa Blutspuren. Der Aufbau der Ebene verteilt sie nach dem Seed der Ebene
+    [ExportGroup("Spuren")]
+    [Export]
+    public Array<LevelMarkResource> Marks { get; set; } = new();
+
     [ExportGroup("Bau")]
     [Export]
     public Texture2D FloorTexture { get; set; }

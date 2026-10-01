@@ -1,0 +1,170 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Environment/BossPortal.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_object.gdshader" id="2_object"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="3_surface"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_floor_mark.gdshader" id="4_mark"]
+[ext_resource type="Texture2D" path="res://Textures/World/Marks/blood_pentagram.png" id="5_pentagram"]
+
+[sub_resource type="BoxShape3D" id="Shape_pick"]
+size = Vector3(2.4, 3.4, 1)
+
+[sub_resource type="SphereMesh" id="Mesh_vortex"]
+radius = 1.0
+height = 2.0
+radial_segments = 12
+rings = 6
+
+[sub_resource type="ShaderMaterial" id="Mat_vortex"]
+shader = ExtResource("2_object")
+shader_parameter/albedo = Color(0.05, 0, 0.01, 1)
+shader_parameter/emission = Color(0.9, 0.08, 0.02, 1)
+shader_parameter/emission_energy = 1.6
+
+[sub_resource type="SphereMesh" id="Mesh_core"]
+radius = 0.45
+height = 0.9
+radial_segments = 10
+rings = 5
+
+[sub_resource type="ShaderMaterial" id="Mat_core"]
+shader = ExtResource("2_object")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/emission = Color(1, 0.45, 0.15, 1)
+shader_parameter/emission_energy = 5.0
+
+[sub_resource type="CylinderMesh" id="Mesh_horn"]
+top_radius = 0.0
+bottom_radius = 0.13
+height = 0.7
+radial_segments = 6
+rings = 1
+
+[sub_resource type="ShaderMaterial" id="Mat_bone"]
+shader = ExtResource("2_object")
+shader_parameter/albedo = Color(0.82, 0.76, 0.64, 1)
+
+[sub_resource type="TorusMesh" id="Mesh_ring"]
+inner_radius = 1.05
+outer_radius = 1.3
+rings = 12
+ring_segments = 6
+
+[sub_resource type="ShaderMaterial" id="Mat_stone"]
+shader = ExtResource("3_surface")
+shader_parameter/albedo = Color(0.18, 0.12, 0.12, 1)
+
+[sub_resource type="TorusMesh" id="Mesh_glow_ring"]
+inner_radius = 1.32
+outer_radius = 1.44
+rings = 12
+ring_segments = 4
+
+[sub_resource type="ShaderMaterial" id="Mat_glow_ring"]
+shader = ExtResource("3_surface")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/emission = Color(1, 0.55, 0.2, 1)
+shader_parameter/emission_energy = 4.0
+
+[sub_resource type="QuadMesh" id="Mesh_sigil"]
+size = Vector2(2.8, 2.8)
+
+[sub_resource type="ShaderMaterial" id="Mat_sigil"]
+shader = ExtResource("4_mark")
+shader_parameter/albedo_texture = ExtResource("5_pentagram")
+shader_parameter/emission = Color(0.6, 0.03, 0.02, 1)
+shader_parameter/emission_energy = 0.6
+
+[node name="BossPortal" type="Area3D" node_paths=PackedStringArray("Glow", "Look", "Vortex", "Light")]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_script")
+Look = NodePath("Look")
+Vortex = NodePath("Look/Vortex")
+Light = NodePath("Look/Light")
+Glow = NodePath("Glow")
+UseRadius = 200.0
+OutlineGlow = Color(1, 0.1, 0.05, 1)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+shape = SubResource("Shape_pick")
+
+[node name="Sigil" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0.03, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_sigil")
+surface_material_override/0 = SubResource("Mat_sigil")
+
+[node name="Ring" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
+mesh = SubResource("Mesh_ring")
+surface_material_override/0 = SubResource("Mat_stone")
+
+[node name="Look" type="Node3D" parent="."]
+
+[node name="Vortex" type="MeshInstance3D" parent="Look"]
+transform = Transform3D(1, 0, 0, 0, 1.25, 0, 0, 0, 0.08, 0, 1.45, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_vortex")
+surface_material_override/0 = SubResource("Mat_vortex")
+
+[node name="Core" type="MeshInstance3D" parent="Look"]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 0.1, 0, 1.45, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_core")
+surface_material_override/0 = SubResource("Mat_core")
+
+[node name="Horn1" type="MeshInstance3D" parent="Look"]
+transform = Transform3D(0.342, 0.94, 0, -0.94, 0.342, 0, 0, 0, 1, 1.27, 2.0, 0)
+mesh = SubResource("Mesh_horn")
+surface_material_override/0 = SubResource("Mat_bone")
+
+[node name="Horn2" type="MeshInstance3D" parent="Look"]
+transform = Transform3D(1.126, 0.65, 0, -0.65, 1.126, 0, 0, 0, 1.3, 0.675, 2.83, 0)
+mesh = SubResource("Mesh_horn")
+surface_material_override/0 = SubResource("Mat_bone")
+
+[node name="Horn3" type="MeshInstance3D" parent="Look"]
+transform = Transform3D(1.126, -0.65, 0, 0.65, 1.126, 0, 0, 0, 1.3, -0.675, 2.83, 0)
+mesh = SubResource("Mesh_horn")
+surface_material_override/0 = SubResource("Mat_bone")
+
+[node name="Horn4" type="MeshInstance3D" parent="Look"]
+transform = Transform3D(0.342, -0.94, 0, 0.94, 0.342, 0, 0, 0, 1, -1.27, 2.0, 0)
+mesh = SubResource("Mesh_horn")
+surface_material_override/0 = SubResource("Mat_bone")
+
+[node name="Horn5" type="MeshInstance3D" parent="Look"]
+transform = Transform3D(-0.342, -0.94, 0, 0.94, -0.342, 0, 0, 0, 1, -1.27, 0.9, 0)
+mesh = SubResource("Mesh_horn")
+surface_material_override/0 = SubResource("Mat_bone")
+
+[node name="Horn6" type="MeshInstance3D" parent="Look"]
+transform = Transform3D(-0.342, 0.94, 0, -0.94, -0.342, 0, 0, 0, 1, 1.27, 0.9, 0)
+mesh = SubResource("Mesh_horn")
+surface_material_override/0 = SubResource("Mat_bone")
+
+[node name="Light" type="OmniLight3D" parent="Look"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0.8)
+light_color = Color(1, 0.18, 0.06, 1)
+light_energy = 3.0
+omni_range = 8.0
+
+[node name="Glow" type="Node3D" parent="."]
+
+[node name="GlowRing" type="MeshInstance3D" parent="Glow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.07, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_glow_ring")
+surface_material_override/0 = SubResource("Mat_glow_ring")
+
+[node name="GlowLight" type="OmniLight3D" parent="Glow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 1.2)
+light_color = Color(1, 0.6, 0.3, 1)
+light_energy = 2.0
+omni_range = 5.0
+
+[node name="Arrival" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.9)

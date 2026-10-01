@@ -24,6 +24,7 @@
 [ext_resource type="Script" path="res://Scripts/UI/LootLabels.cs" id="31_loot_labels"]
 [ext_resource type="Script" path="res://Scripts/World/Levels/Descent.cs" id="32_descent"]
 [ext_resource type="Resource" path="res://Resources/Levels/test_circle.tres" id="33_theme"]
+[ext_resource type="Resource" path="res://Resources/Levels/slaughterhouse.tres" id="52_slaughterhouse"]
 [ext_resource type="Script" path="res://Scripts/UI/LevelMap.cs" id="34_level_map"]
 [ext_resource type="Script" path="res://Scripts/World/GameScene.cs" id="40_game"]
 [ext_resource type="PackedScene" path="res://Scenes/Places/hub.tscn" id="41_hub"]
@@ -33,6 +34,7 @@
 [ext_resource type="Script" path="res://Scripts/UI/TownPortalBadge.cs" id="45_badge"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/circle_dialog.tscn" id="46_circle_dialog"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/curtain.tscn" id="47_curtain"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/boss_bar.tscn" id="53_boss_bar"]
 [ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit_outline.gdshader" id="48_outline"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/pause_menu.tscn" id="49_pause_menu"]
 [ext_resource type="Script" path="res://Scripts/UI/MapFrame.cs" id="51_map_frame"]
@@ -347,6 +349,9 @@ horizontal_alignment = 2
 script = ExtResource("45_badge")
 Descent = NodePath("../../Descent")
 
+[node name="BossBar" parent="Hud" instance=ExtResource("53_boss_bar")]
+unique_name_in_owner = true
+
 [node name="CircleDialog" parent="Hud" instance=ExtResource("46_circle_dialog")]
 unique_name_in_owner = true
 visible = false
@@ -392,5 +397,5 @@ Moonlight = NodePath("../Moonlight")
 Curtain = NodePath("../Hud/Curtain")
 Hub = ExtResource("41_hub")
 TestGrounds = ExtResource("42_test_grounds")
-Circles = Array[ExtResource("43_theme_script")]([ExtResource("33_theme")])
+Circles = Array[ExtResource("43_theme_script")]([ExtResource("33_theme"), ExtResource("52_slaughterhouse")])
 TownPortalScene = ExtResource("44_town_portal")

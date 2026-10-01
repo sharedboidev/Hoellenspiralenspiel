@@ -266,5 +266,5 @@ public partial class Ps1Look : Node
     }
 
     private bool IsPs1Shader(Shader shader)
-        => shader == SurfaceShader || shader == ObjectOutline.Shader || shader == WallFade.MasonryShader || UnitSight.IsUnitShader(shader);
+        => shader == SurfaceShader || shader == ObjectOutline.Shader || shader == WallFade.MasonryShader || shader == WallFade.MarkShader || shader == LevelMarks.FloorShader || UnitSight.IsUnitShader(shader);
 }

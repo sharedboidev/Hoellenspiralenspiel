@@ -14,6 +14,7 @@ namespace Hoellenspiralenspiel.Scripts.Controllers;
 
 public partial class GameController : Node
 {
+    private BossBar                 bossBar;
     private CircleDialog            circleDialog;
     private DeathScreen             deathScreen;
     private bool                    isSaveDue;
@@ -212,6 +213,12 @@ public partial class GameController : Node
         if (Descent is not null)
             Descent.PlaceEntered += ConnectFixtures;
 
+        if (Descent is not null && bossBar is not null)
+        {
+            Descent.BossAppeared   += bossBar.Watch;
+            Descent.CircleUnlocked += number => bossBar.Announce($"The way to Circle {number} is open");
+        }
+
         if (Descent is null || circleDialog is null)
             return;
 
@@ -242,6 +249,7 @@ public partial class GameController : Node
 
     private void LoadNodes()
     {
+        bossBar                 = GetNodeOrNull<BossBar>($"%{nameof(BossBar)}");
         circleDialog            = GetNodeOrNull<CircleDialog>($"%{nameof(CircleDialog)}");
         deathScreen             = GetNode<DeathScreen>($"%{nameof(DeathScreen)}");
         levelUpDialog           = GetNode<LevelUpDialog>($"%{nameof(LevelUpDialog)}");

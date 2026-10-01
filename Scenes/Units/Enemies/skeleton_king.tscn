@@ -1,0 +1,125 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Units/Enemies/Enemy.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://Models/Units/Enemies/skeleton.glb" id="2_model"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit_cutout.gdshader" id="90_cutout"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit.gdshader" id="91_unit"]
+[ext_resource type="Texture2D" path="res://Textures/Units/Enemies/Skeleton/skeleton_albedo.webp" id="92_albedo"]
+
+[sub_resource type="CapsuleShape3D" id="Shape_body"]
+radius = 0.35
+height = 1.75
+
+[sub_resource type="ShaderMaterial" id="Mat_body"]
+shader = ExtResource("90_cutout")
+shader_parameter/albedo_texture = ExtResource("92_albedo")
+
+[sub_resource type="CylinderMesh" id="Mesh_blob_shadow"]
+top_radius = 0.35
+bottom_radius = 0.35
+height = 0.01
+radial_segments = 10
+rings = 0
+
+[sub_resource type="StandardMaterial3D" id="Mat_blob_shadow"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0, 0, 0, 0.5)
+
+[sub_resource type="CylinderMesh" id="Mesh_crown_ring"]
+top_radius = 0.125
+bottom_radius = 0.14
+height = 0.07
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="Mesh_crown_spike"]
+top_radius = 0.0
+bottom_radius = 0.03
+height = 0.12
+radial_segments = 5
+rings = 1
+
+[sub_resource type="SphereMesh" id="Mesh_gem"]
+radius = 0.03
+height = 0.06
+radial_segments = 6
+rings = 3
+
+[sub_resource type="ShaderMaterial" id="Mat_gold"]
+shader = ExtResource("91_unit")
+shader_parameter/albedo = Color(0.92, 0.74, 0.22, 1)
+shader_parameter/emission = Color(0.45, 0.3, 0.05, 1)
+shader_parameter/emission_energy = 0.5
+
+[sub_resource type="ShaderMaterial" id="Mat_gem"]
+shader = ExtResource("91_unit")
+shader_parameter/albedo = Color(0.7, 0.05, 0.05, 1)
+shader_parameter/emission = Color(1, 0.1, 0.1, 1)
+shader_parameter/emission_energy = 1.2
+
+[node name="SkeletonKing" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 11
+motion_mode = 1
+script = ExtResource("1_script")
+HealthbarHeight = 2.0
+WalkCycleSpeed = 1.1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
+shape = SubResource("Shape_body")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Model" parent="Visual" instance=ExtResource("2_model")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+
+[node name="Body" parent="Visual/Model/Armature/Skeleton3D" index="0"]
+surface_material_override/0 = SubResource("Mat_body")
+
+[node name="Crown" type="BoneAttachment3D" parent="Visual/Model/Armature/Skeleton3D"]
+bone_name = "Head"
+
+[node name="Ring" type="MeshInstance3D" parent="Visual/Model/Armature/Skeleton3D/Crown"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16, 0)
+mesh = SubResource("Mesh_crown_ring")
+surface_material_override/0 = SubResource("Mat_gold")
+
+[node name="Spike1" type="MeshInstance3D" parent="Visual/Model/Armature/Skeleton3D/Crown"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.255, 0)
+mesh = SubResource("Mesh_crown_spike")
+surface_material_override/0 = SubResource("Mat_gold")
+
+[node name="Spike2" type="MeshInstance3D" parent="Visual/Model/Armature/Skeleton3D/Crown"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.037, 0.255, 0.114)
+mesh = SubResource("Mesh_crown_spike")
+surface_material_override/0 = SubResource("Mat_gold")
+
+[node name="Spike3" type="MeshInstance3D" parent="Visual/Model/Armature/Skeleton3D/Crown"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.097, 0.255, 0.071)
+mesh = SubResource("Mesh_crown_spike")
+surface_material_override/0 = SubResource("Mat_gold")
+
+[node name="Spike4" type="MeshInstance3D" parent="Visual/Model/Armature/Skeleton3D/Crown"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.097, 0.255, -0.071)
+mesh = SubResource("Mesh_crown_spike")
+surface_material_override/0 = SubResource("Mat_gold")
+
+[node name="Spike5" type="MeshInstance3D" parent="Visual/Model/Armature/Skeleton3D/Crown"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.037, 0.255, -0.114)
+mesh = SubResource("Mesh_crown_spike")
+surface_material_override/0 = SubResource("Mat_gold")
+
+[node name="Gem" type="MeshInstance3D" parent="Visual/Model/Armature/Skeleton3D/Crown"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, 0.14)
+mesh = SubResource("Mesh_gem")
+surface_material_override/0 = SubResource("Mat_gem")
+
+[node name="BlobShadow" type="MeshInstance3D" parent="." groups=["blob_shadows"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_blob_shadow")
+surface_material_override/0 = SubResource("Mat_blob_shadow")
+
+[editable path="Visual/Model"]

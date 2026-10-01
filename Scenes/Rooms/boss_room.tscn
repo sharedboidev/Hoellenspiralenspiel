@@ -1,0 +1,215 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/World/Levels/BossArena.cs" id="room"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/RoomDoor.cs" id="door"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/WallSegment.cs" id="wall"]
+[ext_resource type="Script" path="res://Scripts/World/SpawnMarker.cs" id="marker"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/FloorMarkSpot.cs" id="spot"]
+[ext_resource type="Resource" path="res://Resources/Enemies/skeleton_king.tres" id="king"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="surface"]
+[ext_resource type="Texture2D" path="res://Textures/World/wall_brick.png" id="brick"]
+
+[sub_resource type="PlaneMesh" id="Mesh_preview"]
+size = Vector2(24, 24)
+
+[sub_resource type="BoxShape3D" id="Shape_dais"]
+size = Vector3(5, 0.5, 2.6)
+
+[sub_resource type="BoxMesh" id="Mesh_dais"]
+size = Vector3(5, 0.5, 2.6)
+subdivide_width = 2
+
+[sub_resource type="ShaderMaterial" id="Mat_stone"]
+shader = ExtResource("surface")
+shader_parameter/albedo = Color(0.45, 0.4, 0.4, 1)
+shader_parameter/albedo_texture = ExtResource("brick")
+shader_parameter/world_uv_scale = 0.25
+
+[sub_resource type="BoxMesh" id="Mesh_throne_back"]
+size = Vector3(1.4, 2.2, 0.5)
+subdivide_height = 1
+
+[sub_resource type="BoxMesh" id="Mesh_throne_seat"]
+size = Vector3(1.4, 0.6, 0.9)
+
+[sub_resource type="ShaderMaterial" id="Mat_throne"]
+shader = ExtResource("surface")
+shader_parameter/albedo = Color(0.12, 0.08, 0.08, 1)
+
+[sub_resource type="BoxShape3D" id="Shape_brazier"]
+size = Vector3(0.8, 1, 0.8)
+
+[sub_resource type="BoxMesh" id="Mesh_brazier"]
+size = Vector3(0.8, 1, 0.8)
+
+[sub_resource type="BoxMesh" id="Mesh_ember"]
+size = Vector3(0.5, 0.12, 0.5)
+
+[sub_resource type="ShaderMaterial" id="Mat_ember"]
+shader = ExtResource("surface")
+shader_parameter/albedo = Color(0.1, 0.02, 0.02, 1)
+shader_parameter/emission = Color(1, 0.25, 0.1, 1)
+shader_parameter/emission_energy = 5.0
+
+[node name="BossRoom" type="Node3D"]
+script = ExtResource("room")
+WidthCells = 6
+HeightCells = 6
+Role = 4
+
+[node name="EditorPreview" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh_preview")
+
+[node name="Doors" type="Node3D" parent="."]
+
+[node name="North2" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -12)
+script = ExtResource("door")
+
+[node name="East3" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 2)
+script = ExtResource("door")
+
+[node name="South3" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 12)
+script = ExtResource("door")
+
+[node name="West2" type="Marker3D" parent="Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -2)
+script = ExtResource("door")
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="Boss" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("marker")
+Enemy = ExtResource("king")
+AmountToSpawn = 1
+LevelOffset = 2
+ScatterRadius = 0.0
+
+[node name="GuardsWest" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 3)
+script = ExtResource("marker")
+AmountToSpawn = 2
+ScatterRadius = 200.0
+
+[node name="GuardsEast" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 3)
+script = ExtResource("marker")
+AmountToSpawn = 2
+ScatterRadius = 200.0
+
+[node name="PortalSpot" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+
+[node name="FloorMarkSpot" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("spot")
+
+[node name="Furniture" type="Node3D" parent="."]
+
+[node name="Pillar1" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -8)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("wall")
+Length = 1.2
+Thickness = 1.2
+
+[node name="Pillar2" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -8)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("wall")
+Length = 1.2
+Thickness = 1.2
+
+[node name="Pillar3" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 8)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("wall")
+Length = 1.2
+Thickness = 1.2
+
+[node name="Pillar4" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 8)
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("wall")
+Length = 1.2
+Thickness = 1.2
+
+[node name="Dais" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -10)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/Dais"]
+shape = SubResource("Shape_dais")
+debug_fill = false
+
+[node name="Mesh" type="MeshInstance3D" parent="Furniture/Dais"]
+mesh = SubResource("Mesh_dais")
+surface_material_override/0 = SubResource("Mat_stone")
+
+[node name="ThroneBack" type="MeshInstance3D" parent="Furniture/Dais"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, -0.9)
+mesh = SubResource("Mesh_throne_back")
+surface_material_override/0 = SubResource("Mat_throne")
+
+[node name="ThroneSeat" type="MeshInstance3D" parent="Furniture/Dais"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, -0.3)
+mesh = SubResource("Mesh_throne_seat")
+surface_material_override/0 = SubResource("Mat_throne")
+
+[node name="BrazierWest" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0.5, -10)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/BrazierWest"]
+shape = SubResource("Shape_brazier")
+debug_fill = false
+
+[node name="Mesh" type="MeshInstance3D" parent="Furniture/BrazierWest"]
+mesh = SubResource("Mesh_brazier")
+surface_material_override/0 = SubResource("Mat_stone")
+
+[node name="Ember" type="MeshInstance3D" parent="Furniture/BrazierWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.56, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_ember")
+surface_material_override/0 = SubResource("Mat_ember")
+
+[node name="Light" type="OmniLight3D" parent="Furniture/BrazierWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+light_color = Color(1, 0.35, 0.2, 1)
+light_energy = 3.0
+omni_range = 8.0
+
+[node name="BrazierEast" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.5, -10)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/BrazierEast"]
+shape = SubResource("Shape_brazier")
+debug_fill = false
+
+[node name="Mesh" type="MeshInstance3D" parent="Furniture/BrazierEast"]
+mesh = SubResource("Mesh_brazier")
+surface_material_override/0 = SubResource("Mat_stone")
+
+[node name="Ember" type="MeshInstance3D" parent="Furniture/BrazierEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.56, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_ember")
+surface_material_override/0 = SubResource("Mat_ember")
+
+[node name="Light" type="OmniLight3D" parent="Furniture/BrazierEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+light_color = Color(1, 0.35, 0.2, 1)
+light_energy = 3.0
+omni_range = 8.0

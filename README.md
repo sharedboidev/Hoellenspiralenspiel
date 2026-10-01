@@ -187,7 +187,7 @@ Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
 
 | Feature | Beschreibung |
 |---|---|
-| Vier Gegnertypen | Blue Blob mit Frost, Yellow Blob mit Blitz, ein Testgegner, der Feuer spuckt, und ein Skelett mit Klauen |
+| Fünf Gegnertypen | Blue Blob mit Frost, Yellow Blob mit Blitz, ein Testgegner, der Feuer spuckt, ein Skelett mit Klauen und der Skeleton King als Boss |
 | Gegner als Daten | Jeder Gegner ist eine Resource mit Attributen, Ausrüstung, Skills, Beute und Verhalten. Ein neuer Gegner braucht keinen Code |
 | Level | Jede Karte hat ein Bereichslevel. Attribute wachsen mit dem Level, die Beute trägt das Level des Monsters |
 | Spawn-Marker | Gegner erscheinen in Gruppen, locker verstreut um festgelegte Orte. Zwischen zwei Körpern bleibt mindestens 1 m Luft, und keine Gruppe startet in Aggro-Reichweite des Helden |
@@ -196,6 +196,7 @@ Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
 | Wegfindung | Gegner laufen um Wände herum. Schützen greifen nur mit freier Sicht an |
 | Aufgeben | Entkommt der Held, gibt der Gegner nach einigen Sekunden auf und geht langsam in die Nähe seines Startorts zurück |
 | Elite und Rare Elite | Elite mit 1 bis 2 Mods, Rare Elite mit 3 bis 5. Beide sind größer, bringen mehr Erfahrung und mehr Beute |
+| Boss | Der Skeleton King wartet auf der letzten Ebene jedes Kreises: doppelt so groß, mit Krone, festen Mods statt gewürfelter (Stalwart, Royal Brood, Berserk), eigener Farbe für Aura und Schild, zehnfacher Erfahrung, sechs Beutewürfen und zwanzigfachem Gold. Sein Lebensbalken steht oben in der Hud, solange er in Sicht ist |
 | Monster-Mods | Zehn Mods von einfach bis verrückt, zusammengesteckt aus Werten, Auslösern und Aktionen |
 | Angriffe | Ausholen, Treffer, Erholen. Beim Ausholen färbt sich der Gegner |
 | Skills | Mehrere Skills pro Gegner mit Abklingzeiten, ohne Angabe schlägt er im Nahkampf zu |
@@ -221,8 +222,9 @@ Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
 | Broodmother | Ruft bei halbem Leben drei Blue Blobs |
 | Blinking | Springt alle 4 Sekunden neben sein Ziel, nur für Nahkämpfer |
 | Berserk | Wird unter 35 % Leben deutlich schneller |
+| Royal Brood | Ruft bei halbem Leben drei Skelette. Nur der Boss trägt ihn |
 
-Ein Mod ist eine Resource unter `Resources/MonsterMods/Pool`.
+Ein Mod ist eine Resource unter `Resources/MonsterMods/Pool`. Feste Mods eines Bosses liegen unter `Resources/MonsterMods/Boss` und werden nie gewürfelt.
 Auslöser und Aktionen lassen sich im Inspector frei kombinieren, zum Beispiel "beim Tod" mit "Skill wirken".
 
 </details>
@@ -362,8 +364,10 @@ Ein Klick auf ein Portal im Hub öffnet die Checkpoints seines Kreises. Jede Ebe
 
 | Feature | Beschreibung |
 |---|---|
-| Kreis | Ein Höllenkreis hat mehrere Ebenen, der Testkreis vier |
+| Kreis | Ein Höllenkreis hat mehrere Ebenen, der Testkreis und das Schlachthaus je vier. Auf der letzten Ebene steht statt des Ausgangs der Boss-Raum |
 | Treppen | Die Kellertür im Ausgang führt hinab, die Treppe im Startraum hinauf, aus Ebene 1 in den Hub |
+| Boss-Raum | Ein Raum von 6 x 6 Zellen mit Thron, Feuerschalen und Pfeilern, am weitesten vom Start. Betritt der Held ihn, fallen Gitter in die Türen, bis der Boss fällt oder der Held stirbt |
+| Freischaltung | Fällt der Boss, öffnet sich im Hub das Portal des nächsten Kreises, und im Boss-Raum erscheint ein dämonisches Portal zurück in den Hub. Ein gefallener Boss bleibt gefallen, sein Portal steht beim nächsten Besuch von Anfang an |
 | Ortswechsel | Jeder Wechsel zeigt den Ladebildschirm. Solange er steht, hält die Welt an und der Held nimmt keine Eingaben an. Gebaut wird erst hinter dem schwarzen Vorhang, die Gegner stehen bei gleichem Seed am selben Ort. Die Musik eines Kreises spielt über die Treppen weiter, statt neu zu beginnen |
 | Checkpoints | Jede betretene Ebene schaltet ihren Start frei. Das Portal im Hub bietet alle freigeschalteten Ebenen an |
 | Town-Portal | Town Portal, zu Beginn `T`, öffnet neben dem Helden ein Portal in den Hub, nach einer Sekunde ist es offen. Im Hub steht das Gegenstück und führt zurück an dieselbe Stelle, danach schließt es sich. Abklingzeit 60 Sekunden |
@@ -383,13 +387,19 @@ Ein Klick auf ein Portal im Hub öffnet die Checkpoints seines Kreises. Jede Ebe
 | Rundwege | Räume hängen als Netz zusammen, nicht als Kette. Der Ausgang liegt weit vom Start und muss gesucht werden |
 | Raumvorlagen | Szenen mit Anschlusspunkten, Spawn-Markern und Regeln: Häufigkeit, frühestes Bereichslevel, Höchstzahl, Pflichtraum |
 | Pflichtraum | Der Schrein ist ein Event-Raum und erscheint in jeder Ebene genau einmal |
-| Thema | Eine Resource legt Räume, Texturen, Licht, Musik und Gegnerpool fest |
+| Thema | Eine Resource legt Räume, Texturen, Licht, Musik, Gegnerpool und Spuren fest |
+| Spuren | Blutige Hände, große verlaufene Flecken mit Spritzern drumherum und höchstens ein Pentagramm je Ebene, gewürfelt aus dem Seed. Eine Spur an der Mauer öffnet sich mit dem Mauerwerk |
+| Schlachthaus | Der Platzhalter für den zweiten Kreis: Holzplanken, grobe Zementwände, Blutspuren, Bereichslevel 5 bis 8. Er öffnet sich, sobald der Boss des Testkreises gefallen ist |
 | Tiefe | Mit jeder Ebene steigt das Bereichslevel um 1, und die Ebene bekommt einen Raum mehr. Die erste Ebene des Testkreises hat Bereichslevel 1 |
 | Gegner | Räume bringen ihre Spawn-Marker mit, in Gängen stehen vereinzelt kleine Gruppen aus dem Gegnerpool |
 | Karte | Deckt sich beim Erkunden auf und steht im Spielstand. Sie zeigt Kellertür, Treppe und Town-Portal. `F5` zeigt im Debug-Build zum Testen die ganze Ebene |
 
 <div align="center">
 <img src="docs/images/raeume_und_mauern_3d.webp" alt="Oben links der Held im Hof mit durchsichtigen südlichen Mauern, oben rechts vor dem Tor mit verschlossenem Hof, unten links nördlich des Hofs hinter der halb durchsichtigen Mauer, unten rechts an einer Gangecke hinter offenem Mauerwerk" width="720">
+</div>
+
+<div align="center">
+<img src="docs/images/boss_und_schlachthaus_3d.webp" alt="Oben links der Skeleton King mit Krone und seinem Balken im Boss-Raum, oben rechts das dämonische Portal nach dem Sieg, unten links der Hub mit zwei offenen Portalen, unten rechts ein Gang im Schlachthaus mit Holzplanken, Zementwänden und einem blutigen Handabdruck" width="720">
 </div>
 
 ### 🧊 3D im PS1-Look
@@ -446,10 +456,10 @@ Das Mausrad wirkt immer.
 
 ### 🚧 Noch nicht enthalten
 
-- Balance für Gold und Preise, alle Beträge sind geschätzt
-- Töne für Gold, Truhe und Händler
-- Boss und Freischaltung des nächsten Kreises
-- Ein Höllenkreis mit eigenem Thema, bisher gibt es nur das Testthema
+- Balance für Gold, Preise und den Boss, alle Werte sind geschätzt
+- Töne für Gold, Truhe, Händler, Gitter und Boss
+- Ein Höllenkreis in Endqualität, bisher gibt es das Testthema und das Schlachthaus als Platzhalter
+- Ein echter Boss mit eigenem Modell, der Skeleton King ist ein Platzhalter aus dem Skelett
 - Eigene Modelle für den Held und die übrigen Gegner, bisher hat nur das Skelett eins
 - Item-Basen für die übrigen zwölf Ausrüstungsplätze
 - Klassen und Erwerb von Skills, der Held kennt vorerst alle
@@ -508,7 +518,7 @@ flowchart LR
     M2 --> M3(["M3 Skills"]):::done
     M2 --> M4(["M4 Items und Speichern"]):::done
     M4 --> M5(["M5 Gegner-KI"]):::done --> D{"3D im PS1-Look"}:::done
-    D --> U(["M5.5 Umstellung auf 3D"]):::done --> M6(["M6 Level"]):::done --> M7(["M7 Hub, Etappe 3 von 4"]):::next --> M8(["M8 Höllenkreis"]):::open
+    D --> U(["M5.5 Umstellung auf 3D"]):::done --> M6(["M6 Level"]):::done --> M7(["M7 Hub"]):::done --> M8(["M8 Höllenkreis"]):::next
     M8 --> M9(["M9 Inhalt"]):::open --> M10(["M10 Koop"]):::optional
 
     classDef done fill:#2e7d32,color:#ffffff,stroke:#1b5e20
@@ -529,8 +539,8 @@ flowchart LR
 | ✅ | **Entscheidung** | 3D im Look der PlayStation 1, entschieden nach dem [Vergleich](docs/VERGLEICH_2D_3D.md) | klein |
 | ✅ | **M5.5** Umstellung auf 3D | Die 3D-Fassung kann alles, was die 2D-Fassung konnte, und hat sie abgelöst | mittel |
 | ✅ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
-| ⏭️ | **M7** Hub | Stand 30.09.2026: Etappe 1 bis 3 von 4 stehen. Etappe 1: Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal. Etappe 2: Pausenmenü, Ladebildschirm, Einstellungen für Anzeige, Look, Ton und Tasten, Hud an Ankern. Etappe 3: Gold, Truhe und Händler. Offen: Etappe 4 mit Platzhalter-Boss und Freischaltung des nächsten Kreises | mittel |
-| ⬜ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
+| ✅ | **M7** Hub | Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal, Pausenmenü, Ladebildschirm, Einstellungen, Hud an Ankern, Gold, Truhe, Händler, Platzhalter-Boss mit Boss-Raum und Freischaltung des nächsten Kreises. Etappe 4 liegt seit dem 01.10.2026 auf `master_BossAndUnlock` | mittel |
+| ⏭️ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
 | 💤 | **M10** Koop | Optional, baut auf Kern und Seeds auf | groß |
 
@@ -542,8 +552,8 @@ Aufgaben, Fertig-Kriterien und alle Befunde stehen in der [Roadmap](docs/ROADMAP
 
 | Kreis | Sünde | Stand |
 |---|---|---|
-| 1 | Limbus | geplant |
-| 2 | Wollust | geplant, erster Kandidat für M8: ewiger Sturm als Levelmechanik |
+| 1 | Limbus | geplant, bis dahin steht der Testkreis an seiner Stelle |
+| 2 | Wollust | geplant, erster Kandidat für M8: ewiger Sturm als Levelmechanik. Bis dahin steht das Schlachthaus an seiner Stelle |
 | 3 | Völlerei | geplant |
 | 4 | Habgier | geplant |
 | 5 | Zorn | geplant |
@@ -591,10 +601,10 @@ Hoellenspiralenspiel
 │   │   ├── Skills      Skill-Definition, Abklingzeiten, Kosten, Belegung der Leiste
 │   │   ├── Items       Item-Basis und Instanz, Inventar-Raster, Ausrüstung, Truhe, Affixe, Beute, Reihenfolge der Itemtypen
 │   │   ├── Economy     Gold, Gold von Gegnern, Stufen des Münzhaufens, Preise, Händler und Handel, Eingabe im Goldfeld
-│   │   ├── Enemies     Zustandsmaschine, Seltenheit, Wahl der Mods, Wachstum mit dem Level
+│   │   ├── Enemies     Zustandsmaschine, Seltenheit bis zum Boss, Wahl der Mods, Wachstum mit dem Level
 │   │   ├── Navigation  Takt für die Pfadsuche
 │   │   ├── Spatial     Raster für die Suche nach Einheiten, freie Plätze für Gegner und Beutel, Stapeln der Schilder
-│   │   ├── Levels      Generator für Ebenen, Grundriss, Raumvorlagen, Erkundung, Reise durch die Kreise, Regel für freie Sicht durch Mauern
+│   │   ├── Levels      Generator für Ebenen, Grundriss, Raumvorlagen, Erkundung, Reise durch die Kreise, Regel für freie Sicht durch Mauern, Spuren an Mauern und Boden, Gitter des Boss-Raums, Freischaltung des nächsten Kreises
 │   │   ├── Saving      Format des Spielstands, Lesen und Schreiben als JSON
 │   │   ├── Settings    Einstellungen für Anzeige, Look, Ton und Tasten, tolerantes Lesen, Fenstergrößen, Lautstärkekurve, Pixelraster, Regeln der Tastenbelegung
 │   │   ├── Loading     Tipps des Ladebildschirms mit der aktuellen Taste
@@ -606,18 +616,18 @@ Hoellenspiralenspiel
 │   ├── Items           Bibliothek aller Item-Basen
 │   ├── Enemies         Bibliothek aller Monster-Mods
 │   ├── World           Navigationsnetz, Kamera, PS1-Look, Spawn-Marker
-│   │   └── Levels      Wechsel zwischen Hub und Ebenen, Aufbau einer Ebene, Raumvorlagen, Orte, Mauerstücke
-│   ├── Objects         Beutel und Münzhaufen am Boden, Truhe und Händler, Suche nach Benutzbarem unter der Maus
-│   ├── Environment     Durchgänge: Kellertür, Treppe, Portal eines Kreises, Town-Portal
+│   │   └── Levels      Wechsel zwischen Hub und Ebenen, Aufbau einer Ebene, Raumvorlagen, Orte, Mauerstücke, Spuren, Boss-Raum mit Gittern
+│   ├── Objects         Beutel und Münzhaufen am Boden, Truhe und Händler, Gitter des Boss-Raums, Suche nach Benutzbarem unter der Maus
+│   ├── Environment     Durchgänge: Kellertür, Treppe, Portal eines Kreises, Town-Portal, Portal des Bosses
 │   ├── Saving          Dateien der Spielstände, drei Plätze, Datei der Einstellungen (SettingsStore), Autoload UserSettings
 │   ├── Controllers     Gegnersteuerung, Beute, Händler, Spielablauf, Speichern
 │   ├── Utils           Namen der Aktionen, Tastenbelegung in der InputMap (KeyBindings), Namen der Busse (AudioBuses), kleine Helfer
-│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder, Schilder der Beute, Karte der Ebene, Hauptmenü, Pausenmenü, Dialog am Portal, Ladebildschirm, Einstellungsfenster, Gitteransicht, Fenster von Truhe und Händler
+│   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder, Schilder der Beute, Karte der Ebene, Hauptmenü, Pausenmenü, Dialog am Portal, Ladebildschirm, Einstellungsfenster, Gitteransicht, Fenster von Truhe und Händler, Balken des Bosses
 │       └── Settings    Reiter des Einstellungsfensters: Display, Audio, Controls
 ├── Scenes              Szenen für Hauptmenü, Spiel, Orte, Räume, Einheiten, Items, Skills, Objekte und Oberfläche
 ├── Models              Modelle als .glb, unter Source die Dateien aus Blender. Godot übergeht Source
-├── Shaders             Shader, unter Ps1 die für den PS1-Look, die Figuren und benutzbaren Dinge samt Umriss, die Sicht auf Gegner und der Stern der Beutel, unter Archive2D die Effekte der 2D-Fassung
-├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Gegner, Monster-Mods, Themen der Ebenen, Themes
+├── Shaders             Shader, unter Ps1 die für den PS1-Look, die Figuren und benutzbaren Dinge samt Umriss, die Sicht auf Gegner, die Spuren an Mauern und Boden und der Stern der Beutel, unter Archive2D die Effekte der 2D-Fassung
+├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Gegner, Monster-Mods, Themen der Ebenen samt Spuren, Themes
 ├── Interfaces          Schnittstellen, darunter IHero zwischen Held und Oberfläche
 ├── Enums               Gemeinsame Aufzählungen
 ├── Hoellenspiralenspiel.Tests   Unit-Tests mit NUnit

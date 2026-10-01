@@ -7,7 +7,10 @@ public enum RoomRole
     Normal,
     Start,
     Exit,
-    Event
+    Event,
+
+    //Steht auf der letzten Ebene an der Stelle des Ausgangs
+    Boss
 }
 
 //Offset zählt an Nord und Süd von Westen, an Ost und West von Norden

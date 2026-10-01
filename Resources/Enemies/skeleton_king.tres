@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="EnemyResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Enemies/EnemyResource.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://Scenes/Units/Enemies/skeleton_king.tscn" id="2_scene"]
+[ext_resource type="Script" path="res://Resources/MonsterMods/MonsterModResource.cs" id="3_mod"]
+[ext_resource type="Resource" path="res://Resources/MonsterMods/Pool/stalwart.tres" id="4_stalwart"]
+[ext_resource type="Resource" path="res://Resources/MonsterMods/Boss/royal_brood.tres" id="5_brood"]
+[ext_resource type="Resource" path="res://Resources/MonsterMods/Pool/berserk.tres" id="6_berserk"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "skeleton_king"
+DisplayName = "Skeleton King"
+Scene = ExtResource("2_scene")
+Xp = 150
+GoldMin = 5
+GoldMax = 10
+LootTableId = "blue_blob_loot"
+Strength = 3
+Dexterity = 2
+Constitution = 4
+StrengthPerLevel = 1.5
+DexterityPerLevel = 0.5
+ConstitutionPerLevel = 1.5
+LifeBonus = 260
+Movementspeed = 80.0
+Armor = 6
+DamageMin = 7.0
+DamageMax = 12.0
+DamageType = 2
+AttackRange = 70.0
+AttackWindupSec = 0.6
+AttackRecoverySec = 0.9
+AggroRange = 600.0
+ChaseTimeSec = 10.0
+HomeRadius = 100.0
+IsBoss = true
+FixedMods = Array[ExtResource("3_mod")]([ExtResource("4_stalwart"), ExtResource("5_brood"), ExtResource("6_berserk")])

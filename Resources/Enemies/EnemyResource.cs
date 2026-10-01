@@ -2,6 +2,7 @@ using System.Linq;
 using Godot;
 using Godot.Collections;
 using Hoellenspiralenspiel.Resources.Items;
+using Hoellenspiralenspiel.Resources.MonsterMods;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Enemies;
@@ -139,6 +140,14 @@ public partial class EnemyResource : Resource
     //Der Rückweg endet an einem zufälligen Punkt in diesem Abstand um den Startort
     [Export]
     public float HomeRadius { get; set; } = 150f;
+
+    //Ein Boss bekommt feste Mods statt gewürfelter. Größe, XP, Beute und Gold kommen aus den Boss-Werten des EnemyController
+    [ExportGroup("Boss")]
+    [Export]
+    public bool IsBoss { get; set; }
+
+    [Export]
+    public Array<MonsterModResource> FixedMods { get; set; } = new();
 
     public string NameOrId => string.IsNullOrWhiteSpace(DisplayName) ? Id : DisplayName;
 

@@ -1,16 +1,17 @@
 # Höllenspiralenspiel: Analyse und Roadmap
 
-Stand: 30.09.2026. M0 bis M6 liegen auf `master`, dazu die Nachträge zu M2, M3, M5.5 und M6: Bleed stapelt, Schadenswerte im Tooltip, ausgedünnte Kommentare, die Rückmeldungen aus dem ersten Spielen und die Rückmeldungen zu Mauern und Räumen.
-Die ersten drei von vier Etappen von M7 liegen ebenfalls auf `master`, Etappe 1 und 2 samt den Rückmeldungen aus dem Spielen. Etappe 2 ist seit dem 30.09.2026 vollständig: Pausenmenü, Ladebildschirm, Hud an Ankern und Einstellungen für Anzeige, Ton und Tasten, gebaut auf `master_PauseMenu` und `master_SettingsAndLoading`.
+Stand: 01.10.2026. M0 bis M6 liegen auf `master`, dazu die Nachträge zu M2, M3, M5.5 und M6: Bleed stapelt, Schadenswerte im Tooltip, ausgedünnte Kommentare, die Rückmeldungen aus dem ersten Spielen und die Rückmeldungen zu Mauern und Räumen.
+Alle vier Etappen von M7 sind gebaut. Etappe 1 bis 3 liegen auf `master`, Etappe 1 und 2 samt den Rückmeldungen aus dem Spielen. Etappe 2 ist seit dem 30.09.2026 vollständig: Pausenmenü, Ladebildschirm, Hud an Ankern und Einstellungen für Anzeige, Ton und Tasten, gebaut auf `master_PauseMenu` und `master_SettingsAndLoading`.
 Etappe 3 liegt seit dem 30.09.2026 auf `master`: Gold, Münzhaufen, eine Truhe je Charakter und ein Händler im Hub. Der User hat sie selbst über Pull Request #15 zusammengeführt, Merge-Commit `67e855b`.
 Die Rückmeldungen aus dem Spielen von Etappe 3 sind am selben Tag auf `master_PlaytestFeedback2` gebaut und liegen ebenfalls auf `master`.
 Eine zweite Runde Rückmeldungen zu Etappe 3 ist am selben Tag auf `master_PlaytestFeedback3` gebaut: Umriss für alles Benutzbare, Blick zur Maus, Schlag und Zauber binden den Helden, Kaufen per Rechtsklick und der Vergleich oben bündig.
+Etappe 4 ist am 01.10.2026 auf `master_BossAndUnlock` gebaut und liegt noch nicht auf `master`: der Skeleton King als Platzhalter-Boss mit Krone und Boss-Raum, die Freischaltung des nächsten Kreises und das Schlachthaus als Platzhalter für Kreis 2 mit neuen Texturen und Blutspuren.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code samt Szenen. Die Zeilenzahl aus der ersten Analyse, rund 5.500, galt für die 2D-Fassung.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 bis 3 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 und 3 auch mit Fenster.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 bis 4 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 bis 4 auch mit Fenster.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -1496,7 +1497,7 @@ Bewusst offen gelassen:
 
 Nachtrag vom 30.09.2026: Seit Etappe 2 von M7 wirken F2, F4 und F5 nur im Debug-Build, im Editor also weiter. Die Zeile oben links mit Ebene, Seed und Bereichslevel steht nur dort. Ob Lichter echte Schatten werfen, ist die Einstellung Real Shadows. F4 schaltet nur zum Testen um und speichert nichts.
 
-### M7: Hub und Abstieg (M, Etappe 1 umgesetzt am 29.09.2026 auf `master_HubAndDescent`, das Pausenmenü aus Etappe 2 am selben Tag auf `master_PauseMenu`, der Rest von Etappe 2 am 30.09.2026 auf `master_SettingsAndLoading`, Etappe 3 am selben Tag auf `master_GoldStashVendor`, die Rückmeldungen zu Etappe 3 ebenfalls am selben Tag auf `master_PlaytestFeedback2`, eine zweite Runde Rückmeldungen am selben Tag auf `master_PlaytestFeedback3`)
+### M7: Hub und Abstieg (M, Etappe 1 umgesetzt am 29.09.2026 auf `master_HubAndDescent`, das Pausenmenü aus Etappe 2 am selben Tag auf `master_PauseMenu`, der Rest von Etappe 2 am 30.09.2026 auf `master_SettingsAndLoading`, Etappe 3 am selben Tag auf `master_GoldStashVendor`, die Rückmeldungen zu Etappe 3 ebenfalls am selben Tag auf `master_PlaytestFeedback2`, eine zweite Runde Rückmeldungen am selben Tag auf `master_PlaytestFeedback3`, Etappe 4 am 01.10.2026 auf `master_BossAndUnlock`)
 
 Ziel: die Spielstruktur steht.
 
@@ -1507,11 +1508,11 @@ M7 läuft in vier Etappen:
 | 1 | Hauptmenü, Hub, Portale, mehrere Ebenen pro Kreis, Treppen, Checkpoints, Town-Portal | Umgesetzt |
 | 2 | Pausenmenü, Ladebildschirm, Einstellungen für Auflösung, Tasten und Lautstärke. UI über Anker statt Code, behebt A6. | Umgesetzt, liegt seit dem 30.09.2026 auf `master` |
 | 3 | Hub-Funktionen: Truhe und Händler. Dafür braucht es eine Währung. | Umgesetzt, liegt seit dem 30.09.2026 auf `master`, samt den Rückmeldungen aus dem Spielen. |
-| 4 | Platzhalter-Boss und Freischaltung des nächsten Kreises | Offen |
+| 4 | Platzhalter-Boss und Freischaltung des nächsten Kreises | Umgesetzt am 01.10.2026 auf `master_BossAndUnlock`, dazu das Schlachthaus als Platzhalter für Kreis 2 |
 
 Fertig, wenn man vom Hauptmenü in den Hub, in einen Kreis, zurück und wieder hinein kommt.
 
-Stand des Fertig-Kriteriums: erfüllt seit Etappe 1, geprüft im laufenden Spiel. Seit Etappe 2 führt das Pausenmenü auch zurück ins Hauptmenü, und jeder Ortswechsel zeigt einen Ladebildschirm. Seit Etappe 3 stehen Truhe und Händler im Hub. Es steht Etappe 4 aus.
+Stand des Fertig-Kriteriums: erfüllt seit Etappe 1, geprüft im laufenden Spiel. Seit Etappe 2 führt das Pausenmenü auch zurück ins Hauptmenü, und jeder Ortswechsel zeigt einen Ladebildschirm. Seit Etappe 3 stehen Truhe und Händler im Hub. Seit Etappe 4 wartet auf der letzten Ebene jedes Kreises ein Boss, und sein Tod öffnet im Hub das Portal des nächsten Kreises. M7 ist damit abgeschlossen.
 
 #### Etappe 1: Struktur
 
@@ -2348,12 +2349,103 @@ Bewusst offen gelassen:
 - Tasten während eines Skills puffert der Held nicht: Nur eine gehaltene Taste zählt danach.
 - Gegner kennen die Wirkzeit nicht, ihre Zauber folgen den Zeiten ihres `EnemyResource`.
 
+#### Etappe 4: Boss, Freischaltung und das Schlachthaus
+
+Umgesetzt am 01.10.2026 auf `master_BossAndUnlock`, abgezweigt von `84df1f6`.
+
+Der User hat am 01.10.2026 auf "Was steht als nächstes an?" zwei Runden Fragen per Auswahl beantwortet:
+
+| Frage | Entscheidung |
+|---|---|
+| Boss-Figur | Das Skelett als riesiger Boss, im Wortlaut: "option 1 aber verpass ihm ne Krone." |
+| Ort | Ein eigener Boss-Raum ersetzt auf der letzten Ebene den Ausgangsraum und liegt damit am weitesten vom Start |
+| Nach dem Sieg | Der nächste Kreis schaltet sich frei, und im Boss-Raum erscheint ein Portal zurück in den Hub, "aber das bossportal soll dämonisch aussehen" |
+| Kreis 2 | Ein Platzhalter-Kreis mit eigenem Aussehen: "denk dir andere Texturen für für wände und boden aus. zB Holzplanken auf dem Boden und grobe Zementwände mit einem Blutsprenkel hier und, ab und zu mal eine Blutige Hand an einer wand, oder mal ein sehr großer Blutfleck an der wand, der ein wenig runtergelaufen ist, oder einem mit Blut gemalten pentagram auf dem boden. von dem Pentagram darf höchstens eins pro ebene auftauchen." Nach den ersten Bildern: "nimm die kleinen sprenkel von der wandtextur runter ich lass sie nur in der Nähe von den größeren flecken auftauchen." |
+| Boss-Balken | Ein breiter Balken oben mittig in der Hud mit Namen und Mods, solange der Boss in Sicht ist. Der kleine Balken über dem Kopf bleibt |
+| Fähigkeiten | Feste Mods Stalwart, Royal Brood und Berserk, dazu doppelte Größe und stärkere Klauen |
+| Arena | "Versiegelt bis zum Sieg": Sobald der Held im Raum steht, schließen Gitter die Türen, bis der Boss fällt. Stirbt der Held, öffnen sie sich wieder |
+| Bauweise | Erst Kreis 2 mit Texturen und Blutspuren bauen und Bilder zeigen, dann der Rest. Die Bilder fand er "super" |
+
+Von mir festgelegt:
+
+| Punkt | Festlegung |
+|---|---|
+| Boss | "Skeleton King", `Resources/Enemies/skeleton_king.tres`: 260 Leben extra, Klauen 7 bis 12 Slash mit Reichweite 70, langsamer als das Skelett, zwei Level über dem Bereichslevel. Auf der letzten Ebene des Testkreises Level 6 mit 518 Leben, 1500 XP, sechs Beutewürfen und zwanzigfachem Gold |
+| Stufe Boss | Eine vierte Stufe neben Normal, Elite und Rare Elite. Größe 2, zehnfache XP, sechs Beutewürfe, zwanzigfaches Gold, Farbe (0,85 / 0,2 / 0,4) für Aura und Schild, alles Felder am `EnemyController` unter "Boss" |
+| Royal Brood | Eine eigene Fassung der Broodmother unter `Resources/MonsterMods/Boss`, ruft bei halbem Leben drei Skelette statt Blobs, Ansage "Arise!". Mods in diesem Ordner werden nie gewürfelt |
+| Krone | Fünf goldene Zacken auf einem Ring mit rotem Stein, als `BoneAttachment3D` am Knochen `Head` des Skeletts, aus Grundkörpern mit dem Shader der Figuren |
+| Boss-Raum | `Scenes/Rooms/boss_room.tscn`, 6 x 6 Zellen, Rolle Boss, vier Türen, vier Pfeiler, ein Podest mit Thron und zwei Feuerschalen. Der Boss steht in der Mitte, je zwei Wachen aus dem Gegnerpool an den Seiten. Beide Kreise haben ihn |
+| Gitter | Eines je benutzter Tür, aus sieben Eisenstäben und zwei Balken. Offen hängen sie unsichtbar über der Tür und haben keine Kollision, geschlossen fallen sie in 0,35 s herab und sperren wie eine Mauer. Die Wegfindung wird beim Aufbau der Ebene gebacken und kennt die Gitter nicht: Wer gegen ein geschlossenes Gitter läuft, bleibt davor stehen |
+| Regel der Gitter | Zu, solange der Held lebend im Raum steht und der Boss lebt. Verlässt der Held den Raum durch sein Town-Portal, öffnen sie sich, beim nächsten Betreten schließen sie wieder |
+| Boss-Portal | Ein rot glühender Strudel aus einer flachen Kugel, gesäumt von sechs Hörnern aus Knochen, auf einem Steinring über einem Blut-Pentagramm, mit pulsierendem rotem Licht. Es wächst in 1,2 s aus dem Boden, dreht sich, trägt den hellroten Umriss der Portale und führt vor das Portal seines Kreises im Hub |
+| Freischaltung | Fällt der Boss auf der letzten Ebene des Kreises N, schaltet sich Kreis N + 1 frei, höchstens bis 9. Der Hub zeigt es beim nächsten Betreten. Die Ansage "The way to Circle N is open" steht fünf Sekunden unter dem Boss-Balken. Ein freigeschaltetes Portal ohne Kreis bleibt dunkel und heißt "not yet built" |
+| Gefallener Boss | Steht wie jeder Gegner im Spielstand. Beim nächsten Besuch fehlt er, die Gitter bleiben offen, und sein Portal steht von Anfang an |
+| Schlachthaus | `Resources/Levels/slaughterhouse.tres`, Nummer 2, vier Ebenen ab Bereichslevel 5, dieselben Räume und Gegner wie der Testkreis mit mehr Skeletten, Holzplanken und grobem Zement, kaltes grünliches Licht. In M8 ersetzt ihn Wollust |
+| Texturen | Mit PIL erzeugt wie die alten: 64 Pixel mit 9 und 10 Farben, ohne Sprenkel in der Wand. Die Spuren sind Bilder mit Alphakanal unter `Textures/World/Marks`: Hand 32, Fleck 48 x 64, Spritzer 24, Pentagramm 64 Pixel |
+| Spuren | Felder am Kreis: Bild, Ort (Mauer oder Boden), Maße, Chance, Höchstzahl je Ebene, Höhe an der Mauer und eine Spur, neben der sie erscheint. Hand 0,7 m mit 5 % je Mauerzelle und Seite, Fleck 1,4 x 1,8 m mit 2,5 %, Spritzer 0,45 m nur neben einem Fleck mit 50 % je Nachbarzelle, Pentagramm 3 m mit 60 % je Ebene und höchstens eins. Der Testkreis hat keine |
+| Plätze am Boden | Ein Pentagramm liegt nur an Plätzen, die die Raumvorlagen anbieten: Kammer, Halle, Galerie und Boss-Raum in der Mitte, Schrein vor dem Altar. Start und Ausgang bieten keinen |
+| Spuren an der Mauer | Nur am Mauerwerk über dem Sockel, auf Seiten mit Boden davor, 2 cm vor der Fläche. Sie öffnen sich mit dem Mauerwerk, wenn der Held dahinter steht |
+
+So funktioniert es:
+
+- `RoomRole.Boss` und `LevelSettings.IsLastLevel`: `RoomPicker` nimmt auf der letzten Ebene die Vorlage mit Rolle Boss als Ausgang, sonst wie bisher die Rolle Exit. Fehlt dem Thema ein Boss-Raum, bleibt es beim Ausgang ohne Kellertür. `LevelBuilder` legt in den Boss-Raum keine Kellertür.
+- `BossArena` ist die Wurzel des Boss-Raums, abgeleitet von `RoomTemplate`. `BuildGates` stellt an jede Tür, die der Grundriss benutzt, ein `BossGate` aus `Scenes/Objects/boss_gate.tscn`. `Arm` nennt ihr Boss und Held, `BossArenaRule.IsSealed` im Kern entscheidet jeden Physikschritt über die Gitter. `ShowPortal` stellt das Portal an `PortalSpot`.
+- `EnemyResource.IsBoss` und `FixedMods`: Der `EnemyController` würfelt bei einem Boss die zwei Zahlen wie bei jedem Spawn und verwirft sie, damit die übrigen Gegner der Ebene bleiben, wo sie sind. Die Stufe steht seitdem am Gegner (`Enemy.Rarity`), nicht mehr an der Zahl der Mods.
+- `Descent` findet nach dem Spawnen den Boss, bewaffnet die Arenen und meldet `BossAppeared`. Fällt der Boss, rechnet `CircleUnlockRule.NextCircle` im Kern aus, welcher Kreis sich öffnet, `JourneyState.Unlock` merkt es sich (höchstens `LastCircle`, 9), `CircleUnlocked` löst die Ansage aus, und jede Arena bekommt ihr Portal. Das Portal meldet `Used`, der Abstieg zeigt den Hub mit `Arrival.AtPortalOf`.
+- `BossBar` aus `Scenes/UI/boss_bar.tscn` hängt in der Hud, `GameController` verbindet es mit `BossAppeared` und `CircleUnlocked`. Es zeigt sich nur, solange `Enemy.IsSeen` gilt, und verschwindet mit dem Tod oder dem Verlassen der Ebene.
+- `BossPortal` ist ein `Passage` wie das Town-Portal. Es dreht seinen Strudel, lässt sein Licht pulsieren und wächst über `OpeningSec`.
+- `MarkPlacer` im Kern verteilt die Spuren: `PlaceOnWalls` läuft die Mauerstücke ab und würfelt je Zelle und Seite mit Boden davor, die erste treffende Regel bekommt die Stelle, ihre Begleiter (`Near`) würfeln in derselben und den beiden Nachbarzellen. `PlaceOnFloors` würfelt je Regel bis zur Höchstzahl und nimmt jeden Platz höchstens einmal. Die Zufallsquelle ist der Seed der Ebene plus 7919, die Gegner stehen also wie vorher.
+- `LevelMarks` baut daraus Quads: Spuren an der Mauer hängen als Kinder am `WallSegment` (`AddMark`), das ihnen `see_through` weitergibt, auf der Rückseite vertauscht. Die Shader `ps1_wall_mark` und `ps1_floor_mark` schneiden mit dem Alphakanal aus, die Rechnung der Öffnung steht seitdem in `ps1_wall.gdshaderinc`. `WallFade.GetMark` hält die Materialien der Mauerspuren und gibt ihnen Ort und Lichtradius des Helden weiter wie dem Mauerwerk. `Ps1Look` stimmt beide Shader ab.
+- `FloorMarkSpot` ist ein Marker in Raumvorlagen, `LevelBuilder` sammelt sie beim Aufbau.
+- Der Ladebildschirm hat einen 18. Tipp zum Boss.
+
+Neue Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| `EnemyResource` | `IsBoss`, `FixedMods` | Skeleton King: an, Stalwart, Royal Brood, Berserk | Feste Mods statt gewürfelter |
+| `EnemyController`, Gruppe Boss | `BossScale`, `BossXpFactor`, `BossLootRolls`, `BossNameColor`, `BossGoldFactor` | 2, 10, 6, (0,85 / 0,2 / 0,4), 20 | Aussehen und Ertrag der Stufe Boss |
+| `LevelThemeResource` | `Marks` | Schlachthaus: Hand, Fleck, Spritzer, Pentagramm | Spuren des Kreises |
+| `LevelMarkResource` | `Texture`, `Place`, `WidthMeters`, `HeightMeters`, `Chance`, `MaxPerLevel`, `Near`, `MinCenterHeight`, `MaxCenterHeight` | siehe oben | Eine Spur |
+| `RoomTemplate` | `Role` | Boss-Raum: Boss | Vorlage für die letzte Ebene |
+| `SpawnMarker` im Boss-Raum | `Enemy`, `LevelOffset`, `ScatterRadius` | Skeleton King, 2, 0 | Der Boss steht genau in der Mitte |
+| `BossPortal` | `OpeningSec`, `LightEnergy`, `Pulse` | 1,2 s, 3, 0,5 | Erscheinen und Pulsieren |
+
+So entsteht ein neuer Boss: eine Szene wie `skeleton_king.tscn`, eine `EnemyResource` mit `IsBoss` und `FixedMods`, eingetragen am Marker `Boss` eines Boss-Raums. Feste Mods, die nie gewürfelt werden sollen, liegen unter `Resources/MonsterMods/Boss`.
+
+So entsteht eine neue Spur: ein Bild mit Alphakanal unter `Textures/World/Marks`, eine `LevelMarkResource` im Feld `Marks` des Kreises. Für den Boden brauchen die Räume einen `FloorMarkSpot`.
+
+So bekommt ein Kreis seinen Boss: `boss_room.tscn` unter `Rooms` eintragen. Ohne Boss-Raum endet der Kreis wie bisher ohne Kellertür, und es schaltet sich nichts frei.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Unit-Tests | 31 neue: Spuren an Mauern und Boden samt Begleitern, Höchstzahl und Seed, Boss-Raum als Ausgang der letzten Ebene und nie als Füllraum, Ebenen mit Boss-Raum für 20 Seeds, Freischaltung des nächsten Kreises, höchstens neun Kreise, Regel der Gitter. Zusammen 1143. |
+| Laufendes Spiel mit Fenster | 45 Schritte mit zwei Seeds: Hub mit neun Portalen, letzte Ebene des Testkreises mit Boss-Raum von 6 x 6 Zellen ohne Kellertür, der Skeleton King mit Stufe Boss, festen Mods, Krone, doppelter Größe und Namensschild auf Level 6, Gitter offen ohne Kollision, vor dem Tor offen, im Raum zu und mit Kollision (der Held kommt nicht hindurch), Balken bei Sicht, Tod des Helden öffnet, Rückkehr schließt, Tod des Bosses schaltet Kreis 2 frei, öffnet die Gitter, zeigt das Portal und die Ansage, das Portal führt vor das Portal des Testkreises, Portal 2 ist offen, im Schlachthaus derselbe Ablauf bis Kreis 3, Portal 3 freigeschaltet ohne Kreis |
+| Neustart headless | 7 Schritte: drei Kreise frei, Portal 2 offen und 3 zu, auf der letzten Ebene kein Boss mehr, Portal von Anfang an, Gitter offen, kein Balken |
+| Kreis 2 | Bilder mit Fenster auf Ebene 1 und 2: Planken, Zement, Hand, Fleck, Spritzer nur neben Flecken, Pentagramm, eine Spur hinter der Mauer öffnet sich gepunktet mit dem Mauerwerk |
+| Bilder | Boss mit Krone und Balken, geschlossenes Gitter, Sieg mit Ansage, Portal, Hub mit zwei offenen Portalen, Boss im Schlachthaus |
+| Spielstand | Die Proben liefen mit eigenem Spielstand und eigenen Einstellungen, die des Users blieben unberührt |
+
+Bewusst offen gelassen:
+
+- Die Werte des Bosses sind geschätzt, die Balance kommt mit M8. Er ist ein Platzhalter aus dem Skelett, ein eigenes Modell kommt mit dem echten Boss.
+- Die Wegfindung kennt die Gitter nicht. Wer bei geschlossenem Gitter nach draußen klickt, läuft bis zum Gitter und bleibt davor stehen. Gegner von außen kommen nicht herein.
+- Das Town-Portal geht auch im versiegelten Raum. Wer so flieht, findet beim Zurückkommen die Gitter wieder geschlossen.
+- Der Boss leuchtet wie alle Elite am ganzen Körper in seiner Farbe, siehe die Einschränkung beim Skelett.
+- Ein Gitter deckt eine Zelle. Die Türen der Raumvorlagen sind nie breiter.
+- Ein Fleck und seine Spritzer können sich überlappen, so sieht ein Spritzer aus.
+- Der Boss im Schlachthaus schaltet Kreis 3 frei, den es noch nicht gibt. Das Portal im Hub bleibt dunkel und heißt "not yet built".
+- Die älteren Bilder der README zeigen den Hub noch mit einem offenen Portal.
+
 ### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L)
 
 Ziel: ein Kreis in Endqualität als Vorlage für alle weiteren.
 
 - Vorschlag ist der zweite Kreis aus dem PDF: Wollust, ewiger Sturm. Wind als Levelmechanik.
-- Vier bis fünf Gegnertypen, ein Boss, zwei Event-Räume.
+- Vier bis fünf Gegnertypen, ein echter Boss an der Stelle des Skeleton King, zwei Event-Räume.
 - Item-Basen für alle 16 Slots und Affixe nach der Slot-Tabelle des PDF.
 - Balance-Durchgang für Leben, Schaden, XP und Loot. Dazu gehören B1 bis B8 und die Stellschrauben aus M2.
 - Ton und Musik.

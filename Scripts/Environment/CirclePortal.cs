@@ -52,7 +52,7 @@ public partial class CirclePortal : Passage
 
         tag = IsOpen
                       ? NameTag.Create(this, TagHeightMeters, Circle.DisplayName, OpenColor, $"Circle {Number}")
-                      : NameTag.Create(this, TagHeightMeters, $"Circle {Number}", SealedColor, "sealed");
+                      : NameTag.Create(this, TagHeightMeters, $"Circle {Number}", SealedColor, isUnlocked ? "not yet built" : "sealed");
 
         CombatText.GetLayer(GetTree().CurrentScene ?? GetTree().Root).AddChild(tag);
     }

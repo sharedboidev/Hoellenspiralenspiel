@@ -25,6 +25,8 @@ public partial class WallSegment : StaticBody3D
 
     private readonly List<Node> parts = new();
 
+    private readonly List<(MeshInstance3D Mark, bool IsBehind)> marks = new();
+
     private float          height           = 2.5f;
     private bool           isBuilt;
     private float          length           = 4f;
@@ -123,7 +125,30 @@ public partial class WallSegment : StaticBody3D
 
         Opening = WallOpeningRule.DecideForBothSides(RoomZone.GetIdAt(center + reach), RoomZone.GetIdAt(center - reach), roomOfHero);
 
-        masonry?.SetInstanceShaderParameter(SeeThrough, new Vector2(Opening.HeroAtNormal, Opening.HeroAtBack));
+        ShowOpening();
+    }
+
+    //Eine Spur auf dem Mauerwerk, sie öffnet sich mit ihm. Auf der Rückseite sind die Seiten der Öffnung vertauscht
+    public void AddMark(MeshInstance3D mark, bool isBehind)
+    {
+        marks.Add((mark, isBehind));
+
+        AddChild(mark);
+
+        ShowOpening();
+    }
+
+    private void ShowOpening()
+    {
+        var opening = new Vector2(Opening.HeroAtNormal, Opening.HeroAtBack);
+
+        masonry?.SetInstanceShaderParameter(SeeThrough, opening);
+
+        foreach (var (mark, isBehind) in marks)
+        {
+            if (IsInstanceValid(mark))
+                mark.SetInstanceShaderParameter(SeeThrough, isBehind ? new Vector2(opening.Y, opening.X) : opening);
+        }
     }
 
     private void Change<T>(ref T field, T value)
@@ -181,8 +206,7 @@ public partial class WallSegment : StaticBody3D
             masonry = AddPart("Masonry", new Vector3(Length, Height - plinthTop, Thickness), (Height + plinthTop) / 2f, WallFade.GetMasonry(skin));
 
         AddShade();
-
-        masonry?.SetInstanceShaderParameter(SeeThrough, new Vector2(Opening.HeroAtNormal, Opening.HeroAtBack));
+        ShowOpening();
     }
 
     private MeshInstance3D AddPart(string name, Vector3 size, float centerHeight, Material material)

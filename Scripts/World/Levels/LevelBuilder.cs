@@ -29,6 +29,15 @@ public sealed class BuiltLevel
     public List<CellarDoor> Exits { get; } = new();
 
     public List<StairsUp> Entrances { get; } = new();
+
+    //Die Mauerstücke in der Reihenfolge ihrer Läufe, daran hängen die Spuren
+    public List<(WallRun Run, WallSegment Wall)> Walls { get; } = new();
+
+    //Plätze aus den Raumvorlagen, an denen eine Spur auf dem Boden liegen darf
+    public List<Node3D> FloorSpots { get; } = new();
+
+    //Die Boss-Räume der Ebene, mit ihren Gittern
+    public List<BossArena> Arenas { get; } = new();
 }
 
 //Macht aus dem Grundriss eine begehbare Ebene: Böden, Mauern und die Szenen der Räume
@@ -66,6 +75,7 @@ public static class LevelBuilder
         RaiseWalls(level, theme);
         FurnishRooms(level, rooms, theme);
         MarkCorridorPacks(level);
+        LevelMarks.Place(level, theme);
 
         return level;
     }
@@ -148,6 +158,8 @@ public static class LevelBuilder
             Dress(wall, theme);
 
             walls.AddChild(wall);
+
+            level.Walls.Add((run, wall));
         }
     }
 
@@ -186,6 +198,15 @@ public static class LevelBuilder
 
             container.AddChild(room);
 
+            level.FloorSpots.AddRange(room.GetAllChildren<FloorMarkSpot>());
+
+            if (room is BossArena arena)
+            {
+                arena.BuildGates(placed, level.Layout, level.Grid);
+
+                level.Arenas.Add(arena);
+            }
+
             //Der Name des Markers ist der Name seiner Gruppe. Ohne den Raum im Namen riefe ein Treffer alle gleichnamigen Gruppen der Ebene
             foreach (var marker in room.GetAllChildren<SpawnMarker>())
             {
@@ -201,7 +222,8 @@ public static class LevelBuilder
                 level.Entrances.AddRange(FindEntrances(room));
             }
 
-            if (placed.Index == level.Layout.ExitRoom)
+            //Der Boss-Raum hat keine Kellertür, aus ihm führt nur das Portal des Bosses zurück
+            if (placed.Index == level.Layout.ExitRoom && placed.Blueprint.Role != RoomRole.Boss)
                 level.Exits.AddRange(FindExits(room));
         }
     }

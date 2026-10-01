@@ -17,6 +17,9 @@ public sealed record LevelSettings
 
     public int AreaLevel { get; init; } = 1;
 
+    //Auf der letzten Ebene eines Kreises steht statt des Ausgangs der Boss-Raum, falls das Thema einen hat
+    public bool IsLastLevel { get; init; }
+
     public int Margin { get; init; } = 2;
 
     //Auf so viele Zellen Gang kommt eine Gruppe, 0 lässt die Gänge leer

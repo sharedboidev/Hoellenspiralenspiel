@@ -97,6 +97,22 @@ public partial class EnemyController : Node
     [Export]
     public float RareEliteGoldFactor { get; set; } = 8f;
 
+    [ExportGroup("Boss")]
+    [Export]
+    public float BossScale { get; set; } = 2f;
+
+    [Export]
+    public float BossXpFactor { get; set; } = 10f;
+
+    [Export]
+    public int BossLootRolls { get; set; } = 6;
+
+    [Export]
+    public Color BossNameColor { get; set; } = new(0.85f, 0.2f, 0.4f);
+
+    [Export]
+    public float BossGoldFactor { get; set; } = 20f;
+
     [ExportGroup("Gold")]
     //Elite und Rare Elite lassen immer Gold fallen
     [Export(PropertyHint.Range, "0,100,0.1")]
@@ -301,9 +317,12 @@ public partial class EnemyController : Node
 
         for (var i = 0; i < marker.AmountToSpawn; i++)
         {
+            //Auch ein Boss verbraucht die beiden Würfe, damit die übrigen Spawns der Ebene bleiben, wo sie sind
             var modCount = EnemyRarityRules.RollModCount(chances, GameRandom.Shared);
-
-            var enemy = Spawn(marker.Enemy, new SpawnArea(marker.GlobalPosition, marker.ScatterRadius, marker.MinGap, marker.Enemy.AggroRange + AggroMarginPx), marker.Name, level, modCount);
+            var area     = new SpawnArea(marker.GlobalPosition, marker.ScatterRadius, marker.MinGap, marker.Enemy.AggroRange + AggroMarginPx);
+            var enemy    = marker.Enemy.IsBoss
+                                   ? Spawn(marker.Enemy, area, marker.Name, level, marker.Enemy.FixedMods.Where(mod => mod is not null).ToList(), EnemyRarity.Boss)
+                                   : Spawn(marker.Enemy, area, marker.Name, level, modCount);
 
             enemy.SpawnIndex = nextSpawnIndex++;
         }
@@ -326,11 +345,14 @@ public partial class EnemyController : Node
         => Spawn(definition, new SpawnArea(position), spawnGroup, level, mods);
 
     public Enemy Spawn(EnemyResource definition, SpawnArea area, string spawnGroup, int level, IReadOnlyList<MonsterModResource> mods)
+        => Spawn(definition, area, spawnGroup, level, mods, EnemyRarityRules.FromModCount(mods.Count));
+
+    public Enemy Spawn(EnemyResource definition, SpawnArea area, string spawnGroup, int level, IReadOnlyList<MonsterModResource> mods, EnemyRarity rarity)
     {
         var enemy = definition.Scene.Instantiate<Enemy>();
-        var look  = GetLookOf(EnemyRarityRules.FromModCount(mods.Count));
+        var look  = GetLookOf(rarity);
 
-        enemy.Configure(definition, level, mods, look);
+        enemy.Configure(definition, level, mods, look, rarity);
 
         enemy.Position   = FindFreeSpot(area, enemy.GetBodyRadius() * look.Scale);
         enemy.SpawnGroup = spawnGroup;
@@ -406,6 +428,7 @@ public partial class EnemyController : Node
         {
             EnemyRarity.Elite     => new EnemyRarityLook(EliteScale, EliteXpFactor, EliteLootRolls, EliteNameColor, EliteGoldFactor),
             EnemyRarity.RareElite => new EnemyRarityLook(RareEliteScale, RareEliteXpFactor, RareEliteLootRolls, RareEliteNameColor, RareEliteGoldFactor),
+            EnemyRarity.Boss      => new EnemyRarityLook(BossScale, BossXpFactor, BossLootRolls, BossNameColor, BossGoldFactor),
             _                     => EnemyRarityLook.Normal
         };
 

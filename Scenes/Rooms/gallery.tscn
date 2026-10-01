@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://Scripts/World/Levels/RoomDoor.cs" id="door"]
 [ext_resource type="Script" path="res://Scripts/World/Levels/WallSegment.cs" id="wall"]
 [ext_resource type="Script" path="res://Scripts/World/SpawnMarker.cs" id="marker"]
+[ext_resource type="Script" path="res://Scripts/World/Levels/FloorMarkSpot.cs" id="spot"]
 
 [sub_resource type="PlaneMesh" id="Mesh_preview"]
 size = Vector2(24, 12)
@@ -65,3 +66,7 @@ collision_mask = 0
 script = ExtResource("wall")
 Length = 4.0
 Thickness = 0.5
+
+[node name="FloorMarkSpot" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("spot")

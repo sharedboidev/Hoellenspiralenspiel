@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/Rooms/hall.tscn" id="13_hall"]
 [ext_resource type="PackedScene" path="res://Scenes/Rooms/gallery.tscn" id="14_gallery"]
 [ext_resource type="PackedScene" path="res://Scenes/Rooms/shrine.tscn" id="15_shrine"]
+[ext_resource type="PackedScene" path="res://Scenes/Rooms/boss_room.tscn" id="16_boss"]
 [ext_resource type="Texture2D" uid="uid://bp4uxrb2dhk7x" path="res://Textures/World/floor_stone.png" id="20_floor"]
 [ext_resource type="Texture2D" uid="uid://vo27wofvjp82" path="res://Textures/World/wall_brick.png" id="21_wall"]
 
@@ -43,7 +44,7 @@ Weight = 2.0
 script = ExtResource("1_theme")
 Id = "test_circle"
 DisplayName = "Testkreis"
-Rooms = Array[PackedScene]([ExtResource("10_start"), ExtResource("11_exit"), ExtResource("12_chamber"), ExtResource("13_hall"), ExtResource("14_gallery"), ExtResource("15_shrine")])
+Rooms = Array[PackedScene]([ExtResource("10_start"), ExtResource("11_exit"), ExtResource("12_chamber"), ExtResource("13_hall"), ExtResource("14_gallery"), ExtResource("15_shrine"), ExtResource("16_boss")])
 Enemies = Array[ExtResource("2_entry")]([SubResource("Pool_blue"), SubResource("Pool_yellow"), SubResource("Pool_caster"), SubResource("Pool_skeleton")])
 FloorTexture = ExtResource("20_floor")
 WallTexture = ExtResource("21_wall")

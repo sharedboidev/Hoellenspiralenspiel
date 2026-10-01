@@ -9,6 +9,7 @@ namespace Hoellenspiralenspiel.Scripts.World.Levels;
 public static class WallFade
 {
     private const string MasonryShaderPath = "res://Shaders/Ps1/ps1_wall.gdshader";
+    private const string MarkShaderPath    = "res://Shaders/Ps1/ps1_wall_mark.gdshader";
     private const string PlinthShaderPath  = "res://Shaders/Ps1/ps1_surface.gdshader";
     private const float  TilesPerMeter     = 0.25f;
     private const int    MaxWallsOnRay     = 12;
@@ -25,6 +26,7 @@ public static class WallFade
     private static readonly StringName CoverEdge     = "cover_edge";
 
     private static readonly Dictionary<Texture2D, ShaderMaterial>          MasonryOf = new();
+    private static readonly Dictionary<Texture2D, ShaderMaterial>          MarkOf    = new();
     private static readonly Dictionary<(Texture2D, float), ShaderMaterial> PlinthOf  = new();
     private static readonly List<WallSegment>                              Walls     = new();
 
@@ -32,6 +34,8 @@ public static class WallFade
     private static int  knownZones = -1;
 
     public static Shader MasonryShader { get; } = GD.Load<Shader>(MasonryShaderPath);
+
+    public static Shader MarkShader { get; } = GD.Load<Shader>(MarkShaderPath);
 
     public static WallFadeView View { get; private set; }
 
@@ -62,6 +66,9 @@ public static class WallFade
 
         foreach (var material in MasonryOf.Values)
             Apply(material);
+
+        foreach (var material in MarkOf.Values)
+            Apply(material);
     }
 
     public static ShaderMaterial GetMasonry(Texture2D texture)
@@ -69,16 +76,20 @@ public static class WallFade
         if (MasonryOf.TryGetValue(texture, out var known))
             return known;
 
-        var material = Create(MasonryShader, texture, Vector3.One);
+        return MasonryOf[texture] = Fade(Create(MasonryShader, texture, Vector3.One));
+    }
 
-        material.SetShaderParameter(FadeEdge, WallFadeRule.EdgeMeters);
-        material.SetShaderParameter(FadeSideRamp, WallFadeRule.SideRampMeters);
-        material.SetShaderParameter(CoverRadius, WallFadeRule.CoverMeters);
-        material.SetShaderParameter(CoverEdge, WallFadeRule.CoverEdgeMeters);
+    //Eine Spur auf dem Mauerwerk öffnet sich mit ihm. Ihr Bild folgt dem Netz, nicht der Welt
+    public static ShaderMaterial GetMark(Texture2D texture)
+    {
+        if (MarkOf.TryGetValue(texture, out var known))
+            return known;
 
-        Apply(material);
+        var material = new ShaderMaterial { Shader = MarkShader };
 
-        return MasonryOf[texture] = material;
+        material.SetShaderParameter(AlbedoTexture, texture);
+
+        return MarkOf[texture] = Fade(material);
     }
 
     public static ShaderMaterial GetPlinth(Texture2D texture, float brightness)
@@ -138,6 +149,18 @@ public static class WallFade
         material.SetShaderParameter(AlbedoTexture, texture);
         material.SetShaderParameter(WorldUvScale, TilesPerMeter);
         material.SetShaderParameter(Tint, tint);
+
+        return material;
+    }
+
+    private static ShaderMaterial Fade(ShaderMaterial material)
+    {
+        material.SetShaderParameter(FadeEdge, WallFadeRule.EdgeMeters);
+        material.SetShaderParameter(FadeSideRamp, WallFadeRule.SideRampMeters);
+        material.SetShaderParameter(CoverRadius, WallFadeRule.CoverMeters);
+        material.SetShaderParameter(CoverEdge, WallFadeRule.CoverEdgeMeters);
+
+        Apply(material);
 
         return material;
     }

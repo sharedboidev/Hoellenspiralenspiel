@@ -158,6 +158,12 @@ public partial class Descent : Node
     //Der Held betritt eine Ebene zum ersten Mal. Genannt wird ihr Bereichslevel
     public event Action<int> LevelReached;
 
+    //Auf der Ebene steht ein lebender Boss
+    public event Action<Enemy> BossAppeared;
+
+    //Der Boss ist gefallen, dieser Kreis hat sich im Hub geöffnet
+    public event Action<int> CircleUnlocked;
+
     public override void _Ready()
     {
         surfaceLook = SurfaceLook.From(Surroundings, Moonlight);
@@ -511,7 +517,8 @@ public partial class Descent : Node
             MaxGap               = MaxGap,
             LoopShare            = LoopShare,
             CellsPerCorridorPack = CellsPerCorridorPack,
-            AreaLevel            = circle.FirstAreaLevel + depth - 1
+            AreaLevel            = circle.FirstAreaLevel + depth - 1,
+            IsLastLevel          = depth >= Math.Max(1, circle.LevelCount)
         };
 
     //Erst nach einem Schritt der Physik stehen die Mauern so, dass die Suche nach freien Plätzen sie sieht.
@@ -540,8 +547,23 @@ public partial class Descent : Node
 
         Enemies.SpawnFrom(level.RoomMarkers.Concat(level.CorridorMarkers).Where(marker => marker.Enemy is not null));
 
+        var boss       = Enemies.Enemies.FirstOrDefault(enemy => enemy.Definition?.IsBoss == true);
+        var bossKilled = boss is not null && State.IsKilled(level.Depth, boss.SpawnIndex);
+
         foreach (var enemy in Enemies.Enemies.Where(enemy => State.IsKilled(level.Depth, enemy.SpawnIndex)).ToList())
             Enemies.Remove(enemy);
+
+        //Ein gefallener Boss bleibt gefallen, sein Portal steht dann von Anfang an
+        foreach (var arena in level.Arenas)
+        {
+            arena.Arm(bossKilled ? null : boss, Hero);
+
+            if (bossKilled)
+                OpenBossPortal(arena);
+        }
+
+        if (boss is not null && !bossKilled)
+            BossAppeared?.Invoke(boss);
 
         Hero.Teleport(GetArrivalPoint(level, arrival));
 
@@ -625,6 +647,33 @@ public partial class Descent : Node
     {
         if (Level is not null && State.RememberKill(Level.Depth, enemy.SpawnIndex))
             Changed?.Invoke();
+
+        if (Level is null || Circle is null || enemy.Definition?.IsBoss != true)
+            return;
+
+        var next = CircleUnlockRule.NextCircle(Circle.Number, Level.Depth, Circle.LevelCount);
+
+        if (next > 0 && !Journey.IsUnlocked(next))
+        {
+            Journey.Unlock(next);
+
+            Changed?.Invoke();
+            CircleUnlocked?.Invoke(next);
+        }
+
+        foreach (var arena in Level.Arenas)
+            OpenBossPortal(arena);
+    }
+
+    //Das Portal des Bosses führt zurück in den Hub, vor das Portal dieses Kreises
+    private void OpenBossPortal(BossArena arena)
+    {
+        if (arena.HasPortal)
+            return;
+
+        var number = Circle.Number;
+
+        arena.ShowPortal().Used += _ => Show(Hub, Arrival.AtPortalOf(number));
     }
 
     #region Town-Portal

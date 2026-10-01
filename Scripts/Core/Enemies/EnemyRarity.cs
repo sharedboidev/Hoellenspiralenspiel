@@ -7,7 +7,10 @@ public enum EnemyRarity
 {
     Normal,
     Elite,
-    RareElite
+    RareElite,
+
+    //Feste Mods statt gewürfelter, die Stufe folgt nicht ihrer Zahl
+    Boss
 }
 
 public sealed record EnemyRarityChances(float ElitePercent, float RareElitePercent);
