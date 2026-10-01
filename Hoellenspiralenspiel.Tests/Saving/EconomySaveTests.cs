@@ -21,9 +21,10 @@ public class EconomySaveTests
         return loaded;
     }
 
+    //Seit M8, Etappe 1: Version 5 trägt je Kreis den Inhaltsstand
     [Test]
-    public void DerSpielstandHatVersion4()
-        => Assert.That(SaveGame.CurrentVersion, Is.EqualTo(4));
+    public void DerSpielstandHatVersion5()
+        => Assert.That(SaveGame.CurrentVersion, Is.EqualTo(5));
 
     [Test]
     public void Gold_UeberstehtDasSpeichern()

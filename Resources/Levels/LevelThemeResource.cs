@@ -14,9 +14,17 @@ public partial class LevelThemeResource : Resource
     public string DisplayName { get; set; } = string.Empty;
 
     [ExportGroup("Kreis")]
-    //1 bis 9. Der Kreis ist offen, sobald der Held so viele Kreise freigeschaltet hat
-    [Export(PropertyHint.Range, "1,9,1")]
+    //1 bis 9. Der Kreis ist offen, sobald der Held so viele Kreise freigeschaltet hat. 0 ist nur für einen Testkreis
+    [Export(PropertyHint.Range, "0,9,1")]
     public int Number { get; set; } = 1;
+
+    //Ein Testkreis steht außerhalb der Kette der neun Kreise: sein Portal im Hub ist immer offen, sein Boss schaltet nichts frei
+    [Export]
+    public bool IsTestCircle { get; set; }
+
+    //Wer Räume, Gegner oder Aufbau des Kreises ändert, zählt hier hoch. Ein gespeicherter Abstieg mit anderem Stand beginnt neu, die Checkpoints bleiben
+    [Export(PropertyHint.Range, "1,1000,1")]
+    public int ContentVersion { get; set; } = 1;
 
     [Export(PropertyHint.Range, "1,20,1")]
     public int LevelCount { get; set; } = 4;

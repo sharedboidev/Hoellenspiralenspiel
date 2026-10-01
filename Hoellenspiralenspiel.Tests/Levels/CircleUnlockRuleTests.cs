@@ -33,6 +33,15 @@ public class CircleUnlockRuleTests
         Assert.That(CircleUnlockRule.NextCircle(0, 4, 4), Is.Zero);
     }
 
+    //Ein Testkreis hat die Nummer 0 und steht außerhalb der Kette der neun Kreise
+    [Test]
+    public void EinTestkreisSchaltetNichtsFrei()
+    {
+        Assert.That(CircleUnlockRule.NextCircle(0, 3, 3), Is.Zero);
+        Assert.That(CircleUnlockRule.NextCircle(0, 1, 1), Is.Zero);
+        Assert.That(new JourneyState().IsUnlocked(0), Is.False);
+    }
+
     [Test]
     public void DieReiseKenntHoechstensNeunKreise()
     {

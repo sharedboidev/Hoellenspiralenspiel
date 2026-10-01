@@ -217,4 +217,47 @@ public class JourneyStateTests
         Assert.That(save.Descent, Is.Null);
         Assert.That(save.Version, Is.EqualTo(SaveGame.CurrentVersion));
     }
+
+    [Test]
+    public void EinNeuerAbstiegMerktSichDenInhaltsstandDesKreises()
+    {
+        var journey = new JourneyState();
+
+        journey.BeginAnew(Lust, 1, 3);
+
+        Assert.That(journey.GetDescent(Lust).ContentVersion, Is.EqualTo(3));
+        Assert.That(journey.GetDescent(Lust).IsStale(4), Is.True);
+    }
+
+    [Test]
+    public void DerInhaltsstandUeberstehtDasSpeichern()
+    {
+        var journey = new JourneyState();
+
+        journey.BeginAnew(Lust, 4, 7);
+        journey.BeginAnew(Gluttony, 5);
+
+        var loaded = SaveAndLoad(journey);
+
+        Assert.That(loaded.GetDescent(Lust).ContentVersion, Is.EqualTo(7));
+        Assert.That(loaded.GetDescent(Gluttony).ContentVersion, Is.Zero);
+    }
+
+    [Test]
+    public void EinSpielstandDerVersion4KenntKeinenInhaltsstand()
+    {
+        const string json = "{\"Version\":4,\"Character\":{\"Level\":3},\"Journey\":{\"UnlockedCircles\":2,\"Circles\":[{\"CircleId\":\"lust\",\"Seed\":5,\"DeepestDepth\":2}]}}";
+
+        var journey = new JourneyState();
+
+        Assert.That(SaveGameSerializer.TryDeserialize(json, out var read), Is.True);
+        Assert.That(SaveGameMapper.RestoreJourney(read, journey, Lust), Is.True);
+
+        var descent = journey.GetDescent(Lust);
+
+        Assert.That(descent.HasBegun, Is.True);
+        Assert.That(descent.ContentVersion, Is.Zero);
+        Assert.That(descent.IsStale(3), Is.False);
+        Assert.That(descent.DeepestDepth, Is.EqualTo(2));
+    }
 }

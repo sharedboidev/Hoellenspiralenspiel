@@ -6,7 +6,7 @@ namespace Hoellenspiralenspiel.Scripts.Core.Saving;
 
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 4;
+    public const int CurrentVersion = 5;
 
     public int                    Version   { get; set; } = CurrentVersion;
     public CharacterSave          Character { get; set; } = new();
@@ -54,6 +54,10 @@ public sealed class CircleSave
     public string                  CircleId     { get; set; } = string.Empty;
     public int                     Seed         { get; set; }
     public int                     DeepestDepth { get; set; }
+
+    //Fehlt vor Version 5 und steht dann auf 0: Der Stand des Kreises, mit dem die Ebenen entstanden sind
+    public int                     ContentVersion { get; set; }
+
     public List<ExploredLevelSave> Levels       { get; set; } = new();
 }
 

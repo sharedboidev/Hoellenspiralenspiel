@@ -16,7 +16,8 @@ public partial class CirclePortal : Passage
     private bool    isUnlocked;
     private NameTag tag;
 
-    [Export(PropertyHint.Range, "1,9,1")]
+    //0 ist das Portal des Testkreises, es steht außerhalb der Kette der neun Kreise
+    [Export(PropertyHint.Range, "0,9,1")]
     public int Number { get; set; } = 1;
 
     [Export]
@@ -51,9 +52,11 @@ public partial class CirclePortal : Passage
         if (!IsInsideTree())
             return;
 
+        var title = Number == 0 ? "Test circle" : $"Circle {Number}";
+
         tag = IsOpen
-                      ? NameTag.Create(this, TagHeightMeters, Circle.DisplayName, OpenColor, $"Circle {Number}")
-                      : NameTag.Create(this, TagHeightMeters, $"Circle {Number}", SealedColor, isUnlocked ? "not yet built" : "sealed");
+                      ? NameTag.Create(this, TagHeightMeters, Circle.DisplayName, OpenColor, title)
+                      : NameTag.Create(this, TagHeightMeters, title, SealedColor, isUnlocked ? "not yet built" : "sealed");
 
         CombatText.GetLayer(GetTree().CurrentScene ?? GetTree().Root).AddChild(tag);
     }

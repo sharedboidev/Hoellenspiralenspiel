@@ -38,7 +38,7 @@ Gegner erschlagen, Beute sammeln, Charakter ausbauen.
 
 ## ✨ Feature-Umfang
 
-Das ist der Stand vom 30.09.2026. Das Spiel beginnt im Hauptmenü. Vom Hub führen Portale in die Höllenkreise, bisher in einen Testkreis mit vier erzeugten Ebenen. Im Hub stehen eine Truhe und ein Händler, bezahlt wird mit Gold.
+Das ist der Stand vom 02.10.2026. Das Spiel beginnt im Hauptmenü. Vom Hub führen Portale in die Höllenkreise: in einen Testkreis mit vier erzeugten Ebenen, nach Wollust, das in M8 entsteht, und an einem zehnten Portal ins Schlachthaus, ein Testlevel, das immer offen ist. Im Hub stehen eine Truhe und ein Händler, bezahlt wird mit Gold.
 Das Spiel läuft in 3D, mehr dazu im Abschnitt [3D im PS1-Look](#-3d-im-ps1-look).
 
 ### 🧙 Charakter
@@ -297,7 +297,7 @@ Die Einstellungen liegen als `settings.json` eine Ebene darüber, direkt in `%AP
 | Ohne Spielstand testen | Im Inspector am `GameController` den Schalter `SavingEnabled` ausschalten |
 
 Leben, Mana, Position, Beute und Gold am Boden und der Rückkauf des Händlers stehen nicht im Spielstand.
-Der Spielstand hat Version 4. Ältere Spielstände lädt das Spiel weiter. Vor Version 3 beginnen sie mit 0 Gold und leerer Truhe. Bis Version 3 liegen keine Tränke auf der Leiste, und ein gespeicherter Bestand des Händlers wird beim Laden einmal nach Itemtyp neu ausgelegt, ohne neu zu würfeln. Eine ältere Fassung des Spiels legt einen Spielstand der Version 4 als `.broken` zur Seite.
+Der Spielstand hat Version 5. Ältere Spielstände lädt das Spiel weiter. Vor Version 3 beginnen sie mit 0 Gold und leerer Truhe. Bis Version 3 liegen keine Tränke auf der Leiste, und ein gespeicherter Bestand des Händlers wird beim Laden einmal nach Itemtyp neu ausgelegt, ohne neu zu würfeln. Seit Version 5 steht je Kreis der Inhaltsstand im Spielstand, mit dem seine Ebenen entstanden sind: Ändert sich ein Kreis, beginnt ein gespeicherter Abstieg dort neu, die Checkpoints bleiben. Ein Abstieg aus Version 4 gilt als passend, bis sich der Kreis das nächste Mal ändert. Eine ältere Fassung des Spiels legt einen Spielstand der Version 5 als `.broken` zur Seite.
 Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints und das Town-Portal.
 
 </details>
@@ -314,7 +314,7 @@ Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints
 | Hud an Ankern | Orbs, Skill-Leiste und XP-Balken hängen als Gruppe unten mittig, der Level-up-Knopf neben dem Lebens-Orb, der Charakterbogen oben rechts. Alles sitzt bei jedem Seitenverhältnis richtig, auch nach einem Wechsel im laufenden Spiel. Fenster wie der Charakterbogen liegen über den Orbs |
 | Statuszeile | Oben links. Die Bildrate zeigt sie mit Show FPS aus den Einstellungen, Gegner, Look, Kamera, Ort und Seed nur im Debug-Build. Truhe und Händler verdecken sie, solange sie offen sind |
 | Neuer Charakter | Alle Attribute auf 1, ein weißes Training Sword in der Haupthand, das Inventar ist leer |
-| Hub | Ein ummauerter Platz mit neun Portalen, eines je Höllenkreis. Gesperrte Portale sind dunkel. Nahe am Start stehen eine Truhe und ein Händler |
+| Hub | Ein ummauerter Platz mit neun Portalen, eines je Höllenkreis, und einem zehnten neben dem neunten, das immer offen ins Schlachthaus führt, das Testlevel. Gesperrte Portale sind dunkel. Nahe am Start stehen eine Truhe und ein Händler |
 | Händler | Ein Klick auf ihn öffnet sein Fenster oben links, mit drei Reitern. Consumables: Heil- und Manatrank, sie gehen nie aus. Equipment: zwanzig gewürfelte Basen, davon jedes zwanzigste Magic und jedes dreißigste Rare, der Rest weiß. Buyback: alles, was der Held verkauft hat, in der Reihenfolge des Verkaufs |
 | Ordnung beim Händler | Consumables und Equipment liegen nach Itemtyp: Waffen nach Art, Schilde, Rüstung vom Helm bis zu den Stiefeln, Schmuck, zuletzt Heil- und Manatrank. Innerhalb einer Art nach Basis, dann Rare, Magic, Normal. Das Gitter füllt sich Spalte für Spalte von oben nach unten. Ein Kauf aus dem Equipment lässt eine Lücke |
 | Kaufen und verkaufen | Ein Rechtsklick auf eine Ware kauft, mit `Strg` einen ganzen Stapel Tränke. `Strg` + Linksklick im Inventar verkauft, ebenso ein Linksklick mit dem Item an der Maus ins Händlerfenster. Der Händler zahlt ein Viertel des Preises und verkauft zum selben Betrag zurück, bis der Held den Hub verlässt |
@@ -364,7 +364,7 @@ Ein Klick auf ein Portal im Hub öffnet die Checkpoints seines Kreises. Jede Ebe
 
 | Feature | Beschreibung |
 |---|---|
-| Kreis | Ein Höllenkreis hat mehrere Ebenen, der Testkreis und das Schlachthaus je vier. Auf der letzten Ebene steht statt des Ausgangs der Boss-Raum |
+| Kreis | Ein Höllenkreis hat mehrere Ebenen, der Testkreis und das Schlachthaus je vier, Wollust vorerst drei. Auf der letzten Ebene steht statt des Ausgangs der Boss-Raum |
 | Treppen | Die Kellertür im Ausgang führt hinab, die Treppe im Startraum hinauf, aus Ebene 1 in den Hub |
 | Boss-Raum | Ein Raum von 6 x 6 Zellen mit Thron, Feuerschalen und Pfeilern, am weitesten vom Start. Betritt der Held ihn, fallen Gitter in die Türen, bis der Boss fällt oder der Held stirbt |
 | Freischaltung | Fällt der Boss, öffnet sich im Hub das Portal des nächsten Kreises, und im Boss-Raum erscheint ein dämonisches Portal zurück in den Hub. Ein gefallener Boss bleibt gefallen, sein Portal steht beim nächsten Besuch von Anfang an |
@@ -389,7 +389,8 @@ Ein Klick auf ein Portal im Hub öffnet die Checkpoints seines Kreises. Jede Ebe
 | Pflichtraum | Der Schrein ist ein Event-Raum und erscheint in jeder Ebene genau einmal |
 | Thema | Eine Resource legt Räume, Texturen, Licht, Musik, Gegnerpool und Spuren fest |
 | Spuren | Blutige Hände, große und sehr große verlaufene Flecken mit Spritzern drumherum, Blutlachen in Räumen und Gängen und höchstens ein Pentagramm je Ebene, gewürfelt aus dem Seed. Eine Spur an der Mauer öffnet sich mit dem Mauerwerk |
-| Schlachthaus | Der Platzhalter für den zweiten Kreis: Holzplanken, grobe Zementwände, Blutspuren, Bereichslevel 5 bis 8. Er öffnet sich, sobald der Boss des Testkreises gefallen ist |
+| Schlachthaus | Das Testlevel am zehnten Portal: Holzplanken, grobe Zementwände, Blutspuren, Bereichslevel 5 bis 8. Es ist immer offen, sein Boss schaltet nichts frei. Es war bis zum 02.10.2026 der Platzhalter für den zweiten Kreis |
+| Wollust | Der zweite Kreis, Bereichslevel 5 bis 7, öffnet sich, sobald der Boss des Testkreises gefallen ist. Er entsteht in M8 und erbt bis dahin das Aussehen des Schlachthauses |
 | Tiefe | Mit jeder Ebene steigt das Bereichslevel um 1, und die Ebene bekommt einen Raum mehr. Die erste Ebene des Testkreises hat Bereichslevel 1 |
 | Gegner | Räume bringen ihre Spawn-Marker mit, in Gängen stehen vereinzelt kleine Gruppen aus dem Gegnerpool |
 | Karte | Deckt sich beim Erkunden auf und steht im Spielstand. Sie zeigt Kellertür, Treppe und Town-Portal. `F5` zeigt im Debug-Build zum Testen die ganze Ebene |
@@ -460,7 +461,7 @@ Das Mausrad wirkt immer.
 
 - Balance für Gold, Preise und den Boss, alle Werte sind geschätzt
 - Töne für Gold, Truhe, Händler, Gitter und Boss
-- Ein Höllenkreis in Endqualität, bisher gibt es das Testthema und das Schlachthaus als Platzhalter
+- Ein Höllenkreis in Endqualität, bisher gibt es das Testthema, das Schlachthaus als Testlevel und Wollust als Hülle, die das Schlachthaus erbt
 - Ein echter Boss mit eigenem Modell, der Skeleton King ist ein Platzhalter aus dem Skelett
 - Eigene Modelle für den Held und die übrigen Gegner, bisher hat nur das Skelett eins
 - Item-Basen für die übrigen zwölf Ausrüstungsplätze
@@ -542,11 +543,11 @@ flowchart LR
 | ✅ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
 | ✅ | **M7** Hub | Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal, Pausenmenü, Ladebildschirm, Einstellungen, Hud an Ankern, Gold, Truhe, Händler, Platzhalter-Boss mit Boss-Raum und Freischaltung des nächsten Kreises. Etappe 4 liegt seit dem 01.10.2026 auf `master`, dazu der ruhigere PS1-Look und die Sichtlinie der Mauern | mittel |
 | ✅ | **M7.5** Renderskalierung | Vorgezogen aus M9: Die Welt rendert im Raster der PS1 statt in voller Fenstergröße, gebaut am 01.10.2026 auf `master_RenderScaling`, seit demselben Tag auf `master` | klein |
-| ⏭️ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
+| 🔨 | **M8** Höllenkreis | Wollust als kompletter Kreis in Endqualität: freie Flächen hintereinander, Dungeons per Ladezone, Sturm mit Windschatten, sechs Gegnertypen, Minos als Boss, Events, alle 16 Slots mit Item-Basen, Affixe nach der Slot-Tabelle, Balance, Ton und Musik. Etappe 1 von 20 ist am 02.10.2026 auf `master_CirclesAndTestPortal` gebaut: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal, der Inhaltsstand im Spielstand | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
 | 💤 | **M10** Koop | Optional, baut auf Kern und Seeds auf | groß |
 
-✅ fertig · ⏭️ als Nächstes · ⬜ offen · 💤 optional
+✅ fertig · 🔨 im Bau · ⬜ offen · 💤 optional
 
 Aufgaben, Fertig-Kriterien und alle Befunde stehen in der [Roadmap](docs/ROADMAP.md).
 
@@ -555,7 +556,9 @@ Aufgaben, Fertig-Kriterien und alle Befunde stehen in der [Roadmap](docs/ROADMAP
 | Kreis | Sünde | Stand |
 |---|---|---|
 | 1 | Limbus | geplant, bis dahin steht der Testkreis an seiner Stelle |
-| 2 | Wollust | geplant, erster Kandidat für M8: ewiger Sturm als Levelmechanik. Bis dahin steht das Schlachthaus an seiner Stelle |
+| 2 | Wollust | im Bau seit dem 02.10.2026, M8: drei freie Flächen im ewigen Sturm, je ein Dungeon, Minos als Boss. Bis Etappe 3b erbt er das Aussehen des Schlachthauses |
+
+Das Schlachthaus, bis zum 02.10.2026 der Platzhalter für Kreis 2, bleibt als Testlevel am zehnten Portal des Hubs erhalten.
 | 3 | Völlerei | geplant |
 | 4 | Habgier | geplant |
 | 5 | Zorn | geplant |

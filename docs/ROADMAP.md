@@ -7,12 +7,13 @@ Die Rückmeldungen aus dem Spielen von Etappe 3 sind am selben Tag auf `master_P
 Eine zweite Runde Rückmeldungen zu Etappe 3 ist am selben Tag auf `master_PlaytestFeedback3` gebaut: Umriss für alles Benutzbare, Blick zur Maus, Schlag und Zauber binden den Helden, Kaufen per Rechtsklick und der Vergleich oben bündig.
 Etappe 4 ist am 01.10.2026 auf `master_BossAndUnlock` gebaut und liegt seit demselben Tag auf `master`: der Skeleton King als Platzhalter-Boss mit Krone und Boss-Raum, die Freischaltung des nächsten Kreises und das Schlachthaus als Platzhalter für Kreis 2 mit neuen Texturen und Blutspuren. Auf demselben Branch kamen nach dem Spielen das ruhigere Bild des PS1-Looks und die Sichtlinie der Mauern dazu, beide ebenfalls auf `master`.
 Die Renderskalierung ist aus M9 vorgezogen und am 01.10.2026 als M7.5 auf `master_RenderScaling` gebaut und liegt seit demselben Tag auf `master`: Die Welt rendert im Raster der PS1 statt in voller Fenstergröße.
+M8 ist am 02.10.2026 geplant und läuft in 20 Etappen, siehe dort. Etappe 1 ist am selben Tag auf `master_CirclesAndTestPortal` gebaut und liegt noch nicht auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal des Hubs, der Inhaltsstand eines Kreises im Spielstand.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code samt Szenen. Die Zeilenzahl aus der ersten Analyse, rund 5.500, galt für die 2D-Fassung.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 bis 4 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 bis 4 auch mit Fenster. M7.5 ist randlos und mit Fenster geprüft.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 bis 4 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 bis 4 auch mit Fenster. M7.5 ist randlos und mit Fenster geprüft. Etappe 1 von M8 ist headless und mit Fenster geprüft, dazu der Neustart mit einem Spielstand der Version 4.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -2530,17 +2531,114 @@ Bewusst offen gelassen:
 - Die Karte der Oberfläche rendert weiter in 2560 x 1440 und ohne Raster der PS1, wie bisher.
 - Mit Look aus rendert der Viewport in Fenstergröße. Das kostet gegenüber vorher wenige Prozent, weil das Bild einmal mehr kopiert wird. Der Schalter ist nur zum Vergleichen da.
 
-### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L)
+### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L, geplant am 02.10.2026, Etappe 1 umgesetzt am selben Tag auf `master_CirclesAndTestPortal`)
 
-Ziel: ein Kreis in Endqualität als Vorlage für alle weiteren.
+Ziel: ein Kreis in Endqualität als Vorlage für alle weiteren. Der Kreis ist Wollust, der zweite Kreis aus dem Designdokument: "Strafe: ewiger Sturm/Umherwirbeln".
 
-- Vorschlag ist der zweite Kreis aus dem PDF: Wollust, ewiger Sturm. Wind als Levelmechanik.
-- Vier bis fünf Gegnertypen, ein echter Boss an der Stelle des Skeleton King, zwei Event-Räume.
-- Item-Basen für alle 16 Slots und Affixe nach der Slot-Tabelle des PDF.
-- Balance-Durchgang für Leben, Schaden, XP und Loot. Dazu gehören B1 bis B8 und die Stellschrauben aus M2.
-- Ton und Musik.
+Der Plan ist am 01.10. und 02.10.2026 in zwei Runden mit dem User entstanden. Das Designdokument "Wyldes Gehirnsturmscribble" liegt seit dem 01.10.2026 unter `docs/`. Für M8 gibt es her: den Sturm für Kreis 2 und die Slot-Tabelle der Affixe. Zu Gegnern, Boss und Events sagt es nichts.
+
+Getroffene Richtungsentscheidungen des Users:
+
+| Frage | Entscheidung |
+|---|---|
+| Grundstruktur | Alle Kreise bestehen grundsätzlich aus großen, freien Flächen, hintereinander geschaltet wie Blutmoor, Kalte Ebene und Feld der Steine in Diablo 2. Unterwegs liegen Dungeons hinter Falltüren, Höhleneingängen und Gebäuden, die man per Klick durch eine Ladezone betritt. Dungeons sind gebaut wie das Schlachthaus. Der Testkreis bleibt im alten Stil, bis Limbus in M9 kommt. Entschieden am 02.10.2026. |
+| Wollust | Drei Flächen: Sturmküste, Klagende Ebene, Richterfeld. Auf den Flächen stehen Mauern, Gänge und Ruinen ohne Ladezone, klein bis groß, als Windschutz. Entschieden am 02.10.2026. |
+| Sturm | Wind als Levelmechanik. Keinen Windwiderstand als Stat oder Affix, der User hat ihn gestrichen. Der Wind lässt sich nur über die Umgebung mindern (Windschatten im Lee einer Mauer bis 6 m, Innenräume, Dungeons) und über Buffs aus dem Level. Entschieden am 02.10.2026. |
+| Dungeons | Einer je Fläche, 1 bis 2 Ebenen, am Ende ein Mini-Boss wie die Liebenden aus Dantes Inferno und besondere Beute. Entschieden am 02.10.2026. |
+| Boss | Minos, der Richter, in einer Ruinen-Arena auf der dritten Fläche, offen zum Sturm. Entschieden am 02.10.2026. |
+| Events | Die Sonderräume werden Ruinen auf der Fläche. Neu das Ritual: Wird es nicht binnen 10 Sekunden vollständig unterbrochen, erscheint ein starker Rare Elite. Dazu das Auge des Sturms als Buff aus dem Level. Entschieden am 02.10.2026. |
+| Gegner | Verdammte Seele, Inkubus, Sukkubus, Harpyie, Sturmgeist und Schwärme von Vögeln, eine Einheit mit 8 bis 14 Vögeln, schnell und nervig. Das Vogelmodell liegt unter `Models/Source/vogel.blend`, die übrigen Modelle sucht der User selbst aus. Entschieden am 02.10.2026. |
+| Schlachthaus | Bleibt als Testlevel erhalten, behält seinen Namen und bekommt im Hub ein zehntes, immer offenes Portal neben Portal 9. Entschieden am 01.10.2026. |
+| Icons und Ton | Icons liefert der User, bis dahin Platzhalter. Töne und Musik aus freien Paketen, jeder Download einzeln bestätigt. Entschieden am 01.10.2026. |
+| Vorgehen | Jede Etappe wird einzeln gebaut und gemergt, nach jeder Etappe wartet der Bau auf die Rückmeldung des Users. Entschieden am 02.10.2026. |
+
+M8 läuft in 20 Etappen, jede für sich mergefähig, jede lässt `master` spielbar zurück:
+
+| Etappe | Inhalt | Größe | Stand |
+|---|---|---|---|
+| 1 | Kreise umsortieren: Schlachthaus als Testkreis am zehnten Portal, Wollust als Kreis 2, Inhaltsstand im Spielstand | S | Umgesetzt am 02.10.2026 auf `master_CirclesAndTestPortal` |
+| 2 | Kern-Definitionen für Gegner und Held, Kampfsimulation in den Tests | S | Offen |
+| 3a | Freie Flächen I: der Generator im Kern | M | Offen |
+| 3b | Freie Flächen II: Aufbau in Godot, Kette der Flächen, Karte, Spielstand | M | Offen |
+| 4 | Der Sturm: Grundwind, Böen, Windschatten im Lee, Drift der Projektile, Streifen | M | Offen |
+| 5 | Dungeons per Ladezone und die Liebenden als Mini-Boss | M | Offen |
+| 6 | Das Aussehen von Wollust: Texturen, Ruinen, Requisiten, Spuren, Licht | M | Offen |
+| 7a | Gegner I: Abstandhalten und Rückzug im Kern, Verdammte Seele, Inkubus, Vogelschwarm | M | Offen |
+| 7b | Gegner II: Sukkubus, Harpyie, Sturmgeist, Sturm- und Buff-Aktionen | S bis M | Offen |
+| 8a | Boss-Motor: Takt und Reichweite je Skill, gewichtete Skill-Wahl, Stoß, Marken im Balken | S bis M | Offen |
+| 8b | Minos in der Ruinen-Arena | S bis M | Offen |
+| 9 | Events auf den Flächen: Ritual und Auge des Sturms | M | Offen |
+| 10a | Ringe und Schmuck im Kern | S bis M | Offen |
+| 10b | Item-Basen für alle 16 Slots | M | Offen |
+| 11 | Affixe nach der Slot-Tabelle | S bis M | Offen |
+| 12 | Balance mit der Simulation aus Etappe 2 | M | Offen |
+| 13 | Ton und Musik | M | Offen |
+| 14 | Modelle einbinden, je Modell, sobald der User liefert | S je Modell | Offen |
+| 15 | Durchlauf und Rückmeldungen | S | Offen |
+
+Reihenfolge: 1, 2, 3a, 3b, 4, 5, 6, 7a, 7b, 8a, 8b, 9, 10a, 10b, 11, 12, 13, 15, dazu 14, wann immer ein Modell kommt. Die Items (10a, 10b, 11) und die Kern-Definitionen (2) hängen an keiner Weltetappe und lassen sich dazwischenschieben. Der ausführliche Plan je Etappe mit Dateien, Tests und Prüfungen liegt beim User, die Roadmap bekommt je Etappe ihren Abschnitt, wenn sie gebaut ist.
 
 Fertig, wenn ein Durchlauf des Kreises 30 bis 60 Minuten dauert und Spaß macht.
+
+#### Etappe 1: Kreise umsortieren, Testportal, Hülle von Wollust, Inhaltsstand
+
+Umgesetzt am 02.10.2026 auf `master_CirclesAndTestPortal`, abgezweigt von `225e852`.
+
+- Erledigt: Das Schlachthaus ist ein Testkreis mit der Nummer 0 und steht im Hub an einem zehnten Portal neben Portal 9, immer offen. Sein Boss schaltet nichts frei und öffnet nur sein Portal zurück in den Hub.
+- Erledigt: Wollust ist Kreis 2 mit drei Ebenen ab Bereichslevel 5, `Resources/Levels/wollust.tres`. Bis Etappe 3b erbt es Räume, Gegner, Spuren und Texturen des Schlachthauses, damit es sofort spielbar ist. Sein Boss schaltet Kreis 3 frei.
+- Erledigt: Jeder Kreis trägt einen Inhaltsstand, `ContentVersion`. Er steht je Kreis im Spielstand, Version 5. Ändert sich ein Kreis, beginnt ein gespeicherter Abstieg dort neu, die Checkpoints bleiben.
+- Zusätzlich: Das Vogelmodell des Users liegt unter `Models/Source/vogel.blend`, wo Godot es übergeht. Unter `Models/Units/Enemies` hätte Godot es als Modell importieren wollen und dafür Blender verlangt.
+- Zusätzlich: Das Designdokument liegt im Repo.
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Testkreis | `IsTestCircle` am Thema und `Number` 0. Die Null liegt außerhalb von `JourneyState.IsUnlocked`, und `CircleUnlockRule.NextCircle` liefert für sie schon 0. Es kann nur einen Testkreis geben, weil `Descent` doppelte Nummern verwirft. |
+| Erster Kreis | `Descent.FirstCircle` ist der erste Kreis, der kein Testkreis ist. Nach Nummer sortiert stünde die Null vorn, und die Kellertür im Testgelände und der alte Spielstand der Version 1 führten ins Schlachthaus. |
+| Zehntes Portal | Ein `CirclePortal` mit Nummer 0 im Bogen der neun, ein weiterer Schritt von 20 Grad nach Portal 9, bei (12,8 / 0 / 6,3) zur Mitte gedreht. Sein Schild heißt "Test circle". Ohne Testkreis im Ordner bliebe es dunkel mit "not yet built". |
+| Inhaltsstand | Standard 1, Feld im Inspector. Ein Abstieg mit anderem Stand beginnt beim nächsten Betreten des Kreises neu, mit demselben Seed; Karte und Tote verfallen, `DeepestDepth` bleibt. Ein Stand von 0 aus einem Spielstand der Version 4 gilt als passend und übernimmt beim ersten Betreten den Stand des Kreises, damit die nächste Änderung ihn erkennt. |
+| Wollust | Drei statt vier Ebenen, weil der Kreis ab Etappe 3b aus drei Flächen besteht. Bereichslevel 5 bis 7. Der Name bleibt deutsch wie "Schlachthaus". |
+
+So funktioniert es:
+
+- `LevelThemeResource.IsTestCircle` und `ContentVersion`. `Descent.BuildPlace` öffnet ein Portal, wenn sein Kreis ein Testkreis ist oder die Reise so viele Kreise freigeschaltet hat. `Descent.OnEnemyKilled` überspringt bei einem Testkreis die Freischaltung.
+- `DescentState.ContentVersion`, `IsStale(current)` und `AdoptContentVersion(current)` im Kern. `Descent.BuildLevel` prüft den Stand, bevor es die Ebene baut, und ruft bei einem veralteten Abstieg `JourneyState.BeginAnew(id, seed, contentVersion)`. Ein neuer Abstieg aus dem Dialog nimmt den Stand des Kreises mit.
+- `CircleSave.ContentVersion` im Spielstand, `SaveGameMapper` schreibt und liest es. Spielstände der Version 4 lesen 0.
+- `Arrival.AtPortalOf(0)` findet das Testportal über die Nummer, die Treppe aus Ebene 1 des Schlachthauses kommt davor an.
+
+Neue Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| `LevelThemeResource` | `IsTestCircle` | Schlachthaus: an | Testkreis außerhalb der Kette |
+| `LevelThemeResource` | `ContentVersion` | 1 | Inhaltsstand des Kreises |
+| `LevelThemeResource` | `Number` | 0 bis 9 statt 1 bis 9 | 0 nur für den Testkreis |
+| `CirclePortal` | `Number` | `CircleTest`: 0 | Das Portal des Testkreises |
+
+So entsteht ein Testkreis: ein Thema mit `IsTestCircle` und Nummer 0 unter `Resources/Levels`. Das Portal `CircleTest` im Hub nimmt es von selbst.
+
+So kündigt ein Kreis eine Änderung an: `ContentVersion` am Thema um eins erhöhen, wenn sich Räume, Gegnerpool oder Aufbau ändern. Gespeicherte Abstiege in diesem Kreis beginnen dann neu, ohne Verlust der Checkpoints.
+
+<img src="images/hub_zehntes_portal_m8.webp" alt="Der Hub mit dem zehnten Portal neben Portal 9, der Held steht davor, das Schild nennt das Schlachthaus als Test circle" width="860">
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Unit-Tests | 8 neue: Inhaltsstand veraltet und nicht veraltet, unbekannter Stand gilt als passend und übernimmt den aktuellen, ein neuer Abstieg nimmt den neuen Stand und behält die Checkpoints, die Reise merkt sich den Stand, der Stand übersteht das Speichern, ein Spielstand der Version 4 lädt ohne Stand, ein Testkreis schaltet nichts frei. Einer geändert: Der Spielstand hat Version 5. Zusammen 1169. |
+| Laufendes Spiel, headless | 54 Schritte mit neuem Charakter: zehn Portale, Testportal offen, Portal 1 offen, 2 zu, 3 ohne Kreis, Ankunft vor dem Testportal; der erste Kreis ist der Testkreis; der Boss des Testkreises öffnet Wollust mit Ansage und Portal; der Boss im Schlachthaus öffnet nichts und zeigt sein Portal; Wollust Ebene 1 mit Bereichslevel 5 und Stand 1, sein Boss öffnet Kreis 3, Portal 3 bleibt ohne Kreis zu; der Spielstand hat Version 5 mit drei Kreisen samt Stand; ein höherer Stand lässt den Abstieg mit gleichem Seed neu beginnen, Tote vergessen, Checkpoints bleiben, beim nächsten Betreten kein zweiter Neubeginn |
+| Neustart mit Spielstand der Version 4 | 12 Schritte mit einem Abstieg ins Schlachthaus aus der Zeit als Kreis 2: zwei Kreise frei, Portal 2 und Testportal offen, Abstieg samt Toten und Checkpoints erhalten mit unbekanntem Stand; Checkpoint 2 betreten ohne Neubeginn, Stand 1 übernommen, danach steht Version 5 mit altem Seed im Spielstand |
+| Mit Fenster | Dieselben 54 Schritte, dazu das Bild des Hubs mit dem zehnten Portal |
+| Spielstand | Die Proben liefen mit eigenem Spielstand und eigenen Einstellungen, die des Users blieben unberührt |
+
+Bewusst offen gelassen:
+
+- Wollust sieht noch aus wie das Schlachthaus. Flächen, Sturm und Aussehen kommen mit den Etappen 3a bis 6.
+- Es kann nur einen Testkreis geben. Ein zweiter bräuchte eine eigene Nummer unter null oder eine Id am Portal.
+- Der Händler zählt den Testkreis mit, wenn er das erreichte Bereichslevel bestimmt. Das Schlachthaus hat dieselben Bereichslevel wie Wollust, das ändert nichts.
+- Die älteren Bilder der README zeigen den Hub mit neun Portalen.
 
 ### M9: Inhalt und Politur (L, fortlaufend)
 

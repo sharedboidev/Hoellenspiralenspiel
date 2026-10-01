@@ -17,6 +17,9 @@ public sealed class DescentState
 
     public bool HasBegun { get; private set; }
 
+    //Der Inhaltsstand des Kreises, mit dem die Ebenen entstanden sind. 0 heißt unbekannt, etwa aus einem älteren Spielstand
+    public int ContentVersion { get; private set; }
+
     public bool IsBelowGround => Depth > 0;
 
     public IReadOnlyDictionary<int, string> RevealedByDepth => revealedByDepth;
@@ -24,19 +27,32 @@ public sealed class DescentState
     public IEnumerable<int> DepthsWithKills => killedByDepth.Keys;
 
     //Die Checkpoints bleiben. Ebenen, Karten und Tote gehören zum alten Abstieg und verfallen
-    public void Begin(int seed)
+    public void Begin(int seed, int contentVersion = 0)
     {
-        Seed     = seed;
-        Depth    = 0;
-        HasBegun = true;
+        Seed           = seed;
+        Depth          = 0;
+        HasBegun       = true;
+        ContentVersion = contentVersion;
 
         revealedByDepth.Clear();
         killedByDepth.Clear();
     }
 
-    public void Restore(int seed, int deepestDepth, IEnumerable<KeyValuePair<int, string>> revealed, IEnumerable<KeyValuePair<int, IEnumerable<int>>> killed = null)
+    //Haben sich Räume oder Gegner des Kreises seit dem Spielstand geändert, passen Karten und Tote nicht mehr zu seinen Ebenen.
+    //Ein unbekannter Stand gilt als passend, damit ein älterer Spielstand seinen Abstieg behält
+    public bool IsStale(int currentContentVersion)
+        => HasBegun && ContentVersion != 0 && ContentVersion != currentContentVersion;
+
+    //Ein Abstieg mit unbekanntem Stand übernimmt den aktuellen, damit die nächste Änderung ihn erkennt
+    public void AdoptContentVersion(int currentContentVersion)
     {
-        Begin(seed);
+        if (ContentVersion == 0)
+            ContentVersion = currentContentVersion;
+    }
+
+    public void Restore(int seed, int deepestDepth, IEnumerable<KeyValuePair<int, string>> revealed, IEnumerable<KeyValuePair<int, IEnumerable<int>>> killed = null, int contentVersion = 0)
+    {
+        Begin(seed, contentVersion);
 
         DeepestDepth = Math.Max(0, deepestDepth);
 

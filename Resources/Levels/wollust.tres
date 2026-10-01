@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LevelThemeResource" format=3 uid="uid://d0qrq8r38esvn"]
+[gd_resource type="Resource" script_class="LevelThemeResource" format=3]
 
 [ext_resource type="Script" uid="uid://0v3hroisjaei" path="res://Resources/Levels/LevelThemeResource.cs" id="1_theme"]
 [ext_resource type="Script" uid="uid://bn7bb1uifndmt" path="res://Resources/Levels/EnemyPoolEntry.cs" id="2_entry"]
@@ -105,10 +105,10 @@ InCorridors = true
 
 [resource]
 script = ExtResource("1_theme")
-Id = "slaughterhouse"
-DisplayName = "Schlachthaus"
-Number = 0
-IsTestCircle = true
+Id = "wollust"
+DisplayName = "Wollust"
+Number = 2
+LevelCount = 3
 FirstAreaLevel = 5
 Rooms = Array[PackedScene]([ExtResource("10_start"), ExtResource("11_exit"), ExtResource("12_chamber"), ExtResource("13_hall"), ExtResource("14_gallery"), ExtResource("15_shrine"), ExtResource("16_boss")])
 Enemies = Array[ExtResource("2_entry")]([SubResource("Pool_blue"), SubResource("Pool_yellow"), SubResource("Pool_caster"), SubResource("Pool_skeleton")])

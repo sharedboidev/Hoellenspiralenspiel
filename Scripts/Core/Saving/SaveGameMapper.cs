@@ -198,9 +198,10 @@ public static class SaveGameMapper
     private static CircleSave ToSave(string circleId, DescentState descent)
         => new()
         {
-            CircleId     = circleId,
-            Seed         = descent.Seed,
-            DeepestDepth = descent.DeepestDepth,
+            CircleId       = circleId,
+            Seed           = descent.Seed,
+            DeepestDepth   = descent.DeepestDepth,
+            ContentVersion = descent.ContentVersion,
             Levels = descent.RevealedByDepth.Keys
                             .Union(descent.DepthsWithKills)
                             .OrderBy(depth => depth)
@@ -227,7 +228,7 @@ public static class SaveGameMapper
         foreach (var circle in save.Journey.Circles ?? [])
         {
             if (!string.IsNullOrEmpty(circle?.CircleId))
-                Restore(journey.GetDescent(circle.CircleId), circle.Seed, circle.DeepestDepth, circle.Levels);
+                Restore(journey.GetDescent(circle.CircleId), circle.Seed, circle.DeepestDepth, circle.Levels, circle.ContentVersion);
         }
 
         if (save.Journey.TownPortal is { } portal)
@@ -248,9 +249,10 @@ public static class SaveGameMapper
         return true;
     }
 
-    private static void Restore(DescentState descent, int seed, int deepestDepth, List<ExploredLevelSave> levels)
+    private static void Restore(DescentState descent, int seed, int deepestDepth, List<ExploredLevelSave> levels, int contentVersion = 0)
         => descent.Restore(seed,
                            deepestDepth,
                            (levels ?? []).Select(level => new KeyValuePair<int, string>(level.Depth, level.Revealed)),
-                           (levels ?? []).Select(level => new KeyValuePair<int, IEnumerable<int>>(level.Depth, level.Killed)));
+                           (levels ?? []).Select(level => new KeyValuePair<int, IEnumerable<int>>(level.Depth, level.Killed)),
+                           contentVersion);
 }

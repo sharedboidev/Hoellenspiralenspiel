@@ -141,4 +141,61 @@ public class DescentStateTests
         Assert.That(descent.RememberKill(0, 3), Is.False);
         Assert.That(descent.DepthsWithKills, Is.Empty);
     }
+
+    [Test]
+    public void EinAndererInhaltsstandMachtDenAbstiegVeraltet()
+    {
+        var descent = new DescentState();
+
+        descent.Begin(1, 2);
+
+        Assert.That(descent.ContentVersion, Is.EqualTo(2));
+        Assert.That(descent.IsStale(2), Is.False);
+        Assert.That(descent.IsStale(3), Is.True);
+    }
+
+    [Test]
+    public void OhneBeginnIstEinAbstiegNieVeraltet()
+    {
+        var descent = new DescentState();
+
+        Assert.That(descent.IsStale(1), Is.False);
+        Assert.That(descent.IsStale(7), Is.False);
+    }
+
+    [Test]
+    public void EinUnbekannterInhaltsstandGiltAlsPassendUndUebernimmtDenAktuellen()
+    {
+        var descent = new DescentState();
+
+        descent.Begin(1);
+
+        Assert.That(descent.IsStale(5), Is.False);
+
+        descent.AdoptContentVersion(5);
+
+        Assert.That(descent.ContentVersion, Is.EqualTo(5));
+        Assert.That(descent.IsStale(5), Is.False);
+        Assert.That(descent.IsStale(6), Is.True);
+
+        descent.AdoptContentVersion(9);
+
+        Assert.That(descent.ContentVersion, Is.EqualTo(5));
+    }
+
+    [Test]
+    public void EinNeuerAbstiegNimmtDenNeuenStandUndBehaeltDieCheckpoints()
+    {
+        var descent = new DescentState();
+
+        descent.Begin(1, 1);
+        descent.GoTo(3);
+        descent.RememberKill(2, 4);
+        descent.Begin(1, 2);
+
+        Assert.That(descent.ContentVersion, Is.EqualTo(2));
+        Assert.That(descent.Depth, Is.EqualTo(0));
+        Assert.That(descent.DeepestDepth, Is.EqualTo(3));
+        Assert.That(descent.IsKilled(2, 4), Is.False);
+    }
 }

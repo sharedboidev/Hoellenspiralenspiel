@@ -157,7 +157,8 @@ public partial class Descent : Node
         }
     }
 
-    public LevelThemeResource FirstCircle => Circles.FirstOrDefault();
+    //Der erste echte Kreis. Ein Testkreis mit der Nummer 0 stünde sonst vorn
+    public LevelThemeResource FirstCircle => Circles.FirstOrDefault(circle => !circle.IsTestCircle);
 
     public event Action LevelEntered;
     public event Action PlaceEntered;
@@ -267,7 +268,7 @@ public partial class Descent : Node
         if (circle is null || circle == Circle)
             return;
 
-        Journey.BeginAnew(circle.Id, RollSeed());
+        Journey.BeginAnew(circle.Id, RollSeed(), circle.ContentVersion);
 
         Changed?.Invoke();
     }
@@ -358,11 +359,12 @@ public partial class Descent : Node
 
         LevelRoot.AddChild(place);
 
+        //Das Portal eines Testkreises ist immer offen, es hängt nicht an der Kette der neun Kreise
         foreach (var portal in place.GetAllChildren<CirclePortal>())
         {
             portal.Circle = FindCircle(portal.Number);
 
-            portal.SetUnlocked(Journey.IsUnlocked(portal.Number));
+            portal.SetUnlocked(portal.Circle?.IsTestCircle == true || Journey.IsUnlocked(portal.Number));
 
             portal.Used += used => CirclePortalUsed?.Invoke((CirclePortal)used);
         }
@@ -442,7 +444,20 @@ public partial class Descent : Node
         var state = Journey.GetDescent(circle.Id);
 
         if (!state.HasBegun)
-            Journey.BeginAnew(circle.Id, RollSeed());
+        {
+            Journey.BeginAnew(circle.Id, RollSeed(), circle.ContentVersion);
+        }
+        else if (state.IsStale(circle.ContentVersion))
+        {
+            //Räume oder Gegner des Kreises haben sich seit dem Spielstand geändert, Karten und Tote passten nicht mehr zu den Ebenen
+            GD.Print($"Der Abstieg in {circle.DisplayName} beginnt neu, der Kreis hat sich geändert: Stand {state.ContentVersion} statt {circle.ContentVersion}.");
+
+            Journey.BeginAnew(circle.Id, state.Seed, circle.ContentVersion);
+
+            Changed?.Invoke();
+        }
+
+        state.AdoptContentVersion(circle.ContentVersion);
 
         var depth    = ClampDepth(circle, wantedDepth);
         var rooms    = new RoomLibrary(circle.Rooms);
@@ -707,7 +722,8 @@ public partial class Descent : Node
         if (Level is null || Circle is null || enemy.Definition?.IsBoss != true)
             return;
 
-        var next = CircleUnlockRule.NextCircle(Circle.Number, Level.Depth, Circle.LevelCount);
+        //Der Boss eines Testkreises öffnet nur sein Portal zurück in den Hub
+        var next = Circle.IsTestCircle ? 0 : CircleUnlockRule.NextCircle(Circle.Number, Level.Depth, Circle.LevelCount);
 
         if (next > 0 && !Journey.IsUnlocked(next))
         {

@@ -36,9 +36,9 @@ public sealed class JourneyState
         => UnlockedCircles = Math.Clamp(Math.Max(UnlockedCircles, circleNumber), 1, LastCircle);
 
     //Mit den Ebenen verschwindet auch das Portal, das in ihnen stand
-    public void BeginAnew(string circleId, int seed)
+    public void BeginAnew(string circleId, int seed, int contentVersion = 0)
     {
-        GetDescent(circleId).Begin(seed);
+        GetDescent(circleId).Begin(seed, contentVersion);
 
         if (TownPortal?.CircleId == circleId)
             TownPortal = null;

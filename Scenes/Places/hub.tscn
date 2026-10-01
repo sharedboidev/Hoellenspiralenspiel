@@ -181,6 +181,11 @@ Number = 8
 transform = Transform3D(0.173648, 0, -0.984808, 0, 1, 0, 0.984808, 0, 0.173648, 12.803, 0, 1.743)
 Number = 9
 
+[node name="CircleTest" parent="Portals" unique_id=1507311209 instance=ExtResource("7_portal")]
+transform = Transform3D(-0.173648, 0, -0.984808, 0, 1, 0, 0.984808, 0, -0.173648, 12.803, 0, 6.257)
+isUnlocked = true
+Number = 0
+
 [node name="Braziers" type="Node3D" parent="." unique_id=1226073559]
 
 [node name="West" type="StaticBody3D" parent="Braziers" unique_id=1108917110]
