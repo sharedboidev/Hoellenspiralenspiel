@@ -20,8 +20,8 @@ Id = "wooden_staff"
 DisplayName = "Wooden Staff"
 Icon = ExtResource("2_icon")
 SlotSize = Vector2i(1, 4)
-Price = 32
 Requirements = Dictionary[int, int]({
 2: 1,
 5: 1
 })
+Price = 32

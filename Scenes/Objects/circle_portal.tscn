@@ -1,9 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cyfwqvdukwe3i"]
 
-[ext_resource type="Script" path="res://Scripts/Environment/CirclePortal.cs" id="1_script"]
-[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="2_ps1"]
-[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_object.gdshader" id="5_object"]
-[ext_resource type="Texture2D" path="res://Textures/World/wall_brick.png" id="3_brick"]
+[ext_resource type="Script" uid="uid://blbrv0uiuqtir" path="res://Scripts/Environment/CirclePortal.cs" id="1_script"]
+[ext_resource type="Shader" uid="uid://c2lknp40isk5w" path="res://Shaders/Ps1/ps1_surface.gdshader" id="2_ps1"]
+[ext_resource type="Texture2D" uid="uid://vo27wofvjp82" path="res://Textures/World/wall_brick.png" id="3_brick"]
+[ext_resource type="Shader" uid="uid://d2b4ml3y6ngd3" path="res://Shaders/Ps1/ps1_object.gdshader" id="5_object"]
 
 [sub_resource type="BoxShape3D" id="Shape_pick"]
 size = Vector3(3, 3.6, 1)
@@ -11,15 +11,23 @@ size = Vector3(3, 3.6, 1)
 [sub_resource type="BoxShape3D" id="Shape_pillar"]
 size = Vector3(0.4, 3, 0.4)
 
-[sub_resource type="ShaderMaterial" id="Mat_frame"]
-shader = ExtResource("2_ps1")
-shader_parameter/albedo = Color(0.45, 0.4, 0.4, 1)
-shader_parameter/albedo_texture = ExtResource("3_brick")
-shader_parameter/world_uv_scale = 0.25
-
 [sub_resource type="BoxMesh" id="Mesh_pillar"]
 size = Vector3(0.4, 3, 0.4)
 subdivide_height = 2
+
+[sub_resource type="ShaderMaterial" id="Mat_frame"]
+render_priority = 0
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.45, 0.4, 0.4, 1)
+shader_parameter/albedo_texture = ExtResource("3_brick")
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.25
+shader_parameter/tint = Vector3(1, 1, 1)
+shader_parameter/emission = Color(0, 0, 0, 1)
+shader_parameter/emission_energy = 0.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(426, 240)
+shader_parameter/affine = 1.0
 
 [sub_resource type="BoxMesh" id="Mesh_lintel"]
 size = Vector3(2.6, 0.4, 0.4)
@@ -31,21 +39,35 @@ subdivide_width = 1
 subdivide_height = 2
 
 [sub_resource type="ShaderMaterial" id="Mat_veil"]
+render_priority = 0
 shader = ExtResource("5_object")
 shader_parameter/albedo = Color(0.08, 0.01, 0.01, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
 shader_parameter/emission = Color(1, 0.25, 0.08, 1)
 shader_parameter/emission_energy = 1.6
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(426, 240)
+shader_parameter/affine = 1.0
 
 [sub_resource type="BoxMesh" id="Mesh_rim"]
 size = Vector3(1.8, 0.06, 0.1)
 
 [sub_resource type="ShaderMaterial" id="Mat_rim"]
+render_priority = 0
 shader = ExtResource("2_ps1")
 shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
 shader_parameter/emission = Color(1, 0.8, 0.45, 1)
 shader_parameter/emission_energy = 5.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(426, 240)
+shader_parameter/affine = 1.0
 
-[node name="CirclePortal" type="Area3D" node_paths=PackedStringArray("Glow", "OpenLook")]
+[node name="CirclePortal" type="Area3D" unique_id=1445802716 node_paths=PackedStringArray("OpenLook", "Glow")]
 collision_layer = 32
 collision_mask = 0
 monitoring = false
@@ -55,74 +77,73 @@ Glow = NodePath("Glow")
 UseRadius = 220.0
 OutlineGlow = Color(1, 0.25, 0.08, 1)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2125902196]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 shape = SubResource("Shape_pick")
 
-[node name="PillarWest" type="StaticBody3D" parent="."]
+[node name="PillarWest" type="StaticBody3D" parent="." unique_id=748919348]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, 1.5, 0)
 collision_layer = 8
 collision_mask = 0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="PillarWest"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PillarWest" unique_id=2071594737]
 shape = SubResource("Shape_pillar")
 debug_fill = false
 
-[node name="Mesh" type="MeshInstance3D" parent="PillarWest"]
+[node name="Mesh" type="MeshInstance3D" parent="PillarWest" unique_id=77765532]
 mesh = SubResource("Mesh_pillar")
 surface_material_override/0 = SubResource("Mat_frame")
 
-[node name="PillarEast" type="StaticBody3D" parent="."]
+[node name="PillarEast" type="StaticBody3D" parent="." unique_id=553339023]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 1.5, 0)
 collision_layer = 8
 collision_mask = 0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="PillarEast"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PillarEast" unique_id=658484994]
 shape = SubResource("Shape_pillar")
 debug_fill = false
 
-[node name="Mesh" type="MeshInstance3D" parent="PillarEast"]
+[node name="Mesh" type="MeshInstance3D" parent="PillarEast" unique_id=724614987]
 mesh = SubResource("Mesh_pillar")
 surface_material_override/0 = SubResource("Mat_frame")
 
-[node name="Lintel" type="MeshInstance3D" parent="."]
+[node name="Lintel" type="MeshInstance3D" parent="." unique_id=1125074188]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
 mesh = SubResource("Mesh_lintel")
 surface_material_override/0 = SubResource("Mat_frame")
 
-[node name="OpenLook" type="Node3D" parent="."]
+[node name="OpenLook" type="Node3D" parent="." unique_id=1263787189]
 
-[node name="Veil" type="MeshInstance3D" parent="OpenLook"]
+[node name="Veil" type="MeshInstance3D" parent="OpenLook" unique_id=1196393648]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 cast_shadow = 0
 mesh = SubResource("Mesh_veil")
 surface_material_override/0 = SubResource("Mat_veil")
 
-[node name="Light" type="OmniLight3D" parent="OpenLook"]
+[node name="Light" type="OmniLight3D" parent="OpenLook" unique_id=84461953]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 1)
 light_color = Color(1, 0.35, 0.15, 1)
 light_energy = 3.0
 omni_range = 7.0
 
-[node name="Glow" type="Node3D" parent="."]
+[node name="Glow" type="Node3D" parent="." unique_id=351758307]
 
-[node name="RimTop" type="MeshInstance3D" parent="Glow"]
+[node name="RimTop" type="MeshInstance3D" parent="Glow" unique_id=246857804]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.97, 0.06)
 cast_shadow = 0
 mesh = SubResource("Mesh_rim")
 surface_material_override/0 = SubResource("Mat_rim")
 
-[node name="RimBottom" type="MeshInstance3D" parent="Glow"]
+[node name="RimBottom" type="MeshInstance3D" parent="Glow" unique_id=1987550021]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0.06)
 cast_shadow = 0
 mesh = SubResource("Mesh_rim")
 surface_material_override/0 = SubResource("Mat_rim")
 
-[node name="Light" type="OmniLight3D" parent="Glow"]
+[node name="Light" type="OmniLight3D" parent="Glow" unique_id=63456228]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 1.2)
 light_color = Color(1, 0.8, 0.45, 1)
 light_energy = 3.0
-omni_range = 5.0
 
-[node name="Arrival" type="Marker3D" parent="."]
+[node name="Arrival" type="Marker3D" parent="." unique_id=1945435558]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.2)

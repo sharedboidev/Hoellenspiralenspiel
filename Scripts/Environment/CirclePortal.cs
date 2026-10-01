@@ -12,6 +12,7 @@ public partial class CirclePortal : Passage
     private static readonly Color OpenColor   = new(1f, 0.75f, 0.45f);
     private static readonly Color SealedColor = new(0.55f, 0.55f, 0.55f);
 
+    [Export]
     private bool    isUnlocked;
     private NameTag tag;
 
