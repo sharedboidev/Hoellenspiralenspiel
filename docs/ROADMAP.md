@@ -6,12 +6,13 @@ Etappe 3 liegt seit dem 30.09.2026 auf `master`: Gold, Münzhaufen, eine Truhe j
 Die Rückmeldungen aus dem Spielen von Etappe 3 sind am selben Tag auf `master_PlaytestFeedback2` gebaut und liegen ebenfalls auf `master`.
 Eine zweite Runde Rückmeldungen zu Etappe 3 ist am selben Tag auf `master_PlaytestFeedback3` gebaut: Umriss für alles Benutzbare, Blick zur Maus, Schlag und Zauber binden den Helden, Kaufen per Rechtsklick und der Vergleich oben bündig.
 Etappe 4 ist am 01.10.2026 auf `master_BossAndUnlock` gebaut und liegt seit demselben Tag auf `master`: der Skeleton King als Platzhalter-Boss mit Krone und Boss-Raum, die Freischaltung des nächsten Kreises und das Schlachthaus als Platzhalter für Kreis 2 mit neuen Texturen und Blutspuren. Auf demselben Branch kamen nach dem Spielen das ruhigere Bild des PS1-Looks und die Sichtlinie der Mauern dazu, beide ebenfalls auf `master`.
+Die Renderskalierung ist aus M9 vorgezogen und am 01.10.2026 als M7.5 auf `master_RenderScaling` gebaut: Die Welt rendert im Raster der PS1 statt in voller Fenstergröße.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code samt Szenen. Die Zeilenzahl aus der ersten Analyse, rund 5.500, galt für die 2D-Fassung.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 bis 4 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 bis 4 auch mit Fenster.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 bis 4 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 bis 4 auch mit Fenster. M7.5 ist randlos und mit Fenster geprüft.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -2004,7 +2005,7 @@ Vor der Rückmeldung zu den Reitern liefen alle 232 Schritte der Etappe zusammen
 Bewusst offen gelassen:
 
 - Schalter und Regler sind im Standard-Theme klein und schwer zu lesen. Ein eigenes Theme steht in M9.
-- Die 3D-Welt rendert in voller Fenstergröße und wird erst danach vergröbert. Renderskalierung steht in M9.
+- Die 3D-Welt rendert in voller Fenstergröße und wird erst danach vergröbert. Renderskalierung stand in M9 und ist seit dem 01.10.2026 als M7.5 gebaut.
 - Einmal meldete ein früher Prüflauf beim Beenden "Fatal error." und ein Leck von vier `GodotShape3D`. In 18 weiteren Läufen kam das nicht wieder.
 
 #### Etappe 2: Reviews
@@ -2463,7 +2464,7 @@ Gemessen mit Fenster 1600 x 900 auf Kreis 2 mit Seed 4242: Die Kamera fuhr vom H
 
 Fallen: Godot spiegelt im Vulkan-Renderer die Y-Achse der Projektionsmatrix, `PROJECTION_MATRIX[1][1]` ist im Shader negativ, deshalb der Betrag. Built-ins wie `VIEWPORT_SIZE` sind in Hilfsfunktionen des Shaders nicht erlaubt, deshalb das Varying. `UnprojectPosition` rechnet in der Leinwand von 2560 x 1440, ein Bild aus `GetViewport().GetTexture()` hat die Fenstergröße.
 
-Bewusst offen gelassen: Die Welt rendert weiter in voller Fenstergröße, siehe Renderskalierung unter M9. Wer das alte, starke Wackeln will, stellt `SnapGrain` auf Coarse.
+Bewusst offen gelassen: Die Welt renderte weiter in voller Fenstergröße. Das löst M7.5 vom selben Tag, die Renderskalierung, damit entfällt auch das Varying `texel_lod`. Wer das alte, starke Wackeln will, stellt `SnapGrain` auf Coarse.
 
 Nachtrag vom 01.10.2026, Sichtlinie der Mauern: Der User stand vor einer Mauer, durch die er zu Recht nicht sah, sein Lichtradius reichte aber über sie hinaus und öffnete die Mauer dahinter. Sein Wortlaut: "die durchsichtkeit per lightradius darf nur ausgelöst werden, wenn der held eine direkte sichtlinie auf die wand bzw ihre Oberfläche hat."
 
@@ -2472,6 +2473,62 @@ Nachtrag vom 01.10.2026, Sichtlinie der Mauern: Der User stand vor einer Mauer, 
 - `WallFadeRule.IsBlocked` und `OnCenterLine` im Kern rechnen dasselbe, `WallSegment.IsSeeThroughAt` nimmt `WallFade.Blockers` mit. Was zu bleibt, lässt sich auch nicht anklicken, und Gegner dahinter bleiben verborgen. 7 neue Unit-Tests.
 - Die Sichtlinie von der Kamera zum Helden (`cover`) bleibt unberührt, der Held ist nie verdeckt.
 - Geprüft mit Fenster auf Kreis 2 mit dem Seed des Users: 16 Standorte, an denen eine Mauer hinter einer Ecke nach der alten Regel aufging, drei davon mit Bildern vorher und nachher, dazu 6 Mauern, die nur hinter offenem Mauerwerk liegen und durchsichtig bleiben. Mauern mit freier Sichtlinie öffnen sich weiter.
+
+### M7.5: Renderskalierung (S, vorgezogen aus M9, umgesetzt am 01.10.2026 auf `master_RenderScaling`)
+
+Anlass: Die 3D-Welt renderte in voller Fenstergröße, und erst `ps1_screen` warf fast alle Pixel wieder weg. Bei 3200 x 2000 und Coarse blieb von 64 gerenderten Pixeln einer, beim User lief das Spiel mit rund 40 Bildern pro Sekunde. Der Eintrag stand seit Etappe 2 von M7 in M9, als Politur neben Theme und Pooling. Der User hat ihn vorgezogen: Jede Etappe von M8 brächte neue Materialien, Overlays und Schilder, die alle noch auf der Annahme gebaut würden, dass Welt und Leinwand dasselbe Raster haben, und die Balance von M8 soll nicht bei 40 Bildern pro Sekunde abgestimmt werden. Sein Wortlaut: "Wenn jetzt noch M8 davor erledigt würde, wäre doch noch mehr Zeug da, dass man dannfür den Renderskalierung anpassen müsste."
+
+Umbau:
+
+| Teil | Vorher | Nachher |
+|---|---|---|
+| Welt | Rendert im Fenster in voller Größe | Rendert in `Ps1Look/WorldViewport`, einem SubViewport so groß wie das Raster, bei 1440 Zeilen und Coarse 427 x 240 Zellen. `PixelGrid.CellsToCover` im Kern rechnet, wie viele Zellen das Fenster decken |
+| Kamera | Die Kamera des Spiels im Fenster | Bleibt im Fenster, der Viewport leiht sie sich über `RenderingServer.ViewportAttachCamera`. So rechnen `UnprojectPosition` und die Maus weiter in der Leinwand von 2560 x 1440, Schilder, Schadenszahlen und Klicks sind unverändert |
+| Fenster | Rendert die Welt, darüber `ps1_screen` als ColorRect | `Disable3D`. Es zeigt nur die Oberfläche und `Ps1Screen/Picture`, ein TextureRect mit dem Bild des Viewports, Filter Nearest, um ganze Zellen vergrößert. Lage und Größe rechnet `Ps1Look` über `GetFinalTransform` in die Leinwand um, bei 1600 x 900 ist die Streckung 0,625 |
+| Farbtiefe | `ps1_screen` las je Fensterpixel die Mitte seiner Zelle aus dem Bild | Liegt als `WorldViewport/ColorDepth/Dither` im Viewport, ein Pixel ist eine Zelle. `FRAGCOORD` statt `SCREEN_UV * resolution`, und es rechnet auf 100.000 statt 3,7 Millionen Pixeln |
+| Shader | `screen_resolution` in jedem Material, `texel_lod` als Varying, Zellrechnung in `ps1_unit_outline` und `is_cut` | Alles entfallen. Die Mipmap-Stufe wählt die GPU, der Umriss liest Nachbarn über `1.0 / VIEWPORT_SIZE`, das Punktmuster nimmt `FRAGCOORD.xy`. `Ps1Look` setzt nur noch `snap`, `snap_resolution` und `affine` |
+| Überstand | Die letzte Spalte war eine schmalere Zelle | Geht das Fenster nicht in Zellen auf, ragt das Bild hinaus, der Rest verteilt sich auf beide Seiten, `PixelGrid.Offset`. Bei 2560 x 1440 und Coarse sind es 2 Pixel, je einer links und rechts |
+| Look aus (F1) | Kein Vergröbern | Zelle 1, der Viewport ist so groß wie das Fenster |
+| Schattenatlas | 4096 aus den Projekteinstellungen | Ein SubViewport hat von sich aus 2048, der Knoten setzt 4096 |
+| Szenen | `hub.tscn` trug `screen_resolution` in drei Materialien | Entfernt. `snap_resolution` in den Szenen bleibt, `Ps1Look` überschreibt es |
+
+Gemessen bei 2560 x 1440 randlos auf einer RTX 2060 SUPER, VSync aus, je 3 Sekunden, Bilder pro Sekunde:
+
+| Ort | Pixelgröße | Vorher | Nachher |
+|---|---|---|---|
+| Hub | Coarse | 243 | 884 |
+| Hub | Medium | 247 | 767 |
+| Hub | Fine | 241 | 699 |
+| Hub | Look aus | 255 | 253 |
+| Testgelände mit 40 Gegnern | Coarse | 289 | 781 |
+| Testgelände | Medium | 287 | 686 |
+| Testgelände | Fine | 288 | 689 |
+| Testgelände | Look aus | 305 | 296 |
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Unit-Tests | 7 neue für `CellsToCover` und `Offset`, darunter einer über alle Fensterhöhen von 600 bis 2400 Zeilen, insgesamt 1161 |
+| Zellen | Ohne Oberfläche und Schilder jede fünfte Zeile und Spalte des Bildes: Jeder Farbwechsel liegt auf einer Zellgrenze. Randlos bei 2560 x 1440 und im Fenster 1600 x 900, je Coarse, Medium und Fine, Hub und Testgelände, bis zu 414.000 Grenzen je Bild, keine daneben |
+| Ausrichtung | Der Fußpunkt des Helden, von der Kamera in die Leinwand und von dort ins Fenster gerechnet, liegt im Bild auf seinen Füßen. Schilder von Truhe, Händler und Portalen stehen wie vorher |
+| Karte | Die Karte der Oberfläche zeichnet weiter. Sie ist ein eigener SubViewport mit eigener Kamera auf dieselbe Welt und unverändert |
+| Größenwechsel | 300 Wechsel der Pixelgröße und des Looks in Folge, je vier Bilder Abstand, zweimal im Fenster und einmal randlos, ohne Hänger, am Ende wieder Coarse |
+| Bilder | Hub und Testgelände je Pixelgröße, randlos und im Fenster, dazu die Karte |
+
+Fallen:
+
+- Godots `scaling_3d_scale` taugt dafür nicht. Es vergrößert nur bilinear oder mit FSR, nie Nearest, und mischte so in jede Zelle etwas vom Nachbarn.
+- Ein `SubViewportContainer` mit `stretch` rechnet `stretch_shrink` in Einheiten der Leinwand, nicht in Pixeln des Fensters, und trifft die ganzzahligen Zellen nicht. Deshalb ein TextureRect, dessen Lage und Größe `Ps1Look` selbst setzt.
+- `texture(sampler, uv, lod)` im Shader war ein Bias auf die automatische Stufe, keine feste Stufe. Im Raster der PS1 stimmt die automatische Stufe von selbst.
+- `FRAGCOORD` und `VIEWPORT_SIZE` gibt es nur in `fragment()`, Hilfsfunktionen bekommen den Pixel als Parameter.
+- Eine Kamera, die ihre Höhe hält, spannt sie über den ganzen Viewport. Geht die Fensterhöhe nicht in Zellen auf, etwa 1600 Zeilen mit Zelle 7, zeigt der Viewport 0,2 % mehr Welt, als die Leinwand annimmt, und Schilder liegen in den Ecken bis zu 2 Pixel daneben. Bei 720, 900, 1080, 1200, 1440, 2000 und 2160 Zeilen geht Coarse auf.
+- Zweimal in Folge hing der Prozess im Fenster 1600 x 900, einmal nach dem ersten Wechsel der Pixelgröße, einmal beim Start. Windows meldete "Application Hang", ein Reset des Grafiktreibers steht nicht im Protokoll. In neun weiteren Läufen, darunter die drei mit je 300 Größenwechseln, kam es nicht wieder.
+
+Bewusst offen gelassen:
+
+- Die Karte der Oberfläche rendert weiter in 2560 x 1440 und ohne Raster der PS1, wie bisher.
+- Mit Look aus rendert der Viewport in Fenstergröße. Das kostet gegenüber vorher wenige Prozent, weil das Bild einmal mehr kopiert wird. Der Schalter ist nur zum Vergleichen da.
 
 ### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L)
 
@@ -2491,7 +2548,7 @@ Fertig, wenn ein Durchlauf des Kreises 30 bis 60 Minuten dauert und Spaß macht.
 - Humoristisches Intro.
 - Objekt-Pooling für Schadenszahlen und Projektile, falls Messungen es nötig machen.
 - Ein eigenes Theme für die Oberfläche. Schalter und Regler sind im Standard-Theme von Godot klein, ob ein Schalter an ist, zeigt nur eine kleine Pille.
-- Renderskalierung. Die 3D-Welt rendert in voller Fenstergröße und wird erst danach auf das Raster der PS1 vergröbert. Beim User sind das 3200 x 2000 Pixel, auf seinem Bild mit rund 40 Bildern pro Sekunde.
+- Renderskalierung stand hier und ist als M7.5 vorgezogen, siehe dort.
 
 ### M10: Koop (L, optional)
 
@@ -2503,7 +2560,7 @@ Fertig, wenn ein Durchlauf des Kreises 30 bis 60 Minuten dauert und Spaß macht.
 ```
 M0 -> M1 -> M2 -> M3
              |
-             +-> M4 -> M5 -> [2D/3D] -> M5.5 -> M6 -> M7 -> M8 -> M9 -> M10
+             +-> M4 -> M5 -> [2D/3D] -> M5.5 -> M6 -> M7 -> M7.5 -> M8 -> M9 -> M10
 ```
 
 M3 und M4 sind voneinander unabhängig und können getauscht werden.

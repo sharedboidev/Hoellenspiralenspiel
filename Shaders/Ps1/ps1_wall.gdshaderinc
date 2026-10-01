@@ -94,9 +94,9 @@ float cover(vec3 world, vec3 camera) {
 	return 1.0 - smoothstep(cover_radius - cover_edge, cover_radius, gap);
 }
 
-// Wahr, wo das Punktmuster an dieser Stelle des Bildschirms die Sicht freigibt
-bool sees_through(vec3 world, mat4 model, vec3 camera, vec2 screen_uv) {
+// Wahr, wo das Punktmuster an dieser Stelle des Bildes die Sicht freigibt, pixel ist FRAGCOORD.xy
+bool sees_through(vec3 world, mat4 model, vec3 camera, vec2 pixel) {
 	float see = max(opening(world, model, camera), 0.5 * cover(world, camera));
 
-	return is_cut(see, screen_uv);
+	return is_cut(see, pixel);
 }

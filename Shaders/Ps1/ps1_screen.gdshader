@@ -1,8 +1,8 @@
 shader_type canvas_item;
 
-uniform sampler2D screen : hint_screen_texture, filter_nearest, repeat_disable;
+// Liegt im WorldViewport über der Welt, jeder Pixel ist eine Zelle der PS1. Ps1Look zeigt das Bild danach auf dem Fenster
 
-uniform vec2 resolution = vec2(426.0, 240.0);
+uniform sampler2D screen : hint_screen_texture, filter_nearest, repeat_disable;
 
 // 32 Stufen pro Kanal sind die 15 Bit Farbtiefe der PS1
 uniform float color_levels = 32.0;
@@ -16,8 +16,8 @@ const float BAYER[16] = float[](
 );
 
 void fragment() {
-	vec2 cell = floor(SCREEN_UV * resolution);
-	vec3 color = texture(screen, (cell + 0.5) / resolution).rgb;
+	vec3 color = texture(screen, SCREEN_UV).rgb;
+	vec2 cell = floor(FRAGCOORD.xy);
 
 	int index = int(mod(cell.x, 4.0)) + int(mod(cell.y, 4.0)) * 4;
 	float threshold = (BAYER[index] + 0.5) / 16.0 - 0.5;

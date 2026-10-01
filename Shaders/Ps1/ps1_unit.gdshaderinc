@@ -26,7 +26,7 @@ void fragment() {
 
 		hidden = smoothstep(sight_radius - max(sight_edge, 0.0001), sight_radius, distance(world.xz, sight_center.xz));
 
-		if (is_cut(hidden, SCREEN_UV)) {
+		if (is_cut(hidden, FRAGCOORD.xy)) {
 			discard;
 		}
 	}

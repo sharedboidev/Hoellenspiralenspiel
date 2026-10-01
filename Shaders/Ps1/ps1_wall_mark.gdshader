@@ -14,7 +14,7 @@ uniform float alpha_cutoff : hint_range(0.0, 1.0) = 0.5;
 void fragment() {
 	vec3 world = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
 
-	if (sees_through(world, MODEL_MATRIX, CAMERA_POSITION_WORLD, SCREEN_UV)) {
+	if (sees_through(world, MODEL_MATRIX, CAMERA_POSITION_WORLD, FRAGCOORD.xy)) {
 		discard;
 	}
 

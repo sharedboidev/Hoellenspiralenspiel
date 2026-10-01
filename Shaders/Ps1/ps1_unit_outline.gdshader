@@ -4,14 +4,12 @@ render_mode unshaded, blend_mix, depth_draw_never, depth_test_disabled, cull_dis
 // Liegt als Rechteck über dem ganzen Bild und zieht um Held und Gegner einen dunklen Rand, um den Gegner unter der Maus einen roten.
 // Was der Held benutzen kann, bekommt ebenfalls einen dunklen Rand, leuchtet es, einen in einer hellen Fassung seiner Farbe.
 // Liegt Leuchtendes hinter etwas, etwa ein Portal in seinem Rahmen, läuft sein Rand innen an der sichtbaren Kante entlang.
-// Alle markieren sich im Rauheitskanal, siehe ps1_marks. Entschieden wird pro Zelle des PS1-Rasters,
-// so bleibt der Rand ganze Zellen breit, wenn ps1_screen das Bild vergröbert
+// Alle markieren sich im Rauheitskanal, siehe ps1_marks. Das Bild hat das Raster der PS1, jeder Pixel ist eine Zelle,
+// so ist der Rand ganze Zellen breit
 #include "res://Shaders/Ps1/ps1_marks.gdshaderinc"
 
 uniform sampler2D depth_texture : hint_depth_texture, filter_nearest, repeat_disable;
 uniform sampler2D normal_roughness_texture : hint_normal_roughness_texture, filter_nearest, repeat_disable;
-
-uniform vec2 screen_resolution = vec2(426.0, 240.0);
 
 // Breite in Zellen des PS1-Rasters, gesetzt von Ps1Look
 uniform int outline_width : hint_range(1, 4) = 1;
@@ -39,16 +37,15 @@ vec3 glow_color(float hue) {
 }
 
 void fragment() {
-	vec2 cell = floor(SCREEN_UV * screen_resolution);
-	vec2 center = (cell + 0.5) / screen_resolution;
-	int own = mark_kind(roughness_at(center));
+	vec2 texel = 1.0 / VIEWPORT_SIZE;
+	int own = mark_kind(roughness_at(SCREEN_UV));
 
 	// Über eine Figur zieht kein Rand. Sonst liefe er innen um jeden Arm
 	if (own >= MARK_UNIT) {
 		discard;
 	}
 
-	float depth = texture(depth_texture, center).r;
+	float depth = texture(depth_texture, SCREEN_UV).r;
 	float reach = float(outline_width * outline_width) + float(outline_width) * 0.5;
 	int found = MARK_NONE;
 	float hue = 0.0;
@@ -61,7 +58,7 @@ void fragment() {
 				continue;
 			}
 
-			vec2 uv = (cell + vec2(float(x), float(y)) + 0.5) / screen_resolution;
+			vec2 uv = SCREEN_UV + vec2(float(x), float(y)) * texel;
 
 			// Nur wo der Nachbar vor dem liegt, was hier zu sehen ist. Eine Mauer vor der Figur bekommt keinen Rand
 			if (texture(depth_texture, uv).r <= depth) {
@@ -83,7 +80,7 @@ void fragment() {
 
 	if (found == MARK_NONE && is_covered) {
 		found = MARK_GLOW;
-		hue = mark_hue(roughness_at(center));
+		hue = mark_hue(roughness_at(SCREEN_UV));
 	}
 
 	if (found == MARK_NONE) {

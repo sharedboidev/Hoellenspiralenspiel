@@ -414,8 +414,9 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 | Feature | Beschreibung |
 |---|---|
 | PS1-Look | Wackelnde Eckpunkte, verzogene Texturen, grobe Pixel, 15 Bit Farbtiefe mit Punktmuster |
-| Ruhiges Bild | Die Eckpunkte rasten bei jeder Pixelgröße auf dem feinen Raster ein (`SnapGrain` am Knoten `Ps1Look`), Texturen tragen Mipmaps in der Stufe der Pixelgröße, und Spuren an Mauern und Boden rücken längs des Blicks vor ihre Fläche, damit sie nicht flackern. Texturen mit Alphakanal brauchen Alpha-Bleeding, sonst mischen die Mipmaps Schwarz in die Ränder |
-| Ganzzahlige Pixel | Ein PS1-Pixel deckt immer gleich viele Pixel des Bildschirms: die Fensterhöhe geteilt durch 240, 360 oder 480, gerundet. Ab 600 Zeilen ist jede feinere Stufe echt feiner, notfalls um einen Pixel kleiner als die gröbere. Darunter sind Medium und Fine gleich. Bei 1080 Zeilen sind es 5, 3 und 2 Pixel, bei 1440 Zeilen 6, 4 und 3 |
+| Renderskalierung | Die Welt rendert in einem eigenen Viewport im Raster der PS1, bei 1440 Zeilen und Coarse 427 x 240 Zellen, und erscheint ungeglättet um ganze Zellen vergrößert auf dem Fenster. Das Fenster rendert nur noch die Oberfläche. Bei 2560 x 1440 stieg die Bildrate im Hub so von 243 auf 846 Bilder pro Sekunde |
+| Ruhiges Bild | Die Eckpunkte rasten bei jeder Pixelgröße auf dem feinen Raster ein (`SnapGrain` am Knoten `Ps1Look`), Texturen tragen Mipmaps, deren Stufe die GPU im Raster der PS1 von selbst richtig wählt, und Spuren an Mauern und Boden rücken längs des Blicks vor ihre Fläche, damit sie nicht flackern. Texturen mit Alphakanal brauchen Alpha-Bleeding, sonst mischen die Mipmaps Schwarz in die Ränder |
+| Ganzzahlige Pixel | Ein PS1-Pixel deckt immer gleich viele Pixel des Bildschirms: die Fensterhöhe geteilt durch 240, 360 oder 480, gerundet. Ab 600 Zeilen ist jede feinere Stufe echt feiner, notfalls um einen Pixel kleiner als die gröbere. Darunter sind Medium und Fine gleich. Bei 1080 Zeilen sind es 5, 3 und 2 Pixel, bei 1440 Zeilen 6, 4 und 3. Geht das Fenster nicht in Zellen auf, ragt das Bild um den Rest hinaus, je zur Hälfte auf beiden Seiten |
 | Einstellbar | Pixel Size (Coarse, Medium, Fine), Dithering, Wobbly Vertices, Real Shadows und Brightness stehen im Reiter Display der Einstellungen. Standard: Coarse, alle Schalter an, Brightness 100 % |
 | Umriss | Held und Gegner tragen einen dunklen Rand von einem PS1-Pixel, der Gegner unter der Maus einen roten. Die Breite steht als `OutlineWidth` am Knoten `Ps1Look`. |
 | Umriss für Benutzbares | Truhe, Händler, Beutel, Treppe und Kellertür tragen denselben dunklen Rand. Leuchtende Portale tragen einen Rand in einer hellen Fassung ihrer Farbe: das frei stehende Town-Portal hellblau außen herum, ein offener Kreis hellrot an seiner Portalfläche im Steinrahmen. Der Rahmen selbst und gesperrte Portale tragen keinen. Steht der Held vor einem dieser Dinge, liegt sein Rand darüber |
@@ -519,7 +520,7 @@ flowchart LR
     M2 --> M3(["M3 Skills"]):::done
     M2 --> M4(["M4 Items und Speichern"]):::done
     M4 --> M5(["M5 Gegner-KI"]):::done --> D{"3D im PS1-Look"}:::done
-    D --> U(["M5.5 Umstellung auf 3D"]):::done --> M6(["M6 Level"]):::done --> M7(["M7 Hub"]):::done --> M8(["M8 Höllenkreis"]):::next
+    D --> U(["M5.5 Umstellung auf 3D"]):::done --> M6(["M6 Level"]):::done --> M7(["M7 Hub"]):::done --> R(["M7.5 Renderskalierung"]):::done --> M8(["M8 Höllenkreis"]):::next
     M8 --> M9(["M9 Inhalt"]):::open --> M10(["M10 Koop"]):::optional
 
     classDef done fill:#2e7d32,color:#ffffff,stroke:#1b5e20
@@ -541,6 +542,7 @@ flowchart LR
 | ✅ | **M5.5** Umstellung auf 3D | Die 3D-Fassung kann alles, was die 2D-Fassung konnte, und hat sie abgelöst | mittel |
 | ✅ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
 | ✅ | **M7** Hub | Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal, Pausenmenü, Ladebildschirm, Einstellungen, Hud an Ankern, Gold, Truhe, Händler, Platzhalter-Boss mit Boss-Raum und Freischaltung des nächsten Kreises. Etappe 4 liegt seit dem 01.10.2026 auf `master`, dazu der ruhigere PS1-Look und die Sichtlinie der Mauern | mittel |
+| ✅ | **M7.5** Renderskalierung | Vorgezogen aus M9: Die Welt rendert im Raster der PS1 statt in voller Fenstergröße, gebaut am 01.10.2026 auf `master_RenderScaling` | klein |
 | ⏭️ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
 | 💤 | **M10** Koop | Optional, baut auf Kern und Seeds auf | groß |

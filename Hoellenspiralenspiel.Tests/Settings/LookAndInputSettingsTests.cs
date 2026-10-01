@@ -148,6 +148,47 @@ public class LookAndInputSettingsTests
         }
     }
 
+    [TestCase(2560, 1440, 6, 427, 240, -1, 0)]
+    [TestCase(3200, 2000, 8, 400, 250, 0, 0)]
+    [TestCase(2560, 1600, 7, 366, 229, -1, -1)]
+    [TestCase(1280, 720, 3, 427, 240, 0, 0)]
+    [TestCase(2560, 1440, 1, 2560, 1440, 0, 0)]
+    [TestCase(0, 0, 6, 1, 1, -3, -3)]
+    public void DasBildDecktDasFensterMitGanzenZellen(int width, int height, int cell, int columns, int rows, int x, int y)
+    {
+        var window = new PixelSize(width, height);
+        var cells  = PixelGrid.CellsToCover(window, cell);
+
+        Assert.That(cells, Is.EqualTo(new PixelSize(columns, rows)));
+        Assert.That(PixelGrid.Offset(window, cells, cell), Is.EqualTo((x, y)));
+    }
+
+    [Test]
+    public void DasBildRagtWenigerAlsEineZelleHinausUndBleibtMittig()
+    {
+        for (var height = 600; height <= 2400; height += 7)
+        {
+            var window = new PixelSize(height * 16 / 9, height);
+
+            foreach (var grain in new[] { PixelGrain.Coarse, PixelGrain.Medium, PixelGrain.Fine })
+            {
+                var cell   = PixelGrid.CellSize(height, grain);
+                var cells  = PixelGrid.CellsToCover(window, cell);
+                var (x, y) = PixelGrid.Offset(window, cells, cell);
+                var why    = $"{height} {grain}";
+
+                Assert.That(x, Is.LessThanOrEqualTo(0).And.GreaterThan(-cell), why);
+                Assert.That(y, Is.LessThanOrEqualTo(0).And.GreaterThan(-cell), why);
+                Assert.That(x + cells.Width * cell, Is.GreaterThanOrEqualTo(window.Width).And.LessThan(window.Width + cell), why);
+                Assert.That(y + cells.Height * cell, Is.GreaterThanOrEqualTo(window.Height).And.LessThan(window.Height + cell), why);
+
+                //Die Mitte des Bildes liegt höchstens einen halben Pixel neben der Mitte des Fensters
+                Assert.That(x + cells.Width * cell / 2.0 - window.Width / 2.0, Is.InRange(-0.5, 0.5), why);
+                Assert.That(y + cells.Height * cell / 2.0 - window.Height / 2.0, Is.InRange(-0.5, 0.5), why);
+            }
+        }
+    }
+
     [Test]
     public void EineFreieTasteWirdEinfachBelegt()
     {

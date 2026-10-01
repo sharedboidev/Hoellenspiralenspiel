@@ -1,5 +1,6 @@
 uniform vec4 albedo : source_color = vec4(1.0);
-// Mipmaps halten die Textur so grob wie das Raster des Bildes, sonst flimmert sie, sobald ein Pixel mehrere Texel deckt
+// Mipmaps halten die Textur so grob wie das Raster des Bildes, sonst flimmert sie, sobald ein Pixel mehrere Texel deckt.
+// Die Welt rendert im Raster der PS1, die Stufe wählt die GPU deshalb von selbst richtig
 uniform sampler2D albedo_texture : source_color, filter_nearest_mipmap, repeat_enable, hint_default_white;
 uniform vec2 uv_scale = vec2(1.0);
 
@@ -10,11 +11,8 @@ uniform vec3 tint = vec3(1.0);
 uniform vec4 emission : source_color = vec4(0.0, 0.0, 0.0, 1.0);
 uniform float emission_energy = 0.0;
 
-// Das Raster des Bildes, auf dem ps1_screen vergröbert. Punktmuster und Texturstufe richten sich danach
-uniform vec2 screen_resolution = vec2(426.0, 240.0);
-
 // Die PS1 kannte keine Bruchteile von Pixeln, jeder Eckpunkt rastet auf einem Raster ein. Es ist feiner als das Bild,
-// weil die Figuren bei großen Pixeln sonst zu stark zappeln. Ps1Look setzt beide Raster
+// weil die Figuren bei großen Pixeln sonst zu stark zappeln. Ps1Look setzt es, gezählt in Zellen seiner Stufe über das ganze Bild
 uniform float snap = 1.0;
 uniform vec2 snap_resolution = vec2(852.0, 480.0);
 
@@ -22,11 +20,6 @@ uniform vec2 snap_resolution = vec2(852.0, 480.0);
 uniform float affine = 1.0;
 
 varying vec3 affine_uv;
-
-// Die Welt rendert in voller Fenstergröße, erst ps1_screen vergröbert sie. Die Textur muss deshalb um so viele Stufen
-// gröber sein, wie ein Pixel des Rasters Pixel des Fensters deckt. Gerechnet im Vertex-Teil, weil der Fragment-Teil
-// die Fenstergröße nicht in Hilfsfunktionen kennt
-varying float texel_lod;
 
 #ifdef LIFTED
 // Spuren liegen flach auf Boden oder Mauer. Das Einrasten verschiebt ihre Eckpunkte anders als die der Fläche darunter,
@@ -85,7 +78,6 @@ void vertex() {
 	float depth = mix(1.0, clip.w, affine);
 
 	affine_uv = vec3(uv * depth, depth);
-	texel_lod = log2(max(VIEWPORT_SIZE.y / screen_resolution.y, 1.0));
 }
 
 const float BAYER[16] = float[](
@@ -95,21 +87,21 @@ const float BAYER[16] = float[](
 	15.0, 7.0, 13.0, 5.0
 );
 
-// Wahr, wo das Punktmuster an dieser Stelle des Bildschirms ein Loch lässt: 0 lässt nichts weg, 1 alles.
-// Das Muster liegt auf dem Raster des Bildschirms, damit es die grobe Auflösung übersteht
-bool is_cut(float amount, vec2 screen_uv) {
+// Wahr, wo das Punktmuster an dieser Stelle des Bildes ein Loch lässt: 0 lässt nichts weg, 1 alles.
+// pixel ist FRAGCOORD.xy, jeder Pixel des Bildes ist eine Zelle der PS1
+bool is_cut(float amount, vec2 pixel) {
 	if (amount <= 0.0) {
 		return false;
 	}
 
-	vec2 cell = floor(screen_uv * screen_resolution);
+	vec2 cell = floor(pixel);
 	int index = int(mod(cell.x, 4.0)) + int(mod(cell.y, 4.0)) * 4;
 
 	return 1.0 - amount < (BAYER[index] + 0.5) / 16.0;
 }
 
 vec4 sample_texel(vec3 uv) {
-	return texture(albedo_texture, uv.xy / uv.z, texel_lod);
+	return texture(albedo_texture, uv.xy / uv.z);
 }
 
 vec3 sample_surface(vec3 uv) {
