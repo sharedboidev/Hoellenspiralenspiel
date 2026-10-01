@@ -540,7 +540,7 @@ flowchart LR
 | ✅ | **Entscheidung** | 3D im Look der PlayStation 1, entschieden nach dem [Vergleich](docs/VERGLEICH_2D_3D.md) | klein |
 | ✅ | **M5.5** Umstellung auf 3D | Die 3D-Fassung kann alles, was die 2D-Fassung konnte, und hat sie abgelöst | mittel |
 | ✅ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
-| ✅ | **M7** Hub | Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal, Pausenmenü, Ladebildschirm, Einstellungen, Hud an Ankern, Gold, Truhe, Händler, Platzhalter-Boss mit Boss-Raum und Freischaltung des nächsten Kreises. Etappe 4 liegt seit dem 01.10.2026 auf `master_BossAndUnlock` | mittel |
+| ✅ | **M7** Hub | Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal, Pausenmenü, Ladebildschirm, Einstellungen, Hud an Ankern, Gold, Truhe, Händler, Platzhalter-Boss mit Boss-Raum und Freischaltung des nächsten Kreises. Etappe 4 liegt seit dem 01.10.2026 auf `master`, dazu der ruhigere PS1-Look und die Sichtlinie der Mauern | mittel |
 | ⏭️ | **M8** Höllenkreis | Ein kompletter Kreis in Endqualität | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
 | 💤 | **M10** Koop | Optional, baut auf Kern und Seeds auf | groß |

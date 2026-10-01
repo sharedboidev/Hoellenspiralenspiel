@@ -5,7 +5,7 @@ Alle vier Etappen von M7 sind gebaut. Etappe 1 bis 3 liegen auf `master`, Etappe
 Etappe 3 liegt seit dem 30.09.2026 auf `master`: Gold, Münzhaufen, eine Truhe je Charakter und ein Händler im Hub. Der User hat sie selbst über Pull Request #15 zusammengeführt, Merge-Commit `67e855b`.
 Die Rückmeldungen aus dem Spielen von Etappe 3 sind am selben Tag auf `master_PlaytestFeedback2` gebaut und liegen ebenfalls auf `master`.
 Eine zweite Runde Rückmeldungen zu Etappe 3 ist am selben Tag auf `master_PlaytestFeedback3` gebaut: Umriss für alles Benutzbare, Blick zur Maus, Schlag und Zauber binden den Helden, Kaufen per Rechtsklick und der Vergleich oben bündig.
-Etappe 4 ist am 01.10.2026 auf `master_BossAndUnlock` gebaut und liegt noch nicht auf `master`: der Skeleton King als Platzhalter-Boss mit Krone und Boss-Raum, die Freischaltung des nächsten Kreises und das Schlachthaus als Platzhalter für Kreis 2 mit neuen Texturen und Blutspuren.
+Etappe 4 ist am 01.10.2026 auf `master_BossAndUnlock` gebaut und liegt seit demselben Tag auf `master`: der Skeleton King als Platzhalter-Boss mit Krone und Boss-Raum, die Freischaltung des nächsten Kreises und das Schlachthaus als Platzhalter für Kreis 2 mit neuen Texturen und Blutspuren. Auf demselben Branch kamen nach dem Spielen das ruhigere Bild des PS1-Looks und die Sichtlinie der Mauern dazu, beide ebenfalls auf `master`.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
