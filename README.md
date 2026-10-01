@@ -326,7 +326,7 @@ Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints
 | Erfahrungsbalken | Unterteilt, mit Anzeige beim Überfahren |
 | Overlay-Karte | Das Level aus dem Winkel der Kamera, nur von weiter weg, mit Map, zu Beginn `Tab`, ein- und ausgeblendet. Unter der Erde ist sie gezeichnet und zeigt nur, was der Held schon erkundet hat |
 | Karte und Fenster | Die Karte liegt unter allen Fenstern und füllt nur den breitesten Streifen, den Charakterbogen, Werteliste, Truhe und Händler frei lassen, mit dem Helden in der Mitte. Ist der Streifen schmaler als 400 px, bleibt sie weg, bis wieder Platz ist. Die Grenze steht als `MinWidthPx` an `Hud/MapFrame` |
-| Mauern | Jede Mauer hat einen Sockel und Mauerwerk darüber. Steht der Held hinter ihr, wird das Mauerwerk durchsichtig, so weit sein Licht reicht. Was dahinter liegt, lässt sich dann anklicken |
+| Mauern | Jede Mauer hat einen Sockel und Mauerwerk darüber. Steht der Held hinter ihr, wird das Mauerwerk durchsichtig, so weit sein Licht reicht und nur dort, wo er die Mauer selbst sieht. Was hinter einer Ecke liegt, bleibt zu, was nur hinter offenem Mauerwerk liegt, wird mit ihm durchsichtig. Was hinter offenem Mauerwerk liegt, lässt sich anklicken |
 | Räume | Ein Raum bleibt verschlossen, solange der Held nicht drin steht: Seine vorderen Mauern bleiben zu, seine hinteren werden nur halb durchsichtig |
 | Licht und Sicht | Kein Licht scheint durch Mauern, weder das des Helden noch Altar, Aura oder Feuerball. Gegner und ihre Wirkungen zeigen sich erst mit Sichtkontakt |
 | Sichtweite | Gegner zeigen sich bis 120 % des Lichtradius und blenden am Rand mit demselben Punktmuster ein wie die Mauern. Faktor und Rand stehen im Inspector am `EnemyController` |

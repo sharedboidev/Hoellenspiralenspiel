@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="LevelThemeResource" format=3]
+[gd_resource type="Resource" script_class="LevelThemeResource" format=3 uid="uid://d0qrq8r38esvn"]
 
-[ext_resource type="Script" path="res://Resources/Levels/LevelThemeResource.cs" id="1_theme"]
-[ext_resource type="Script" path="res://Resources/Levels/EnemyPoolEntry.cs" id="2_entry"]
-[ext_resource type="Script" path="res://Resources/Levels/LevelMarkResource.cs" id="3_mark"]
+[ext_resource type="Script" uid="uid://0v3hroisjaei" path="res://Resources/Levels/LevelThemeResource.cs" id="1_theme"]
+[ext_resource type="Script" uid="uid://bn7bb1uifndmt" path="res://Resources/Levels/EnemyPoolEntry.cs" id="2_entry"]
+[ext_resource type="Script" uid="uid://1wd0b4wdme6t" path="res://Resources/Levels/LevelMarkResource.cs" id="3_mark"]
 [ext_resource type="Resource" path="res://Resources/Enemies/blue_blob.tres" id="4_blue"]
 [ext_resource type="Resource" path="res://Resources/Enemies/yellow_blob.tres" id="5_yellow"]
 [ext_resource type="Resource" path="res://Resources/Enemies/test_enemy.tres" id="6_caster"]
@@ -14,14 +14,14 @@
 [ext_resource type="PackedScene" path="res://Scenes/Rooms/gallery.tscn" id="14_gallery"]
 [ext_resource type="PackedScene" path="res://Scenes/Rooms/shrine.tscn" id="15_shrine"]
 [ext_resource type="PackedScene" path="res://Scenes/Rooms/boss_room.tscn" id="16_boss"]
-[ext_resource type="Texture2D" path="res://Textures/World/floor_planks.png" id="20_floor"]
-[ext_resource type="Texture2D" path="res://Textures/World/wall_cement.png" id="21_wall"]
-[ext_resource type="Texture2D" path="res://Textures/World/Marks/blood_hand.png" id="30_hand"]
-[ext_resource type="Texture2D" path="res://Textures/World/Marks/blood_stain.png" id="31_stain"]
-[ext_resource type="Texture2D" path="res://Textures/World/Marks/blood_splatter.png" id="32_splatter"]
-[ext_resource type="Texture2D" path="res://Textures/World/Marks/blood_pentagram.png" id="33_pentagram"]
-[ext_resource type="Texture2D" path="res://Textures/World/Marks/blood_smear.png" id="34_smear"]
-[ext_resource type="Texture2D" path="res://Textures/World/Marks/blood_pool.png" id="35_pool"]
+[ext_resource type="Texture2D" uid="uid://cciue45qhuupq" path="res://Textures/World/floor_planks.png" id="20_floor"]
+[ext_resource type="Texture2D" uid="uid://c3gbyfhybnfx5" path="res://Textures/World/wall_cement.png" id="21_wall"]
+[ext_resource type="Texture2D" uid="uid://dca5gsnui8e50" path="res://Textures/World/Marks/blood_hand.png" id="30_hand"]
+[ext_resource type="Texture2D" uid="uid://cp03yk7trpjx" path="res://Textures/World/Marks/blood_stain.png" id="31_stain"]
+[ext_resource type="Texture2D" uid="uid://bh35qoim5rrmx" path="res://Textures/World/Marks/blood_splatter.png" id="32_splatter"]
+[ext_resource type="Texture2D" uid="uid://10fb3okb3t7a" path="res://Textures/World/Marks/blood_pentagram.png" id="33_pentagram"]
+[ext_resource type="Texture2D" uid="uid://cu5t6yxluyild" path="res://Textures/World/Marks/blood_smear.png" id="34_smear"]
+[ext_resource type="Texture2D" uid="uid://cjuj0ww7aqlug" path="res://Textures/World/Marks/blood_pool.png" id="35_pool"]
 
 [sub_resource type="Resource" id="Pool_blue"]
 script = ExtResource("2_entry")
@@ -50,44 +50,36 @@ Weight = 3.0
 [sub_resource type="Resource" id="Mark_smear"]
 script = ExtResource("3_mark")
 Texture = ExtResource("34_smear")
-Place = 0
 WidthMeters = 2.4
 HeightMeters = 1.8
 Chance = 0.04
-MaxPerLevel = 0
 MinCenterHeight = 1.5
 MaxCenterHeight = 1.6
 
 [sub_resource type="Resource" id="Mark_stain"]
 script = ExtResource("3_mark")
 Texture = ExtResource("31_stain")
-Place = 0
 WidthMeters = 1.4
 HeightMeters = 1.8
 Chance = 0.06
-MaxPerLevel = 0
 MinCenterHeight = 1.5
 MaxCenterHeight = 1.6
 
 [sub_resource type="Resource" id="Mark_hand"]
 script = ExtResource("3_mark")
 Texture = ExtResource("30_hand")
-Place = 0
 WidthMeters = 0.7
 HeightMeters = 0.7
 Chance = 0.05
-MaxPerLevel = 0
 MinCenterHeight = 1.1
 MaxCenterHeight = 1.6
 
 [sub_resource type="Resource" id="Mark_splatter"]
 script = ExtResource("3_mark")
 Texture = ExtResource("32_splatter")
-Place = 0
 WidthMeters = 0.45
 HeightMeters = 0.45
 Chance = 0.5
-MaxPerLevel = 0
 Near = SubResource("Mark_stain")
 MinCenterHeight = 0.9
 MaxCenterHeight = 2.0
@@ -116,7 +108,6 @@ script = ExtResource("1_theme")
 Id = "slaughterhouse"
 DisplayName = "Schlachthaus"
 Number = 2
-LevelCount = 4
 FirstAreaLevel = 5
 Rooms = Array[PackedScene]([ExtResource("10_start"), ExtResource("11_exit"), ExtResource("12_chamber"), ExtResource("13_hall"), ExtResource("14_gallery"), ExtResource("15_shrine"), ExtResource("16_boss")])
 Enemies = Array[ExtResource("2_entry")]([SubResource("Pool_blue"), SubResource("Pool_yellow"), SubResource("Pool_caster"), SubResource("Pool_skeleton")])

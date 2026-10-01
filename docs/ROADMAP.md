@@ -2465,6 +2465,14 @@ Fallen: Godot spiegelt im Vulkan-Renderer die Y-Achse der Projektionsmatrix, `PR
 
 Bewusst offen gelassen: Die Welt rendert weiter in voller Fenstergröße, siehe Renderskalierung unter M9. Wer das alte, starke Wackeln will, stellt `SnapGrain` auf Coarse.
 
+Nachtrag vom 01.10.2026, Sichtlinie der Mauern: Der User stand vor einer Mauer, durch die er zu Recht nicht sah, sein Lichtradius reichte aber über sie hinaus und öffnete die Mauer dahinter. Sein Wortlaut: "die durchsichtkeit per lightradius darf nur ausgelöst werden, wenn der held eine direkte sichtlinie auf die wand bzw ihre Oberfläche hat."
+
+- `WallFade.Update` sammelt die Mittellinien der Mauerstücke im Lichtradius des Helden (`WallSegment.Line`, `WallLine` im Kern), die nächsten zuerst und höchstens 32, so viele kennt der Shader. Es reicht sie als `blockers` und `blocker_count` an Mauerwerk und Mauerspuren. Die Auswahl trifft `WallFadeRule.SelectBlockers` im Kern: Ein Stück, das sich für den Helden selbst öffnet (`Opens`: er steht hinter ihm, sein Raum lässt es zu), hält nichts auf. Was nur hinter offenem Mauerwerk liegt, bleibt so durchsichtig, zweiter Wunsch des Users mit Bild: "Teile von Wänden, die von durchsichtigen Wänden die Line of Sight des helden blockiert werden müssen durchsichtig sein." Eine Kette offener Mauern braucht keine Rekursion: Was ein offenes Stück verdeckte, quert dieselbe Strecke und steht schon selbst in der Liste.
+- `ps1_wall.gdshaderinc` prüft je Pixel die Strecke vom Helden zum Punkt auf der Mittellinie des eigenen Stücks gegen alle Stücke. Kreuzt eines die Strecke, bleibt die Stelle zu. Das eigene Stück trifft die Strecke genau am Ende und zählt nicht, deshalb der Punkt auf der Mittellinie statt auf der Fläche. Die Rechnung läuft am Boden in zwei Dimensionen, alle Mauern sind gleich hoch.
+- `WallFadeRule.IsBlocked` und `OnCenterLine` im Kern rechnen dasselbe, `WallSegment.IsSeeThroughAt` nimmt `WallFade.Blockers` mit. Was zu bleibt, lässt sich auch nicht anklicken, und Gegner dahinter bleiben verborgen. 7 neue Unit-Tests.
+- Die Sichtlinie von der Kamera zum Helden (`cover`) bleibt unberührt, der Held ist nie verdeckt.
+- Geprüft mit Fenster auf Kreis 2 mit dem Seed des Users: 16 Standorte, an denen eine Mauer hinter einer Ecke nach der alten Regel aufging, drei davon mit Bildern vorher und nachher, dazu 6 Mauern, die nur hinter offenem Mauerwerk liegen und durchsichtig bleiben. Mauern mit freier Sichtlinie öffnen sich weiter.
+
 ### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L)
 
 Ziel: ein Kreis in Endqualität als Vorlage für alle weiteren.

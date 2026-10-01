@@ -99,6 +99,18 @@ public partial class WallSegment : StaticBody3D
         }
     }
 
+    //Die Mittellinie am Boden, von einem Ende zum anderen
+    public WallLine Line
+    {
+        get
+        {
+            var half   = WorldScale.OnGround(GlobalBasis.X).Normalized() * (Length / 2f);
+            var center = GlobalPosition;
+
+            return new WallLine(center.X - half.X, center.Z - half.Z, center.X + half.X, center.Z + half.Z);
+        }
+    }
+
     public override void _EnterTree()
     {
         if (!Engine.IsEditorHint())
@@ -115,7 +127,7 @@ public partial class WallSegment : StaticBody3D
         => Build();
 
     public bool IsSeeThroughAt(Vector3 point)
-        => point.Y > GlobalPosition.Y + PlinthHeight && WallFadeRule.IsSeeThrough(new WorldPoint(point.X, point.Y, point.Z), Plane, Opening, WallFade.View);
+        => point.Y > GlobalPosition.Y + PlinthHeight && WallFadeRule.IsSeeThrough(new WorldPoint(point.X, point.Y, point.Z), Plane, Opening, WallFade.View, WallFade.Blockers);
 
     //Welche Räume an den beiden Seiten liegen, zeigt ein Punkt kurz vor und kurz hinter der Mitte des Stücks
     public void Refresh(int roomOfHero)

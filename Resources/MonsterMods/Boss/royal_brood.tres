@@ -1,21 +1,20 @@
-[gd_resource type="Resource" script_class="MonsterModResource" format=3]
+[gd_resource type="Resource" script_class="MonsterModResource" format=3 uid="uid://bjglfv3mo4goo"]
 
-[ext_resource type="Script" path="res://Resources/MonsterMods/MonsterModResource.cs" id="1_mod"]
-[ext_resource type="Script" path="res://Resources/MonsterMods/MonsterModEffect.cs" id="2_effect"]
-[ext_resource type="Script" path="res://Resources/MonsterMods/ModAction.cs" id="3_action"]
-[ext_resource type="Script" path="res://Resources/MonsterMods/Triggers/LifeBelowTrigger.cs" id="4_life"]
-[ext_resource type="Script" path="res://Resources/MonsterMods/Actions/SummonAction.cs" id="5_summon"]
+[ext_resource type="Script" uid="uid://bmdtfopxhfr80" path="res://Resources/MonsterMods/MonsterModResource.cs" id="1_mod"]
+[ext_resource type="Script" uid="uid://dc7isn5cyxrnu" path="res://Resources/MonsterMods/MonsterModEffect.cs" id="2_effect"]
+[ext_resource type="Script" uid="uid://dbyr5d8bfuy1x" path="res://Resources/MonsterMods/ModAction.cs" id="3_action"]
+[ext_resource type="Script" uid="uid://cg8q23e0xji5k" path="res://Resources/MonsterMods/Triggers/LifeBelowTrigger.cs" id="4_life"]
+[ext_resource type="Script" uid="uid://2dmcmpwys2w4" path="res://Resources/MonsterMods/Actions/SummonAction.cs" id="5_summon"]
+[ext_resource type="Script" uid="uid://d25uftp3t754i" path="res://Resources/MonsterMods/StatModifierResource.cs" id="6_fdlkx"]
 [ext_resource type="Resource" path="res://Resources/Enemies/skeleton.tres" id="6_skeleton"]
-
-[sub_resource type="Resource" id="Resource_trigger"]
-script = ExtResource("4_life")
-Percent = 50.0
 
 [sub_resource type="Resource" id="Resource_action"]
 script = ExtResource("5_summon")
 Enemy = ExtResource("6_skeleton")
-Count = 3
 Radius = 160.0
+
+[sub_resource type="Resource" id="Resource_trigger"]
+script = ExtResource("4_life")
 
 [sub_resource type="Resource" id="Resource_effect"]
 script = ExtResource("2_effect")

@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="MonsterModResource" format=3]
+[gd_resource type="Resource" script_class="MonsterModResource" format=3 uid="uid://cpclhjy2balbx"]
 
-[ext_resource type="Script" path="res://Resources/MonsterMods/MonsterModResource.cs" id="1_mod"]
-[ext_resource type="Script" path="res://Resources/MonsterMods/StatModifierResource.cs" id="2_stat"]
+[ext_resource type="Script" uid="uid://dc7isn5cyxrnu" path="res://Resources/MonsterMods/MonsterModEffect.cs" id="1_3xc1i"]
+[ext_resource type="Script" uid="uid://bmdtfopxhfr80" path="res://Resources/MonsterMods/MonsterModResource.cs" id="1_mod"]
+[ext_resource type="Script" uid="uid://d25uftp3t754i" path="res://Resources/MonsterMods/StatModifierResource.cs" id="2_stat"]
 
 [sub_resource type="Resource" id="Resource_life"]
 script = ExtResource("2_stat")

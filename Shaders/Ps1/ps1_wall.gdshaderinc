@@ -14,6 +14,36 @@ uniform float cover_edge = 0.3;
 // Wie weit sich das Stück öffnet, wenn der Held hinter ihm steht: auf der Seite seiner Z-Achse (x) oder auf der anderen (y)
 instance uniform vec2 see_through = vec2(1.0, 1.0);
 
+// Das Licht öffnet nur, was der Held auch sieht. WallFade reicht die Mittellinien der Mauerstücke in seinem Umkreis herein,
+// je Stück Anfang (xy) und Ende (zw) am Boden. Steht eines zwischen ihm und der Stelle, bleibt sie zu
+uniform int blocker_count = 0;
+uniform vec4 blockers[32];
+
+// Wahr, wenn ein Stück die Strecke kreuzt. Das eigene Stück trifft sie genau am Ende und zählt nicht
+bool is_blocked(vec2 from, vec2 to) {
+	vec2 d = to - from;
+
+	for (int i = 0; i < blocker_count; i++) {
+		vec2 a = blockers[i].xy;
+		vec2 e = blockers[i].zw - a;
+		float denominator = d.x * e.y - d.y * e.x;
+
+		if (abs(denominator) < 0.000001) {
+			continue;
+		}
+
+		vec2 ap = a - from;
+		float along = (ap.x * e.y - ap.y * e.x) / denominator;
+		float where = (ap.x * d.y - ap.y * d.x) / denominator;
+
+		if (along > 0.0 && along < 0.999 && where >= 0.0 && where <= 1.0) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 float opening(vec3 world, mat4 model, vec3 camera) {
 	// Die dünne Achse des Mauerstücks ist seine Z-Achse
 	vec2 wall_origin = model[3].xz;
@@ -28,6 +58,13 @@ float opening(vec3 world, mat4 model, vec3 camera) {
 	float amount = hero_side > 0.0 ? see_through.x : see_through.y;
 	float behind = smoothstep(0.0, fade_side_ramp, abs(hero_side));
 	float outside = smoothstep(fade_radius - fade_edge, fade_radius, distance(world.xz, fade_center.xz));
+
+	// Geprüft wird der Punkt auf der Mittellinie, der Held sieht ihn von seiner Seite aus
+	vec2 on_line = world.xz - wall_normal * dot(world.xz - wall_origin, wall_normal);
+
+	if (outside >= 1.0 || is_blocked(fade_center.xz, on_line)) {
+		return 0.0;
+	}
 
 	return amount * behind * (1.0 - outside);
 }

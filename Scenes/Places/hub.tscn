@@ -29,6 +29,7 @@ shader_parameter/world_uv_scale = 0.25
 shader_parameter/tint = Vector3(1, 1, 1)
 shader_parameter/emission = Color(0, 0, 0, 1)
 shader_parameter/emission_energy = 0.0
+shader_parameter/screen_resolution = Vector2(426, 240)
 shader_parameter/snap = 1.0
 shader_parameter/snap_resolution = Vector2(426, 240)
 shader_parameter/affine = 1.0
@@ -52,6 +53,7 @@ shader_parameter/world_uv_scale = 0.25
 shader_parameter/tint = Vector3(1, 1, 1)
 shader_parameter/emission = Color(0, 0, 0, 1)
 shader_parameter/emission_energy = 0.0
+shader_parameter/screen_resolution = Vector2(426, 240)
 shader_parameter/snap = 1.0
 shader_parameter/snap_resolution = Vector2(426, 240)
 shader_parameter/affine = 1.0
@@ -68,6 +70,7 @@ shader_parameter/world_uv_scale = 0.0
 shader_parameter/tint = Vector3(1, 1, 1)
 shader_parameter/emission = Color(1, 0.45, 0.15, 1)
 shader_parameter/emission_energy = 5.0
+shader_parameter/screen_resolution = Vector2(426, 240)
 shader_parameter/snap = 1.0
 shader_parameter/snap_resolution = Vector2(426, 240)
 shader_parameter/affine = 1.0
@@ -150,6 +153,7 @@ isUnlocked = true
 
 [node name="Circle2" parent="Portals" unique_id=888773842 instance=ExtResource("7_portal")]
 transform = Transform3D(0.5, 0, 0.866025, 0, 1, 0, -0.866025, 0, 0.5, -11.258, 0, -2.5)
+isUnlocked = true
 Number = 2
 
 [node name="Circle3" parent="Portals" unique_id=165230872 instance=ExtResource("7_portal")]

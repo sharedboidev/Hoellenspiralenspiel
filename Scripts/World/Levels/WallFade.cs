@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Levels;
 using Hoellenspiralenspiel.Scripts.Skills;
 
 namespace Hoellenspiralenspiel.Scripts.World.Levels;
 
-//Hält fest, wo der Held steht, in welchem Raum und wie weit sein Licht reicht. Daraus folgt, welches Mauerwerk die Sicht freigibt
+//Hält fest, wo der Held steht, in welchem Raum und wie weit sein Licht reicht. Daraus folgt, welches Mauerwerk die Sicht freigibt.
+//Die Mauerstücke in seinem Umkreis halten die Sicht auf: Was hinter einer Ecke liegt, öffnet sich nicht
 public static class WallFade
 {
     private const string MasonryShaderPath = "res://Shaders/Ps1/ps1_wall.gdshader";
@@ -13,6 +16,9 @@ public static class WallFade
     private const string PlinthShaderPath  = "res://Shaders/Ps1/ps1_surface.gdshader";
     private const float  TilesPerMeter     = 0.25f;
     private const int    MaxWallsOnRay     = 12;
+
+    //So viele Stücke kennt der Shader, siehe ps1_wall.gdshaderinc
+    private const int MaxBlockers = 32;
 
     private static readonly StringName AlbedoTexture = "albedo_texture";
     private static readonly StringName WorldUvScale  = "world_uv_scale";
@@ -24,11 +30,14 @@ public static class WallFade
     private static readonly StringName HeroHeight    = "hero_height";
     private static readonly StringName CoverRadius   = "cover_radius";
     private static readonly StringName CoverEdge     = "cover_edge";
+    private static readonly StringName BlockerLines  = "blockers";
+    private static readonly StringName BlockerCount  = "blocker_count";
 
     private static readonly Dictionary<Texture2D, ShaderMaterial>          MasonryOf = new();
     private static readonly Dictionary<Texture2D, ShaderMaterial>          MarkOf    = new();
     private static readonly Dictionary<(Texture2D, float), ShaderMaterial> PlinthOf  = new();
     private static readonly List<WallSegment>                              Walls     = new();
+    private static readonly Vector4[]                                      BlockerBuffer = new Vector4[MaxBlockers];
 
     private static bool areWallsStale;
     private static int  knownZones = -1;
@@ -40,6 +49,9 @@ public static class WallFade
     public static WallFadeView View { get; private set; }
 
     public static int RoomOfHero { get; private set; } = WallOpeningRule.NoRoom;
+
+    //Die Mittellinien der Mauerstücke im Lichtradius des Helden, die nächsten zuerst
+    public static IReadOnlyList<WallLine> Blockers { get; private set; } = Array.Empty<WallLine>();
 
     public static void Register(WallSegment wall)
     {
@@ -53,16 +65,21 @@ public static class WallFade
 
     public static void Update(Vector3 hero, float heroHeight, float radiusMeters, Vector3 camera)
     {
-        var view = new WallFadeView(ToPoint(hero), heroHeight, ToPoint(camera), radiusMeters);
-        var room = RoomZone.GetIdAt(hero);
+        var view     = new WallFadeView(ToPoint(hero), heroHeight, ToPoint(camera), radiusMeters);
+        var room     = RoomZone.GetIdAt(hero);
+        var wasStale = areWallsStale;
 
         if (room != RoomOfHero || knownZones != RoomZone.Version || areWallsStale)
             Refresh(room);
 
-        if (view == View)
+        if (view == View && !wasStale)
             return;
 
-        View = view;
+        View     = view;
+        Blockers = FindBlockers(view);
+
+        for (var i = 0; i < MaxBlockers; i++)
+            BlockerBuffer[i] = i < Blockers.Count ? new Vector4(Blockers[i].X0, Blockers[i].Z0, Blockers[i].X1, Blockers[i].Z1) : Vector4.Zero;
 
         foreach (var material in MasonryOf.Values)
             Apply(material);
@@ -142,6 +159,18 @@ public static class WallFade
     private static WorldPoint ToPoint(Vector3 vector)
         => new(vector.X, vector.Y, vector.Z);
 
+    //Nur Stücke im Lichtradius, die sich nicht selbst öffnen, halten die Sicht auf. Mehr als der Shader kennt, bleiben die fernsten weg
+    public static IReadOnlyList<WallLine> FindBlockers(WallFadeView view)
+    {
+        if (view.Radius <= 0f)
+            return Array.Empty<WallLine>();
+
+        var pieces = Walls.Where(wall => GodotObject.IsInstanceValid(wall) && wall.IsInsideTree())
+                          .Select(wall => new WallPiece(wall.Plane, wall.Line, wall.Opening));
+
+        return WallFadeRule.SelectBlockers(pieces, view, MaxBlockers);
+    }
+
     private static ShaderMaterial Create(Shader shader, Texture2D texture, Vector3 tint)
     {
         var material = new ShaderMaterial { Shader = shader };
@@ -170,5 +199,7 @@ public static class WallFade
         material.SetShaderParameter(FadeCenter, new Vector3(View.Hero.X, View.Hero.Y, View.Hero.Z));
         material.SetShaderParameter(FadeRadius, View.Radius);
         material.SetShaderParameter(HeroHeight, View.HeroHeight);
+        material.SetShaderParameter(BlockerLines, BlockerBuffer);
+        material.SetShaderParameter(BlockerCount, Blockers.Count);
     }
 }

@@ -132,6 +132,94 @@ public class WallFadeRuleTests
         Assert.That(WallFadeRule.GetOpacity(OnWall(6f), Wall, opening, HeroAt(0f, -2f)), Is.EqualTo(0f));
     }
 
+    //Der Held steht nördlich hinter der Mauer. Ein Stück längs Z bei x = 3 steht zwischen ihm und der Stelle bei x = 6, nicht aber vor der bei x = -3
+    [Test]
+    public void EinMauerstueckZwischenHeldUndStelle_HaeltSieZu()
+    {
+        var view     = HeroAt(0f, -2f);
+        var blockers = new[] { new WallLine(3f, -4f, 3f, 0f) };
+
+        Assert.That(WallFadeRule.GetOpacity(OnWall(6f), Wall, WallOpening.Open, view, blockers), Is.EqualTo(1f));
+        Assert.That(WallFadeRule.IsSeeThrough(OnWall(6f), Wall, WallOpening.Open, view, blockers), Is.False);
+        Assert.That(WallFadeRule.GetOpacity(OnWall(-3f), Wall, WallOpening.Open, view, blockers), Is.EqualTo(0f));
+    }
+
+    //Das eigene Stück endet genau an der Stelle, ein Stück südlich der Mauer liegt neben der Sichtlinie
+    [Test]
+    public void DasEigeneStueckUndStueckeNebenDerSichtlinie_HaltenNichtsAuf()
+    {
+        var own    = new WallLine(-10f, 0f, 10f, 0f);
+        var beside = new WallLine(3f, 1f, 3f, 5f);
+
+        Assert.That(WallFadeRule.GetOpacity(OnWall(6f), Wall, WallOpening.Open, HeroAt(0f, -2f), new[] { own, beside }), Is.EqualTo(0f));
+    }
+
+    //Der Punkt liegt auf der Fläche zur Kamera, einen Viertelmeter südlich der Mittellinie. Geprüft wird die Mittellinie, sonst hielte das eigene Stück sich selbst auf
+    [Test]
+    public void GeprueftWirdDieMittellinieDesEigenenStuecks()
+    {
+        var own   = new WallLine(-10f, 0f, 10f, 0f);
+        var front = new WorldPoint(6f, Masonry, 0.25f);
+
+        Assert.That(WallFadeRule.OnCenterLine(front, Wall), Is.EqualTo(new WorldPoint(6f, Masonry, 0f)));
+        Assert.That(WallFadeRule.GetOpacity(front, Wall, WallOpening.Open, HeroAt(0f, -2f), new[] { own }), Is.EqualTo(0f));
+    }
+
+    [Test]
+    public void OhneStuecke_HaeltNichtsAuf()
+    {
+        var from = new WorldPoint(0f, 0f, -2f);
+        var to   = new WorldPoint(6f, 0f, 0f);
+
+        Assert.That(WallFadeRule.IsBlocked(from, to, null), Is.False);
+        Assert.That(WallFadeRule.IsBlocked(from, to, System.Array.Empty<WallLine>()), Is.False);
+        Assert.That(WallFadeRule.IsBlocked(from, to, new[] { new WallLine(0f, -5f, 6f, -3f) }), Is.False, "parallel zur Sichtlinie");
+        Assert.That(WallFadeRule.IsBlocked(from, to, new[] { new WallLine(3f, -4f, 3f, 0f) }), Is.True);
+    }
+
+    //Zwei Stücke längs Z bei x = 3: eines nördlich der Mauer, hinter dem der Held steht, eines südlich davon.
+    //Steht der Held östlich der beiden, öffnet sich das nördliche nicht (Held und Kamera auf derselben Seite) und hält die Sicht auf
+    [Test]
+    public void EinStueckDasSichSelbstOeffnet_HaeltDieSichtNichtAuf()
+    {
+        var view   = HeroAt(0f, -2f);
+        var north  = new WallPiece(new WallPlane(3f, -2f, 1f, 0f), new WallLine(3f, -4f, 3f, 0f), WallOpening.Open);
+        var closed = new WallPiece(new WallPlane(3f, -2f, 1f, 0f), new WallLine(3f, -4f, 3f, 0f), Closed);
+
+        Assert.That(WallFadeRule.Opens(north.Plane, north.Opening, view), Is.True, "Held westlich, Kamera östlich");
+        Assert.That(WallFadeRule.Opens(north.Plane, north.Opening, HeroAt(5f, -2f)), Is.False, "Held und Kamera östlich");
+        Assert.That(WallFadeRule.Opens(closed.Plane, closed.Opening, view), Is.False, "verschlossener Raum");
+
+        Assert.That(WallFadeRule.SelectBlockers(new[] { north }, view, 32), Is.Empty);
+        Assert.That(WallFadeRule.SelectBlockers(new[] { closed }, view, 32), Has.Count.EqualTo(1));
+        Assert.That(WallFadeRule.GetOpacity(OnWall(6f), Wall, WallOpening.Open, view, WallFadeRule.SelectBlockers(new[] { north }, view, 32)), Is.EqualTo(0f));
+        Assert.That(WallFadeRule.GetOpacity(OnWall(6f), Wall, WallOpening.Open, view, WallFadeRule.SelectBlockers(new[] { closed }, view, 32)), Is.EqualTo(1f));
+    }
+
+    [Test]
+    public void DieBlockerKommenNachAbstandUndNurAusDemLichtradius()
+    {
+        var view = HeroAt(0f, -2f, 5f);
+        var near = new WallPiece(new WallPlane(0f, -4f, 0f, 1f), new WallLine(-2f, -4f, 2f, -4f), Closed);
+        var far  = new WallPiece(new WallPlane(0f, -6f, 0f, 1f), new WallLine(-2f, -6f, 2f, -6f), Closed);
+        var out_ = new WallPiece(new WallPlane(0f, -9f, 0f, 1f), new WallLine(-2f, -9f, 2f, -9f), Closed);
+
+        var blockers = WallFadeRule.SelectBlockers(new[] { out_, far, near }, view, 32);
+
+        Assert.That(blockers, Is.EqualTo(new[] { near.Line, far.Line }));
+        Assert.That(WallFadeRule.SelectBlockers(new[] { out_, far, near }, view, 1), Is.EqualTo(new[] { near.Line }));
+    }
+
+    [Test]
+    public void DerAbstandZurMittellinie_ZaehltBisZuIhrenEnden()
+    {
+        var line = new WallLine(-2f, 0f, 2f, 0f);
+
+        Assert.That(line.DistanceTo(0f, 3f), Is.EqualTo(3f).Within(0.001f));
+        Assert.That(line.DistanceTo(5f, 0f), Is.EqualTo(3f).Within(0.001f));
+        Assert.That(line.DistanceTo(5f, 4f), Is.EqualTo(5f).Within(0.001f));
+    }
+
     //Die Sichtlinie von der Kamera zum Helden quert die Mauer einen Meter östlich von ihm
     [Test]
     public void WoDieMauerDenHeldenVerdeckt_BleibtSieNieGanzZu()
