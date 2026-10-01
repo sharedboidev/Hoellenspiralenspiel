@@ -32,6 +32,10 @@ public partial class LevelMarkResource : Resource
     [Export]
     public LevelMarkResource Near { get; set; }
 
+    //Nur am Boden: auch in den Zellen der Gänge, nicht nur an den Plätzen, die die Räume anbieten
+    [Export]
+    public bool InCorridors { get; set; }
+
     [ExportGroup("Mauer")]
     //Höhe der Mitte über dem Boden, gewürfelt zwischen beiden Werten. Der Sockel reicht bis 0,6 m, das Mauerwerk bis 2,5 m
     [Export]
@@ -51,6 +55,7 @@ public partial class LevelMarkResource : Resource
             MaxPerLevel     = MaxPerLevel,
             MinCenterHeight = MinCenterHeight,
             MaxCenterHeight = MaxCenterHeight,
-            Near            = nearId ?? string.Empty
+            Near            = nearId ?? string.Empty,
+            InCorridors     = InCorridors
         };
 }

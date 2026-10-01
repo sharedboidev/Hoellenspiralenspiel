@@ -20,6 +20,8 @@
 [ext_resource type="Texture2D" path="res://Textures/World/Marks/blood_stain.png" id="31_stain"]
 [ext_resource type="Texture2D" path="res://Textures/World/Marks/blood_splatter.png" id="32_splatter"]
 [ext_resource type="Texture2D" path="res://Textures/World/Marks/blood_pentagram.png" id="33_pentagram"]
+[ext_resource type="Texture2D" path="res://Textures/World/Marks/blood_smear.png" id="34_smear"]
+[ext_resource type="Texture2D" path="res://Textures/World/Marks/blood_pool.png" id="35_pool"]
 
 [sub_resource type="Resource" id="Pool_blue"]
 script = ExtResource("2_entry")
@@ -45,6 +47,28 @@ script = ExtResource("2_entry")
 Enemy = ExtResource("7_skeleton")
 Weight = 3.0
 
+[sub_resource type="Resource" id="Mark_smear"]
+script = ExtResource("3_mark")
+Texture = ExtResource("34_smear")
+Place = 0
+WidthMeters = 2.4
+HeightMeters = 1.8
+Chance = 0.04
+MaxPerLevel = 0
+MinCenterHeight = 1.5
+MaxCenterHeight = 1.6
+
+[sub_resource type="Resource" id="Mark_stain"]
+script = ExtResource("3_mark")
+Texture = ExtResource("31_stain")
+Place = 0
+WidthMeters = 1.4
+HeightMeters = 1.8
+Chance = 0.06
+MaxPerLevel = 0
+MinCenterHeight = 1.5
+MaxCenterHeight = 1.6
+
 [sub_resource type="Resource" id="Mark_hand"]
 script = ExtResource("3_mark")
 Texture = ExtResource("30_hand")
@@ -54,17 +78,6 @@ HeightMeters = 0.7
 Chance = 0.05
 MaxPerLevel = 0
 MinCenterHeight = 1.1
-MaxCenterHeight = 1.6
-
-[sub_resource type="Resource" id="Mark_stain"]
-script = ExtResource("3_mark")
-Texture = ExtResource("31_stain")
-Place = 0
-WidthMeters = 1.4
-HeightMeters = 1.8
-Chance = 0.025
-MaxPerLevel = 0
-MinCenterHeight = 1.5
 MaxCenterHeight = 1.6
 
 [sub_resource type="Resource" id="Mark_splatter"]
@@ -88,6 +101,16 @@ HeightMeters = 3.0
 Chance = 0.6
 MaxPerLevel = 1
 
+[sub_resource type="Resource" id="Mark_pool"]
+script = ExtResource("3_mark")
+Texture = ExtResource("35_pool")
+Place = 1
+WidthMeters = 2.2
+HeightMeters = 2.2
+Chance = 0.9
+MaxPerLevel = 12
+InCorridors = true
+
 [resource]
 script = ExtResource("1_theme")
 Id = "slaughterhouse"
@@ -97,7 +120,7 @@ LevelCount = 4
 FirstAreaLevel = 5
 Rooms = Array[PackedScene]([ExtResource("10_start"), ExtResource("11_exit"), ExtResource("12_chamber"), ExtResource("13_hall"), ExtResource("14_gallery"), ExtResource("15_shrine"), ExtResource("16_boss")])
 Enemies = Array[ExtResource("2_entry")]([SubResource("Pool_blue"), SubResource("Pool_yellow"), SubResource("Pool_caster"), SubResource("Pool_skeleton")])
-Marks = Array[ExtResource("3_mark")]([SubResource("Mark_hand"), SubResource("Mark_stain"), SubResource("Mark_splatter"), SubResource("Mark_pentagram")])
+Marks = Array[ExtResource("3_mark")]([SubResource("Mark_smear"), SubResource("Mark_stain"), SubResource("Mark_hand"), SubResource("Mark_splatter"), SubResource("Mark_pentagram"), SubResource("Mark_pool")])
 FloorTexture = ExtResource("20_floor")
 WallTexture = ExtResource("21_wall")
 PlinthBrightness = 0.5

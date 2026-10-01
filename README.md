@@ -388,7 +388,7 @@ Ein Klick auf ein Portal im Hub öffnet die Checkpoints seines Kreises. Jede Ebe
 | Raumvorlagen | Szenen mit Anschlusspunkten, Spawn-Markern und Regeln: Häufigkeit, frühestes Bereichslevel, Höchstzahl, Pflichtraum |
 | Pflichtraum | Der Schrein ist ein Event-Raum und erscheint in jeder Ebene genau einmal |
 | Thema | Eine Resource legt Räume, Texturen, Licht, Musik, Gegnerpool und Spuren fest |
-| Spuren | Blutige Hände, große verlaufene Flecken mit Spritzern drumherum und höchstens ein Pentagramm je Ebene, gewürfelt aus dem Seed. Eine Spur an der Mauer öffnet sich mit dem Mauerwerk |
+| Spuren | Blutige Hände, große und sehr große verlaufene Flecken mit Spritzern drumherum, Blutlachen in Räumen und Gängen und höchstens ein Pentagramm je Ebene, gewürfelt aus dem Seed. Eine Spur an der Mauer öffnet sich mit dem Mauerwerk |
 | Schlachthaus | Der Platzhalter für den zweiten Kreis: Holzplanken, grobe Zementwände, Blutspuren, Bereichslevel 5 bis 8. Er öffnet sich, sobald der Boss des Testkreises gefallen ist |
 | Tiefe | Mit jeder Ebene steigt das Bereichslevel um 1, und die Ebene bekommt einen Raum mehr. Die erste Ebene des Testkreises hat Bereichslevel 1 |
 | Gegner | Räume bringen ihre Spawn-Marker mit, in Gängen stehen vereinzelt kleine Gruppen aus dem Gegnerpool |

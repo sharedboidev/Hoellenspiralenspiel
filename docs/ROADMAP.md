@@ -2365,6 +2365,7 @@ Der User hat am 01.10.2026 auf "Was steht als nächstes an?" zwei Runden Fragen 
 | Fähigkeiten | Feste Mods Stalwart, Royal Brood und Berserk, dazu doppelte Größe und stärkere Klauen |
 | Arena | "Versiegelt bis zum Sieg": Sobald der Held im Raum steht, schließen Gitter die Türen, bis der Boss fällt. Stirbt der Held, öffnen sie sich wieder |
 | Bauweise | Erst Kreis 2 mit Texturen und Blutspuren bauen und Bilder zeigen, dann der Rest. Die Bilder fand er "super" |
+| Dritte Runde | Nach dem Commit: "ok sieht alles gut aus aber es ist zu wenig blut im schlachthaus. Die wände brauchen mehr von den ganz großen flecken und es müssen auch große blutlachen auf dem Boden zu finden sein" |
 
 Von mir festgelegt:
 
@@ -2381,9 +2382,9 @@ Von mir festgelegt:
 | Freischaltung | Fällt der Boss auf der letzten Ebene des Kreises N, schaltet sich Kreis N + 1 frei, höchstens bis 9. Der Hub zeigt es beim nächsten Betreten. Die Ansage "The way to Circle N is open" steht fünf Sekunden unter dem Boss-Balken. Ein freigeschaltetes Portal ohne Kreis bleibt dunkel und heißt "not yet built" |
 | Gefallener Boss | Steht wie jeder Gegner im Spielstand. Beim nächsten Besuch fehlt er, die Gitter bleiben offen, und sein Portal steht von Anfang an |
 | Schlachthaus | `Resources/Levels/slaughterhouse.tres`, Nummer 2, vier Ebenen ab Bereichslevel 5, dieselben Räume und Gegner wie der Testkreis mit mehr Skeletten, Holzplanken und grobem Zement, kaltes grünliches Licht. In M8 ersetzt ihn Wollust |
-| Texturen | Mit PIL erzeugt wie die alten: 64 Pixel mit 9 und 10 Farben, ohne Sprenkel in der Wand. Die Spuren sind Bilder mit Alphakanal unter `Textures/World/Marks`: Hand 32, Fleck 48 x 64, Spritzer 24, Pentagramm 64 Pixel |
-| Spuren | Felder am Kreis: Bild, Ort (Mauer oder Boden), Maße, Chance, Höchstzahl je Ebene, Höhe an der Mauer und eine Spur, neben der sie erscheint. Hand 0,7 m mit 5 % je Mauerzelle und Seite, Fleck 1,4 x 1,8 m mit 2,5 %, Spritzer 0,45 m nur neben einem Fleck mit 50 % je Nachbarzelle, Pentagramm 3 m mit 60 % je Ebene und höchstens eins. Der Testkreis hat keine |
-| Plätze am Boden | Ein Pentagramm liegt nur an Plätzen, die die Raumvorlagen anbieten: Kammer, Halle, Galerie und Boss-Raum in der Mitte, Schrein vor dem Altar. Start und Ausgang bieten keinen |
+| Texturen | Mit PIL erzeugt wie die alten: 64 Pixel mit 9 und 10 Farben, ohne Sprenkel in der Wand. Die Spuren sind Bilder mit Alphakanal unter `Textures/World/Marks`: Hand 32, Fleck 48 x 64, sehr großer Fleck 64 x 48, Spritzer 24, Pentagramm 64, Lache 64 Pixel |
+| Spuren | Felder am Kreis: Bild, Ort (Mauer oder Boden), Maße, Chance, Höchstzahl je Ebene, Höhe an der Mauer und eine Spur, neben der sie erscheint. Sehr großer Fleck 2,4 x 1,8 m mit 4 % je Mauerzelle und Seite, Fleck 1,4 x 1,8 m mit 6 %, Hand 0,7 m mit 5 %, Spritzer 0,45 m nur neben einem Fleck mit 50 % je Nachbarzelle, Pentagramm 3 m mit 60 % je Ebene und höchstens eins, Lache 2,2 m mit 90 % je Versuch und bis zu zwölf je Ebene, auch in Gängen. Der Testkreis hat keine. Nach der dritten Runde kamen sehr große Flecken und Lachen dazu, und der Fleck stieg von 2,5 auf 6 % |
+| Plätze am Boden | Ein Pentagramm liegt nur an Plätzen, die die Raumvorlagen anbieten: Kammer, Halle, Galerie und Boss-Raum in der Mitte, Schrein vor dem Altar, dazu je ein bis drei weitere am Rand. Lachen dürfen außerdem in jeder Zelle eines Gangs liegen. Der Startraum bietet keinen Platz |
 | Spuren an der Mauer | Nur am Mauerwerk über dem Sockel, auf Seiten mit Boden davor, 2 cm vor der Fläche. Sie öffnen sich mit dem Mauerwerk, wenn der Held dahinter steht |
 
 So funktioniert es:
@@ -2394,9 +2395,9 @@ So funktioniert es:
 - `Descent` findet nach dem Spawnen den Boss, bewaffnet die Arenen und meldet `BossAppeared`. Fällt der Boss, rechnet `CircleUnlockRule.NextCircle` im Kern aus, welcher Kreis sich öffnet, `JourneyState.Unlock` merkt es sich (höchstens `LastCircle`, 9), `CircleUnlocked` löst die Ansage aus, und jede Arena bekommt ihr Portal. Das Portal meldet `Used`, der Abstieg zeigt den Hub mit `Arrival.AtPortalOf`.
 - `BossBar` aus `Scenes/UI/boss_bar.tscn` hängt in der Hud, `GameController` verbindet es mit `BossAppeared` und `CircleUnlocked`. Es zeigt sich nur, solange `Enemy.IsSeen` gilt, und verschwindet mit dem Tod oder dem Verlassen der Ebene.
 - `BossPortal` ist ein `Passage` wie das Town-Portal. Es dreht seinen Strudel, lässt sein Licht pulsieren und wächst über `OpeningSec`.
-- `MarkPlacer` im Kern verteilt die Spuren: `PlaceOnWalls` läuft die Mauerstücke ab und würfelt je Zelle und Seite mit Boden davor, die erste treffende Regel bekommt die Stelle, ihre Begleiter (`Near`) würfeln in derselben und den beiden Nachbarzellen. `PlaceOnFloors` würfelt je Regel bis zur Höchstzahl und nimmt jeden Platz höchstens einmal. Die Zufallsquelle ist der Seed der Ebene plus 7919, die Gegner stehen also wie vorher.
+- `MarkPlacer` im Kern verteilt die Spuren: `PlaceOnWalls` läuft die Mauerstücke ab und würfelt je Zelle und Seite mit Boden davor, die erste treffende Regel bekommt die Stelle, ihre Begleiter (`Near`) würfeln in derselben und den beiden Nachbarzellen. `PlaceOnFloors` würfelt je Regel bis zur Höchstzahl und nimmt jeden Platz höchstens einmal. Die Plätze der Räume stehen vorn, dahinter die Zellen der Gänge, die nur Regeln mit `InCorridors` nehmen. Die Zufallsquelle ist der Seed der Ebene plus 7919, die Gegner stehen also wie vorher.
 - `LevelMarks` baut daraus Quads: Spuren an der Mauer hängen als Kinder am `WallSegment` (`AddMark`), das ihnen `see_through` weitergibt, auf der Rückseite vertauscht. Die Shader `ps1_wall_mark` und `ps1_floor_mark` schneiden mit dem Alphakanal aus, die Rechnung der Öffnung steht seitdem in `ps1_wall.gdshaderinc`. `WallFade.GetMark` hält die Materialien der Mauerspuren und gibt ihnen Ort und Lichtradius des Helden weiter wie dem Mauerwerk. `Ps1Look` stimmt beide Shader ab.
-- `FloorMarkSpot` ist ein Marker in Raumvorlagen, `LevelBuilder` sammelt sie beim Aufbau.
+- `FloorMarkSpot` ist ein Marker in Raumvorlagen, `LevelBuilder` sammelt sie beim Aufbau. `LevelMarks` zählt die Zellen der Gänge dazu und gibt jeder Spur einen Namen aus Bild und laufender Nummer, sonst benennt Godot gleichnamige Geschwister um.
 - Der Ladebildschirm hat einen 18. Tipp zum Boss.
 
 Neue Felder im Inspector:
@@ -2406,7 +2407,7 @@ Neue Felder im Inspector:
 | `EnemyResource` | `IsBoss`, `FixedMods` | Skeleton King: an, Stalwart, Royal Brood, Berserk | Feste Mods statt gewürfelter |
 | `EnemyController`, Gruppe Boss | `BossScale`, `BossXpFactor`, `BossLootRolls`, `BossNameColor`, `BossGoldFactor` | 2, 10, 6, (0,85 / 0,2 / 0,4), 20 | Aussehen und Ertrag der Stufe Boss |
 | `LevelThemeResource` | `Marks` | Schlachthaus: Hand, Fleck, Spritzer, Pentagramm | Spuren des Kreises |
-| `LevelMarkResource` | `Texture`, `Place`, `WidthMeters`, `HeightMeters`, `Chance`, `MaxPerLevel`, `Near`, `MinCenterHeight`, `MaxCenterHeight` | siehe oben | Eine Spur |
+| `LevelMarkResource` | `Texture`, `Place`, `WidthMeters`, `HeightMeters`, `Chance`, `MaxPerLevel`, `Near`, `InCorridors`, `MinCenterHeight`, `MaxCenterHeight` | siehe oben | Eine Spur |
 | `RoomTemplate` | `Role` | Boss-Raum: Boss | Vorlage für die letzte Ebene |
 | `SpawnMarker` im Boss-Raum | `Enemy`, `LevelOffset`, `ScatterRadius` | Skeleton King, 2, 0 | Der Boss steht genau in der Mitte |
 | `BossPortal` | `OpeningSec`, `LightEnergy`, `Pulse` | 1,2 s, 3, 0,5 | Erscheinen und Pulsieren |
@@ -2422,10 +2423,10 @@ Geprüft, alles fehlerfrei:
 | Prüfung | Umfang |
 |---|---|
 | Build | Ohne Fehler und Warnungen |
-| Unit-Tests | 31 neue: Spuren an Mauern und Boden samt Begleitern, Höchstzahl und Seed, Boss-Raum als Ausgang der letzten Ebene und nie als Füllraum, Ebenen mit Boss-Raum für 20 Seeds, Freischaltung des nächsten Kreises, höchstens neun Kreise, Regel der Gitter. Zusammen 1143. |
+| Unit-Tests | 35 neue: Spuren an Mauern und Boden samt Begleitern, Lachen auch in Gängen, Höchstzahl und Seed, Boss-Raum als Ausgang der letzten Ebene und nie als Füllraum, Ebenen mit Boss-Raum für 20 Seeds, Freischaltung des nächsten Kreises, höchstens neun Kreise, Regel der Gitter. Zusammen 1147. |
 | Laufendes Spiel mit Fenster | 45 Schritte mit zwei Seeds: Hub mit neun Portalen, letzte Ebene des Testkreises mit Boss-Raum von 6 x 6 Zellen ohne Kellertür, der Skeleton King mit Stufe Boss, festen Mods, Krone, doppelter Größe und Namensschild auf Level 6, Gitter offen ohne Kollision, vor dem Tor offen, im Raum zu und mit Kollision (der Held kommt nicht hindurch), Balken bei Sicht, Tod des Helden öffnet, Rückkehr schließt, Tod des Bosses schaltet Kreis 2 frei, öffnet die Gitter, zeigt das Portal und die Ansage, das Portal führt vor das Portal des Testkreises, Portal 2 ist offen, im Schlachthaus derselbe Ablauf bis Kreis 3, Portal 3 freigeschaltet ohne Kreis |
 | Neustart headless | 7 Schritte: drei Kreise frei, Portal 2 offen und 3 zu, auf der letzten Ebene kein Boss mehr, Portal von Anfang an, Gitter offen, kein Balken |
-| Kreis 2 | Bilder mit Fenster auf Ebene 1 und 2: Planken, Zement, Hand, Fleck, Spritzer nur neben Flecken, Pentagramm, eine Spur hinter der Mauer öffnet sich gepunktet mit dem Mauerwerk |
+| Kreis 2 | Bilder mit Fenster auf Ebene 1 bis 3 mit zwei Seeds: Planken, Zement, Hand, Fleck, sehr großer Fleck, Spritzer nur neben Flecken, Pentagramm, Lachen in Räumen und Gängen (9 und 8 je Ebene), eine Spur hinter der Mauer öffnet sich gepunktet mit dem Mauerwerk |
 | Bilder | Boss mit Krone und Balken, geschlossenes Gitter, Sieg mit Ansage, Portal, Hub mit zwei offenen Portalen, Boss im Schlachthaus |
 | Spielstand | Die Proben liefen mit eigenem Spielstand und eigenen Einstellungen, die des Users blieben unberührt |
 

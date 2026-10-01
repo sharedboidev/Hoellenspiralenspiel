@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Levels;
@@ -35,6 +36,9 @@ public sealed record MarkRule
 
     //Die Id einer anderen Spur an der Mauer. Gesetzt, erscheint diese Spur nie allein, sondern nur in der Zelle jener Spur und den beiden Nachbarzellen
     public string Near { get; init; } = string.Empty;
+
+    //Nur am Boden: auch in den Zellen der Gänge, nicht nur an den Plätzen, die die Räume anbieten
+    public bool InCorridors { get; init; }
 
     public bool IsCompanion => !string.IsNullOrEmpty(Near);
 }
@@ -76,8 +80,9 @@ public static class MarkPlacer
         return marks;
     }
 
-    //Würfelt je Regel bis zu MaxPerLevel Mal und nimmt jeden Platz höchstens einmal
-    public static List<FloorMark> PlaceOnFloors(int spotCount, IReadOnlyList<MarkRule> rules, IRandomSource random)
+    //Würfelt je Regel bis zu MaxPerLevel Mal und nimmt jeden Platz höchstens einmal. Die Plätze der Räume kommen zuerst,
+    //dahinter die Zellen der Gänge, die nur Regeln mit InCorridors nehmen
+    public static List<FloorMark> PlaceOnFloors(int roomSpotCount, int corridorSpotCount, IReadOnlyList<MarkRule> rules, IRandomSource random)
     {
         ArgumentNullException.ThrowIfNull(rules);
         ArgumentNullException.ThrowIfNull(random);
@@ -85,7 +90,7 @@ public static class MarkPlacer
         var marks = new List<FloorMark>();
         var free  = new List<int>();
 
-        for (var spot = 0; spot < spotCount; spot++)
+        for (var spot = 0; spot < roomSpotCount + corridorSpotCount; spot++)
             free.Add(spot);
 
         for (var index = 0; index < rules.Count; index++)
@@ -97,16 +102,22 @@ public static class MarkPlacer
 
             var tries = Math.Max(1, rule.MaxPerLevel);
 
-            for (var attempt = 0; attempt < tries && free.Count > 0; attempt++)
+            for (var attempt = 0; attempt < tries; attempt++)
             {
+                var allowed = rule.InCorridors ? free.Count : free.Count(spot => spot < roomSpotCount);
+
+                if (allowed == 0)
+                    break;
+
                 if (random.NextFloat() >= rule.Chance)
                     continue;
 
-                var pick = random.NextInt(0, free.Count);
+                var pick = random.NextInt(0, allowed);
+                var spot = rule.InCorridors ? free[pick] : free.Where(candidate => candidate < roomSpotCount).ElementAt(pick);
 
-                marks.Add(new FloorMark(index, free[pick], random.NextFloat() * MathF.Tau));
+                marks.Add(new FloorMark(index, spot, random.NextFloat() * MathF.Tau));
 
-                free.RemoveAt(pick);
+                free.Remove(spot);
             }
         }
 

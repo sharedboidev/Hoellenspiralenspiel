@@ -8,7 +8,7 @@ using Hoellenspiralenspiel.Scripts.Core.Rng;
 namespace Hoellenspiralenspiel.Scripts.World.Levels;
 
 //Verteilt die Spuren eines Themas über eine gebaute Ebene: Bilder an den Mauern und auf dem Boden, gewürfelt aus dem Seed der Ebene.
-//Eine Spur an der Mauer hängt an ihrem Mauerstück und öffnet sich mit ihm
+//Eine Spur an der Mauer hängt an ihrem Mauerstück und öffnet sich mit ihm. Jede Spur heißt nach ihrem Bild und trägt eine laufende Nummer
 public static class LevelMarks
 {
     private const string FloorShaderPath = "res://Shaders/Ps1/ps1_floor_mark.gdshader";
@@ -38,24 +38,47 @@ public static class LevelMarks
 
         level.Root.AddChild(container);
 
-        foreach (var mark in MarkPlacer.PlaceOnWalls(runs, rules, LevelGrid.CellMeters, random))
-            AddWallMark(level, mark, resources[mark.Rule]);
+        var count = 0;
 
-        foreach (var mark in MarkPlacer.PlaceOnFloors(level.FloorSpots.Count, rules, random))
-            AddFloorMark(level, mark, resources[mark.Rule], container);
+        foreach (var mark in MarkPlacer.PlaceOnWalls(runs, rules, LevelGrid.CellMeters, random))
+            AddWallMark(level, mark, resources[mark.Rule], ++count);
+
+        var corridorCells = CollectCorridorCells(level.Layout);
+
+        foreach (var mark in MarkPlacer.PlaceOnFloors(level.FloorSpots.Count, corridorCells.Count, rules, random))
+            AddFloorMark(level, mark, resources[mark.Rule], container, corridorCells, ++count);
+    }
+
+    //Jede Zelle eines Gangs ist ein Platz für Lachen. Räume bieten ihre Plätze selbst an
+    private static List<Cell> CollectCorridorCells(LevelLayout layout)
+    {
+        var cells = new List<Cell>();
+
+        for (var y = 0; y < layout.Height; y++)
+        {
+            for (var x = 0; x < layout.Width; x++)
+            {
+                var cell = new Cell(x, y);
+
+                if (layout.GetKind(cell) == CellKind.Corridor)
+                    cells.Add(cell);
+            }
+        }
+
+        return cells;
     }
 
     private static string NameOf(LevelMarkResource mark)
         => mark.Texture.ResourcePath.GetFile().GetBaseName();
 
-    private static void AddWallMark(BuiltLevel level, WallMark mark, LevelMarkResource resource)
+    private static void AddWallMark(BuiltLevel level, WallMark mark, LevelMarkResource resource, int number)
     {
         var (run, wall) = level.Walls[mark.Run];
         var start       = run.IsAlongX ? level.Grid.GetCorner(mark.Along, run.Line) : level.Grid.GetCorner(run.Line, mark.Along);
         var point       = start + (run.IsAlongX ? Vector3.Right : Vector3.Back) * mark.AlongMeters + Vector3.Up * mark.CenterHeightMeters;
         var local       = wall.GlobalTransform.AffineInverse() * point;
         var side        = mark.IsBefore ? -1f : 1f;
-        var quad        = CreateQuad(WallMarkPrefix + NameOf(resource), resource, WallFade.GetMark(resource.Texture));
+        var quad        = CreateQuad($"{WallMarkPrefix}{NameOf(resource)}_{number}", resource, WallFade.GetMark(resource.Texture));
 
         quad.Position = new Vector3(local.X, local.Y, side * (wall.Thickness / 2f + WallGap));
         quad.Basis    = mark.IsBefore ? new Basis(Vector3.Up, Mathf.Pi) : Basis.Identity;
@@ -63,14 +86,16 @@ public static class LevelMarks
         wall.AddMark(quad, mark.IsBefore);
     }
 
-    private static void AddFloorMark(BuiltLevel level, FloorMark mark, LevelMarkResource resource, Node3D container)
+    private static void AddFloorMark(BuiltLevel level, FloorMark mark, LevelMarkResource resource, Node3D container, List<Cell> corridorCells, int number)
     {
-        var spot = level.FloorSpots[mark.Spot];
-        var quad = CreateQuad(FloorMarkPrefix + NameOf(resource), resource, GetFloorMaterial(resource.Texture));
+        var point = mark.Spot < level.FloorSpots.Count
+                            ? level.FloorSpots[mark.Spot].GlobalPosition
+                            : level.Grid.GetCenter(corridorCells[mark.Spot - level.FloorSpots.Count]);
+        var quad = CreateQuad($"{FloorMarkPrefix}{NameOf(resource)}_{number}", resource, GetFloorMaterial(resource.Texture));
 
         container.AddChild(quad);
 
-        quad.GlobalPosition = WorldScale.OnGround(spot.GlobalPosition) + Vector3.Up * FloorLift;
+        quad.GlobalPosition = WorldScale.OnGround(point) + Vector3.Up * FloorLift;
         quad.GlobalBasis    = new Basis(Vector3.Up, mark.TurnRadians) * new Basis(Vector3.Right, -Mathf.Pi / 2f);
     }
 

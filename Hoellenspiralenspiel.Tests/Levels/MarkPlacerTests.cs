@@ -41,11 +41,14 @@ public class MarkPlacerTests
             MaxPerLevel  = max
         };
 
+    private static MarkRule Pool(float chance = 1f, int max = 8)
+        => Pentagram(chance, max) with { Id = "pool", WidthMeters = 2.2f, HeightMeters = 2.2f, InCorridors = true };
+
     [Test]
     public void OhneRegelnGibtEsKeineSpuren()
     {
         Assert.That(MarkPlacer.PlaceOnWalls([RoomToCorridor], [], Cell, new SeededRandom(1)), Is.Empty);
-        Assert.That(MarkPlacer.PlaceOnFloors(3, [], new SeededRandom(1)), Is.Empty);
+        Assert.That(MarkPlacer.PlaceOnFloors(3, 0, [], new SeededRandom(1)), Is.Empty);
     }
 
     [Test]
@@ -161,7 +164,7 @@ public class MarkPlacerTests
     [Test]
     public void AmBodenNimmtJederPlatzHoechstensEineSpur()
     {
-        var marks = MarkPlacer.PlaceOnFloors(1, [Pentagram(max: 3)], new SeededRandom(1));
+        var marks = MarkPlacer.PlaceOnFloors(1, 0, [Pentagram(max: 3)], new SeededRandom(1));
 
         Assert.That(marks, Has.Count.EqualTo(1));
         Assert.That(marks[0].Spot, Is.EqualTo(0));
@@ -171,7 +174,7 @@ public class MarkPlacerTests
     [Test]
     public void AmBodenGiltDieHoechstzahlJeEbene()
     {
-        var marks = MarkPlacer.PlaceOnFloors(5, [Pentagram(max: 2)], new SeededRandom(1));
+        var marks = MarkPlacer.PlaceOnFloors(5, 0, [Pentagram(max: 2)], new SeededRandom(1));
 
         Assert.That(marks, Has.Count.EqualTo(2));
         Assert.That(marks.Select(mark => mark.Spot).Distinct().Count(), Is.EqualTo(2));
@@ -180,15 +183,54 @@ public class MarkPlacerTests
     [Test]
     public void OhneChanceOderPlaetzeBleibtDerBodenLeer()
     {
-        Assert.That(MarkPlacer.PlaceOnFloors(4, [Pentagram(0f)], new SeededRandom(1)), Is.Empty);
-        Assert.That(MarkPlacer.PlaceOnFloors(0, [Pentagram()], new SeededRandom(1)), Is.Empty);
+        Assert.That(MarkPlacer.PlaceOnFloors(4, 0, [Pentagram(0f)], new SeededRandom(1)), Is.Empty);
+        Assert.That(MarkPlacer.PlaceOnFloors(0, 0, [Pentagram()], new SeededRandom(1)), Is.Empty);
+    }
+
+    [Test]
+    public void OhneGangerlaubnisBleibenDieGaengeFrei()
+    {
+        var marks = MarkPlacer.PlaceOnFloors(2, 10, [Pentagram(max: 5)], new SeededRandom(1));
+
+        Assert.That(marks, Has.Count.EqualTo(2));
+        Assert.That(marks.Select(mark => mark.Spot), Is.All.LessThan(2));
+    }
+
+    [Test]
+    public void LachenLiegenAuchInGaengen()
+    {
+        var marks = MarkPlacer.PlaceOnFloors(2, 10, [Pool()], new SeededRandom(1));
+
+        Assert.That(marks, Has.Count.EqualTo(8));
+        Assert.That(marks.Select(mark => mark.Spot).Distinct().Count(), Is.EqualTo(8));
+        Assert.That(marks.Count(mark => mark.Spot >= 2), Is.GreaterThanOrEqualTo(6));
+    }
+
+    [Test]
+    public void DasPentagrammBekommtSeinenPlatzVorDenLachen()
+    {
+        var marks     = MarkPlacer.PlaceOnFloors(1, 3, [Pentagram(), Pool()], new SeededRandom(1));
+        var pentagram = marks.Where(mark => mark.Rule == 0).ToList();
+        var pools     = marks.Where(mark => mark.Rule == 1).ToList();
+
+        Assert.That(pentagram, Has.Count.EqualTo(1));
+        Assert.That(pentagram[0].Spot, Is.Zero);
+        Assert.That(pools, Has.Count.EqualTo(3));
+        Assert.That(pools.Select(mark => mark.Spot), Is.All.GreaterThanOrEqualTo(1));
+    }
+
+    [Test]
+    public void NurGaengeOhneRaumplaetzeReichenFuerLachen()
+    {
+        Assert.That(MarkPlacer.PlaceOnFloors(0, 4, [Pentagram()], new SeededRandom(1)), Is.Empty);
+        Assert.That(MarkPlacer.PlaceOnFloors(0, 4, [Pool()], new SeededRandom(1)), Has.Count.EqualTo(4));
     }
 
     [Test]
     public void RegelnWirkenNurAnIhremOrt()
     {
-        Assert.That(MarkPlacer.PlaceOnFloors(4, [Hand()], new SeededRandom(1)), Is.Empty);
-        Assert.That(MarkPlacer.PlaceOnFloors(4, [Pentagram() with { Near = "hand" }], new SeededRandom(1)), Is.Empty);
+        Assert.That(MarkPlacer.PlaceOnFloors(4, 0, [Hand()], new SeededRandom(1)), Is.Empty);
+        Assert.That(MarkPlacer.PlaceOnFloors(4, 0, [Pentagram() with { Near = "hand" }], new SeededRandom(1)), Is.Empty);
         Assert.That(MarkPlacer.PlaceOnWalls([RoomToCorridor], [Pentagram()], Cell, new SeededRandom(1)), Is.Empty);
     }
 }
