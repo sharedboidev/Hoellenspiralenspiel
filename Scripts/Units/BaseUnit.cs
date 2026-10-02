@@ -132,10 +132,7 @@ public abstract partial class BaseUnit : CharacterBody3D
 
         Stats.Update(sheet =>
         {
-            sheet.SetBase(CombatStat.HitChance, CombatRules.BaseHitChance);
-            sheet.SetBase(CombatStat.CriticalDamage, CombatRules.BaseCriticalDamage);
-            sheet.SetBase(CombatStat.BlockReduction, CombatRules.BaseBlockReduction);
-            sheet.SetBase(CombatStat.ProjectileCount, 1);
+            UnitBaseValues.Apply(sheet);
 
             ApplyBaseValues(sheet);
         });

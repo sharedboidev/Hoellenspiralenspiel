@@ -333,7 +333,7 @@ public partial class EnemyController : Node
 
     public Enemy Spawn(EnemyResource definition, SpawnArea area, string spawnGroup, int level, int modCount = 0)
     {
-        var traits = new MonsterTraits(level, definition.UsesProjectiles);
+        var traits = new MonsterTraits(level, definition.Core.UsesProjectiles);
         var mods   = MonsterModRoller.Pick(MonsterModLibrary.Pool, modCount, traits, GameRandom.Shared)
                                      .Select(mod => MonsterModLibrary.Find(mod.Id))
                                      .ToList();

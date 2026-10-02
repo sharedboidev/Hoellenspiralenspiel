@@ -4,13 +4,11 @@ using System.Linq;
 using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Resources.Enemies;
-using Hoellenspiralenspiel.Resources.Items;
 using Hoellenspiralenspiel.Resources.MonsterMods;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Enemies;
-using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Stats;
@@ -189,34 +187,13 @@ public partial class Enemy : BaseUnit
             return;
         }
 
-        brain = new EnemyBrain(Definition.ToBehaviour());
+        var core = Definition.Core;
 
-        WieldWeapon(Definition.WieldedWeapon);
+        brain                 = new EnemyBrain(core.Behaviour);
+        weapon                = EnemyStats.GetWeapon(core, Level);
+        weaponProjectileScene = Definition.WieldedWeapon?.ProjectileScene;
 
-        sheet.SetBase(CombatStat.Strength, EnemyScaling.GetAttribute(Definition.Strength, Definition.StrengthPerLevel, Level));
-        sheet.SetBase(CombatStat.Dexterity, EnemyScaling.GetAttribute(Definition.Dexterity, Definition.DexterityPerLevel, Level));
-        sheet.SetBase(CombatStat.Intelligence, EnemyScaling.GetAttribute(Definition.Intelligence, Definition.IntelligencePerLevel, Level));
-        sheet.SetBase(CombatStat.Constitution, EnemyScaling.GetAttribute(Definition.Constitution, Definition.ConstitutionPerLevel, Level));
-        sheet.SetBase(CombatStat.Awareness, EnemyScaling.GetAttribute(Definition.Awareness, Definition.AwarenessPerLevel, Level));
-        sheet.SetBase(CombatStat.Life, Definition.LifeBonus);
-        sheet.SetBase(CombatStat.Movementspeed, Definition.Movementspeed);
-        sheet.SetBase(CombatStat.Armor, Definition.Armor);
-        sheet.SetBase(CombatStat.Dodge, Definition.Dodge);
-        sheet.SetBase(CombatStat.FireResistance, Definition.FireResistance);
-        sheet.SetBase(CombatStat.FrostResistance, Definition.FrostResistance);
-        sheet.SetBase(CombatStat.LightningResistance, Definition.LightningResistance);
-
-        foreach (var item in Definition.Equipment.Where(item => item is not null))
-            sheet.AddModifiers(new ItemInstance(item.Definition, Level).GetEquipModifiers());
-
-        foreach (var mod in mods)
-            sheet.AddModifiers(mod.Definition.GetStampedModifiers());
-    }
-
-    private void WieldWeapon(WeaponBaseResource wieldedWeapon)
-    {
-        weapon                = wieldedWeapon is null ? Definition.NaturalWeapon : new ItemInstance(wieldedWeapon.Definition, Level).ToWeaponProfile();
-        weaponProjectileScene = wieldedWeapon?.ProjectileScene;
+        EnemyStats.Apply(sheet, core, Level, mods.Select(mod => mod.Definition));
     }
 
     //Alle Teile blenden am Rand der Sicht ein. Der Körper bekommt dazu sein eigenes Material, sonst färbte das Ausholen alle Gegner dieser Szene

@@ -7,13 +7,13 @@ Die Rückmeldungen aus dem Spielen von Etappe 3 sind am selben Tag auf `master_P
 Eine zweite Runde Rückmeldungen zu Etappe 3 ist am selben Tag auf `master_PlaytestFeedback3` gebaut: Umriss für alles Benutzbare, Blick zur Maus, Schlag und Zauber binden den Helden, Kaufen per Rechtsklick und der Vergleich oben bündig.
 Etappe 4 ist am 01.10.2026 auf `master_BossAndUnlock` gebaut und liegt seit demselben Tag auf `master`: der Skeleton King als Platzhalter-Boss mit Krone und Boss-Raum, die Freischaltung des nächsten Kreises und das Schlachthaus als Platzhalter für Kreis 2 mit neuen Texturen und Blutspuren. Auf demselben Branch kamen nach dem Spielen das ruhigere Bild des PS1-Looks und die Sichtlinie der Mauern dazu, beide ebenfalls auf `master`.
 Die Renderskalierung ist aus M9 vorgezogen und am 01.10.2026 als M7.5 auf `master_RenderScaling` gebaut und liegt seit demselben Tag auf `master`: Die Welt rendert im Raster der PS1 statt in voller Fenstergröße.
-M8 ist am 02.10.2026 geplant und läuft in 20 Etappen, siehe dort. Etappe 1 ist am selben Tag auf `master_CirclesAndTestPortal` gebaut und liegt seit demselben Tag auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal des Hubs, der Inhaltsstand eines Kreises im Spielstand.
+M8 ist am 02.10.2026 geplant und läuft in 20 Etappen, siehe dort. Etappe 1 ist am selben Tag auf `master_CirclesAndTestPortal` gebaut und liegt seit demselben Tag auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal des Hubs, der Inhaltsstand eines Kreises im Spielstand. Etappe 2 ist am selben Tag auf `master_CoreDefinitions` gebaut und liegt noch nicht auf `master`: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests, der mit den echten Resources rechnet.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code samt Szenen. Die Zeilenzahl aus der ersten Analyse, rund 5.500, galt für die 2D-Fassung.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 bis 4 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 bis 4 auch mit Fenster. M7.5 ist randlos und mit Fenster geprüft. Etappe 1 von M8 ist headless und mit Fenster geprüft, dazu der Neustart mit einem Spielstand der Version 4.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 bis 4 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 bis 4 auch mit Fenster. M7.5 ist randlos und mit Fenster geprüft. Etappe 1 von M8 ist headless und mit Fenster geprüft, dazu der Neustart mit einem Spielstand der Version 4. Etappe 2 von M8 ist headless und mit Fenster geprüft, dazu ein Vergleich aller Werte vor und nach dem Umbau.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -162,7 +162,7 @@ Hinweis zu A10: Die alten Testzauber Fireball, Frost Nova und Lightning Strike s
 
 ### 3.4 Balance
 
-Beobachtungen aus den Laufzeitprüfungen von M2 bis M5. Der Balance-Durchgang steht in M8.
+Beobachtungen aus den Laufzeitprüfungen von M2 bis M5. Der Balance-Durchgang steht in M8. Seit Etappe 2 von M8 rechnet ein Kampfsimulator in den Tests diese Werte nach, die Matrix steht dort.
 
 | Nr. | Beobachtung | Stelle |
 |---|---|---|
@@ -2531,7 +2531,7 @@ Bewusst offen gelassen:
 - Die Karte der Oberfläche rendert weiter in 2560 x 1440 und ohne Raster der PS1, wie bisher.
 - Mit Look aus rendert der Viewport in Fenstergröße. Das kostet gegenüber vorher wenige Prozent, weil das Bild einmal mehr kopiert wird. Der Schalter ist nur zum Vergleichen da.
 
-### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L, geplant am 02.10.2026, Etappe 1 umgesetzt am selben Tag auf `master_CirclesAndTestPortal`)
+### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L, geplant am 02.10.2026, Etappe 1 umgesetzt am selben Tag auf `master_CirclesAndTestPortal`, Etappe 2 am selben Tag auf `master_CoreDefinitions`)
 
 Ziel: ein Kreis in Endqualität als Vorlage für alle weiteren. Der Kreis ist Wollust, der zweite Kreis aus dem Designdokument: "Strafe: ewiger Sturm/Umherwirbeln".
 
@@ -2557,7 +2557,7 @@ M8 läuft in 20 Etappen, jede für sich mergefähig, jede lässt `master` spielb
 | Etappe | Inhalt | Größe | Stand |
 |---|---|---|---|
 | 1 | Kreise umsortieren: Schlachthaus als Testkreis am zehnten Portal, Wollust als Kreis 2, Inhaltsstand im Spielstand | S | Umgesetzt am 02.10.2026 auf `master_CirclesAndTestPortal`, liegt seit demselben Tag auf `master` |
-| 2 | Kern-Definitionen für Gegner und Held, Kampfsimulation in den Tests | S | Offen |
+| 2 | Kern-Definitionen für Gegner und Held, Kampfsimulation in den Tests | S | Umgesetzt am 02.10.2026 auf `master_CoreDefinitions` |
 | 3a | Freie Flächen I: der Generator im Kern | M | Offen |
 | 3b | Freie Flächen II: Aufbau in Godot, Kette der Flächen, Karte, Spielstand | M | Offen |
 | 4 | Der Sturm: Grundwind, Böen, Windschatten im Lee, Drift der Projektile, Streifen | M | Offen |
@@ -2639,6 +2639,104 @@ Bewusst offen gelassen:
 - Es kann nur einen Testkreis geben. Ein zweiter bräuchte eine eigene Nummer unter null oder eine Id am Portal.
 - Der Händler zählt den Testkreis mit, wenn er das erreichte Bereichslevel bestimmt. Das Schlachthaus hat dieselben Bereichslevel wie Wollust, das ändert nichts.
 - Die älteren Bilder der README zeigen den Hub mit neun Portalen.
+
+#### Etappe 2: Kern-Definitionen und Kampfsimulation
+
+Umgesetzt am 02.10.2026 auf `master_CoreDefinitions`, abgezweigt von `ba2b79e`.
+
+- Erledigt: Die Grundwerte der Gegner entstehen im Kern. `EnemyDefinition` hält alles, was ein `EnemyResource` sagt, außer der Szene und den Auslösern der Mods. `EnemyStats.Apply` setzt Attribute und Grundwerte auf einem Level und legt Ausrüstung und Mods an, `EnemyStats.GetWeapon` liefert die geführte oder die natürliche Waffe.
+- Erledigt: Die Grundwerte des Helden entstehen im Kern, `HeroBaseValues`. Manaregeneration, Dodge und Lichtradius standen bisher fest im Code und sind jetzt Felder am Helden.
+- Erledigt: Ein Kampfsimulator in den Tests. Ein Angreifer schlägt auf einen Verteidiger ein, der stillhält, bis dieser fällt. Gerechnet wird wie im Spiel mit `HitResolver`, `AttackCycle`, `StatusEffectTracker`, Lebensregeneration, Abklingzeiten und Mana, in Schritten der Physik. Ergebnis sind Sekunden und Schläge bis zum Tod.
+- Erledigt: Die Matrix druckt ein expliziter Test, breite Bänder laufen als echte Tests.
+- Zusätzlich: `UnitBaseValues` setzt die Werte, die jede Einheit hat: Trefferchance 100, Krit-Schaden 50, Blockminderung 50, ein Projektil. Bisher standen sie in `BaseUnit`. So baut der Simulator dasselbe Blatt wie das Spiel.
+- Zusätzlich: Die Tests lesen die Resources des Spiels. Ein kleiner Leser für `.tres` baut Gegner, Waffen, Rüstungen, Skills und Mods, damit Matrix und Bänder mit den echten Zahlen rechnen. Ein neuer Gegner unter `Resources/Enemies` steht von selbst in der Matrix.
+- Kein Verhalten ändert sich. Alle Werte von Held und Gegnern sind vor und nach dem Umbau gleich, gemessen im laufenden Spiel.
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Skills in der Definition | Als `SkillDefinition` statt nur als Ids. Die Definition trägt die Id ohnehin, und der Simulator braucht Schaden, Kosten und Abklingzeit. Damit rechnet auch `UsesProjectiles` im Kern |
+| Feste Mods | Als `MonsterModDefinition`, also mit ihren Modifiern. Auslöser und Aktionen bleiben in Godot |
+| Attribute | Je Attribut ein `AttributeGrowth` aus dem Wert auf Level 1 und dem Wachstum je Level |
+| Ohne Id | `EnemyDefinition` bricht bei leerer Id nicht ab, anders als die Definitionen von Mods, Items und Skills. Ein Gegner ohne Id lief bisher und soll nicht beim Spawnen scheitern. Sein Name ist dann die Id |
+| Leben | Der Plan nannte 49 Leben für das Skelett auf Level 1 und 59 für einen neuen Helden. Im Spiel sind es 50 und 60, weil Konstitution 1 das Leben um gut 2 % verstärkt. Die Tests prüfen die Werte aus dem Spiel |
+| Takt | Schritte von 1/60 s wie die Physik. Je Handlung höchstens ein Schritt Versatz, wie beim Gegner im Spiel, der nach dem Erholen erst im nächsten Schritt wieder ausholt |
+| Held in der Matrix | Level N mit N − 1 Punkten, abwechselnd auf Stärke und Konstitution, mit dem Trainingsschwert wie ein neuer Charakter. Mit einem Zauber wirkt er ihn, solange das Mana reicht, sonst schlägt er |
+| Bänder | Breit, sie fangen grobe Fehler und lassen Etappe 12 Raum: Held Level 1 gegen Skelett Level 1 in 2 bis 15 s, Skelett gegen neuen Helden 8 bis 40 s, Skeleton King Level 7 gegen das Schwert eines Helden Level 7 30 bis 300 s, jeder Gegner fällt auf Level 1 durch das Schwert |
+
+So funktioniert es:
+
+- `EnemyResource.Core` baut die `EnemyDefinition` beim ersten Zugriff, wie `MonsterModResource.Definition`. `Enemy.ApplyBaseValues` holt Gehirn, Waffe und Werte daraus. Die Szene des Projektils bleibt an der Resource. `NaturalWeapon`, `ToBehaviour` und `UsesProjectiles` an der Resource entfallen, `EnemyController` fragt `Core.UsesProjectiles`.
+- `Hero.BaseValues` baut `HeroBaseValues` aus den Feldern, `Hero.ApplyBaseValues` legt sie an.
+- `BaseUnit._Ready` ruft erst `UnitBaseValues.Apply`, dann `ApplyBaseValues`.
+- Unter `Hoellenspiralenspiel.Tests/Balance/`: `TresFile` liest eine `.tres`, `GameData` baut daraus Definitionen, `Fighter` beschreibt Held oder Gegner und baut je Kampf ein frisches Blatt, `FightSimulator.Run` rechnet einen Kampf, `Summarize` mittelt über Seeds. `BalanceReportTests` hält Matrix und Bänder.
+
+Neue Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| `Hero` | `Manaregeneration` | 0,5 | Mana je Sekunde vor Ausrüstung |
+| `Hero` | `Dodge` | 6 | Ausweichen in Prozent, bevor Geschick es verstärkt |
+| `Hero` | `LightRadius` | 100 | Lichtradius in Prozent des Lichts, das die Szene dem Helden mitgibt |
+
+So druckt man die Matrix:
+
+```bash
+dotnet test Hoellenspiralenspiel.Tests --filter "FullyQualifiedName~Matrix_Drucken" --logger "console;verbosity=detailed"
+```
+
+So rechnet ein Test einen eigenen Kampf: `FightSimulator.Summarize(BalanceReportTests.HeroAt(5, GameData.PlayerSkill("fireball")), Fighter.Enemy(GameData.Enemy("skeleton"), 5))`. Ohne Angabe kämpft ein Boss mit seinen festen Mods, wie im Spiel.
+
+Die Matrix zum Stand dieser Etappe, Mittel aus 200 Seeds, in Klammern der kürzeste und der längste Kampf:
+
+| Gegner | Leben | Held tötet mit Schwert | mit Fireball | mit Frost Nova | mit Thunderbolt | Gegner tötet Helden |
+|---|---|---|---|---|---|---|
+| Blue Blob 1 | 9 | 1,1 s (0,4 bis 2,5), 2,1 Schläge | 0,2 s (0,2 bis 1,1) | 0,6 s (0,2 bis 1,9) | 0,3 s (0,2 bis 1,9) | 38,2 s (30,1 bis 50,2) |
+| Blue Blob 3 | 17 | 2,1 s (1,1 bis 4,4), 3,5 Schläge | 0,2 s (0,2 bis 1,1) | 1,5 s (0,2 bis 3,6) | 0,3 s (0,2 bis 3,3) | 115,7 s (79,8 bis 180,4) |
+| Blue Blob 5 | 25 | 3,2 s (1,8 bis 6,0), 5,1 Schläge | 0,2 s (0,2 bis 1,1) | 2,3 s (1,3 bis 5,2) | 0,3 s (0,2 bis 4,7) | 123,2 s (88,1 bis 187,5) |
+| Blue Blob 7 | 34 | 4,5 s (2,5 bis 7,4), 7,0 Schläge | 0,2 s (0,2 bis 1,1) | 3,3 s (1,9 bis 6,5) | 0,3 s (0,2 bis 6,1) | nie |
+| Skeleton 1 | 50 | 4,7 s (3,2 bis 7,4), 7,2 Schläge | 0,2 s (0,2 bis 1,1) | 1,4 s (0,2 bis 3,6) | 0,3 s (0,2 bis 6,1) | 14,6 s (11,6 bis 27,0) |
+| Skeleton 3 | 58 | 5,7 s (3,9 bis 8,4), 8,6 Schläge | 0,3 s (0,2 bis 1,5) | 1,7 s (0,2 bis 4,7) | 0,3 s (0,2 bis 6,7) | 20,2 s (15,3 bis 38,7) |
+| Skeleton 5 | 67 | 7,1 s (5,3 bis 11,6), 10,6 Schläge | 0,5 s (0,2 bis 1,5) | 2,0 s (0,2 bis 4,7) | 0,4 s (0,2 bis 6,7) | 21,6 s (16,5 bis 39,5) |
+| Skeleton 7 | 75 | 8,6 s (6,7 bis 15,1), 12,8 Schläge | 0,6 s (0,2 bis 1,5) | 2,3 s (0,2 bis 4,7) | 0,4 s (0,2 bis 6,7) | 32,4 s (22,4 bis 52,8) |
+| Skeleton King 1 (Stalwart, Royal Brood, Berserk) | 460 | 43,6 s (37,9 bis 50,9), 62,7 Schläge | 6,9 s (2,6 bis 13,8) | 21,5 s (14,3 bis 28,7) | 4,8 s (0,2 bis 20,9) | 7,5 s (5,0 bis 13,8) |
+| Skeleton King 3 (Stalwart, Royal Brood, Berserk) | 484 | 57,7 s (49,4 bis 69,0), 82,9 Schläge | 8,0 s (3,2 bis 14,3) | 26,3 s (18,3 bis 34,6) | 5,5 s (0,2 bis 22,9) | 8,9 s (5,1 bis 22,6) |
+| Skeleton King 5 (Stalwart, Royal Brood, Berserk) | 509 | 82,5 s (66,9 bis 104,0), 118,3 Schläge | 9,6 s (4,7 bis 16,6) | 32,7 s (22,3 bis 46,4) | 6,3 s (0,2 bis 27,8) | 9,3 s (6,1 bis 24,1) |
+| Skeleton King 7 (Stalwart, Royal Brood, Berserk) | 536 | 111,7 s (90,7 bis 139,0), 160,1 Schläge | 11,4 s (6,5 bis 18,3) | 39,1 s (26,3 bis 58,3) | 7,2 s (1,3 bis 30,3) | 11,1 s (6,6 bis 28,5) |
+| Test Enemy 1 | 263 | 20,7 s (16,5 bis 25,4), 30,1 Schläge | 2,0 s (1,1 bis 6,5) | 9,0 s (4,7 bis 14,3) | 1,6 s (0,2 bis 12,1) | 17,2 s (13,1 bis 26,6) |
+| Test Enemy 3 | 270 | 23,1 s (18,4 bis 28,4), 33,6 Schläge | 2,1 s (1,1 bis 6,5) | 9,9 s (5,9 bis 16,3) | 1,8 s (0,2 bis 13,5) | 24,9 s (17,8 bis 42,9) |
+| Test Enemy 5 | 278 | 24,1 s (19,3 bis 29,1), 34,9 Schläge | 2,2 s (1,1 bis 6,5) | 10,4 s (6,5 bis 17,7) | 1,9 s (0,2 bis 14,8) | 26,2 s (19,4 bis 44,5) |
+| Test Enemy 7 | 286 | 27,5 s (21,4 bis 33,3), 39,8 Schläge | 2,5 s (1,5 bis 6,5) | 11,5 s (6,5 bis 18,3) | 2,0 s (0,2 bis 14,8) | 44,5 s (28,8 bis 66,4) |
+| Yellow Blob 1 | 76 | 6,6 s (5,3 bis 9,5), 10,0 Schläge | 0,6 s (0,2 bis 1,5) | 2,2 s (0,2 bis 4,7) | 1,4 s (0,2 bis 6,7) | 25,4 s (19,4 bis 38,4) |
+| Yellow Blob 3 | 85 | 7,9 s (6,0 bis 12,3), 11,8 Schläge | 0,7 s (0,2 bis 1,5) | 2,5 s (1,3 bis 4,7) | 1,9 s (0,2 bis 6,7) | 46,9 s (34,8 bis 69,1) |
+| Yellow Blob 5 | 93 | 9,3 s (7,4 bis 15,1), 13,8 Schläge | 0,7 s (0,2 bis 1,5) | 2,8 s (1,3 bis 5,2) | 2,3 s (0,2 bis 7,9) | 49,8 s (37,2 bis 71,5) |
+| Yellow Blob 7 | 102 | 11,4 s (8,1 bis 18,6), 16,8 Schläge | 0,7 s (0,2 bis 1,5) | 3,2 s (1,3 bis 6,5) | 2,9 s (0,2 bis 10,0) | 217,4 s (116,5 bis 386,3) |
+
+Was die Matrix zeigt, als Ausgangspunkt für Etappe 12:
+
+- Fireball und Thunderbolt töten jeden gewöhnlichen Gegner mit dem ersten Treffer, den Skeleton King in 7 bis 11 Sekunden statt in bis zu zwei Minuten mit dem Schwert. Das bestätigt B5.
+- Ein Blue Blob hat auf Level 1 nur 9 Leben, und ab Level 7 regeneriert der Held schneller, als ein Blue Blob ihn verletzt. Das passt zu B9 und B12.
+- Der Skeleton King tötet einen Helden auf gleichem Level in 7 bis 11 Sekunden, der Held braucht mit dem Schwert 44 bis 112. Im offenen Schlagabtausch mit dem Schwert verliert der Held deutlich.
+- Die Zeit, die ein Gegner für den Helden braucht, wächst mit dem Level oft schneller als die umgekehrte, weil der Held Konstitution verteilt und regeneriert.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Unit-Tests | 33 neue: Leben, Wachstum, Resistenz, Mods, Ausrüstung, natürliche Waffe und Projektile der Gegner im Kern; Leben, Mana, Grundwerte und Attribute des Helden, die Werte jeder Einheit; der Simulator mit gleichem Seed, festem Schaden im Takt, Regeneration, Bleed, Zeitlimit, Mana und Rückfall aufs Schwert; der Leser mit allen Gegnern im Ordner, dem Leben sechs gespawnter Gegner aus dem Spiel, Fire Spit, den festen Mods des Kings und dem Trainingsschwert; die vier Bänder. Zusammen 1202, dazu die Matrix als expliziter Test |
+| Laufendes Spiel, headless | 153 Schritte: sieben selbst gespawnte Gegner (Skelett auf Level 1, 4 mit Hasted und Swift, und 6, Blue Blob 1, Yellow Blob 3 mit Stalwart, Testgegner 5, Skeleton King 7 mit seinen festen Mods) und 40 Gegner, die das Spiel im Testgelände aus seinen Markern spawnt, darunter Elite und Rare Elite: alle 32 Stats gleich `EnemyStats.Apply` auf einem frischen Blatt, Leben und Waffe gleich. Der Held: Grundwerte gleich `HeroBaseValues`, neue Felder mit 0,5, 6 und 100 |
+| Vorher und nachher | Dieselbe Probe schrieb vor dem Umbau auf `master` alle 32 Stats, Leben, Mana und Waffe des Helden und der sieben Gegner in eine Datei mit 272 Zeilen. Nach dem Umbau ist die Datei byte-gleich, headless und mit Fenster |
+| Mit Fenster | Dieselben 153 Schritte zweimal |
+| Spielstand | Die Proben liefen mit eigenem Spielstand und eigenen Einstellungen, die des Users blieben unberührt |
+
+Bewusst offen gelassen:
+
+- Der Simulator kennt keine Laufwege, keine Flugzeit von Projektilen, keine Verzögerung von Flächen wie Meteor und Thunderbolt, keine Gabelung des Feuerballs und keine Fächer. Jede Handlung trifft das eine Ziel genau einmal. Von den Mods zählen nur die Modifier, Berserk und Beschwörungen fehlen. Der Verteidiger hält still. Ein Duell, in dem beide schlagen, kommt, wenn Etappe 12 es braucht.
+- Die Standardwerte von Items und Skills, die in einer `.tres` fehlen, stehen im Leser noch einmal, weil die Resource-Klassen Godot brauchen. Ändert sich ein Standard dort, muss er im Leser mit. Für Gegner nimmt der Leser die Standards von `EnemyDefinition`, aus der auch die Resource baut.
+- `Enemy` liest Takt, Reichweite und Rückweg weiter an der Resource. Es sind dieselben Werte wie im Kern, den Takt je Skill zieht Etappe 8a ohnehin in den Kern.
+- Beim ersten Lauf mit Fenster beendete die Probe das Spiel mitten in der Reise ins Testgelände, und Godot stürzte beim Beenden ab ("Leaked unsafe reference" zu einem `NavigationMesh`). Mit abgewarteter Reise lief alles sauber. Der Umbau berührt weder Reise noch Navigation, das Beenden während einer Reise ist aber ein eigener Befund.
 
 ### M9: Inhalt und Politur (L, fortlaufend)
 

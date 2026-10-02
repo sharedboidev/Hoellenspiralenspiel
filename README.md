@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-1112_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-1202_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -459,7 +459,7 @@ Das Mausrad wirkt immer.
 
 ### 🚧 Noch nicht enthalten
 
-- Balance für Gold, Preise und den Boss, alle Werte sind geschätzt
+- Balance für Gold, Preise und den Boss, alle Werte sind geschätzt. Ein Kampfsimulator in den Tests rechnet die Kämpfe seit M8 Etappe 2 mit den echten Werten nach
 - Töne für Gold, Truhe, Händler, Gitter und Boss
 - Ein Höllenkreis in Endqualität, bisher gibt es das Testthema, das Schlachthaus als Testlevel und Wollust als Hülle, die das Schlachthaus erbt
 - Ein echter Boss mit eigenem Modell, der Skeleton King ist ein Platzhalter aus dem Skelett
@@ -543,7 +543,7 @@ flowchart LR
 | ✅ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
 | ✅ | **M7** Hub | Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal, Pausenmenü, Ladebildschirm, Einstellungen, Hud an Ankern, Gold, Truhe, Händler, Platzhalter-Boss mit Boss-Raum und Freischaltung des nächsten Kreises. Etappe 4 liegt seit dem 01.10.2026 auf `master`, dazu der ruhigere PS1-Look und die Sichtlinie der Mauern | mittel |
 | ✅ | **M7.5** Renderskalierung | Vorgezogen aus M9: Die Welt rendert im Raster der PS1 statt in voller Fenstergröße, gebaut am 01.10.2026 auf `master_RenderScaling`, seit demselben Tag auf `master` | klein |
-| 🔨 | **M8** Höllenkreis | Wollust als kompletter Kreis in Endqualität: freie Flächen hintereinander, Dungeons per Ladezone, Sturm mit Windschatten, sechs Gegnertypen, Minos als Boss, Events, alle 16 Slots mit Item-Basen, Affixe nach der Slot-Tabelle, Balance, Ton und Musik. Etappe 1 von 20 liegt seit dem 02.10.2026 auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal, der Inhaltsstand im Spielstand | groß |
+| 🔨 | **M8** Höllenkreis | Wollust als kompletter Kreis in Endqualität: freie Flächen hintereinander, Dungeons per Ladezone, Sturm mit Windschatten, sechs Gegnertypen, Minos als Boss, Events, alle 16 Slots mit Item-Basen, Affixe nach der Slot-Tabelle, Balance, Ton und Musik. Etappe 1 von 20 liegt seit dem 02.10.2026 auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal, der Inhaltsstand im Spielstand. Etappe 2 ist am selben Tag auf `master_CoreDefinitions` gebaut: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
 | 💤 | **M10** Koop | Optional, baut auf Kern und Seeds auf | groß |
 
@@ -599,6 +599,12 @@ godot --headless --path . --import
 dotnet test Hoellenspiralenspiel.Tests
 ```
 
+Die Kampfmatrix aus dem Simulator, Held gegen jeden Gegner auf Level 1 bis 7, druckt ein expliziter Test:
+
+```bash
+dotnet test Hoellenspiralenspiel.Tests --filter "FullyQualifiedName~Matrix_Drucken" --logger "console;verbosity=detailed"
+```
+
 ---
 
 ## 🧱 Aufbau des Projekts
@@ -607,12 +613,12 @@ dotnet test Hoellenspiralenspiel.Tests
 Hoellenspiralenspiel
 ├── Scripts
 │   ├── Core            Spiellogik ohne Godot, vollständig getestet
-│   │   ├── Stats       Stat-Blatt, Rechenregeln, abgeleitete Werte
+│   │   ├── Stats       Stat-Blatt, Rechenregeln, abgeleitete Werte, Grundwerte des Helden und jeder Einheit
 │   │   ├── Combat      Trefferauflösung, Schadensarten, Statuseffekte, Angriffstakt
 │   │   ├── Skills      Skill-Definition, Abklingzeiten, Kosten, Belegung der Leiste
 │   │   ├── Items       Item-Basis und Instanz, Inventar-Raster, Ausrüstung, Truhe, Affixe, Beute, Reihenfolge der Itemtypen
 │   │   ├── Economy     Gold, Gold von Gegnern, Stufen des Münzhaufens, Preise, Händler und Handel, Eingabe im Goldfeld
-│   │   ├── Enemies     Zustandsmaschine, Seltenheit bis zum Boss, Wahl der Mods, Wachstum mit dem Level
+│   │   ├── Enemies     Definition und Grundwerte der Gegner, Zustandsmaschine, Seltenheit bis zum Boss, Wahl der Mods, Wachstum mit dem Level
 │   │   ├── Navigation  Takt für die Pfadsuche
 │   │   ├── Spatial     Raster für die Suche nach Einheiten, freie Plätze für Gegner und Beutel, Stapeln der Schilder
 │   │   ├── Levels      Generator für Ebenen, Grundriss, Raumvorlagen, Erkundung, Reise durch die Kreise, Regel für freie Sicht durch Mauern, Spuren an Mauern und Boden, Gitter des Boss-Raums, Freischaltung des nächsten Kreises
@@ -641,7 +647,7 @@ Hoellenspiralenspiel
 ├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Gegner, Monster-Mods, Themen der Ebenen samt Spuren, Themes
 ├── Interfaces          Schnittstellen, darunter IHero zwischen Held und Oberfläche
 ├── Enums               Gemeinsame Aufzählungen
-├── Hoellenspiralenspiel.Tests   Unit-Tests mit NUnit
+├── Hoellenspiralenspiel.Tests   Unit-Tests mit NUnit, unter Balance ein Kampfsimulator, der die Resources des Spiels liest
 ├── default_bus_layout.tres      Busse für den Ton: Master, Music, Effects
 └── docs                Roadmap, Analyse und der Vergleich von 2D und 3D
 ```

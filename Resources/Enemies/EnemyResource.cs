@@ -6,7 +6,6 @@ using Hoellenspiralenspiel.Resources.MonsterMods;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Enemies;
-using Hoellenspiralenspiel.Scripts.Core.Skills;
 
 namespace Hoellenspiralenspiel.Resources.Enemies;
 
@@ -153,25 +152,39 @@ public partial class EnemyResource : Resource
 
     public WeaponBaseResource WieldedWeapon => Equipment.OfType<WeaponBaseResource>().FirstOrDefault();
 
-    public bool UsesProjectiles
+    //Die Definition entsteht beim ersten Zugriff. Wer danach Werte der Resource ändert, sieht davon nichts
+    public EnemyDefinition Core => field ??= new EnemyDefinition(Id, DisplayName)
     {
-        get
-        {
-            var hasRangedWeapon = WieldedWeapon?.ProjectileScene is not null;
-
-            return Skills.Any(skill => skill is not null &&
-                                       (skill.Delivery == SkillDelivery.Projectile ||
-                                        (skill.Delivery == SkillDelivery.Weapon && hasRangedWeapon))) ||
-                   (Skills.Count == 0 && hasRangedWeapon);
-        }
-    }
-
-    public WeaponProfile NaturalWeapon => new(DamageMin, DamageMax, 1f, CriticalHitChance, DamageType, AttackRange);
-
-    public EnemyBehaviour ToBehaviour()
-        => new()
-        {
-            AggroRange   = AggroRange,
-            ChaseTimeSec = ChaseTimeSec
-        };
+        LevelOffset         = LevelOffset,
+        Xp                  = Xp,
+        GoldMin             = GoldMin,
+        GoldMax             = GoldMax,
+        LootTableId         = LootTableId ?? string.Empty,
+        Strength            = new AttributeGrowth(Strength, StrengthPerLevel),
+        Dexterity           = new AttributeGrowth(Dexterity, DexterityPerLevel),
+        Intelligence        = new AttributeGrowth(Intelligence, IntelligencePerLevel),
+        Constitution        = new AttributeGrowth(Constitution, ConstitutionPerLevel),
+        Awareness           = new AttributeGrowth(Awareness, AwarenessPerLevel),
+        LifeBonus           = LifeBonus,
+        Movementspeed       = Movementspeed,
+        Armor               = Armor,
+        Dodge               = Dodge,
+        FireResistance      = FireResistance,
+        FrostResistance     = FrostResistance,
+        LightningResistance = LightningResistance,
+        Equipment           = Equipment.Where(item => item is not null).Select(item => item.Definition).ToArray(),
+        DamageMin           = DamageMin,
+        DamageMax           = DamageMax,
+        DamageType          = DamageType,
+        CriticalHitChance   = CriticalHitChance,
+        Skills              = Skills.Where(skill => skill is not null).Select(skill => skill.Definition).ToArray(),
+        AttackRange         = AttackRange,
+        AttackWindupSec     = AttackWindupSec,
+        AttackRecoverySec   = AttackRecoverySec,
+        Behaviour           = new EnemyBehaviour { AggroRange = AggroRange, ChaseTimeSec = ChaseTimeSec },
+        ReturnSpeedFactor   = ReturnSpeedFactor,
+        HomeRadius          = HomeRadius,
+        IsBoss              = IsBoss,
+        FixedMods           = FixedMods.Where(mod => mod is not null).Select(mod => mod.Definition).ToArray()
+    };
 }

@@ -1,0 +1,85 @@
+using System.Linq;
+using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Enemies;
+using Hoellenspiralenspiel.Scripts.Core.Items;
+using Hoellenspiralenspiel.Scripts.Core.Skills;
+using Hoellenspiralenspiel.Scripts.Core.Stats;
+using NUnit.Framework;
+
+namespace Hoellenspiralenspiel.Tests.Balance;
+
+[TestFixture]
+public class GameDataTests
+{
+    [Test]
+    public void JederGegnerImOrdner_LaesstSichLesen()
+    {
+        var enemies = GameData.AllEnemies();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(enemies, Is.Not.Empty);
+            Assert.That(enemies.Select(enemy => enemy.Id), Is.All.Not.Empty);
+            Assert.That(enemies.Select(enemy => enemy.Id), Is.Unique);
+        });
+    }
+
+    //Die Leben las die Laufzeitprüfung der Etappe 2 von M8 an gespawnten Gegnern im Spiel ab
+    [TestCase("skeleton", 1, "", 50)]
+    [TestCase("skeleton", 6, "", 71)]
+    [TestCase("blue_blob", 1, "", 9)]
+    [TestCase("yellow_blob", 3, "stalwart", 136)]
+    [TestCase("test_enemy", 5, "", 278)]
+    [TestCase("skeleton_king", 7, null, 536)]
+    public void GeleseneGegner_HabenDasLebenAusDemSpiel(string id, int level, string modId, int expectedLife)
+    {
+        var enemy = GameData.Enemy(id);
+        var mods  = modId is null ? null : modId.Length == 0 ? [] : new[] { GameData.PoolMod(modId) };
+
+        Assert.That(Fighter.Enemy(enemy, level, mods).CreateStats().GetFinalWhole(CombatStat.Life), Is.EqualTo(expectedLife));
+    }
+
+    [Test]
+    public void Testgegner_SpucktFeuerAlsProjektil()
+    {
+        var enemy = GameData.Enemy("test_enemy");
+        var spit  = enemy.Skills.Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(spit.Id, Is.EqualTo("fire_spit"));
+            Assert.That(spit.Spell, Is.EqualTo(new SpellDefinition("Fire Spit", 3, 6, DamageType.Fire, 5)));
+            Assert.That(spit.Delivery, Is.EqualTo(SkillDelivery.Projectile));
+            Assert.That(enemy.UsesProjectiles, Is.True);
+        });
+    }
+
+    [Test]
+    public void SkeletonKing_IstBossMitDreiFestenMods_UndStalwartGibt60ProzentMehrLeben()
+    {
+        var king = GameData.Enemy("skeleton_king");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(king.IsBoss, Is.True);
+            Assert.That(king.FixedMods.Select(mod => mod.Id), Is.EqualTo(new[] { "stalwart", "royal_brood", "berserk" }));
+            Assert.That(king.FixedMods[0].Modifiers.Single(), Is.EqualTo(new CombatStatModifier(CombatStat.Life, ModificationType.More, 0.6f)));
+            Assert.That(king.Behaviour, Is.EqualTo(new EnemyBehaviour { AggroRange = 600f, ChaseTimeSec = 10 }));
+        });
+    }
+
+    //Das Profil las die Laufzeitprüfung am Helden ab, der das Schwert trug
+    [Test]
+    public void Trainingsschwert_HatDasProfilAusDemSpiel_UndPariert()
+    {
+        var sword = GameData.Weapon("training_sword");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(new ItemInstance(sword).ToWeaponProfile(), Is.EqualTo(new WeaponProfile(4, 9, 1.4f, 5, DamageType.Slash, 100, false, 1400)));
+            Assert.That(sword.Weapon.WieldStrategy, Is.EqualTo(WieldStrategy.MainHand));
+            Assert.That(sword.Guard.MeleeParry, Is.EqualTo(5f));
+        });
+    }
+}

@@ -131,6 +131,16 @@ public partial class Hero
     public float Movementspeed { get; set; } = 1000f;
 
     [Export]
+    public float Manaregeneration { get; set; } = 0.5f;
+
+    [Export]
+    public float Dodge { get; set; } = 6f;
+
+    //In Prozent der Reichweite, die das Licht in der Szene hat
+    [Export]
+    public float LightRadius { get; set; } = 100f;
+
+    [Export]
     public float RespawnInvulnerabilitySec { get; set; } = 2f;
 
     [ExportGroup("Attributes")]
@@ -244,19 +254,22 @@ public partial class Hero
             MarkBody(child);
     }
 
-    protected override void ApplyBaseValues(StatSheet sheet)
+    public HeroBaseValues BaseValues => new()
     {
-        sheet.SetBase(CombatStat.Strength, Strength);
-        sheet.SetBase(CombatStat.Dexterity, Dexterity);
-        sheet.SetBase(CombatStat.Intelligence, Intelligence);
-        sheet.SetBase(CombatStat.Constitution, Constitution);
-        sheet.SetBase(CombatStat.Awareness, Awareness);
-        sheet.SetBase(CombatStat.Dodge, 6);
-        sheet.SetBase(CombatStat.Life, LifeBonus);
-        sheet.SetBase(CombatStat.Movementspeed, Movementspeed);
-        sheet.SetBase(CombatStat.Manaregeneration, 0.5f);
-        sheet.SetBase(CombatStat.LightRadius, 100);
-    }
+        Strength         = Strength,
+        Dexterity        = Dexterity,
+        Intelligence     = Intelligence,
+        Constitution     = Constitution,
+        Awareness        = Awareness,
+        LifeBonus        = LifeBonus,
+        Movementspeed    = Movementspeed,
+        Manaregeneration = Manaregeneration,
+        Dodge            = Dodge,
+        LightRadius      = LightRadius
+    };
+
+    protected override void ApplyBaseValues(StatSheet sheet)
+        => BaseValues.Apply(sheet);
 
     protected override void OnStatsRecalculated()
     {
