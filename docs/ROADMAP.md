@@ -2688,30 +2688,47 @@ dotnet test Hoellenspiralenspiel.Tests --filter "FullyQualifiedName~Matrix_Druck
 
 So rechnet ein Test einen eigenen Kampf: `FightSimulator.Summarize(BalanceReportTests.HeroAt(5, GameData.PlayerSkill("fireball")), Fighter.Enemy(GameData.Enemy("skeleton"), 5))`. Ohne Angabe kämpft ein Boss mit seinen festen Mods, wie im Spiel.
 
-Die Matrix zum Stand dieser Etappe, Mittel aus 200 Seeds, in Klammern der kürzeste und der längste Kampf:
+Die Matrix zum Stand dieser Etappe, so wie der Test sie druckt: eine Tabelle je Level, darin vom schnellsten zum langsamsten Kampf mit dem Schwert. Zeiten in Sekunden bis zum Tod, Mittel aus 200 Seeds, in Klammern der kürzeste und der längste Kampf. Schläge zählt die Schwerthiebe im Mittel. "nie" heißt: nicht binnen 600 Sekunden. Der Skeleton King kämpft mit Stalwart, Royal Brood und Berserk, gerechnet werden nur deren Modifier.
 
-| Gegner | Leben | Held tötet mit Schwert | mit Fireball | mit Frost Nova | mit Thunderbolt | Gegner tötet Helden |
-|---|---|---|---|---|---|---|
-| Blue Blob 1 | 9 | 1,1 s (0,4 bis 2,5), 2,1 Schläge | 0,2 s (0,2 bis 1,1) | 0,6 s (0,2 bis 1,9) | 0,3 s (0,2 bis 1,9) | 38,2 s (30,1 bis 50,2) |
-| Blue Blob 3 | 17 | 2,1 s (1,1 bis 4,4), 3,5 Schläge | 0,2 s (0,2 bis 1,1) | 1,5 s (0,2 bis 3,6) | 0,3 s (0,2 bis 3,3) | 115,7 s (79,8 bis 180,4) |
-| Blue Blob 5 | 25 | 3,2 s (1,8 bis 6,0), 5,1 Schläge | 0,2 s (0,2 bis 1,1) | 2,3 s (1,3 bis 5,2) | 0,3 s (0,2 bis 4,7) | 123,2 s (88,1 bis 187,5) |
-| Blue Blob 7 | 34 | 4,5 s (2,5 bis 7,4), 7,0 Schläge | 0,2 s (0,2 bis 1,1) | 3,3 s (1,9 bis 6,5) | 0,3 s (0,2 bis 6,1) | nie |
-| Skeleton 1 | 50 | 4,7 s (3,2 bis 7,4), 7,2 Schläge | 0,2 s (0,2 bis 1,1) | 1,4 s (0,2 bis 3,6) | 0,3 s (0,2 bis 6,1) | 14,6 s (11,6 bis 27,0) |
-| Skeleton 3 | 58 | 5,7 s (3,9 bis 8,4), 8,6 Schläge | 0,3 s (0,2 bis 1,5) | 1,7 s (0,2 bis 4,7) | 0,3 s (0,2 bis 6,7) | 20,2 s (15,3 bis 38,7) |
-| Skeleton 5 | 67 | 7,1 s (5,3 bis 11,6), 10,6 Schläge | 0,5 s (0,2 bis 1,5) | 2,0 s (0,2 bis 4,7) | 0,4 s (0,2 bis 6,7) | 21,6 s (16,5 bis 39,5) |
-| Skeleton 7 | 75 | 8,6 s (6,7 bis 15,1), 12,8 Schläge | 0,6 s (0,2 bis 1,5) | 2,3 s (0,2 bis 4,7) | 0,4 s (0,2 bis 6,7) | 32,4 s (22,4 bis 52,8) |
-| Skeleton King 1 (Stalwart, Royal Brood, Berserk) | 460 | 43,6 s (37,9 bis 50,9), 62,7 Schläge | 6,9 s (2,6 bis 13,8) | 21,5 s (14,3 bis 28,7) | 4,8 s (0,2 bis 20,9) | 7,5 s (5,0 bis 13,8) |
-| Skeleton King 3 (Stalwart, Royal Brood, Berserk) | 484 | 57,7 s (49,4 bis 69,0), 82,9 Schläge | 8,0 s (3,2 bis 14,3) | 26,3 s (18,3 bis 34,6) | 5,5 s (0,2 bis 22,9) | 8,9 s (5,1 bis 22,6) |
-| Skeleton King 5 (Stalwart, Royal Brood, Berserk) | 509 | 82,5 s (66,9 bis 104,0), 118,3 Schläge | 9,6 s (4,7 bis 16,6) | 32,7 s (22,3 bis 46,4) | 6,3 s (0,2 bis 27,8) | 9,3 s (6,1 bis 24,1) |
-| Skeleton King 7 (Stalwart, Royal Brood, Berserk) | 536 | 111,7 s (90,7 bis 139,0), 160,1 Schläge | 11,4 s (6,5 bis 18,3) | 39,1 s (26,3 bis 58,3) | 7,2 s (1,3 bis 30,3) | 11,1 s (6,6 bis 28,5) |
-| Test Enemy 1 | 263 | 20,7 s (16,5 bis 25,4), 30,1 Schläge | 2,0 s (1,1 bis 6,5) | 9,0 s (4,7 bis 14,3) | 1,6 s (0,2 bis 12,1) | 17,2 s (13,1 bis 26,6) |
-| Test Enemy 3 | 270 | 23,1 s (18,4 bis 28,4), 33,6 Schläge | 2,1 s (1,1 bis 6,5) | 9,9 s (5,9 bis 16,3) | 1,8 s (0,2 bis 13,5) | 24,9 s (17,8 bis 42,9) |
-| Test Enemy 5 | 278 | 24,1 s (19,3 bis 29,1), 34,9 Schläge | 2,2 s (1,1 bis 6,5) | 10,4 s (6,5 bis 17,7) | 1,9 s (0,2 bis 14,8) | 26,2 s (19,4 bis 44,5) |
-| Test Enemy 7 | 286 | 27,5 s (21,4 bis 33,3), 39,8 Schläge | 2,5 s (1,5 bis 6,5) | 11,5 s (6,5 bis 18,3) | 2,0 s (0,2 bis 14,8) | 44,5 s (28,8 bis 66,4) |
-| Yellow Blob 1 | 76 | 6,6 s (5,3 bis 9,5), 10,0 Schläge | 0,6 s (0,2 bis 1,5) | 2,2 s (0,2 bis 4,7) | 1,4 s (0,2 bis 6,7) | 25,4 s (19,4 bis 38,4) |
-| Yellow Blob 3 | 85 | 7,9 s (6,0 bis 12,3), 11,8 Schläge | 0,7 s (0,2 bis 1,5) | 2,5 s (1,3 bis 4,7) | 1,9 s (0,2 bis 6,7) | 46,9 s (34,8 bis 69,1) |
-| Yellow Blob 5 | 93 | 9,3 s (7,4 bis 15,1), 13,8 Schläge | 0,7 s (0,2 bis 1,5) | 2,8 s (1,3 bis 5,2) | 2,3 s (0,2 bis 7,9) | 49,8 s (37,2 bis 71,5) |
-| Yellow Blob 7 | 102 | 11,4 s (8,1 bis 18,6), 16,8 Schläge | 0,7 s (0,2 bis 1,5) | 3,2 s (1,3 bis 6,5) | 2,9 s (0,2 bis 10,0) | 217,4 s (116,5 bis 386,3) |
+Level 1
+
+| Gegner               | Leben |            Schwert | Schläge |        Fireball |       Frost Nova |    Thunderbolt | Gegner tötet Helden |
+|----------------------|------:|-------------------:|--------:|----------------:|-----------------:|---------------:|--------------------:|
+| Blue Blob            |     9 |   1,1 (0,4–2,5)    |     2,1 |  0,2 (0,2–1,1)  |  0,6 (0,2–1,9)   | 0,3 (0,2–1,9)  |  38,2 (30,1–50,2)   |
+| Skeleton             |    50 |   4,7 (3,2–7,4)    |     7,2 |  0,2 (0,2–1,1)  |  1,4 (0,2–3,6)   | 0,3 (0,2–6,1)  |  14,6 (11,6–27,0)   |
+| Yellow Blob          |    76 |   6,6 (5,3–9,5)    |    10,0 |  0,6 (0,2–1,5)  |  2,2 (0,2–4,7)   | 1,4 (0,2–6,7)  |  25,4 (19,4–38,4)   |
+| Test Enemy           |   263 |  20,7 (16,5–25,4)  |    30,1 |  2,0 (1,1–6,5)  |  9,0 (4,7–14,3)  | 1,6 (0,2–12,1) |  17,2 (13,1–26,6)   |
+| Skeleton King (Boss) |   460 |  43,6 (37,9–50,9)  |    62,7 |  6,9 (2,6–13,8) | 21,5 (14,3–28,7) | 4,8 (0,2–20,9) |   7,5 (5,0–13,8)    |
+
+Level 3
+
+| Gegner               | Leben |            Schwert | Schläge |        Fireball |       Frost Nova |    Thunderbolt | Gegner tötet Helden |
+|----------------------|------:|-------------------:|--------:|----------------:|-----------------:|---------------:|--------------------:|
+| Blue Blob            |    17 |   2,1 (1,1–4,4)    |     3,5 |  0,2 (0,2–1,1)  |  1,5 (0,2–3,6)   | 0,3 (0,2–3,3)  | 115,7 (79,8–180,4)  |
+| Skeleton             |    58 |   5,7 (3,9–8,4)    |     8,6 |  0,3 (0,2–1,5)  |  1,7 (0,2–4,7)   | 0,3 (0,2–6,7)  |  20,2 (15,3–38,7)   |
+| Yellow Blob          |    85 |   7,9 (6,0–12,3)   |    11,8 |  0,7 (0,2–1,5)  |  2,5 (1,3–4,7)   | 1,9 (0,2–6,7)  |  46,9 (34,8–69,1)   |
+| Test Enemy           |   270 |  23,1 (18,4–28,4)  |    33,6 |  2,1 (1,1–6,5)  |  9,9 (5,9–16,3)  | 1,8 (0,2–13,5) |  24,9 (17,8–42,9)   |
+| Skeleton King (Boss) |   484 |  57,7 (49,4–69,0)  |    82,9 |  8,0 (3,2–14,3) | 26,3 (18,3–34,6) | 5,5 (0,2–22,9) |   8,9 (5,1–22,6)    |
+
+Level 5
+
+| Gegner               | Leben |            Schwert | Schläge |        Fireball |       Frost Nova |    Thunderbolt | Gegner tötet Helden |
+|----------------------|------:|-------------------:|--------:|----------------:|-----------------:|---------------:|--------------------:|
+| Blue Blob            |    25 |   3,2 (1,8–6,0)    |     5,1 |  0,2 (0,2–1,1)  |  2,3 (1,3–5,2)   | 0,3 (0,2–4,7)  | 123,2 (88,1–187,5)  |
+| Skeleton             |    67 |   7,1 (5,3–11,6)   |    10,6 |  0,5 (0,2–1,5)  |  2,0 (0,2–4,7)   | 0,4 (0,2–6,7)  |  21,6 (16,5–39,5)   |
+| Yellow Blob          |    93 |   9,3 (7,4–15,1)   |    13,8 |  0,7 (0,2–1,5)  |  2,8 (1,3–5,2)   | 2,3 (0,2–7,9)  |  49,8 (37,2–71,5)   |
+| Test Enemy           |   278 |  24,1 (19,3–29,1)  |    34,9 |  2,2 (1,1–6,5)  | 10,4 (6,5–17,7)  | 1,9 (0,2–14,8) |  26,2 (19,4–44,5)   |
+| Skeleton King (Boss) |   509 |  82,5 (66,9–104,0) |   118,3 |  9,6 (4,7–16,6) | 32,7 (22,3–46,4) | 6,3 (0,2–27,8) |   9,3 (6,1–24,1)    |
+
+Level 7
+
+| Gegner               | Leben |            Schwert | Schläge |        Fireball |       Frost Nova |    Thunderbolt | Gegner tötet Helden |
+|----------------------|------:|-------------------:|--------:|----------------:|-----------------:|---------------:|--------------------:|
+| Blue Blob            |    34 |   4,5 (2,5–7,4)    |     7,0 |  0,2 (0,2–1,1)  |  3,3 (1,9–6,5)   | 0,3 (0,2–6,1)  |   nie               |
+| Skeleton             |    75 |   8,6 (6,7–15,1)   |    12,8 |  0,6 (0,2–1,5)  |  2,3 (0,2–4,7)   | 0,4 (0,2–6,7)  |  32,4 (22,4–52,8)   |
+| Yellow Blob          |   102 |  11,4 (8,1–18,6)   |    16,8 |  0,7 (0,2–1,5)  |  3,2 (1,3–6,5)   | 2,9 (0,2–10,0) | 217,4 (116,5–386,3) |
+| Test Enemy           |   286 |  27,5 (21,4–33,3)  |    39,8 |  2,5 (1,5–6,5)  | 11,5 (6,5–18,3)  | 2,0 (0,2–14,8) |  44,5 (28,8–66,4)   |
+| Skeleton King (Boss) |   536 | 111,7 (90,7–139,0) |   160,1 | 11,4 (6,5–18,3) | 39,1 (26,3–58,3) | 7,2 (1,3–30,3) |  11,1 (6,6–28,5)    |
 
 Was die Matrix zeigt, als Ausgangspunkt für Etappe 12:
 
