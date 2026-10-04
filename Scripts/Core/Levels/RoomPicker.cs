@@ -41,7 +41,7 @@ public static class RoomPicker
     private static bool IsFiller(RoomBlueprint blueprint)
         => blueprint.Role is RoomRole.Normal or RoomRole.Event;
 
-    private static RoomBlueprint PickByWeight(List<RoomBlueprint> blueprints, IRandomSource random)
+    internal static RoomBlueprint PickByWeight(List<RoomBlueprint> blueprints, IRandomSource random)
     {
         if (blueprints.Count == 0)
             return null;

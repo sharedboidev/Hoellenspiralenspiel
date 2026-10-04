@@ -7,13 +7,13 @@ Die Rückmeldungen aus dem Spielen von Etappe 3 sind am selben Tag auf `master_P
 Eine zweite Runde Rückmeldungen zu Etappe 3 ist am selben Tag auf `master_PlaytestFeedback3` gebaut: Umriss für alles Benutzbare, Blick zur Maus, Schlag und Zauber binden den Helden, Kaufen per Rechtsklick und der Vergleich oben bündig.
 Etappe 4 ist am 01.10.2026 auf `master_BossAndUnlock` gebaut und liegt seit demselben Tag auf `master`: der Skeleton King als Platzhalter-Boss mit Krone und Boss-Raum, die Freischaltung des nächsten Kreises und das Schlachthaus als Platzhalter für Kreis 2 mit neuen Texturen und Blutspuren. Auf demselben Branch kamen nach dem Spielen das ruhigere Bild des PS1-Looks und die Sichtlinie der Mauern dazu, beide ebenfalls auf `master`.
 Die Renderskalierung ist aus M9 vorgezogen und am 01.10.2026 als M7.5 auf `master_RenderScaling` gebaut und liegt seit demselben Tag auf `master`: Die Welt rendert im Raster der PS1 statt in voller Fenstergröße.
-M8 ist am 02.10.2026 geplant und läuft in 20 Etappen, siehe dort. Etappe 1 ist am selben Tag auf `master_CirclesAndTestPortal` gebaut und liegt seit demselben Tag auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal des Hubs, der Inhaltsstand eines Kreises im Spielstand. Etappe 2 ist am selben Tag auf `master_CoreDefinitions` gebaut und liegt seit dem 05.10.2026 auf `master`: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests, der mit den echten Resources rechnet.
+M8 ist am 02.10.2026 geplant und läuft in 20 Etappen, siehe dort. Etappe 1 ist am selben Tag auf `master_CirclesAndTestPortal` gebaut und liegt seit demselben Tag auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal des Hubs, der Inhaltsstand eines Kreises im Spielstand. Etappe 2 ist am selben Tag auf `master_CoreDefinitions` gebaut und liegt seit dem 05.10.2026 auf `master`: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests, der mit den echten Resources rechnet. Etappe 3a ist am 05.10.2026 auf `master_FieldGenerator` gebaut und liegt noch nicht auf `master`: der Generator für freie Flächen im Kern.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code samt Szenen. Die Zeilenzahl aus der ersten Analyse, rund 5.500, galt für die 2D-Fassung.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 bis 4 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 bis 4 auch mit Fenster. M7.5 ist randlos und mit Fenster geprüft. Etappe 1 von M8 ist headless und mit Fenster geprüft, dazu der Neustart mit einem Spielstand der Version 4. Etappe 2 von M8 ist headless und mit Fenster geprüft, dazu ein Vergleich aller Werte vor und nach dem Umbau.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 bis 4 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 bis 4 auch mit Fenster. M7.5 ist randlos und mit Fenster geprüft. Etappe 1 von M8 ist headless und mit Fenster geprüft, dazu der Neustart mit einem Spielstand der Version 4. Etappe 2 von M8 ist headless und mit Fenster geprüft, dazu ein Vergleich aller Werte vor und nach dem Umbau. Etappe 3a ändert im Spiel nichts und ist mit Tests und einem Vergleich von 300 Ebenen vor und nach dem Umbau geprüft.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -2531,7 +2531,7 @@ Bewusst offen gelassen:
 - Die Karte der Oberfläche rendert weiter in 2560 x 1440 und ohne Raster der PS1, wie bisher.
 - Mit Look aus rendert der Viewport in Fenstergröße. Das kostet gegenüber vorher wenige Prozent, weil das Bild einmal mehr kopiert wird. Der Schalter ist nur zum Vergleichen da.
 
-### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L, geplant am 02.10.2026, Etappe 1 umgesetzt am selben Tag auf `master_CirclesAndTestPortal`, Etappe 2 am selben Tag auf `master_CoreDefinitions`)
+### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L, geplant am 02.10.2026, Etappe 1 umgesetzt am selben Tag auf `master_CirclesAndTestPortal`, Etappe 2 am selben Tag auf `master_CoreDefinitions`, Etappe 3a am 05.10.2026 auf `master_FieldGenerator`)
 
 Ziel: ein Kreis in Endqualität als Vorlage für alle weiteren. Der Kreis ist Wollust, der zweite Kreis aus dem Designdokument: "Strafe: ewiger Sturm/Umherwirbeln".
 
@@ -2558,7 +2558,7 @@ M8 läuft in 20 Etappen, jede für sich mergefähig, jede lässt `master` spielb
 |---|---|---|---|
 | 1 | Kreise umsortieren: Schlachthaus als Testkreis am zehnten Portal, Wollust als Kreis 2, Inhaltsstand im Spielstand | S | Umgesetzt am 02.10.2026 auf `master_CirclesAndTestPortal`, liegt seit demselben Tag auf `master` |
 | 2 | Kern-Definitionen für Gegner und Held, Kampfsimulation in den Tests | S | Umgesetzt am 02.10.2026 auf `master_CoreDefinitions`, liegt seit dem 05.10.2026 auf `master` |
-| 3a | Freie Flächen I: der Generator im Kern | M | Offen |
+| 3a | Freie Flächen I: der Generator im Kern | M | Umgesetzt am 05.10.2026 auf `master_FieldGenerator` |
 | 3b | Freie Flächen II: Aufbau in Godot, Kette der Flächen, Karte, Spielstand | M | Offen |
 | 4 | Der Sturm: Grundwind, Böen, Windschatten im Lee, Drift der Projektile, Streifen | M | Offen |
 | 5 | Dungeons per Ladezone und die Liebenden als Mini-Boss | M | Offen |
@@ -2754,6 +2754,120 @@ Bewusst offen gelassen:
 - Die Standardwerte von Items und Skills, die in einer `.tres` fehlen, stehen im Leser noch einmal, weil die Resource-Klassen Godot brauchen. Ändert sich ein Standard dort, muss er im Leser mit. Für Gegner nimmt der Leser die Standards von `EnemyDefinition`, aus der auch die Resource baut.
 - `Enemy` liest Takt, Reichweite und Rückweg weiter an der Resource. Es sind dieselben Werte wie im Kern, den Takt je Skill zieht Etappe 8a ohnehin in den Kern.
 - Beim ersten Lauf mit Fenster beendete die Probe das Spiel mitten in der Reise ins Testgelände, und Godot stürzte beim Beenden ab ("Leaked unsafe reference" zu einem `NavigationMesh`). Mit abgewarteter Reise lief alles sauber. Der Umbau berührt weder Reise noch Navigation, das Beenden während einer Reise ist aber ein eigener Befund.
+
+#### Etappe 3a: Freie Flächen I, der Generator im Kern
+
+Umgesetzt am 05.10.2026 auf `master_FieldGenerator`, abgezweigt von `8eb3fdb`.
+
+- Erledigt: Aus einem Seed entsteht der Grundriss einer freien Fläche, reines C# unter `Scripts/Core/Levels/Fields/`: Boden mit zwei Zellen Abgrund als Saum, Eingang und Ausgang an gegenüberliegenden Rändern, Ruinen, ein Dungeon-Eingang, das geplante Event, auf der letzten Fläche die Arena, Gruppen von Hindernissen und Plätze für Gegnergruppen. Gleicher Seed, gleiche Fläche.
+- Erledigt: Die Zellarten `Ground`, `Obstacle` und `Void` am Ende von `CellKind`. Boden ist begehbar, Hindernis und Abgrund nicht. Die Erkundung läuft über Boden und stoppt an Hindernissen und an den Mauern einer Ruine, durch deren Türen geht sie hinein.
+- Erledigt: Die Rollen `Ruin` und `Entrance` am Ende von `RoomRole`, dazu `RoomBlueprint.OpenToField`.
+- Zusätzlich: `LevelLayout.FindReachable` als gemeinsame Flutfüllung, auch der Ebenen-Generator nutzt sie jetzt. `LevelLayout.Paint` malt die Zellen einer Fläche.
+- Im Spiel ändert sich noch nichts, den Aufbau in Godot bringt Etappe 3b.
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Eingang und Ausgang | Zellen auf der äußersten Zeile oder Spalte des Bodens, keine Vorlagen. Ein Tor kennt seine Randseite (`FieldGate`), dort stellt der Aufbau in 3b Torbogen und Pfad hin. Der Eingang liegt an einer zufälligen Seite, der Ausgang gegenüber, beide mindestens 3 Zellen von den Ecken. Gemessen wird die Luftlinie, mindestens 70 % der größeren Seitenlänge, auf 32 × 24 Zellen also 22,4 Zellen. Gut jede sechste Fläche wird dadurch schräg von Nord nach Süd durchquert, die übrigen von West nach Ost oder umgekehrt |
+| Letzte Fläche | Gibt es eine Arena-Vorlage, ersetzt die Arena den Ausgang. Der Held kommt dann über eine schmale Seite herein, und die Arena steht am anderen Ende der langen Achse, höchstens 2 Zellen vom fernen Rand. Ohne Arena-Vorlage behält die letzte Fläche ihren Ausgang, wie die letzte Ebene ohne Boss-Raum |
+| Abstände der Vorlagen | Eine Zelle Boden zum Abgrund, zwei Zellen zueinander wie die Räume einer Ebene, drei zu den Toren. Von mehreren freien Plätzen nimmt eine Vorlage den, der am weitesten von allem bisher Gesetzten liegt, so verteilen sich die Ruinen über die Fläche. Die Arena kommt zuerst, danach die großen Vorlagen vor den kleinen |
+| Ruinen ohne Platz | Eine Ruine, für die kein Platz bleibt, entfällt, solange mindestens `MinRuins` stehen. Pflichtruinen, Dungeon-Eingang, Event und Arena müssen stehen, sonst beginnt ein neuer Versuch mit abgeleitetem Seed, wie bei den Ebenen höchstens 20 |
+| Türen | Jede Tür einer Vorlage öffnet sich zur Fläche. Bei Ruinen ist jede offene Kante eine Tür, denn der Kern kennt keine Mauern im Innern einer Vorlage und geht nur durch Türen hinein |
+| Hindernisse | Gruppen aus 1 bis 6 Zellen, gewachsen von einer Startzelle aus. Zwischen zwei Gruppen bleibt eine Zelle Platz, auch über Eck. Nie vor einer Tür und nie eine Zelle davor, nie im Umkreis von 2 Zellen um ein Tor. Eine Gruppe, nach der nicht mehr jeder Boden vom Eingang aus erreichbar wäre, entfällt. Das ist strenger als im Plan, der nur den Weg zum Ausgang verlangte: So gibt es keine abgeschnittenen Inseln, auf denen Gegner unerreichbar stünden |
+| Gruppenplätze | Eine Gruppe je 40 Zellen Boden, gezählt nach den Hindernissen. Nicht näher als 4 Zellen am Eingang, in Luftlinie. Nicht näher als 2 Zellen an einer Vorlage, also mit einer freien Zelle dazwischen; mit zwei freien Zellen blieb auf der vollen letzten Fläche keine einzige Zelle übrig. Nicht am Abgrund. Verteilt wie Punkte einer Poisson-Scheibe: anfangs 0,8 × √40, also gut 5 Zellen Abstand, reicht der Platz nicht, schrumpft er, nie unter 2 |
+| Event | `FieldSettings.EventRoomId` nennt das Event, das der Plan des Abstiegs der Fläche gibt. Den Plan selbst, `EventSchedule`, bringt Etappe 9. Das geplante Event kommt auch unter seinem Mindestlevel. Fehlt seine Vorlage, wirft der Generator. Ohne Plan steht kein Event auf der Fläche |
+| Grundriss | `FieldLayout` hält Zellen, Vorlagen und Türen in einem `LevelLayout`, so lesen Karte und Erkundung eine Fläche wie eine Ebene. Freier Boden gehört dort wie ein Gang zu keinem Raum, Hindernis und Abgrund zählen wie Fels. Einen Startraum hat eine Fläche nicht, `ExitRoom` ist die Arena |
+
+So funktioniert es:
+
+- `FieldGenerator.Generate(blueprints, settings, seed)` würfelt je Versuch mit einem eigenen `SeededRandom` aus Seed und Versuch. Ein Versuch wählt die Vorlagen, setzt die Tore, setzt die Vorlagen, baut den Grundriss mit dem Saum als Abgrund und dem Rest als Boden, öffnet alle Türen, verstreut die Hindernisse, prüft, dass Ausgang und jede Vorlage zu Fuß erreichbar sind, und verteilt die Gruppenplätze.
+- `FieldPicker.Pick` wählt nach dem Muster von `RoomPicker`: die Arena nur auf der letzten Fläche, einen Dungeon-Eingang, das geplante Event, dann 5 bis 8 Ruinen nach Gewicht, Mindestlevel und Höchstzahl, Pflichtruinen immer.
+- `ObstacleScatter.Scatter` und `PackScatter.Place` arbeiten auf dem fertigen Grundriss.
+- `FieldSettings`: Breite 32, Höhe 24, Saum 2, 5 bis 8 Ruinen, Hindernisanteil 8 %, eine Gruppe je 40 Zellen Boden, Bereichslevel, letzte Fläche, geplantes Event, 20 Versuche.
+- `FieldLayout`: Seed, `Grid`, `Ground`, `Entrance`, `Exit` (fehlt neben einer Arena), `Placed`, `Arena`, `ObstacleGroups`, `PackSpots`, `WithRole(role)`.
+
+So druckt man Flächen als Textbild:
+
+```bash
+dotnet test Hoellenspiralenspiel.Tests --filter "FullyQualifiedName~Flaechen_Drucken" --logger "console;verbosity=detailed"
+```
+
+Zwei Flächen aus dem Test mit Vorlagen in den Größen, die der Plan für Wollust vorsieht. Abgrund leer, Boden `.`, Hindernis `#`, Eingang `S`, Ausgang `X`, Gegnergruppe `!`, Ruine `R`, Dungeon-Eingang `D`, Event `E`, Arena `A`, Zellen mit Tür klein. Zuerst eine Fläche mit dem Ritual als Event, Eingang im Osten, Ausgang im Westen:
+
+```
+                                
+                                
+  ......##....................  
+  .!..RR.............rr.......  
+  ....Rr......................  
+  .......##......!............  
+  #......................DdD..  
+  #........!.RRrRRR...!..dDd..  
+  #..........RRRRRR......DdD..  
+  ..EEeEE...#RRRRRR..#........  
+  ..EEEEE..##RRRRRR..#........  
+  ..eEEEe...#RRrrRR.........!.  
+  ..EEEEE.....................  
+  ..EEeEE#....................  
+  ................!..##.......  
+  ........!.........##.......S  
+  .............r....rRRR......  
+  X....#....#..R....rRRR......  
+  .....##.####.R....rRRR......  
+  .!....#.#....r....rRRR......  
+  ###...rr..!.........#..!....  
+  ##.................###......  
+                                
+                                
+```
+
+Die letzte Fläche mit der Arena am fernen Rand statt eines Ausgangs:
+
+```
+                                
+                                
+  .......................##...  
+  ..rRRR...RRRR..!........##..  
+  ..rRRR...RRRR....RRrRRR..#r.  
+  ..rRRR...RRRR....RRRRRR...r.  
+  ..rRRR...rrrr....RRRRRR.!...  
+  ...##........##..RRRRRR.....  
+  ..##....#....##..RRrrRR.....  
+  ......!.##....!.............  
+  ........##.##...............  
+  .!.AAAAaAAAA...RRRr........S  
+  #..AAAAAAAAA.#.RRRr..r......  
+  ##.AAAAAAAAA##.RRRr..r......  
+  .#.AAAAAAAAA###RRRr.....!...  
+  ...aAAAAAAAa................  
+  ...AAAAAAAAA.........RRRr...  
+  ...AAAAAAAAA.........RRRr...  
+  ...AAAAAAAAA..DdD....RRRr...  
+  .!.AAAAaAAAA..dDd....RRRr...  
+  ..............DdD.!.........  
+  ............................  
+                                
+                                
+```
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen. Die Analyzer-Warnung aus dem Simulator-Test von Etappe 2 ist behoben, die drei übrigen im Testprojekt stammen aus M7 |
+| Unit-Tests | 44 neue, die meisten je über 50 Seeds auf normalen Flächen, Flächen mit Event und letzten Flächen: gleicher Seed gleiche Fläche, verschiedene Seeds verschiedene Flächen, keine Ausnahme; Saum genau zwei Zellen Abgrund; Tore auf Boden am Rand, einander gegenüber, mindestens 70 % der Breite auseinander; Ausgang, jede Vorlage und jeder Boden vom Eingang aus erreichbar; jede Tür offen zum Boden; Vorlagen ohne Überlappung mit zwei Zellen Platz, eine Zelle vom Abgrund, drei von den Toren; genau ein Dungeon-Eingang, 5 bis 8 Ruinen, Pflichtruinen, Mindestlevel und Höchstzahl; Arena nur auf der letzten Fläche, dort am fernen Rand statt des Ausgangs, ohne Arena-Vorlage bleibt der Ausgang; Event genau nach Plan, ohne Plan keins, fehlende Vorlage wirft; Hindernisanteil in der Toleranz, Gruppen aus 1 bis 6 Zellen ohne Berührung, nichts vor Türen und an Toren, ohne Anteil keine; Gruppenplätze auf Boden, fern vom Eingang, nicht an Vorlagen und Abgrund, in der richtigen Zahl, mit Abstand zueinander, ohne Anteil keine; Fehler bei Vorlage ohne Tür, zu kleiner Fläche und vertauschter Ruinenzahl; Boden begehbar, Hindernis und Abgrund nicht, Mauern nur zwischen Boden und Vorlage ohne Tür, Erkundung stoppt an Hindernissen und Ruinenmauern und geht durch die Tür. Zusammen 1246, dazu die Textbilder als expliziter Test |
+| Robustheit | Je 500 Seeds in acht Einstellungen ohne eine Ausnahme: 32 × 24 Zellen normal, mit Event und als letzte Fläche, als letzte Fläche mit 8 Ruinen neben der Arena, 24 × 32 hochkant normal und als letzte Fläche, 40 × 30, und 16 × 14 mit 1 bis 3 Ruinen. Der erste Versuch scheitert auf normalen Flächen in 0,2 % der Fälle, auf letzten Flächen in 11 %, mit 8 Ruinen neben der Arena in 56 %, ein späterer Versuch gelingt immer. Eine Fläche von 32 × 24 Zellen braucht im Debug-Build rund 10 ms |
+| Ebenen unverändert | 300 Ebenen mit wechselndem Bereichslevel und letzter Ebene, samt Erkundung und Mauerstücken, ergeben auf `master` und auf dem Branch dieselben 4,6 MB Text, Byte für Byte |
+| Im Spiel | Keine Prüfung, die Etappe ändert im Spiel nichts |
+
+Bewusst offen gelassen:
+
+- Der Aufbau in Godot, die Kette der Flächen, Karte und Spielstand kommen mit Etappe 3b.
+- Eine Fläche hat keinen Startraum. Code in Godot, der einen erwartet, etwa `LevelGrid`, bekommt in 3b einen eigenen Weg für Flächen.
+- `GetWallRuns` meldet auf Flächen auch Mauern zwischen Boden und Hindernis oder Abgrund, weil dort kein Boden mehr ist. Welche davon im Aufbau zu Mauern werden, entscheidet 3b: am Abgrund eine unsichtbare Mauer, auf Hindernissen Requisiten, um Ruinen mit `OpenToField` keine.
+- Die Erkundung deckt nur Boden auf, nicht die Hindernisse selbst. Die Karte in 3b zeichnet Hindernisse neben aufgedecktem Boden.
+- Die geliehenen Räume Kammer, Halle und Galerie brauchen für 3b Türen an jeder offenen Kante, wenn sie als Ruinen auf der Fläche stehen.
 
 ### M9: Inhalt und Politur (L, fortlaufend)
 

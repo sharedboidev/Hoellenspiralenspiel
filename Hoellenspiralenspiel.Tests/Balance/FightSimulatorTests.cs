@@ -30,10 +30,12 @@ public class FightSimulatorTests
     [Test]
     public void GleicherSeed_ErgibtDenselbenKampf()
     {
-        var hero  = BalanceReportTests.HeroAt(1);
-        var enemy = Fighter.Enemy(GameData.Enemy("skeleton"), 1);
+        var hero   = BalanceReportTests.HeroAt(1);
+        var enemy  = Fighter.Enemy(GameData.Enemy("skeleton"), 1);
+        var first  = FightSimulator.Run(hero, enemy, 7);
+        var second = FightSimulator.Run(hero, enemy, 7);
 
-        Assert.That(FightSimulator.Run(hero, enemy, 7), Is.EqualTo(FightSimulator.Run(hero, enemy, 7)));
+        Assert.That(second, Is.EqualTo(first));
     }
 
     [Test]

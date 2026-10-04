@@ -3,11 +3,15 @@ using System.Collections.Generic;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Levels;
 
+//Neue Werte nur am Ende anhängen. Ground, Obstacle und Void gibt es nur auf freien Flächen
 public enum CellKind : byte
 {
     Solid,
     Room,
-    Corridor
+    Corridor,
+    Ground,
+    Obstacle,
+    Void
 }
 
 //Eine Mauer auf einer Linie des Gitters. Längs X liegt sie zwischen den Zeilen Line - 1 und Line, sonst zwischen den Spalten.
@@ -23,7 +27,8 @@ public sealed class LevelLayout
     public const int Rock     = -2;
     public const int Corridor = -1;
 
-    private const int NoRoom = -1;
+    //Für StartRoom und ExitRoom, wenn es keinen solchen Raum gibt, etwa auf einer freien Fläche
+    public const int NoRoom = -1;
 
     private readonly CellKind[]          kinds;
     private readonly HashSet<(Cell, Cell)> openings = new();
@@ -80,16 +85,18 @@ public sealed class LevelLayout
         => Contains(cell) ? kinds[cell.Y * Width + cell.X] : CellKind.Solid;
 
     public bool IsFloor(Cell cell)
-        => GetKind(cell) != CellKind.Solid;
+        => GetKind(cell) is CellKind.Room or CellKind.Corridor or CellKind.Ground;
 
     public int GetRoomIndex(Cell cell)
         => Contains(cell) ? roomOf[cell.Y * Width + cell.X] : NoRoom;
 
+    //Freier Boden gehört wie ein Gang zu keinem Raum
     public int GetRegion(Cell cell)
         => GetKind(cell) switch
         {
             CellKind.Room     => GetRoomIndex(cell),
             CellKind.Corridor => Corridor,
+            CellKind.Ground   => Corridor,
             _                 => Rock
         };
 
@@ -100,6 +107,19 @@ public sealed class LevelLayout
 
         if (Contains(cell))
             kinds[cell.Y * Width + cell.X] = CellKind.Corridor;
+    }
+
+    //Für freie Flächen: Boden, Hindernis oder Abgrund. Die Zellen einer Vorlage bleiben, was sie sind
+    public void Paint(Cell cell, CellKind kind)
+    {
+        if (kind == CellKind.Room)
+            throw new ArgumentException("Raumzellen entstehen nur aus Vorlagen.", nameof(kind));
+
+        if (GetKind(cell) == CellKind.Room)
+            throw new InvalidOperationException($"Die Zelle {cell} gehört zu einer Vorlage.");
+
+        if (Contains(cell))
+            kinds[cell.Y * Width + cell.X] = kind;
     }
 
     public void Open(PlacedDoor door)
@@ -122,6 +142,9 @@ public sealed class LevelLayout
         if (GetKind(cell) == CellKind.Corridor && GetKind(other) == CellKind.Corridor)
             return false;
 
+        if (GetKind(cell) == CellKind.Ground && GetKind(other) == CellKind.Ground)
+            return false;
+
         if (GetKind(cell) == CellKind.Room && GetRoomIndex(cell) == GetRoomIndex(other))
             return false;
 
@@ -130,6 +153,33 @@ public sealed class LevelLayout
 
     public bool CanStep(Cell from, CellSide side)
         => IsFloor(from) && IsFloor(from.Step(side)) && !HasWall(from, side);
+
+    //Alles, was vom Ursprung aus zu Fuß erreichbar ist: durch Türen, aber nicht durch Mauern, Hindernisse oder den Abgrund
+    public HashSet<Cell> FindReachable(Cell origin)
+    {
+        var reached = new HashSet<Cell>();
+
+        if (!IsFloor(origin))
+            return reached;
+
+        var waiting = new Queue<Cell>();
+
+        reached.Add(origin);
+        waiting.Enqueue(origin);
+
+        while (waiting.Count > 0)
+        {
+            var cell = waiting.Dequeue();
+
+            foreach (var side in SideExtensions.All)
+            {
+                if (CanStep(cell, side) && reached.Add(cell.Step(side)))
+                    waiting.Enqueue(cell.Step(side));
+            }
+        }
+
+        return reached;
+    }
 
     //Ein Stück endet, wo die Mauer endet oder wo sich ändert, was auf einer ihrer Seiten liegt
     public List<WallRun> GetWallRuns()

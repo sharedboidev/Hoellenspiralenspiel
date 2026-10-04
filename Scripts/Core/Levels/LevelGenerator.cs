@@ -303,22 +303,7 @@ public static class LevelGenerator
 
     private static bool IsEveryRoomReachable(LevelLayout layout)
     {
-        var reached = new HashSet<Cell>();
-        var waiting = new Queue<Cell>();
-
-        waiting.Enqueue(layout.GetCenterCell(layout.StartRoom));
-        reached.Add(layout.GetCenterCell(layout.StartRoom));
-
-        while (waiting.Count > 0)
-        {
-            var cell = waiting.Dequeue();
-
-            foreach (var side in SideExtensions.All)
-            {
-                if (layout.CanStep(cell, side) && reached.Add(cell.Step(side)))
-                    waiting.Enqueue(cell.Step(side));
-            }
-        }
+        var reached = layout.FindReachable(layout.GetCenterCell(layout.StartRoom));
 
         return layout.Rooms.All(room => reached.Contains(layout.GetCenterCell(room.Index)));
     }
