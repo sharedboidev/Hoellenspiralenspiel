@@ -6,6 +6,7 @@
 [ext_resource type="Resource" path="res://Resources/Enemies/blue_blob.tres" id="4_blue"]
 [ext_resource type="Resource" path="res://Resources/Enemies/yellow_blob.tres" id="5_yellow"]
 [ext_resource type="Resource" path="res://Resources/Enemies/test_enemy.tres" id="6_caster"]
+[ext_resource type="Script" path="res://Resources/Levels/FieldResource.cs" id="6_nd005"]
 [ext_resource type="Resource" path="res://Resources/Enemies/skeleton.tres" id="7_skeleton"]
 [ext_resource type="PackedScene" path="res://Scenes/Rooms/start_room.tscn" id="10_start"]
 [ext_resource type="PackedScene" path="res://Scenes/Rooms/exit_room.tscn" id="11_exit"]

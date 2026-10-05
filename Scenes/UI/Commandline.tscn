@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://bki6057dpkc32"]
+
+[ext_resource type="Script" uid="uid://48ccqr5grqjr" path="res://Scripts/UI/Commandline.cs" id="1_38d6l"]
+
+[node name="Commandline" type="Control" unique_id=1968794366 node_paths=PackedStringArray("textEdit")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_38d6l")
+textEdit = NodePath("HBoxContainer/TextEdit")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=133028701]
+layout_mode = 0
+offset_right = 91.0
+offset_bottom = 29.0
+color = Color(0.14767182, 0.14767179, 0.14767179, 0.6784314)
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=766061354]
+layout_mode = 0
+offset_right = 91.0
+offset_bottom = 29.0
+theme_override_constants/separation = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer" unique_id=74629884]
+layout_mode = 2
+theme_override_constants/margin_left = 3
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 3
+theme_override_constants/margin_bottom = 3
+
+[node name="Label" type="Label" parent="HBoxContainer/MarginContainer" unique_id=2141864950]
+layout_mode = 2
+text = "Command:"
+
+[node name="TextEdit" type="TextEdit" parent="HBoxContainer" unique_id=461502169]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+placeholder_text = "spawn <unit_id> <amount> "
+
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]

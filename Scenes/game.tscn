@@ -1,11 +1,10 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cwd70rcupxmcv"]
 
 [ext_resource type="Script" uid="uid://bvsds0qn0dn78" path="res://Scripts/World/LevelNavigation.cs" id="2_navigation"]
 [ext_resource type="Script" uid="uid://16fsaqk8fbva" path="res://Scripts/World/IsoCamera.cs" id="3_camera"]
-[ext_resource type="PackedScene" path="res://Scenes/Units/hero.tscn" id="5_hero"]
+[ext_resource type="PackedScene" uid="uid://jijd2qmg0xiu" path="res://Scenes/Units/hero.tscn" id="5_hero"]
 [ext_resource type="Script" uid="uid://k2gb16ifn72b" path="res://Scripts/Controllers/EnemyController.cs" id="6_enemies"]
 [ext_resource type="Script" uid="uid://rq55bipqlvcq" path="res://Scripts/Controllers/GameController.cs" id="7_game"]
-[ext_resource type="Script" path="res://Scripts/Controllers/VendorController.cs" id="50_vendor"]
 [ext_resource type="Script" uid="uid://v5paruy0b76n" path="res://Scripts/UI/OverlayMapViewport.cs" id="8_map"]
 [ext_resource type="Script" uid="uid://c7orotexs54nd" path="res://Scripts/World/Ps1Look.cs" id="12_look"]
 [ext_resource type="Shader" uid="uid://c2lknp40isk5w" path="res://Shaders/Ps1/ps1_surface.gdshader" id="13_surface"]
@@ -13,28 +12,30 @@
 [ext_resource type="PackedScene" uid="uid://b8q3plajba8gb" path="res://Scenes/UI/character_sheet.tscn" id="20_sheet"]
 [ext_resource type="PackedScene" uid="uid://c7cdly8lgcdqk" path="res://Scenes/UI/item_tooltip.tscn" id="21_tooltip"]
 [ext_resource type="Script" uid="uid://cgt0qeoamx7my" path="res://Resources/Items/ItemBaseResource.cs" id="22_item_base"]
-[ext_resource type="Resource" path="res://Resources/Items/Weapons/training_sword.tres" id="item_training_sword"]
 [ext_resource type="PackedScene" uid="uid://bapl2sjbv6xe6" path="res://Scenes/UI/resource_orb.tscn" id="23_orb"]
 [ext_resource type="PackedScene" uid="uid://c5g22iexdnhsv" path="res://Scenes/UI/Character/segmented_xp_bar.tscn" id="24_xp_bar"]
 [ext_resource type="Script" uid="uid://dy1c6k8lr7jsu" path="res://Scripts/UI/Skills/SkillBarView.cs" id="25_skill_bar"]
 [ext_resource type="PackedScene" uid="uid://blqiwj17e0cdf" path="res://Scenes/lootsystem.tscn" id="26_lootsystem"]
+[ext_resource type="PackedScene" uid="uid://bki6057dpkc32" path="res://Scenes/UI/Commandline.tscn" id="28_i26dy"]
 [ext_resource type="PackedScene" uid="uid://c26mvsx1cy2ur" path="res://Scenes/UI/level_up_dialog.tscn" id="28_level_up"]
 [ext_resource type="PackedScene" uid="uid://3mk1pcudqb64" path="res://Scenes/UI/Buttons/open_level_up_dialog_button.tscn" id="29_level_up_button"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/death_screen.tscn" id="30_death"]
-[ext_resource type="Script" path="res://Scripts/UI/LootLabels.cs" id="31_loot_labels"]
-[ext_resource type="Script" path="res://Scripts/World/Levels/Descent.cs" id="32_descent"]
-[ext_resource type="Script" path="res://Scripts/UI/LevelMap.cs" id="34_level_map"]
-[ext_resource type="Script" path="res://Scripts/World/GameScene.cs" id="40_game"]
-[ext_resource type="PackedScene" path="res://Scenes/Places/hub.tscn" id="41_hub"]
+[ext_resource type="Script" uid="uid://cxb7oylqlyqv8" path="res://Scripts/UI/LootLabels.cs" id="31_loot_labels"]
+[ext_resource type="Script" uid="uid://buoustjfeq4of" path="res://Scripts/World/Levels/Descent.cs" id="32_descent"]
+[ext_resource type="Script" uid="uid://dvdpau7u3xluv" path="res://Scripts/UI/LevelMap.cs" id="34_level_map"]
+[ext_resource type="Script" uid="uid://bw15yklrr8ksu" path="res://Scripts/World/GameScene.cs" id="40_game"]
+[ext_resource type="PackedScene" uid="uid://c57e64b5ec4cw" path="res://Scenes/Places/hub.tscn" id="41_hub"]
 [ext_resource type="PackedScene" path="res://Scenes/Places/test_grounds.tscn" id="42_test_grounds"]
 [ext_resource type="PackedScene" path="res://Scenes/Objects/town_portal.tscn" id="44_town_portal"]
-[ext_resource type="Script" path="res://Scripts/UI/TownPortalBadge.cs" id="45_badge"]
+[ext_resource type="Script" uid="uid://b2hfribc41drj" path="res://Scripts/UI/TownPortalBadge.cs" id="45_badge"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/circle_dialog.tscn" id="46_circle_dialog"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/curtain.tscn" id="47_curtain"]
-[ext_resource type="PackedScene" path="res://Scenes/UI/boss_bar.tscn" id="53_boss_bar"]
-[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_unit_outline.gdshader" id="48_outline"]
+[ext_resource type="Shader" uid="uid://bq8f77a017yy7" path="res://Shaders/Ps1/ps1_unit_outline.gdshader" id="48_outline"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/pause_menu.tscn" id="49_pause_menu"]
-[ext_resource type="Script" path="res://Scripts/UI/MapFrame.cs" id="51_map_frame"]
+[ext_resource type="Script" uid="uid://b126fo503oy5y" path="res://Scripts/Controllers/VendorController.cs" id="50_vendor"]
+[ext_resource type="Script" uid="uid://bialuy714c8qq" path="res://Scripts/UI/MapFrame.cs" id="51_map_frame"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/boss_bar.tscn" id="53_boss_bar"]
+[ext_resource type="Resource" path="res://Resources/Items/Weapons/training_sword.tres" id="item_training_sword"]
 
 [sub_resource type="Environment" id="Env_level"]
 background_mode = 1
@@ -50,12 +51,16 @@ fog_sky_affect = 0.0
 fog_depth_begin = 31.7
 fog_depth_end = 55.7
 
-[sub_resource type="QuadMesh" id="Mesh_unit_outline"]
-size = Vector2(2, 2)
-
 [sub_resource type="ShaderMaterial" id="Mat_unit_outline"]
 render_priority = 100
 shader = ExtResource("48_outline")
+shader_parameter/outline_width = 1
+shader_parameter/outline_color = Color(0.02, 0.015, 0.015, 1)
+shader_parameter/highlight_color = Color(0.9, 0.12, 0.05, 1)
+shader_parameter/glow_saturation = 0.35
+
+[sub_resource type="QuadMesh" id="Mesh_unit_outline"]
+size = Vector2(2, 2)
 
 [sub_resource type="ShaderMaterial" id="Mat_screen"]
 shader = ExtResource("14_screen")
@@ -67,7 +72,7 @@ background_mode = 1
 ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
 
-[node name="Game" type="Node3D" node_paths=PackedStringArray("Enemies", "Status", "Look", "Descent", "Camera")]
+[node name="Game" type="Node3D" unique_id=1786511766 node_paths=PackedStringArray("Enemies", "Status", "Look", "Descent", "Camera")]
 script = ExtResource("40_game")
 Enemies = NodePath("EnemyController")
 Status = NodePath("Hud/Margin/Rows/Status")
@@ -75,29 +80,29 @@ Look = NodePath("Ps1Look")
 Descent = NodePath("Descent")
 Camera = NodePath("Camera")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1431244358]
 environment = SubResource("Env_level")
 
-[node name="Moonlight" type="DirectionalLight3D" parent="."]
+[node name="Moonlight" type="DirectionalLight3D" parent="." unique_id=941023072]
 transform = Transform3D(0.8660254, -0.35355338, 0.35355338, 0, 0.70710677, 0.70710677, -0.5, -0.61237246, 0.61237246, 0, 10, 0)
 light_color = Color(0.75, 0.5, 0.45, 1)
 light_energy = 0.12
 shadow_enabled = true
 directional_shadow_max_distance = 90.0
 
-[node name="Environment" type="Node3D" parent="."]
+[node name="Environment" type="Node3D" parent="." unique_id=1556852382]
 
-[node name="LevelNavigation" type="NavigationRegion3D" parent="." node_paths=PackedStringArray("SourceRoot")]
+[node name="LevelNavigation" type="NavigationRegion3D" parent="." unique_id=774141322 node_paths=PackedStringArray("SourceRoot")]
 script = ExtResource("2_navigation")
 SourceRoot = NodePath("../Environment")
 
-[node name="Hero" parent="." instance=ExtResource("5_hero")]
+[node name="Hero" parent="." unique_id=191123826 instance=ExtResource("5_hero")]
 StartingEquipment = Array[ExtResource("22_item_base")]([ExtResource("item_training_sword")])
 Movementspeed = 500.0
 
-[node name="Enemies" type="Node3D" parent="."]
+[node name="Enemies" type="Node3D" parent="." unique_id=1078435156]
 
-[node name="Camera" type="Camera3D" parent="." node_paths=PackedStringArray("Target")]
+[node name="Camera" type="Camera3D" parent="." unique_id=487164005 node_paths=PackedStringArray("Target")]
 transform = Transform3D(0.70710677, -0.35355338, 0.61237246, 0, 0.8660254, 0.5, -0.70710677, -0.35355338, 0.61237246, 24.5, 20, 24.5)
 projection = 1
 current = true
@@ -106,17 +111,15 @@ near = 0.1
 far = 150.0
 script = ExtResource("3_camera")
 Target = NodePath("../Hero")
-ViewHeight = 14.0
 
-[node name="UnitOutline" type="MeshInstance3D" parent="Camera"]
+[node name="UnitOutline" type="MeshInstance3D" parent="Camera" unique_id=1646467039]
+material_override = SubResource("Mat_unit_outline")
 cast_shadow = 0
 extra_cull_margin = 16384.0
 mesh = SubResource("Mesh_unit_outline")
-material_override = SubResource("Mat_unit_outline")
 
-[node name="Ps1Look" type="Node" parent="." node_paths=PackedStringArray("UnitOutline", "WorldViewport", "Screen", "Dither", "World", "Surroundings")]
+[node name="Ps1Look" type="Node" parent="." unique_id=2111930265 node_paths=PackedStringArray("UnitOutline", "WorldViewport", "Screen", "Dither", "World", "Surroundings")]
 script = ExtResource("12_look")
-OutlineWidth = 1
 SurfaceShader = ExtResource("13_surface")
 UnitOutline = NodePath("../Camera/UnitOutline")
 WorldViewport = NodePath("WorldViewport")
@@ -125,13 +128,13 @@ Dither = NodePath("WorldViewport/ColorDepth/Dither")
 World = NodePath("..")
 Surroundings = NodePath("../WorldEnvironment")
 
-[node name="WorldViewport" type="SubViewport" parent="Ps1Look"]
+[node name="WorldViewport" type="SubViewport" parent="Ps1Look" unique_id=1043056359]
 positional_shadow_atlas_size = 4096
 size = Vector2i(426, 240)
 
-[node name="ColorDepth" type="CanvasLayer" parent="Ps1Look/WorldViewport"]
+[node name="ColorDepth" type="CanvasLayer" parent="Ps1Look/WorldViewport" unique_id=733409175]
 
-[node name="Dither" type="ColorRect" parent="Ps1Look/WorldViewport/ColorDepth"]
+[node name="Dither" type="ColorRect" parent="Ps1Look/WorldViewport/ColorDepth" unique_id=342323277]
 material = SubResource("Mat_screen")
 anchors_preset = 15
 anchor_right = 1.0
@@ -140,18 +143,18 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Ps1Screen" type="CanvasLayer" parent="."]
+[node name="Ps1Screen" type="CanvasLayer" parent="." unique_id=1499829024]
 layer = -1
 
-[node name="Picture" type="TextureRect" parent="Ps1Screen"]
+[node name="Picture" type="TextureRect" parent="Ps1Screen" unique_id=1130319318]
 texture_filter = 1
 mouse_filter = 2
 expand_mode = 1
 
-[node name="CombatTextLayer" type="CanvasLayer" parent="."]
+[node name="CombatTextLayer" type="CanvasLayer" parent="." unique_id=2074768212]
 layer = 0
 
-[node name="LootLabels" type="Control" parent="CombatTextLayer" node_paths=PackedStringArray("Hero")]
+[node name="LootLabels" type="Control" parent="CombatTextLayer" unique_id=1438425862 node_paths=PackedStringArray("Hero")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -162,25 +165,25 @@ mouse_filter = 2
 script = ExtResource("31_loot_labels")
 Hero = NodePath("../../Hero")
 
-[node name="Hud" type="CanvasLayer" parent="."]
+[node name="Hud" type="CanvasLayer" parent="." unique_id=341669956]
 
-[node name="Margin" type="MarginContainer" parent="Hud"]
+[node name="Margin" type="MarginContainer" parent="Hud" unique_id=1292589200]
 offset_right = 560.0
 offset_bottom = 330.0
 mouse_filter = 2
 theme_override_constants/margin_left = 32
 theme_override_constants/margin_top = 32
 
-[node name="Rows" type="VBoxContainer" parent="Hud/Margin"]
+[node name="Rows" type="VBoxContainer" parent="Hud/Margin" unique_id=1398177670]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Status" type="Label" parent="Hud/Margin/Rows"]
+[node name="Status" type="Label" parent="Hud/Margin/Rows" unique_id=29844945]
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "FPS"
 
-[node name="BottomHud" type="Control" parent="Hud"]
+[node name="BottomHud" type="Control" parent="Hud" unique_id=499960578]
 layout_mode = 3
 anchors_preset = 7
 anchor_left = 0.5
@@ -194,7 +197,7 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
 
-[node name="LifeOrb" parent="Hud/BottomHud" node_paths=PackedStringArray("player") instance=ExtResource("23_orb")]
+[node name="LifeOrb" parent="Hud/BottomHud" unique_id=1948392445 node_paths=PackedStringArray("player") instance=ExtResource("23_orb")]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.25
@@ -209,7 +212,7 @@ grow_horizontal = 2
 grow_vertical = 0
 player = NodePath("../../../Hero")
 
-[node name="ManaOrb" parent="Hud/BottomHud" node_paths=PackedStringArray("player") instance=ExtResource("23_orb")]
+[node name="ManaOrb" parent="Hud/BottomHud" unique_id=1492958552 node_paths=PackedStringArray("player") instance=ExtResource("23_orb")]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.75
@@ -225,7 +228,7 @@ grow_vertical = 0
 player = NodePath("../../../Hero")
 type = 1
 
-[node name="SkillBar" type="HBoxContainer" parent="Hud/BottomHud" node_paths=PackedStringArray("player")]
+[node name="SkillBar" type="HBoxContainer" parent="Hud/BottomHud" unique_id=1703043320 node_paths=PackedStringArray("player")]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -239,7 +242,7 @@ grow_vertical = 0
 script = ExtResource("25_skill_bar")
 player = NodePath("../../../Hero")
 
-[node name="SegmentedXpBar" parent="Hud/BottomHud" node_paths=PackedStringArray("player") instance=ExtResource("24_xp_bar")]
+[node name="SegmentedXpBar" parent="Hud/BottomHud" unique_id=17756933 node_paths=PackedStringArray("player") instance=ExtResource("24_xp_bar")]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
@@ -254,7 +257,7 @@ grow_horizontal = 2
 grow_vertical = 0
 player = NodePath("../../../Hero")
 
-[node name="MapFrame" type="Control" parent="Hud" node_paths=PackedStringArray("Sheet")]
+[node name="MapFrame" type="Control" parent="Hud" unique_id=2096633512 node_paths=PackedStringArray("Sheet")]
 clip_contents = true
 layout_mode = 3
 anchors_preset = 9
@@ -265,7 +268,7 @@ mouse_filter = 2
 script = ExtResource("51_map_frame")
 Sheet = NodePath("../CharacterSheet")
 
-[node name="OverlayMapContainer" type="SubViewportContainer" parent="Hud/MapFrame"]
+[node name="OverlayMapContainer" type="SubViewportContainer" parent="Hud/MapFrame" unique_id=1964643324]
 visible = false
 modulate = Color(1, 1, 1, 0.6)
 layout_mode = 1
@@ -277,7 +280,7 @@ grow_vertical = 2
 mouse_filter = 2
 stretch = true
 
-[node name="OverlayMapViewport" type="SubViewport" parent="Hud/MapFrame/OverlayMapContainer" node_paths=PackedStringArray("Camera", "Target")]
+[node name="OverlayMapViewport" type="SubViewport" parent="Hud/MapFrame/OverlayMapContainer" unique_id=153148173 node_paths=PackedStringArray("Camera", "Target")]
 transparent_bg = true
 handle_input_locally = false
 size = Vector2i(2560, 1440)
@@ -286,14 +289,14 @@ script = ExtResource("8_map")
 Camera = NodePath("MapCamera")
 Target = NodePath("../../../../Hero")
 
-[node name="MapCamera" type="Camera3D" parent="Hud/MapFrame/OverlayMapContainer/OverlayMapViewport"]
+[node name="MapCamera" type="Camera3D" parent="Hud/MapFrame/OverlayMapContainer/OverlayMapViewport" unique_id=754383770]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 60, 0)
 environment = SubResource("Env_map")
 projection = 1
 size = 70.0
 far = 200.0
 
-[node name="LevelMap" type="Control" parent="Hud/MapFrame" node_paths=PackedStringArray("Descent", "Hero", "SurfaceMap")]
+[node name="LevelMap" type="Control" parent="Hud/MapFrame" unique_id=1335442182 node_paths=PackedStringArray("Descent", "Hero", "SurfaceMap")]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -307,24 +310,24 @@ Descent = NodePath("../../../Descent")
 Hero = NodePath("../../../Hero")
 SurfaceMap = NodePath("../OverlayMapContainer/OverlayMapViewport")
 
-[node name="ItemTooltip" parent="Hud" instance=ExtResource("21_tooltip")]
+[node name="ItemTooltip" parent="Hud" unique_id=573599836 instance=ExtResource("21_tooltip")]
 unique_name_in_owner = true
 visible = false
 
-[node name="CharacterSheet" parent="Hud" node_paths=PackedStringArray("player") instance=ExtResource("20_sheet")]
+[node name="CharacterSheet" parent="Hud" unique_id=1183167214 node_paths=PackedStringArray("player") instance=ExtResource("20_sheet")]
 unique_name_in_owner = true
 visible = false
 player = NodePath("../../Hero")
 
-[node name="LevelUpDialog" parent="Hud" node_paths=PackedStringArray("player") instance=ExtResource("28_level_up")]
+[node name="LevelUpDialog" parent="Hud" unique_id=1709529389 node_paths=PackedStringArray("player") instance=ExtResource("28_level_up")]
 unique_name_in_owner = true
 visible = false
 player = NodePath("../../Hero")
 
-[node name="OpenLevelUpDialogButton" parent="Hud" instance=ExtResource("29_level_up_button")]
+[node name="OpenLevelUpDialogButton" parent="Hud" unique_id=1738135043 instance=ExtResource("29_level_up_button")]
 unique_name_in_owner = true
 visible = false
-anchors_preset = -1
+anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
@@ -336,11 +339,11 @@ offset_bottom = -224.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="DeathScreen" parent="Hud" instance=ExtResource("30_death")]
+[node name="DeathScreen" parent="Hud" unique_id=2053409117 instance=ExtResource("30_death")]
 unique_name_in_owner = true
 visible = false
 
-[node name="TownPortalBadge" type="Label" parent="Hud" node_paths=PackedStringArray("Descent")]
+[node name="TownPortalBadge" type="Label" parent="Hud" unique_id=2035133397 node_paths=PackedStringArray("Descent")]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -349,7 +352,6 @@ offset_top = 32.0
 offset_right = -32.0
 offset_bottom = 72.0
 grow_horizontal = 0
-mouse_filter = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 26
@@ -358,44 +360,47 @@ horizontal_alignment = 2
 script = ExtResource("45_badge")
 Descent = NodePath("../../Descent")
 
-[node name="BossBar" parent="Hud" instance=ExtResource("53_boss_bar")]
+[node name="BossBar" parent="Hud" unique_id=1450106829 instance=ExtResource("53_boss_bar")]
 unique_name_in_owner = true
+layout_mode = 3
 
-[node name="CircleDialog" parent="Hud" instance=ExtResource("46_circle_dialog")]
+[node name="CircleDialog" parent="Hud" unique_id=719622922 instance=ExtResource("46_circle_dialog")]
 unique_name_in_owner = true
 visible = false
 
-[node name="PauseMenu" parent="Hud" node_paths=PackedStringArray("Game", "Descent", "WindowRoot") instance=ExtResource("49_pause_menu")]
+[node name="PauseMenu" parent="Hud" unique_id=1125820811 node_paths=PackedStringArray("Game", "Descent", "WindowRoot") instance=ExtResource("49_pause_menu")]
 unique_name_in_owner = true
 visible = false
 Game = NodePath("../../GameController")
 Descent = NodePath("../../Descent")
 WindowRoot = NodePath("..")
 
-[node name="Curtain" parent="Hud" instance=ExtResource("47_curtain")]
+[node name="Curtain" parent="Hud" unique_id=839367118 instance=ExtResource("47_curtain")]
 StartsDown = true
 
-[node name="Lootsystem" parent="." instance=ExtResource("26_lootsystem")]
+[node name="Commandline" parent="Hud" unique_id=1968794366 instance=ExtResource("28_i26dy")]
 
-[node name="EnemyController" type="Node" parent="." node_paths=PackedStringArray("Hero", "EnemyContainer", "Lootsystem")]
+[node name="Lootsystem" parent="." unique_id=2087298944 instance=ExtResource("26_lootsystem")]
+
+[node name="EnemyController" type="Node" parent="." unique_id=2061685279 node_paths=PackedStringArray("Hero", "EnemyContainer", "Lootsystem")]
 script = ExtResource("6_enemies")
 Hero = NodePath("../Hero")
 EnemyContainer = NodePath("../Enemies")
 Lootsystem = NodePath("../Lootsystem")
 
-[node name="VendorController" type="Node" parent="." node_paths=PackedStringArray("Hero", "Descent", "Lootsystem")]
+[node name="VendorController" type="Node" parent="." unique_id=1816138142 node_paths=PackedStringArray("Hero", "Descent", "Lootsystem")]
 script = ExtResource("50_vendor")
 Hero = NodePath("../Hero")
 Descent = NodePath("../Descent")
 Lootsystem = NodePath("../Lootsystem")
 
-[node name="GameController" type="Node" parent="." node_paths=PackedStringArray("Hero", "Descent", "Vendors")]
+[node name="GameController" type="Node" parent="." unique_id=1306374666 node_paths=PackedStringArray("Hero", "Descent", "Vendors")]
 script = ExtResource("7_game")
 Hero = NodePath("../Hero")
 Descent = NodePath("../Descent")
 Vendors = NodePath("../VendorController")
 
-[node name="Descent" type="Node" parent="." node_paths=PackedStringArray("Hero", "Enemies", "Navigation", "LevelRoot", "Surroundings", "Moonlight", "Curtain")]
+[node name="Descent" type="Node" parent="." unique_id=1760526823 node_paths=PackedStringArray("Hero", "Enemies", "Navigation", "LevelRoot", "Surroundings", "Moonlight", "Curtain")]
 script = ExtResource("32_descent")
 Hero = NodePath("../Hero")
 Enemies = NodePath("../EnemyController")
