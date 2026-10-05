@@ -28,3 +28,7 @@ obj/
 .vscode/
 *.user
 *.DotSettings.user
+
+# Seiten von poedb.tw, die tools/python/fetch.py lädt
+tools/python/cache/
+__pycache__/

@@ -680,6 +680,7 @@ Hoellenspiralenspiel
 ├── Enums               Gemeinsame Aufzählungen
 ├── Hoellenspiralenspiel.Tests   Unit-Tests mit NUnit, unter Balance ein Kampfsimulator, der die Resources des Spiels liest
 ├── default_bus_layout.tres      Busse für den Ton: Master, Music, Effects
+├── tools/python        Skripte für die Affixe aus Path of Exile: Laden von poedb.tw, Synonyme der Namen, Generator der Affix-Dateien. Godot übergeht tools
 └── docs                Roadmap, Analyse und der Vergleich von 2D und 3D
 ```
 

@@ -1,0 +1,2115 @@
+[
+ {
+  "type": "Suffix",
+  "family": [
+   "Strength"
+  ],
+  "template": "+# to Strength",
+  "tiers": [
+   {
+    "name": "of the Brute",
+    "level": 1,
+    "weight": 1000,
+    "values": [
+     [
+      8.0,
+      12.0
+     ]
+    ],
+    "lines": [
+     "+(8—12) to Strength"
+    ],
+    "tags": [
+     "Attribute"
+    ]
+   },
+   {
+    "name": "of the Wrestler",
+    "level": 11,
+    "weight": 1000,
+    "values": [
+     [
+      13.0,
+      17.0
+     ]
+    ],
+    "lines": [
+     "+(13—17) to Strength"
+    ],
+    "tags": [
+     "Attribute"
+    ]
+   },
+   {
+    "name": "of the Bear",
+    "level": 22,
+    "weight": 1000,
+    "values": [
+     [
+      18.0,
+      22.0
+     ]
+    ],
+    "lines": [
+     "+(18—22) to Strength"
+    ],
+    "tags": [
+     "Attribute"
+    ]
+   },
+   {
+    "name": "of the Lion",
+    "level": 33,
+    "weight": 1000,
+    "values": [
+     [
+      23.0,
+      27.0
+     ]
+    ],
+    "lines": [
+     "+(23—27) to Strength"
+    ],
+    "tags": [
+     "Attribute"
+    ]
+   },
+   {
+    "name": "of the Gorilla",
+    "level": 44,
+    "weight": 1000,
+    "values": [
+     [
+      28.0,
+      32.0
+     ]
+    ],
+    "lines": [
+     "+(28—32) to Strength"
+    ],
+    "tags": [
+     "Attribute"
+    ]
+   },
+   {
+    "name": "of the Goliath",
+    "level": 55,
+    "weight": 1000,
+    "values": [
+     [
+      33.0,
+      37.0
+     ]
+    ],
+    "lines": [
+     "+(33—37) to Strength"
+    ],
+    "tags": [
+     "Attribute"
+    ]
+   },
+   {
+    "name": "of the Leviathan",
+    "level": 66,
+    "weight": 1000,
+    "values": [
+     [
+      38.0,
+      42.0
+     ]
+    ],
+    "lines": [
+     "+(38—42) to Strength"
+    ],
+    "tags": [
+     "Attribute"
+    ]
+   },
+   {
+    "name": "of the Titan",
+    "level": 74,
+    "weight": 1000,
+    "values": [
+     [
+      43.0,
+      50.0
+     ]
+    ],
+    "lines": [
+     "+(43—50) to Strength"
+    ],
+    "tags": [
+     "Attribute"
+    ]
+   },
+   {
+    "name": "of the Gods",
+    "level": 82,
+    "weight": 1000,
+    "values": [
+     [
+      51.0,
+      55.0
+     ]
+    ],
+    "lines": [
+     "+(51—55) to Strength"
+    ],
+    "tags": [
+     "Attribute"
+    ]
+   }
+  ]
+ },
+ {
+  "type": "Prefix",
+  "family": [
+   "IncreasedLife"
+  ],
+  "template": "+# to maximum Life",
+  "tiers": [
+   {
+    "name": "Hale",
+    "level": 1,
+    "weight": 1000,
+    "values": [
+     [
+      3.0,
+      9.0
+     ]
+    ],
+    "lines": [
+     "+(3—9) to maximum Life"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "Healthy",
+    "level": 5,
+    "weight": 1000,
+    "values": [
+     [
+      10.0,
+      24.0
+     ]
+    ],
+    "lines": [
+     "+(10—24) to maximum Life"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "Sanguine",
+    "level": 11,
+    "weight": 1000,
+    "values": [
+     [
+      25.0,
+      39.0
+     ]
+    ],
+    "lines": [
+     "+(25—39) to maximum Life"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "Stalwart",
+    "level": 18,
+    "weight": 1000,
+    "values": [
+     [
+      40.0,
+      54.0
+     ]
+    ],
+    "lines": [
+     "+(40—54) to maximum Life"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "Stout",
+    "level": 24,
+    "weight": 1000,
+    "values": [
+     [
+      55.0,
+      69.0
+     ]
+    ],
+    "lines": [
+     "+(55—69) to maximum Life"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "Robust",
+    "level": 30,
+    "weight": 1000,
+    "values": [
+     [
+      70.0,
+      84.0
+     ]
+    ],
+    "lines": [
+     "+(70—84) to maximum Life"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "Rotund",
+    "level": 36,
+    "weight": 1000,
+    "values": [
+     [
+      85.0,
+      99.0
+     ]
+    ],
+    "lines": [
+     "+(85—99) to maximum Life"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "Virile",
+    "level": 44,
+    "weight": 1000,
+    "values": [
+     [
+      100.0,
+      114.0
+     ]
+    ],
+    "lines": [
+     "+(100—114) to maximum Life"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "Athlete's",
+    "level": 54,
+    "weight": 1000,
+    "values": [
+     [
+      115.0,
+      129.0
+     ]
+    ],
+    "lines": [
+     "+(115—129) to maximum Life"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "Fecund",
+    "level": 64,
+    "weight": 1000,
+    "values": [
+     [
+      130.0,
+      144.0
+     ]
+    ],
+    "lines": [
+     "+(130—144) to maximum Life"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "Vigorous",
+    "level": 73,
+    "weight": 1000,
+    "values": [
+     [
+      145.0,
+      159.0
+     ]
+    ],
+    "lines": [
+     "+(145—159) to maximum Life"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "Rapturous",
+    "level": 81,
+    "weight": 1000,
+    "values": [
+     [
+      160.0,
+      174.0
+     ]
+    ],
+    "lines": [
+     "+(160—174) to maximum Life"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "Prime",
+    "level": 86,
+    "weight": 1000,
+    "values": [
+     [
+      175.0,
+      189.0
+     ]
+    ],
+    "lines": [
+     "+(175—189) to maximum Life"
+    ],
+    "tags": [
+     "Life"
+    ]
+   }
+  ]
+ },
+ {
+  "type": "Prefix",
+  "family": [
+   "DefencesPercent"
+  ],
+  "template": "#% increased Armour",
+  "tiers": [
+   {
+    "name": "Reinforced",
+    "level": 3,
+    "weight": 1000,
+    "values": [
+     [
+      15.0,
+      26.0
+     ]
+    ],
+    "lines": [
+     "(15—26)% increased Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Layered",
+    "level": 17,
+    "weight": 1000,
+    "values": [
+     [
+      27.0,
+      42.0
+     ]
+    ],
+    "lines": [
+     "(27—42)% increased Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Lobstered",
+    "level": 29,
+    "weight": 1000,
+    "values": [
+     [
+      43.0,
+      55.0
+     ]
+    ],
+    "lines": [
+     "(43—55)% increased Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Buttressed",
+    "level": 42,
+    "weight": 1000,
+    "values": [
+     [
+      56.0,
+      67.0
+     ]
+    ],
+    "lines": [
+     "(56—67)% increased Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Thickened",
+    "level": 60,
+    "weight": 1000,
+    "values": [
+     [
+      68.0,
+      79.0
+     ]
+    ],
+    "lines": [
+     "(68—79)% increased Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Girded",
+    "level": 72,
+    "weight": 1000,
+    "values": [
+     [
+      80.0,
+      91.0
+     ]
+    ],
+    "lines": [
+     "(80—91)% increased Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Impregnable",
+    "level": 84,
+    "weight": 1000,
+    "values": [
+     [
+      92.0,
+      100.0
+     ]
+    ],
+    "lines": [
+     "(92—100)% increased Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Impenetrable",
+    "level": 86,
+    "weight": 1000,
+    "values": [
+     [
+      101.0,
+      110.0
+     ]
+    ],
+    "lines": [
+     "(101—110)% increased Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   }
+  ]
+ },
+ {
+  "type": "Prefix",
+  "family": [
+   "DefencesPercentAndStunRecovery"
+  ],
+  "template": "#% increased Armour / #% increased Stun and Block Recovery",
+  "tiers": [
+   {
+    "name": "Beetle's",
+    "level": 1,
+    "weight": 1000,
+    "values": [
+     [
+      6.0,
+      13.0
+     ],
+     [
+      6.0,
+      7.0
+     ]
+    ],
+    "lines": [
+     "(6—13)% increased Armour",
+     "(6—7)% increased Stun and Block Recovery"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Crab's",
+    "level": 17,
+    "weight": 1000,
+    "values": [
+     [
+      14.0,
+      20.0
+     ],
+     [
+      8.0,
+      9.0
+     ]
+    ],
+    "lines": [
+     "(14—20)% increased Armour",
+     "(8—9)% increased Stun and Block Recovery"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Armadillo's",
+    "level": 29,
+    "weight": 1000,
+    "values": [
+     [
+      21.0,
+      26.0
+     ],
+     [
+      10.0,
+      11.0
+     ]
+    ],
+    "lines": [
+     "(21—26)% increased Armour",
+     "(10—11)% increased Stun and Block Recovery"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Rhino's",
+    "level": 42,
+    "weight": 1000,
+    "values": [
+     [
+      27.0,
+      32.0
+     ],
+     [
+      12.0,
+      13.0
+     ]
+    ],
+    "lines": [
+     "(27—32)% increased Armour",
+     "(12—13)% increased Stun and Block Recovery"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Elephant's",
+    "level": 60,
+    "weight": 1000,
+    "values": [
+     [
+      33.0,
+      38.0
+     ],
+     [
+      14.0,
+      15.0
+     ]
+    ],
+    "lines": [
+     "(33—38)% increased Armour",
+     "(14—15)% increased Stun and Block Recovery"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Mammoth's",
+    "level": 78,
+    "weight": 1000,
+    "values": [
+     [
+      39.0,
+      42.0
+     ],
+     [
+      16.0,
+      17.0
+     ]
+    ],
+    "lines": [
+     "(39—42)% increased Armour",
+     "(16—17)% increased Stun and Block Recovery"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   }
+  ]
+ },
+ {
+  "type": "Prefix",
+  "family": [
+   "BaseLocalDefences"
+  ],
+  "template": "+# to Armour",
+  "tiers": [
+   {
+    "name": "Lacquered",
+    "level": 1,
+    "weight": 1000,
+    "values": [
+     [
+      6.0,
+      12.0
+     ]
+    ],
+    "lines": [
+     "+(6—12) to Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Studded",
+    "level": 11,
+    "weight": 1000,
+    "values": [
+     [
+      13.0,
+      35.0
+     ]
+    ],
+    "lines": [
+     "+(13—35) to Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Ribbed",
+    "level": 17,
+    "weight": 1000,
+    "values": [
+     [
+      36.0,
+      63.0
+     ]
+    ],
+    "lines": [
+     "+(36—63) to Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Fortified",
+    "level": 23,
+    "weight": 1000,
+    "values": [
+     [
+      64.0,
+      82.0
+     ]
+    ],
+    "lines": [
+     "+(64—82) to Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Plated",
+    "level": 29,
+    "weight": 1000,
+    "values": [
+     [
+      83.0,
+      101.0
+     ]
+    ],
+    "lines": [
+     "+(83—101) to Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Carapaced",
+    "level": 35,
+    "weight": 1000,
+    "values": [
+     [
+      102.0,
+      120.0
+     ]
+    ],
+    "lines": [
+     "+(102—120) to Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Encased",
+    "level": 43,
+    "weight": 1000,
+    "values": [
+     [
+      121.0,
+      150.0
+     ]
+    ],
+    "lines": [
+     "+(121—150) to Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Enveloped",
+    "level": 51,
+    "weight": 1000,
+    "values": [
+     [
+      151.0,
+      200.0
+     ]
+    ],
+    "lines": [
+     "+(151—200) to Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Abating",
+    "level": 60,
+    "weight": 1000,
+    "values": [
+     [
+      201.0,
+      300.0
+     ]
+    ],
+    "lines": [
+     "+(201—300) to Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Unmoving",
+    "level": 69,
+    "weight": 1000,
+    "values": [
+     [
+      301.0,
+      400.0
+     ]
+    ],
+    "lines": [
+     "+(301—400) to Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Impervious",
+    "level": 77,
+    "weight": 1000,
+    "values": [
+     [
+      401.0,
+      500.0
+     ]
+    ],
+    "lines": [
+     "+(401—500) to Armour"
+    ],
+    "tags": [
+     "Defences",
+     "Armour"
+    ]
+   }
+  ]
+ },
+ {
+  "type": "Prefix",
+  "family": [
+   "BaseLocalDefencesAndLife"
+  ],
+  "template": "+# to Armour / +# to maximum Life",
+  "tiers": [
+   {
+    "name": "Oyster's",
+    "level": 30,
+    "weight": 1000,
+    "values": [
+     [
+      20.0,
+      32.0
+     ],
+     [
+      18.0,
+      23.0
+     ]
+    ],
+    "lines": [
+     "+(20—32) to Armour",
+     "+(18—23) to maximum Life"
+    ],
+    "tags": [
+     "Life",
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Urchin's",
+    "level": 46,
+    "weight": 1000,
+    "values": [
+     [
+      33.0,
+      48.0
+     ],
+     [
+      24.0,
+      28.0
+     ]
+    ],
+    "lines": [
+     "+(33—48) to Armour",
+     "+(24—28) to maximum Life"
+    ],
+    "tags": [
+     "Life",
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Nautilus's",
+    "level": 62,
+    "weight": 1000,
+    "values": [
+     [
+      49.0,
+      96.0
+     ],
+     [
+      29.0,
+      33.0
+     ]
+    ],
+    "lines": [
+     "+(49—96) to Armour",
+     "+(29—33) to maximum Life"
+    ],
+    "tags": [
+     "Life",
+     "Defences",
+     "Armour"
+    ]
+   },
+   {
+    "name": "Crocodile's",
+    "level": 78,
+    "weight": 500,
+    "values": [
+     [
+      97.0,
+      144.0
+     ],
+     [
+      34.0,
+      38.0
+     ]
+    ],
+    "lines": [
+     "+(97—144) to Armour",
+     "+(34—38) to maximum Life"
+    ],
+    "tags": [
+     "Life",
+     "Defences",
+     "Armour"
+    ]
+   }
+  ]
+ },
+ {
+  "type": "Suffix",
+  "family": [
+   "LifeRegeneration"
+  ],
+  "template": "Regenerate # Life per second",
+  "tiers": [
+   {
+    "name": "of the Newt",
+    "level": 1,
+    "weight": 1000,
+    "values": [
+     [
+      1.0,
+      2.0
+     ]
+    ],
+    "lines": [
+     "Regenerate (1—2) Life per second"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "of the Lizard",
+    "level": 7,
+    "weight": 1000,
+    "values": [
+     [
+      2.1,
+      8.0
+     ]
+    ],
+    "lines": [
+     "Regenerate (2.1—8) Life per second"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "of the Flatworm",
+    "level": 19,
+    "weight": 1000,
+    "values": [
+     [
+      8.1,
+      16.0
+     ]
+    ],
+    "lines": [
+     "Regenerate (8.1—16) Life per second"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "of the Starfish",
+    "level": 31,
+    "weight": 1000,
+    "values": [
+     [
+      16.1,
+      24.0
+     ]
+    ],
+    "lines": [
+     "Regenerate (16.1—24) Life per second"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "of the Hydra",
+    "level": 44,
+    "weight": 1000,
+    "values": [
+     [
+      24.1,
+      32.0
+     ]
+    ],
+    "lines": [
+     "Regenerate (24.1—32) Life per second"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "of the Troll",
+    "level": 55,
+    "weight": 1000,
+    "values": [
+     [
+      32.1,
+      48.0
+     ]
+    ],
+    "lines": [
+     "Regenerate (32.1—48) Life per second"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "of Ryslatha",
+    "level": 68,
+    "weight": 1000,
+    "values": [
+     [
+      48.1,
+      64.0
+     ]
+    ],
+    "lines": [
+     "Regenerate (48.1—64) Life per second"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "of the Phoenix",
+    "level": 74,
+    "weight": 1000,
+    "values": [
+     [
+      64.1,
+      96.0
+     ]
+    ],
+    "lines": [
+     "Regenerate (64.1—96) Life per second"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "of Recuperation",
+    "level": 78,
+    "weight": 1000,
+    "values": [
+     [
+      96.1,
+      128.0
+     ]
+    ],
+    "lines": [
+     "Regenerate (96.1—128) Life per second"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "of Life-giving",
+    "level": 83,
+    "weight": 1000,
+    "values": [
+     [
+      128.1,
+      152.0
+     ]
+    ],
+    "lines": [
+     "Regenerate (128.1—152) Life per second"
+    ],
+    "tags": [
+     "Life"
+    ]
+   },
+   {
+    "name": "of Convalescence",
+    "level": 86,
+    "weight": 1000,
+    "values": [
+     [
+      152.1,
+      176.0
+     ]
+    ],
+    "lines": [
+     "Regenerate (152.1—176) Life per second"
+    ],
+    "tags": [
+     "Life"
+    ]
+   }
+  ]
+ },
+ {
+  "type": "Suffix",
+  "family": [
+   "FireResistance"
+  ],
+  "template": "+#% to Fire Resistance",
+  "tiers": [
+   {
+    "name": "of the Whelpling",
+    "level": 1,
+    "weight": 1000,
+    "values": [
+     [
+      6.0,
+      11.0
+     ]
+    ],
+    "lines": [
+     "+(6—11)% to Fire Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Fire",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Salamander",
+    "level": 12,
+    "weight": 1000,
+    "values": [
+     [
+      12.0,
+      17.0
+     ]
+    ],
+    "lines": [
+     "+(12—17)% to Fire Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Fire",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Drake",
+    "level": 24,
+    "weight": 1000,
+    "values": [
+     [
+      18.0,
+      23.0
+     ]
+    ],
+    "lines": [
+     "+(18—23)% to Fire Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Fire",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Kiln",
+    "level": 36,
+    "weight": 1000,
+    "values": [
+     [
+      24.0,
+      29.0
+     ]
+    ],
+    "lines": [
+     "+(24—29)% to Fire Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Fire",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Furnace",
+    "level": 48,
+    "weight": 1000,
+    "values": [
+     [
+      30.0,
+      35.0
+     ]
+    ],
+    "lines": [
+     "+(30—35)% to Fire Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Fire",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Volcano",
+    "level": 60,
+    "weight": 1000,
+    "values": [
+     [
+      36.0,
+      41.0
+     ]
+    ],
+    "lines": [
+     "+(36—41)% to Fire Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Fire",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Magma",
+    "level": 72,
+    "weight": 1000,
+    "values": [
+     [
+      42.0,
+      45.0
+     ]
+    ],
+    "lines": [
+     "+(42—45)% to Fire Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Fire",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of Tzteosh",
+    "level": 84,
+    "weight": 1000,
+    "values": [
+     [
+      46.0,
+      48.0
+     ]
+    ],
+    "lines": [
+     "+(46—48)% to Fire Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Fire",
+     "Resistance"
+    ]
+   }
+  ]
+ },
+ {
+  "type": "Suffix",
+  "family": [
+   "ColdResistance"
+  ],
+  "template": "+#% to Cold Resistance",
+  "tiers": [
+   {
+    "name": "of the Inuit",
+    "level": 1,
+    "weight": 1000,
+    "values": [
+     [
+      6.0,
+      11.0
+     ]
+    ],
+    "lines": [
+     "+(6—11)% to Cold Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Cold",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Seal",
+    "level": 14,
+    "weight": 1000,
+    "values": [
+     [
+      12.0,
+      17.0
+     ]
+    ],
+    "lines": [
+     "+(12—17)% to Cold Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Cold",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Penguin",
+    "level": 26,
+    "weight": 1000,
+    "values": [
+     [
+      18.0,
+      23.0
+     ]
+    ],
+    "lines": [
+     "+(18—23)% to Cold Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Cold",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Yeti",
+    "level": 38,
+    "weight": 1000,
+    "values": [
+     [
+      24.0,
+      29.0
+     ]
+    ],
+    "lines": [
+     "+(24—29)% to Cold Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Cold",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Walrus",
+    "level": 50,
+    "weight": 1000,
+    "values": [
+     [
+      30.0,
+      35.0
+     ]
+    ],
+    "lines": [
+     "+(30—35)% to Cold Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Cold",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Polar Bear",
+    "level": 60,
+    "weight": 1000,
+    "values": [
+     [
+      36.0,
+      41.0
+     ]
+    ],
+    "lines": [
+     "+(36—41)% to Cold Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Cold",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Ice",
+    "level": 72,
+    "weight": 1000,
+    "values": [
+     [
+      42.0,
+      45.0
+     ]
+    ],
+    "lines": [
+     "+(42—45)% to Cold Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Cold",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of Haast",
+    "level": 84,
+    "weight": 1000,
+    "values": [
+     [
+      46.0,
+      48.0
+     ]
+    ],
+    "lines": [
+     "+(46—48)% to Cold Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Cold",
+     "Resistance"
+    ]
+   }
+  ]
+ },
+ {
+  "type": "Suffix",
+  "family": [
+   "LightningResistance"
+  ],
+  "template": "+#% to Lightning Resistance",
+  "tiers": [
+   {
+    "name": "of the Cloud",
+    "level": 1,
+    "weight": 1000,
+    "values": [
+     [
+      6.0,
+      11.0
+     ]
+    ],
+    "lines": [
+     "+(6—11)% to Lightning Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Lightning",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Squall",
+    "level": 13,
+    "weight": 1000,
+    "values": [
+     [
+      12.0,
+      17.0
+     ]
+    ],
+    "lines": [
+     "+(12—17)% to Lightning Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Lightning",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Storm",
+    "level": 25,
+    "weight": 1000,
+    "values": [
+     [
+      18.0,
+      23.0
+     ]
+    ],
+    "lines": [
+     "+(18—23)% to Lightning Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Lightning",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Thunderhead",
+    "level": 37,
+    "weight": 1000,
+    "values": [
+     [
+      24.0,
+      29.0
+     ]
+    ],
+    "lines": [
+     "+(24—29)% to Lightning Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Lightning",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Tempest",
+    "level": 49,
+    "weight": 1000,
+    "values": [
+     [
+      30.0,
+      35.0
+     ]
+    ],
+    "lines": [
+     "+(30—35)% to Lightning Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Lightning",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Maelstrom",
+    "level": 60,
+    "weight": 1000,
+    "values": [
+     [
+      36.0,
+      41.0
+     ]
+    ],
+    "lines": [
+     "+(36—41)% to Lightning Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Lightning",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of the Lightning",
+    "level": 72,
+    "weight": 1000,
+    "values": [
+     [
+      42.0,
+      45.0
+     ]
+    ],
+    "lines": [
+     "+(42—45)% to Lightning Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Lightning",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of Ephij",
+    "level": 84,
+    "weight": 1000,
+    "values": [
+     [
+      46.0,
+      48.0
+     ]
+    ],
+    "lines": [
+     "+(46—48)% to Lightning Resistance"
+    ],
+    "tags": [
+     "Elemental",
+     "Lightning",
+     "Resistance"
+    ]
+   }
+  ]
+ },
+ {
+  "type": "Suffix",
+  "family": [
+   "ChaosResistance"
+  ],
+  "template": "+#% to Chaos Resistance",
+  "tiers": [
+   {
+    "name": "of the Lost",
+    "level": 16,
+    "weight": 250,
+    "values": [
+     [
+      5.0,
+      10.0
+     ]
+    ],
+    "lines": [
+     "+(5—10)% to Chaos Resistance"
+    ],
+    "tags": [
+     "Chaos",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of Banishment",
+    "level": 30,
+    "weight": 250,
+    "values": [
+     [
+      11.0,
+      15.0
+     ]
+    ],
+    "lines": [
+     "+(11—15)% to Chaos Resistance"
+    ],
+    "tags": [
+     "Chaos",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of Eviction",
+    "level": 44,
+    "weight": 250,
+    "values": [
+     [
+      16.0,
+      20.0
+     ]
+    ],
+    "lines": [
+     "+(16—20)% to Chaos Resistance"
+    ],
+    "tags": [
+     "Chaos",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of Expulsion",
+    "level": 56,
+    "weight": 250,
+    "values": [
+     [
+      21.0,
+      25.0
+     ]
+    ],
+    "lines": [
+     "+(21—25)% to Chaos Resistance"
+    ],
+    "tags": [
+     "Chaos",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of Exile",
+    "level": 65,
+    "weight": 250,
+    "values": [
+     [
+      26.0,
+      30.0
+     ]
+    ],
+    "lines": [
+     "+(26—30)% to Chaos Resistance"
+    ],
+    "tags": [
+     "Chaos",
+     "Resistance"
+    ]
+   },
+   {
+    "name": "of Bameth",
+    "level": 81,
+    "weight": 250,
+    "values": [
+     [
+      31.0,
+      35.0
+     ]
+    ],
+    "lines": [
+     "+(31—35)% to Chaos Resistance"
+    ],
+    "tags": [
+     "Chaos",
+     "Resistance"
+    ]
+   }
+  ]
+ },
+ {
+  "type": "Suffix",
+  "family": [
+   "StunRecovery"
+  ],
+  "template": "#% increased Stun and Block Recovery",
+  "tiers": [
+   {
+    "name": "of Thick Skin",
+    "level": 1,
+    "weight": 1000,
+    "values": [
+     [
+      11.0,
+      13.0
+     ]
+    ],
+    "lines": [
+     "(11—13)% increased Stun and Block Recovery"
+    ],
+    "tags": []
+   },
+   {
+    "name": "of Stone Skin",
+    "level": 17,
+    "weight": 1000,
+    "values": [
+     [
+      14.0,
+      16.0
+     ]
+    ],
+    "lines": [
+     "(14—16)% increased Stun and Block Recovery"
+    ],
+    "tags": []
+   },
+   {
+    "name": "of Iron Skin",
+    "level": 28,
+    "weight": 1000,
+    "values": [
+     [
+      17.0,
+      19.0
+     ]
+    ],
+    "lines": [
+     "(17—19)% increased Stun and Block Recovery"
+    ],
+    "tags": []
+   },
+   {
+    "name": "of Steel Skin",
+    "level": 42,
+    "weight": 1000,
+    "values": [
+     [
+      20.0,
+      22.0
+     ]
+    ],
+    "lines": [
+     "(20—22)% increased Stun and Block Recovery"
+    ],
+    "tags": []
+   },
+   {
+    "name": "of Adamantite Skin",
+    "level": 56,
+    "weight": 1000,
+    "values": [
+     [
+      23.0,
+      25.0
+     ]
+    ],
+    "lines": [
+     "(23—25)% increased Stun and Block Recovery"
+    ],
+    "tags": []
+   },
+   {
+    "name": "of Corundum Skin",
+    "level": 79,
+    "weight": 1000,
+    "values": [
+     [
+      26.0,
+      28.0
+     ]
+    ],
+    "lines": [
+     "(26—28)% increased Stun and Block Recovery"
+    ],
+    "tags": []
+   }
+  ]
+ },
+ {
+  "type": "Prefix",
+  "family": [
+   "AttackerTakesDamageNoRange"
+  ],
+  "template": "Reflects # Physical Damage to Melee Attackers",
+  "tiers": [
+   {
+    "name": "Thorny",
+    "level": 1,
+    "weight": 1000,
+    "values": [
+     [
+      1.0,
+      4.0
+     ]
+    ],
+    "lines": [
+     "Reflects (1—4) Physical Damage to Melee Attackers"
+    ],
+    "tags": [
+     "Damage",
+     "Physical"
+    ]
+   },
+   {
+    "name": "Spiny",
+    "level": 10,
+    "weight": 1000,
+    "values": [
+     [
+      5.0,
+      10.0
+     ]
+    ],
+    "lines": [
+     "Reflects (5—10) Physical Damage to Melee Attackers"
+    ],
+    "tags": [
+     "Damage",
+     "Physical"
+    ]
+   },
+   {
+    "name": "Barbed",
+    "level": 20,
+    "weight": 1000,
+    "values": [
+     [
+      11.0,
+      24.0
+     ]
+    ],
+    "lines": [
+     "Reflects (11—24) Physical Damage to Melee Attackers"
+    ],
+    "tags": [
+     "Damage",
+     "Physical"
+    ]
+   },
+   {
+    "name": "Jagged",
+    "level": 35,
+    "weight": 1000,
+    "values": [
+     [
+      25.0,
+      50.0
+     ]
+    ],
+    "lines": [
+     "Reflects (25—50) Physical Damage to Melee Attackers"
+    ],
+    "tags": [
+     "Damage",
+     "Physical"
+    ]
+   }
+  ]
+ },
+ {
+  "type": "Suffix",
+  "family": [
+   "LocalAttributeRequirements"
+  ],
+  "template": "#% reduced Attribute Requirements",
+  "tiers": [
+   {
+    "name": "of the Worthy",
+    "level": 36,
+    "weight": 850,
+    "values": [
+     [
+      18.0,
+      18.0
+     ]
+    ],
+    "lines": [
+     "18% reduced Attribute Requirements"
+    ],
+    "tags": []
+   },
+   {
+    "name": "of the Apt",
+    "level": 60,
+    "weight": 850,
+    "values": [
+     [
+      32.0,
+      32.0
+     ]
+    ],
+    "lines": [
+     "32% reduced Attribute Requirements"
+    ],
+    "tags": []
+   }
+  ]
+ },
+ {
+  "type": "Suffix",
+  "family": [
+   "ReducedPhysicalDamageTaken"
+  ],
+  "template": "#% additional Physical Damage Reduction",
+  "tiers": [
+   {
+    "name": "of the Watchman",
+    "level": 45,
+    "weight": 1000,
+    "values": [
+     [
+      4.0,
+      4.0
+     ]
+    ],
+    "lines": [
+     "4% additional Physical Damage Reduction"
+    ],
+    "tags": [
+     "Physical"
+    ]
+   },
+   {
+    "name": "of the Sentry",
+    "level": 58,
+    "weight": 1000,
+    "values": [
+     [
+      5.0,
+      5.0
+     ]
+    ],
+    "lines": [
+     "5% additional Physical Damage Reduction"
+    ],
+    "tags": [
+     "Physical"
+    ]
+   },
+   {
+    "name": "of the Keeper",
+    "level": 67,
+    "weight": 1000,
+    "values": [
+     [
+      6.0,
+      6.0
+     ]
+    ],
+    "lines": [
+     "6% additional Physical Damage Reduction"
+    ],
+    "tags": [
+     "Physical"
+    ]
+   },
+   {
+    "name": "of the Protector",
+    "level": 77,
+    "weight": 1000,
+    "values": [
+     [
+      7.0,
+      7.0
+     ]
+    ],
+    "lines": [
+     "7% additional Physical Damage Reduction"
+    ],
+    "tags": [
+     "Physical"
+    ]
+   },
+   {
+    "name": "of the Conservator",
+    "level": 86,
+    "weight": 1000,
+    "values": [
+     [
+      8.0,
+      8.0
+     ]
+    ],
+    "lines": [
+     "8% additional Physical Damage Reduction"
+    ],
+    "tags": [
+     "Physical"
+    ]
+   }
+  ]
+ }
+]
