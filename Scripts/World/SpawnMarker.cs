@@ -1,9 +1,10 @@
 using Godot;
+using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Resources.Enemies;
 
 namespace Hoellenspiralenspiel.Scripts.World;
 
-public partial class SpawnMarker : Marker3D
+public partial class SpawnMarker : Marker3D, ISpawnDefinition
 {
     [Export]
     public EnemyResource Enemy { get; set; }

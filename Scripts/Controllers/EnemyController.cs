@@ -13,8 +13,10 @@ using Hoellenspiralenspiel.Scripts.Enemies;
 using Hoellenspiralenspiel.Scripts.Extensions;
 using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.Skills;
+using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.Units.Enemies;
+using Hoellenspiralenspiel.Scripts.Utils;
 using Hoellenspiralenspiel.Scripts.World;
 using Hoellenspiralenspiel.Scripts.World.Levels;
 
@@ -35,6 +37,7 @@ public partial class EnemyController : Node
     private readonly List<Node3D>   effects       = new();
     private readonly List<Enemy>    enemies       = new();
     private readonly List<BaseUnit> unitsNearSpot = new();
+    private readonly List<EnemyResource> availableEnemiesToSpawn = new();
 
     private int nextSpawnIndex;
     private int sightCursor;
@@ -50,6 +53,9 @@ public partial class EnemyController : Node
 
     [Export]
     public Lootsystem Lootsystem { get; set; }
+
+    [Export]
+    public Commandline Commandline { get; set; }
 
     //Jedes Monster der Karte hat dieses Level, plus die Anpassungen an Monster und Spawn-Marker
     [Export]
@@ -136,14 +142,48 @@ public partial class EnemyController : Node
     public IReadOnlyList<Enemy> Enemies => enemies;
 
     public event Action<Enemy> EnemyKilled;
+    public const string EnemiesPath = "res://Resources/Enemies";
 
     public override void _Ready()
     {
         EnemyContainer.ChildEnteredTree += NoteEffect;
         EnemyContainer.ChildExitingTree += child => effects.Remove(child as Node3D);
 
+        if(Commandline is not null)
+            Commandline.SpawnUnits += CommandlineOnSpawnUnits;
+        
         if (SpawnMarkers is not null)
             SpawnFrom(SpawnMarkers.GetAllChildren<SpawnMarker>());
+
+        FillAvailableEnemies();
+    }
+    private void FillAvailableEnemies()
+    {
+        foreach (var enemyResourcePath in ResourceFiles.ListIn(EnemiesPath))
+        {
+            if(ResourceLoader.Load<EnemyResource>(enemyResourcePath) is {} enemyResource)
+                availableEnemiesToSpawn.Add(enemyResource);
+        }
+    }
+
+    private void CommandlineOnSpawnUnits(string unitId, int amount)
+    {
+        var enemy = availableEnemiesToSpawn.FirstOrDefault(enemy => enemy.Id == unitId);
+
+        if (enemy is null)
+            return;
+
+        var markerMock = new SpawnMarker
+        {
+            Name = "CommandSpawn",
+            GlobalPosition = Hero.GlobalPosition,
+            Enemy = enemy,
+            AmountToSpawn = amount
+        };
+        
+        SpawnGroupAt(markerMock);
+        
+        markerMock.QueueFree();
     }
 
     //Neben den Gegnern hängen hier ihre Wirkungen: Projektile und Flächen

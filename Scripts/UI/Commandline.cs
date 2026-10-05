@@ -5,11 +5,14 @@ namespace Hoellenspiralenspiel.Scripts.UI;
 
 public partial class Commandline : Control
 {
+    public delegate void SpawnUnitsEvent(string unitId, int amount);
+
     [Export] private TextEdit textEdit;
+    public event SpawnUnitsEvent SpawnUnits;
 
     public override void _UnhandledKeyInput(InputEvent @event)
     {
-        if (@event is not InputEventKey { Keycode: Key.Enter } keyEvent || !keyEvent.IsReleased())
+        if (@event is not InputEventKey {Keycode: Key.Enter} keyEvent || !keyEvent.IsReleased())
             return;
 
         if (Visible)
@@ -19,15 +22,28 @@ public partial class Commandline : Control
     }
 
     private void ShowCommandline()
-        => Visible = true;
+    {
+        Visible = true;
+        
+        textEdit.GrabFocus();
+    }
 
     private void ExecuteCommand()
     {
-        CommandResolver.Resolve(textEdit.Text);
-        
+        var commandInterpretation = CommandResolver.Resolve(textEdit.Text);
+
         HideCommandline();
+        
+        if (commandInterpretation is not SpawnDefinition spawnDefinition)
+            return;
+
+        SpawnUnits?.Invoke(spawnDefinition.UnitId, spawnDefinition.Amount);
     }
 
     private void HideCommandline()
-        => Visible = false;
+    {
+        textEdit.Clear();
+        
+        Visible = false;
+    }
 }

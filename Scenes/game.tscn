@@ -379,14 +379,16 @@ WindowRoot = NodePath("..")
 StartsDown = true
 
 [node name="Commandline" parent="Hud" unique_id=1968794366 instance=ExtResource("28_i26dy")]
+visible = false
 
 [node name="Lootsystem" parent="." unique_id=2087298944 instance=ExtResource("26_lootsystem")]
 
-[node name="EnemyController" type="Node" parent="." unique_id=2061685279 node_paths=PackedStringArray("Hero", "EnemyContainer", "Lootsystem")]
+[node name="EnemyController" type="Node" parent="." unique_id=2061685279 node_paths=PackedStringArray("Hero", "EnemyContainer", "Lootsystem", "Commandline")]
 script = ExtResource("6_enemies")
 Hero = NodePath("../Hero")
 EnemyContainer = NodePath("../Enemies")
 Lootsystem = NodePath("../Lootsystem")
+Commandline = NodePath("../Hud/Commandline")
 
 [node name="VendorController" type="Node" parent="." unique_id=1816138142 node_paths=PackedStringArray("Hero", "Descent", "Lootsystem")]
 script = ExtResource("50_vendor")
