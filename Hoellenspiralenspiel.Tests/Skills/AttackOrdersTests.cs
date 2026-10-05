@@ -30,4 +30,23 @@ public class AttackOrdersTests
     [TestCase(false, false)]
     public void Stehenbleiben_SchlaegtImmerAusDemStand(bool isMelee, bool hasTarget)
         => Assert.That(AttackOrders.Choose(isMelee, hasTarget, true), Is.EqualTo(AttackOrder.InPlace));
+
+    [Test]
+    public void OhneAngriff_LaeuftDerHeldMitDerRichtung()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(AttackOrders.MovementCancels(true, false, false), Is.True);
+            Assert.That(AttackOrders.MovementCancels(true, false, true), Is.True);
+            Assert.That(AttackOrders.MovementCancels(false, false, false), Is.False, "ohne Richtung gibt es nichts abzubrechen");
+        });
+    }
+
+    [Test]
+    public void GehalteneRichtung_WartetAufDenAngriff()
+        => Assert.That(AttackOrders.MovementCancels(true, true, false), Is.False);
+
+    [Test]
+    public void NeuGedrueckteRichtung_BrichtDenAngriffAb()
+        => Assert.That(AttackOrders.MovementCancels(true, true, true), Is.True);
 }

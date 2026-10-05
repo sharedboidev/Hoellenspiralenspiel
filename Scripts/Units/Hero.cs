@@ -610,7 +610,7 @@ public partial class Hero
 
         var inputDirection = GetInputDirection();
 
-        if (inputDirection != Vector3.Zero)
+        if (AttackOrders.MovementCancels(inputDirection != Vector3.Zero, orderedSkill is not null, IsMovementJustPressed()))
         {
             CancelAttack();
 
@@ -644,6 +644,12 @@ public partial class Hero
 
         return Vector3.Zero;
     }
+
+    private static bool IsMovementJustPressed()
+        => Input.IsActionJustPressed(InputActions.MoveLeft) ||
+           Input.IsActionJustPressed(InputActions.MoveRight) ||
+           Input.IsActionJustPressed(InputActions.MoveUp) ||
+           Input.IsActionJustPressed(InputActions.MoveDown);
 
     //Oben auf dem Bildschirm ist die Blickrichtung der Kamera auf dem Boden
     private Vector3 GetInputDirection()

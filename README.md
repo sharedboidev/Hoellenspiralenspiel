@@ -146,6 +146,7 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 | Gehaltene Taste | Wiederholt den Skill, sobald er wieder bereit ist |
 | Stehenbleiben | Mit gehaltenem `Shift` greift der Held aus dem Stand Richtung Maus an, statt zum Gegner zu laufen, auch ohne Gegner unter der Maus. Ohne `Shift` braucht ein Nahkampfangriff einen Gegner unter der Maus. Zauber wirkt er ohnehin aus dem Stand |
 | Passende Waffe | Skills für Nahkampfwaffen liegen rot hinterlegt auf der Leiste, solange der Held einen Bogen trägt, und lösen nicht aus. Ihr Tooltip sagt, warum |
+| Skills unterbrechen das Laufen | Wer im Laufen einen Skill auslöst, bleibt stehen oder läuft zum Ziel, führt ihn aus und läuft danach in die gehaltene Richtung weiter |
 | Schlag und Zauber binden | Ein Schlag dauert so lange, wie das Angriffstempo vorgibt, ein Zauber seine Wirkzeit, Standard 0,4 s. Beide lösen nach der Hälfte aus. Ein Nahkampfschlag holt bis dahin aus und zieht mit dem Treffer in 0,15 s durch. Bis zum Ende steht der Held, dreht sich nicht und beginnt nichts Neues. Wird währenddessen eine Skill-Taste gedrückt und gehalten, folgt ihr Skill danach |
 | Kosten | Mana und Abklingzeit pro Skill, Ton bei leerem Mana |
 | Tooltip mit DPS | Schaden pro Sekunde, mittlerer Treffer, Krit-Chance, Einsätze pro Sekunde, Wirkzeit und Abklingzeit, gerechnet mit den Werten des Helden |
@@ -512,7 +513,7 @@ Die Skill-Leiste zeigt immer die aktuelle Taste.
 
 | Taste | Aktion |
 |---|---|
-| `W` `A` `S` `D` | Bewegen, bricht Hinlaufen ab. Während eines Schlags oder Zaubers steht der Held |
+| `W` `A` `S` `D` | Bewegen. Ein Skill unterbricht das Laufen: Eine gehaltene Richtung wartet, bis er ausgeführt ist, auch wenn der Held dafür erst zum Ziel läuft. Eine neu gedrückte Richtung bricht das Hinlaufen ab. Während eines Schlags oder Zaubers steht der Held |
 | Maus | Der Held schaut immer zum Mauszeiger, auch beim Laufen. Während eines Schlags oder Zaubers dreht er sich nicht |
 | Linke Maustaste | Attack: auf einen Gegner klicken, der Held läuft hin und greift an |
 | Rechte Maustaste | Lightning Strike in Richtung der Maus |

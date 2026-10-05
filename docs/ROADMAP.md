@@ -23,7 +23,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | Sichtbare Ausrüstung | Ja, man soll Ausrüstung am Helden sehen, auch das Amulett. Nur die Ringe bleiben unsichtbar. Gegner zeigen ihre Ausrüstung, sobald es Gegner mit Armen gibt. Entschieden am 29.09.2026. |
 | Modelle | Held und humanoide Gegner bekommen ein Skelett mit starrer Gewichtung, in Godot `Skeleton3D`. Blobs und einfache Gegner bleiben bei Knoten und Tweens. Entschieden am 29.09.2026, löst "Starre Teile ohne Skelett" vom selben Tag ab. |
 | Kontrast der Figuren | Held und Gegner tragen einen dunklen Umriss, der Gegner unter der Maus einen roten. Randlicht und Helligkeitskontrast sind verworfen. Entschieden am 29.09.2026 nach einem Vergleich im Spiel. Seit dem 30.09.2026 trägt auch alles, was der Held benutzen kann, einen Umriss: dunkel, oder wenn es leuchtet, in einer hellen Fassung seiner Farbe an der leuchtenden Fläche. |
-| Blick und Skills | Der Held schaut immer zur Maus, auch beim Laufen. Schlag und Zauber binden ihn bis zu ihrem Ende, so lange läuft und dreht er sich nicht. Zauber haben dafür eine Wirkzeit je Zauber, Standard 0,4 s, und lösen nach der Hälfte aus. Entschieden am 30.09.2026. |
+| Blick und Skills | Der Held schaut immer zur Maus, auch beim Laufen. Schlag und Zauber binden ihn bis zu ihrem Ende, so lange läuft und dreht er sich nicht. Zauber haben dafür eine Wirkzeit je Zauber, Standard 0,4 s, und lösen nach der Hälfte aus. Entschieden am 30.09.2026. Ein Skill unterbricht das Laufen, auch bei gehaltener Richtungstaste. Entschieden am 05.10.2026. |
 | Spielstruktur | Hub (Stadt) plus Abstieg in einen Höllenkreis mit mehreren Ebenen |
 | Leveldesign | Etwa 90 % prozedural, dazu handgebaute Räume und Event-Locations, die gezielt eingestreut werden |
 | Multiplayer | Singleplayer zuerst, Koop soll später nachrüstbar bleiben |
@@ -3230,6 +3230,28 @@ Ursache: Der Held zog die Waffe schon während des Ausholens durch, von 0 bis 0,
 |---|---|
 | Build | Ohne Fehler und Warnungen |
 | Laufendes Spiel, headless und mit Fenster | Je 16 Schritte mit Cleave und Attack aus dem Stand, je Physik-Frame die Drehung der Waffe. Bei 1,43 Angriffen pro Sekunde kommt der Treffer nach 0,350 s, im selben Frame wie der Hieb. Bis dahin zieht die Waffe nie nach vorn, beim Treffer steht sie bei −89,4° (Cleave) und −69,5° (Attack). Danach zieht sie in 0,150 s bis +90° und +70° durch und steht am Ende wieder in Ruhe. Bilder von Ausholen, Treffer und drei Momenten des Durchziehens |
+
+Zweite Rückmeldung des Users, am selben Tag und grundsätzlich: Wird im Laufen ein Skill aktiviert, soll der Held das Laufen unterbrechen und den Skill ausführen.
+
+Bis dahin galt das nur für Zauber. Ein Angriff wurde von einer gehaltenen Richtungstaste im nächsten Frame wieder verworfen, im Laufen schlug der Held also nie zu.
+
+- Erledigt: Eine gehaltene Richtungstaste wartet, bis der Angriff ausgeführt ist. Der Held läuft wenn nötig zum Ziel, schlägt und läuft danach in die gehaltene Richtung weiter. Mit einer gehaltenen Skill-Taste schlägt er weiter, solange sie gehalten ist.
+- Erledigt: Erst eine neu gedrückte Richtungstaste bricht den Angriff ab, solange er noch nicht ausgeholt hat. Die Regel steht als `AttackOrders.MovementCancels` im Kern.
+
+Von mir festgelegt:
+
+| Punkt | Festlegung |
+|---|---|
+| Nahkampf ohne Ziel | Tut auch im Laufen nichts, der Held läuft weiter. Mit `Shift` schlägt er aus dem Stand |
+| Hinlaufen zum Ziel | Gehört zum Ausführen. Bei gehaltener Richtungstaste läuft der Held trotzdem zum Gegner unter der Maus |
+| Zauber | Unverändert, sie unterbrachen das Laufen schon vorher |
+| Laufen zu Truhe, Händler oder Beutel | Unverändert, eine gehaltene Richtung bricht es weiter ab. Es ist kein Skill |
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Unit-Tests | 3 neue für `MovementCancels`, zusammen 1809 |
+| Laufendes Spiel, headless | 15 Schritte mit echten Tasten im Hub. Bei gehaltenem `W` läuft Attack auf ein Ziel 3,5 m entfernt hin und trifft, danach läuft der Held mit `W` weiter. Cleave aus dem Stand schlägt, der Held steht 0 m weiter, danach läuft er. Ein neu gedrücktes `D` bricht das Hinlaufen ab, ohne Schlag. Frost Nova lässt ihn beim Wirken stehen. Cleave ohne Ziel startet nicht, und der Held läuft weiter. Gegenprobe mit dem alten Code: Attack und Cleave werden verworfen, 3 Schritte scheitern |
 
 ### M9: Inhalt und Politur (L, fortlaufend)
 
