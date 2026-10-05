@@ -4,6 +4,7 @@ using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Skills.Effects;
 using Hoellenspiralenspiel.Scripts.Units;
@@ -13,6 +14,9 @@ namespace Hoellenspiralenspiel.Scripts.Skills;
 
 public static class SkillExecutor
 {
+    //Die Kugeln springen aus der Mitte des Körpers
+    private const float ScatterStartHeightShare = 0.5f;
+
     private static readonly List<BaseUnit> UnitsInReach = new();
 
     public static void Execute(BaseUnit caster, SkillResource skill, SkillAim aim)
@@ -26,12 +30,12 @@ public static class SkillExecutor
                 LaunchProjectile(caster, cast, caster.WeaponProjectileScene, caster.Weapon.GetProjectile(), aim, caster.Weapon.ExtraProjectiles);
 
                 break;
-            case SkillDelivery.Weapon:
-                StrikeInMelee(caster, cast, skill.EffectScene, aim);
+            case SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike when caster.Weapon.IsRanged:
+                GD.PushWarning($"{caster.Name} braucht für {definition.Name} eine Nahkampfwaffe.");
 
                 break;
-            case SkillDelivery.WeaponSweep when caster.Weapon.IsRanged:
-                GD.PushWarning($"{caster.Name} braucht für {definition.Name} eine Nahkampfwaffe.");
+            case SkillDelivery.Weapon or SkillDelivery.MeleeStrike:
+                StrikeInMelee(caster, cast, skill, aim);
 
                 break;
             case SkillDelivery.WeaponSweep:
@@ -54,18 +58,50 @@ public static class SkillExecutor
     }
 
     //Der Hieb ist auch zu sehen, wenn er ins Leere geht. Trifft er, läuft er durch das Ziel
-    private static void StrikeInMelee(BaseUnit caster, SkillCast cast, PackedScene slashScene, SkillAim aim)
+    private static void StrikeInMelee(BaseUnit caster, SkillCast cast, SkillResource skill, SkillAim aim)
     {
-        var hits = aim.HasTarget && cast.CanHit(aim.Target) && caster.DistancePxTo(aim.Target) <= caster.Weapon.Reach;
+        var target = aim.Target;
+        var hits   = aim.HasTarget && cast.CanHit(target) && caster.DistancePxTo(target) <= caster.Weapon.Reach;
 
         var radiusPx = hits
-                           ? WorldScale.GroundDistancePx(caster.GlobalPosition, aim.Target.GlobalPosition)
+                           ? WorldScale.GroundDistancePx(caster.GlobalPosition, target.GlobalPosition)
                            : caster.BodyRadiusPx + caster.Weapon.Range;
 
-        ShowSlash(caster, slashScene, GetFacing(caster, aim), radiusPx);
+        ShowSlash(caster, skill.EffectScene, GetFacing(caster, aim), radiusPx);
 
-        if (hits)
-            cast.ApplyTo(aim.Target, true);
+        if (!hits)
+            return;
+
+        //Vor dem Treffer gemessen, er kann das Ziel töten
+        var scatterOrigin = target.GlobalPosition + Vector3.Up * (target.PickHeight * ScatterStartHeightShare);
+        var targetRadius  = target.BodyRadiusPx;
+
+        if (cast.ApplyTo(target, true).HasLanded)
+            Scatter(caster, skill, scatterOrigin, targetRadius);
+    }
+
+    //Die Kugeln springen aus dem Körper des Getroffenen und schlagen um die Stelle ein, an der er beim Treffer stand. Läuft er weg, kann er ihnen entkommen
+    private static void Scatter(BaseUnit caster, SkillResource skill, Vector3 origin, float targetRadiusPx)
+    {
+        if (skill.Definition.Scatter is not { } scatter || skill is not AttackSkillResource { ScatterScene: { } scene })
+            return;
+
+        var hit    = HitRequests.ForAttack(caster.Stats, caster.Weapon, scatter.GetAttack(skill.Definition.Attack));
+        var area   = new AreaSettings(scatter.ImpactRadius, 0f, scatter.FlightSec);
+        var center = WorldScale.OnGround(origin);
+
+        foreach (var (x, y) in scatter.PickLandings(targetRadiusPx, GameRandom.Shared))
+        {
+            var landing = center + new Vector3(WorldScale.ToMeters(x), 0f, WorldScale.ToMeters(y));
+            var ball    = scene.Instantiate<LobbedArea>();
+
+            ball.Launch(new SkillCast(caster, hit), area);
+            ball.LaunchFrom(origin - landing);
+
+            caster.GetParent().AddChild(ball);
+
+            ball.GlobalPosition = landing;
+        }
     }
 
     //Der Bogen zeigt, wohin der Schlagende beim Ausholen schaute. Wer währenddessen hinter ihn läuft, entgeht ihm

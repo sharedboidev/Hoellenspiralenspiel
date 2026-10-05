@@ -563,7 +563,7 @@ public partial class Hero
     }
 
     private bool IsMelee(SkillResource skill)
-        => (skill.Delivery is SkillDelivery.Weapon or SkillDelivery.WeaponSweep) && !Weapon.IsRanged;
+        => (skill.Delivery is SkillDelivery.Weapon or SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike) && !Weapon.IsRanged;
 
     //Bei gehaltener Taste bleibt der Ton für fehlendes Mana aus, sonst liefe er in Dauerschleife
     private bool Report(SkillUseCheck check, bool isQuiet)
@@ -670,6 +670,7 @@ public partial class Hero
         => skill.Delivery switch
         {
             SkillDelivery.Weapon           => Weapon.Range,
+            SkillDelivery.MeleeStrike      => Weapon.Range,
             SkillDelivery.WeaponSweep      => skill.Sweep.GetEngageRange(Weapon),
             SkillDelivery.Projectile       => skill.Projectile.Reach * EngageFraction,
             SkillDelivery.AreaAroundCaster => skill.Area.Radius * EngageFraction,

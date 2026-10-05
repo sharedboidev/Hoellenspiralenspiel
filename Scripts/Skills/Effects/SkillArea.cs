@@ -35,6 +35,11 @@ public partial class SkillArea : Node3D
     [Export]
     public float LingerSec { get; set; }
 
+    //Nach der Verzögerung, ohne sie im ersten Physik-Frame
+    protected bool HasImpacted => hasStarted;
+
+    protected double DelaySec => settings?.DelaySec ?? 0;
+
     //Vor dem Einhängen in den Szenenbaum aufrufen
     public void Launch(SkillCast skillCast, AreaSettings areaSettings)
     {

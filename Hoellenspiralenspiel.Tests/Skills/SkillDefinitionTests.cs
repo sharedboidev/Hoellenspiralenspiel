@@ -53,13 +53,17 @@ public class SkillDefinitionTests
     }
 
     [Test]
-    public void NurDerBogenschlag_BrauchtEineNahkampfwaffe()
+    public void BogenschlagUndNahkampfschlag_BrauchenEineNahkampfwaffe()
     {
         var cleave = SkillDefinition.ForAttack("cleave", new AttackDefinition("Cleave", 120f)) with { Delivery = SkillDelivery.WeaponSweep };
+        var magma  = SkillDefinition.ForAttack("magma_strike", new AttackDefinition("Magma Strike", 80f, DamageType.Fire)) with { Delivery = SkillDelivery.MeleeStrike };
 
         Assert.Multiple(() =>
         {
             Assert.That(cleave.NeedsMeleeWeapon, Is.True);
+            Assert.That(magma.NeedsMeleeWeapon, Is.True);
+            Assert.That(magma.IsArea, Is.False);
+            Assert.That(magma.Scatter, Is.Null, "ohne Angabe springen keine Kugeln");
             Assert.That(SkillDefinition.ForAttack("attack", AttackDefinition.Standard).NeedsMeleeWeapon, Is.False);
             Assert.That(cleave.IsArea, Is.False, "der Bogen gehört zur Waffe, nicht zu den Flächen");
         });

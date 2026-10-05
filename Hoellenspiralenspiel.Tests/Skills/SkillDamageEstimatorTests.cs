@@ -597,4 +597,79 @@ public class SkillDamageEstimatorTests
     }
 
     #endregion
+
+    #region Kugeln
+
+    private static SkillDefinition MagmaStrike(int balls = 3, float manaCost = 0f)
+        => SkillDefinition.ForAttack("magma_strike", new AttackDefinition("Magma Strike", 80f, DamageType.Fire)) with
+        {
+            ManaCost = manaCost,
+            Delivery = SkillDelivery.MeleeStrike,
+            Scatter = balls > 0 ? new ScatterSettings(balls, 65f, 75f, 0.6f) : null
+        };
+
+    private static HitRequest MagmaHit(StatSheet attacker, WeaponProfile weapon, float weaponDamagePercent)
+        => HitRequests.ForAttack(attacker, weapon, new AttackDefinition("Magma Strike", weaponDamagePercent, DamageType.Fire));
+
+    //So langsam, dass der Brand nicht an seine Obergrenze stößt
+    [Test]
+    public void Kugeln_ZaehlenMitIhremAnteilZuDenDps()
+    {
+        var weapon   = Weapon(DamageType.Slash, 0.25f);
+        var attacker = Attacker(weapon);
+        var strike   = SkillDamageEstimator.Estimate(attacker, weapon, MagmaStrike(0));
+        var magma    = SkillDamageEstimator.Estimate(attacker, weapon, MagmaStrike());
+        var ball     = AverageOf(MagmaHit(attacker, weapon, 65f));
+        var share    = ball / AverageOf(MagmaHit(attacker, weapon, 80f));
+        var landing  = magma.HitChance / 100f;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(magma.AverageHit, Is.EqualTo(strike.AverageHit), "der Schlag selbst bleibt gleich");
+            Assert.That(magma.ScatterCount, Is.EqualTo(3));
+            Assert.That(strike.ScatterCount, Is.Zero);
+            Assert.That(magma.ScatterAverageHit, Is.EqualTo(ball).Within(Tolerance));
+            Assert.That(share, Is.EqualTo(65f / 80f).Within(Tolerance));
+            Assert.That(magma.HitDps, Is.EqualTo(strike.HitDps + 3f * ball * (float)magma.UsesPerSecond * landing * landing).Within(Tolerance),
+                        "nur ein gelandeter Schlag wirft Kugeln, und jede muss selbst treffen");
+            Assert.That(magma.EffectDps, Is.EqualTo(strike.EffectDps * (1f + 3f * landing * share)).Within(Tolerance), "die Kugeln brennen wie der Schlag");
+        });
+    }
+
+    [Test]
+    public void KugelnUndSchlag_TeilenSichDieStapelDesBrands()
+    {
+        var weapon   = Weapon(DamageType.Slash, 1f);
+        var attacker = Attacker(weapon);
+        var magma    = SkillDamageEstimator.Estimate(attacker, weapon, MagmaStrike());
+        var landing  = magma.HitChance / 100f;
+        var strikes  = (float)magma.UsesPerSecond * landing;
+        var balls    = strikes * 3f * landing;
+        var average  = (strikes * AverageOf(MagmaHit(attacker, weapon, 80f)) + balls * AverageOf(MagmaHit(attacker, weapon, 65f))) / (strikes + balls);
+        var perStack = average * CombatRules.BurnDamageFraction / CombatRules.BurnDurationSec;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(strikes * CombatRules.BurnDurationSec, Is.LessThan(CombatRules.BurnMaxStacks), "der Schlag allein bliebe darunter");
+            Assert.That((strikes + balls) * CombatRules.BurnDurationSec, Is.GreaterThan(CombatRules.BurnMaxStacks));
+            Assert.That(magma.EffectDps, Is.EqualTo(perStack * CombatRules.BurnMaxStacks).Within(Tolerance));
+        });
+    }
+
+    [Test]
+    public void Kugeln_WerdenVomManaGebremstWieDerSchlag()
+    {
+        var weapon   = Weapon(DamageType.Slash, 0.25f);
+        var attacker = Attacker(weapon, 0.25f);
+        var magma    = SkillDamageEstimator.Estimate(attacker, weapon, MagmaStrike(manaCost: 2f));
+        var affords  = attacker.GetFinal(CombatStat.Manaregeneration) / 2f;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(magma.IsLimitedByMana, Is.True);
+            Assert.That(magma.SustainedDps, Is.EqualTo(magma.Dps * affords / (float)magma.UsesPerSecond).Within(Tolerance));
+        });
+    }
+
+    #endregion
 }

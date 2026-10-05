@@ -137,7 +137,15 @@ internal static class GameData
             var script when script.EndsWith("/AttackSkillResource.cs", StringComparison.Ordinal) =>
                     SkillDefinition.ForAttack(id, new AttackDefinition(name,
                                                                        values.Float("WeaponDamagePercent", 100f),
-                                                                       values.Bool("ConvertsDamageType", false) ? values.Enum("DealtAs", DamageType.Crush) : null)),
+                                                                       values.Bool("ConvertsDamageType", false) ? values.Enum("DealtAs", DamageType.Crush) : null)) with
+                    {
+                        Scatter = values.Int("ScatterCount", 0) > 0
+                                ? new ScatterSettings(values.Int("ScatterCount", 0),
+                                                      values.Float("ScatterWeaponDamagePercent", 50f),
+                                                      values.Float("ScatterImpactRadius", 75f),
+                                                      values.Float("ScatterFlightSec", 0.6f))
+                                : null
+                    },
             var script when script.EndsWith("/SpellSkillResource.cs", StringComparison.Ordinal) =>
                     SkillDefinition.ForSpell(id, new SpellDefinition(name,
                                                                      values.Float("MinDamage", 0f),

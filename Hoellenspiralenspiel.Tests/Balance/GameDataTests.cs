@@ -69,6 +69,24 @@ public class GameDataTests
         });
     }
 
+    //Die Werte hat der User am 05.10.2026 vorgegeben
+    [Test]
+    public void MagmaStrike_WandeltInFeuer_UndWirftDreiKugeln()
+    {
+        var magma = GameData.PlayerSkill("magma_strike");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(magma.Name, Is.EqualTo("Magma Strike"));
+            Assert.That(magma.Delivery, Is.EqualTo(SkillDelivery.MeleeStrike));
+            Assert.That(magma.NeedsMeleeWeapon, Is.True);
+            Assert.That(magma.Attack, Is.EqualTo(new AttackDefinition("Magma Strike", 80f, DamageType.Fire)));
+            Assert.That(magma.ManaCost, Is.EqualTo(2f));
+            Assert.That(magma.CooldownSec, Is.Zero);
+            Assert.That(magma.Scatter, Is.EqualTo(new ScatterSettings(3, 65f, 75f, 0.6f)));
+        });
+    }
+
     //Das Profil las die Laufzeitprüfung am Helden ab, der das Schwert trug
     [Test]
     public void Trainingsschwert_HatDasProfilAusDemSpiel_UndPariert()

@@ -3253,6 +3253,81 @@ Von mir festgelegt:
 | Unit-Tests | 3 neue für `MovementCancels`, zusammen 1809 |
 | Laufendes Spiel, headless | 15 Schritte mit echten Tasten im Hub. Bei gehaltenem `W` läuft Attack auf ein Ziel 3,5 m entfernt hin und trifft, danach läuft der Held mit `W` weiter. Cleave aus dem Stand schlägt, der Held steht 0 m weiter, danach läuft er. Ein neu gedrücktes `D` bricht das Hinlaufen ab, ohne Schlag. Frost Nova lässt ihn beim Wirken stehen. Cleave ohne Ziel startet nicht, und der Held läuft weiter. Gegenprobe mit dem alten Code: Attack und Cleave werden verworfen, 3 Schritte scheitern |
 
+#### Skill 2: Magma Strike
+
+Umgesetzt am 05.10.2026 auf `master_MagmaStrike`, abgezweigt von `a2a9358`. Wunsch des Users: Ein Schlag auf ein Ziel, bei dem 100 % des physischen Schadens der Waffe zu Feuer werden. Der übrige Elementarschaden kommt nach der Umwandlung dazu, danach wirken die Multiplikatoren. Der Schlag macht 80 % Waffenschaden. Trifft er, springen drei kleine Magmakugeln aus dem Ziel, etwa halb so groß wie der Kopf des Helden. Sie fliegen im steilen Bogen auf etwa 150 % der Körperhöhe des Helden und schlagen zufällig um das Ziel ein, immer so nah, dass es getroffen würde. Jede Kugel macht 65 % Waffenschaden in einem kleinen Radius.
+
+Getroffene Entscheidungen des Users vom 05.10.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| Waffe | Nur Nahkampfwaffen, mit dem Bogen liegt der Platz rot wie bei Cleave |
+| Kosten | 2 Mana, keine Abklingzeit |
+| Radius der Kugeln | 0,75 m |
+| Ziel läuft weg | Die Kugeln fallen um die Stelle, an der das Ziel beim Treffer stand. Wer sofort wegläuft, kann ihnen entkommen |
+
+- Erledigt: Magma Strike als `Resources/Skills/Player/magma_strike.tres`. Eine neue Lieferung `SkillDelivery.MeleeStrike` (am Ende angehängt, Wert 5) schlägt wie `Weapon` auf ein Ziel, geht aber nur mit einer Nahkampfwaffe. `SkillDefinition.NeedsMeleeWeapon` gilt jetzt für `WeaponSweep` und `MeleeStrike`.
+- Erledigt: Die Umwandlung nutzt das schon vorhandene `ConvertsDamageType` mit `DealtAs` Fire, wie Lightning Strike. Der Grundschaden der Waffe samt "Adds X to Y Physical Damage to Attacks" wird zu Feuer, Feuer der Waffe zählt zum Hauptteil, Frost und Blitz bleiben Zusatzschaden. Danach wirken nur die Multiplikatoren für Feuer, Elementarschaden und Elementarschaden mit Angriffen, die für physischen Schaden nicht.
+- Erledigt: Kugeln aus dem Ziel. `ScatterSettings` im Kern hält Zahl, Anteil am Waffenschaden, Radius und Flugzeit. `SkillExecutor` wirft sie nur, wenn der Schlag gelandet ist, also nicht verfehlt, ausgewichen oder pariert. Jede Kugel ist ein eigener Treffer mit eigenem `SkillCast` und demselben Element wie der Schlag.
+- Erledigt: Die Einschläge. Jede Kugel bekommt ein Drittel des Kreises um das Ziel und fällt darin zufällig, damit nicht alle auf einer Seite landen. Sie landet außerhalb des Körpers, aber höchstens 90 % des Radius von seinem Rand entfernt. So trifft ihr Einschlag das stehende Ziel immer.
+- Erledigt: Der Flug. `LobArc` im Kern rechnet die Höhe mit gleicher Schwerkraft auf dem ganzen Weg, aus der Mitte des Körpers bis 2,7 m und zurück auf den Boden. `LobbedArea` ist eine `SkillArea`, deren Verzögerung die Flugzeit ist. Die Kugel fliegt im Takt des Bildes, der Einschlag kommt im Takt der Physik.
+- Erledigt: Ein orange glühender Hieb (`magma_slash.tscn`), die Kugel mit Licht und ein flacher, orangefarbener Einschlag in der Größe des Radius (`magma_ball.tscn`).
+- Erledigt: Der Tooltip zählt die Kugeln zu den DPS und nennt ihren mittleren Treffer ("Per Ball"). Brand aus Schlag und Kugeln teilt sich die Obergrenze von 10 Stapeln.
+- Zusätzlich: Ein Platzhalter-Icon unter `Textures/Skills/Icons/magma_strike.png`.
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Startbelegung | Magma Strike liegt bei neuen Charakteren auf `1`. Bestehende Charaktere legen ihn per Rechtsklick auf einen Platz |
+| Größe der Kugel | 16 cm Durchmesser, der Kopf des Helden misst 32 cm |
+| Höhe | Die Spitze liegt bei 2,7 m über dem Boden, dem Anderthalbfachen der 1,8 m des Helden. Sie steht in `magma_ball.tscn` |
+| Start | Aus der Mitte des Körpers, bei einem Skelett 0,87 m hoch |
+| Flugzeit | 0,6 s, so steil, wie es die kurze Strecke erlaubt |
+| Tödlicher Schlag | Die Kugeln springen auch aus einem Ziel, das am Schlag stirbt |
+| Andere Gegner | Wer neben dem Ziel steht, kann von den Einschlägen getroffen werden. Jede Kugel trifft jeden höchstens einmal |
+| Kugeln im Element | Die Kugeln machen Feuerschaden wie der Schlag und können brennen lassen |
+| Reflect | Nur der Schlag selbst kann Reflect auslösen, die Kugeln nicht |
+| Mauern | Halten die Kugeln nicht auf, sie fliegen darüber |
+| Gegner | Ein Gegner mit Magma Strike würde ihn genauso einsetzen und auf die Reichweite seiner Waffe herankommen |
+
+So funktioniert es:
+
+- `SkillExecutor.StrikeInMelee` misst vor dem Treffer Mitte, Höhe und Körperradius des Ziels. `SkillCast.ApplyTo` gibt jetzt das `HitResult` zurück. Ist es gelandet, holt `Scatter` die Einschläge aus `ScatterSettings.PickLandings` und legt je Kugel eine `LobbedArea` mit eigenem `SkillCast` an.
+- Die Treffer der Kugeln baut `HitRequests.ForAttack` mit `ScatterSettings.GetAttack`, also dem Angriff des Skills mit 65 % statt 80 %.
+- `SkillArea` hat dafür zwei geschützte Werte bekommen, `HasImpacted` und `DelaySec`. Sonst ist sie unverändert.
+- `SkillDamageEstimator` rechnet jeden Treffer eines Skills mit seinem Anteil an Landungen je Einsatz. Für die Kugeln ist das die Trefferchance des Schlags mal 3 mal ihre eigene. Die Stapel eines Effekts zählen über alle Treffer zusammen.
+
+Neue Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| `AttackSkillResource`, Gruppe Scatter | `ScatterCount` | 3 | Zahl der Kugeln, 0 heißt keine |
+| | `ScatterWeaponDamagePercent` | 65 | Anteil jeder Kugel am Waffenschaden |
+| | `ScatterImpactRadius` | 75 | Radius eines Einschlags in Pixeln |
+| | `ScatterFlightSec` | 0,6 | Flugzeit einer Kugel |
+| | `ScatterScene` | `magma_ball.tscn` | Szene einer Kugel, ihr Wurzelknoten ist eine `LobbedArea` |
+| `LobbedArea` | `Ball` | Knoten `Ball` | Was fliegt, liegt nicht unter `Visual`, weil `Visual` mit dem Radius skaliert |
+| | `PeakHeightMeters` | 2,7 | Höhe der Spitze über dem Boden |
+
+Ein neuer Schlag mit Kugeln, etwa Frost statt Feuer: eine `AttackSkillResource` mit `Delivery` MeleeStrike, `DealtAs` und den Feldern der Gruppe Scatter, dazu als `ScatterScene` eine Kopie von `magma_ball.tscn`. Code braucht er keinen.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Unit-Tests | 25 neue: Zahl der Einschläge, keine Würfe ohne Kugeln, jeder Einschlag trifft das stehende Ziel bei Körperradius 0, 30 und 120 über je 500 Seeds, keiner landet im Körper, Streuung bis an den Rand, jede Kugel in ihrem Drittel, Abstand über die Fläche verteilt, gleicher Seed gleiche Einschläge, Element und Anteil der Kugeln; Bogen mit Start, Spitze, Boden, Symmetrie vom Boden, kürzerer Anstieg aus der Höhe, gleiche Schwerkraft, Start über der Spitze, Fortschritt außerhalb; Nahkampfschlag braucht eine Nahkampfwaffe, mit Bogen abgelehnt, Mana; DPS mit Kugeln, gemeinsame Stapel des Brands, Bremse durch Mana; die Werte aus `magma_strike.tres`. Zusammen 1834 |
+| Laufendes Spiel, headless und mit Fenster | Je 71 Prüfungen im Hub mit Skeletten. Magma Strike liegt beim neuen Charakter auf `1`. Mit dem Übungsschwert würfelt der Schlag 3,2 bis 7,2 Feuer, eine Kugel 2,6 bis 5,85. Aus dem Stand: 2 Mana, ein Hieb, der Schlag trifft als Feuer, im selben Frame entstehen drei Kugeln. Sie steigen aus dem Körper des Ziels auf 2,70 m, landen zwischen 73 und 102 Pixeln von seiner Mitte, erlaubt sind 35 bis 110, und treffen es dreimal als Feuer, 0,62 s nach dem Schlag. Ein Skelett 4,5 m entfernt bleibt unberührt. Ein Ziel, das nach dem Treffer wegläuft, wird nur vom Schlag getroffen. Ein ausgewichener Schlag wirft keine Kugeln. Ein Ziel, das am Schlag stirbt, wirft trotzdem drei. Ins Leere mit `Shift`: Hieb, kein Treffer, keine Kugeln. Ohne `Shift` läuft der Held 2,9 m zum Ziel und trifft es viermal. Bilder vom Flug und vom Einschlag |
+| Spielstand | Die Proben liefen in einem eigenen Worktree mit eigenem Spielstand und eigenen Einstellungen, die des Users blieben unberührt. Die Probe ist wieder gelöscht |
+
+Bewusst offen gelassen:
+
+- Mit 16 cm Durchmesser ist eine Kugel in der Kamera des Spiels nur ein bis zwei Pixel groß. Sie leuchtet und färbt den Boden und die Figuren unter sich orange. Ob sie größer werden oder einen Schweif bekommen soll, entscheidet der User.
+- Das Icon ist ein gezeichneter Platzhalter, bis der User ein eigenes liefert.
+- Ton für Schlag, Flug und Einschlag fehlt, er kommt mit Etappe 13 von M8.
+- Der Kampfsimulator der Balance-Tests liest die Kugeln, wertet sie aber nicht aus. Er schlägt nur mit dem Hauptteil.
+
 ### M9: Inhalt und Politur (L, fortlaufend)
 
 - Die übrigen acht Kreise nach dem Muster aus M8.

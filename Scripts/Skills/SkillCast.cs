@@ -29,7 +29,7 @@ public sealed class SkillCast
            !hitUnits.Contains(unit.GetInstanceId());
 
     //Nur ein Schlag im Nahkampf kann Reflect auslösen, Projektile und Flächen nicht
-    public void ApplyTo(BaseUnit unit, bool isMelee = false)
+    public HitResult ApplyTo(BaseUnit unit, bool isMelee = false)
     {
         hitUnits.Add(unit.GetInstanceId());
 
@@ -42,5 +42,7 @@ public sealed class SkillCast
 
         if (isMelee && attacker is not null && !attacker.IsDead)
             unit.ReflectMeleeHit(result, attacker);
+
+        return result;
     }
 }

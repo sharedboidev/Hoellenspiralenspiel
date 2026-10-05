@@ -7,5 +7,8 @@ public enum SkillDelivery
     Projectile,
     AreaAroundCaster,
     AreaAtPoint,
-    WeaponSweep
+    WeaponSweep,
+
+    //Ein Schlag auf das Ziel wie Weapon, aber nur mit einer Nahkampfwaffe. Weapon schießt mit einer Fernkampfwaffe
+    MeleeStrike
 }

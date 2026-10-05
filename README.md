@@ -134,10 +134,11 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 | Feature | Beschreibung |
 |---|---|
 | Skills als Daten | Jeder Skill ist eine Resource mit Kosten, Abklingzeit, Schaden und Szene. Ein neuer Skill braucht keinen Code |
-| Sechs Skills | Attack, Cleave, Lightning Strike, Fireball, Frost Nova und Thunderbolt |
+| Sieben Skills | Attack, Cleave, Magma Strike, Lightning Strike, Fireball, Frost Nova und Thunderbolt |
 | Projektile | Fliegen bis zum ersten Feind oder zur Wand. Der Feuerball spaltet sich und sucht die nächsten Gegner |
 | Flächen | Um den Helden oder am Mauszeiger, sofort oder mit Verzögerung |
 | Bogenschlag | Ein Schlag der Nahkampfwaffe trifft jeden in einem Bogen vor dem Helden. Der Radius wächst mit der Reichweite der Waffe |
+| Kugeln aus dem Ziel | Landet ein Schlag, springen Kugeln aus dem Getroffenen, fliegen im steilen Bogen und schlagen um ihn herum ein. Jede ist ein eigener Treffer mit eigenem Anteil am Waffenschaden und trifft das Ziel, solange es stehen bleibt |
 | Hiebe sichtbar | Jeder Schlag mit einer Nahkampfwaffe zieht mit dem Treffer einen hellen Bogen von rechts nach links, zusammen mit der Waffe und auch ins Leere. Ein Treffer läuft durch das Ziel, Cleave zieht einen weiten Halbkreis |
 | Für jeden gleich | Wen ein Skill trifft, entscheidet die Fraktion. Gegner setzen dieselben Skills ein wie der Held |
 | Skill-Leiste | Zehn Plätze mit Icon, Taste und Abklingzeit |
@@ -149,7 +150,7 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 | Skills unterbrechen das Laufen | Wer im Laufen einen Skill auslöst, bleibt stehen oder läuft zum Ziel, führt ihn aus und läuft danach in die gehaltene Richtung weiter |
 | Schlag und Zauber binden | Ein Schlag dauert so lange, wie das Angriffstempo vorgibt, ein Zauber seine Wirkzeit, Standard 0,4 s. Beide lösen nach der Hälfte aus. Ein Nahkampfschlag holt bis dahin aus und zieht mit dem Treffer in 0,15 s durch. Bis zum Ende steht der Held, dreht sich nicht und beginnt nichts Neues. Wird währenddessen eine Skill-Taste gedrückt und gehalten, folgt ihr Skill danach |
 | Kosten | Mana und Abklingzeit pro Skill, Ton bei leerem Mana |
-| Tooltip mit DPS | Schaden pro Sekunde, mittlerer Treffer, Krit-Chance, Einsätze pro Sekunde, Wirkzeit und Abklingzeit, gerechnet mit den Werten des Helden |
+| Tooltip mit DPS | Schaden pro Sekunde, mittlerer Treffer, Krit-Chance, Einsätze pro Sekunde, Wirkzeit und Abklingzeit, gerechnet mit den Werten des Helden. Kugeln zählen mit, der Tooltip nennt ihren mittleren Treffer |
 
 <details>
 <summary>Die Skills im Überblick</summary>
@@ -158,6 +159,7 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 |---|---|---|---|---|---|---|
 | Attack | ATTACK | 100 % Waffenschaden | 0 | 1 / Angriffstempo | keine | Treffer der Waffe, mit dem Bogen ein Pfeil |
 | Cleave | ATTACK | 120 % Waffenschaden | 1 | 1 / Angriffstempo | keine | Halbkreis vor dem Helden mit der anderthalbfachen Reichweite der Waffe, trifft jeden darin. Nur mit Nahkampfwaffen |
+| Magma Strike | ATTACK | 80 % Waffenschaden als Fire, jede Kugel 65 % | 2 | 1 / Angriffstempo | keine | Schlag auf ein Ziel, der physische Schaden der Waffe wird zu Feuer. Ein gelandeter Treffer wirft drei Magmakugeln aus dem Ziel, die mit 0,75 m Radius um es herum einschlagen. Nur mit Nahkampfwaffen |
 | Lightning Strike | ATTACK | 180 % Waffenschaden als Lightning | 3 | 1 / Angriffstempo | keine | Schwung mit Blitzprojektil |
 | Fireball | SPELL | 50 bis 75 Fire | 2 | 0,4 s | 0,25 s | Projektil, das sich bis zu zweimal aufspaltet |
 | Frost Nova | SPELL | 10 bis 50 Frost | 2 | 0,4 s | 0,5 s | Ring um den Helden |
@@ -521,7 +523,8 @@ Die Skill-Leiste zeigt immer die aktuelle Taste.
 | `R` | Thunderbolt am Mauszeiger |
 | `F` | Fireball in Richtung der Maus |
 | `Q` | Cleave: auf einen Gegner zeigen, der Held läuft hin und schlägt einen Halbkreis |
-| `1` bis `4` | Freie Plätze der Skill-Leiste |
+| `1` | Magma Strike: auf einen Gegner zeigen, der Held läuft hin, schlägt mit Feuer zu, und drei Magmakugeln springen aus dem Ziel |
+| `2` bis `4` | Freie Plätze der Skill-Leiste |
 | `Shift` halten + Skill-Taste | Angriff aus dem Stand Richtung Maus, ohne hinzulaufen, auch ohne Gegner unter der Maus |
 | Taste gedrückt halten | Wiederholt den Skill |
 | Taste eines Platzes mit Trank | Einen Trank dieser Art aus dem Inventar trinken, gehalten nur einen |
@@ -576,7 +579,7 @@ flowchart LR
 | ✅ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
 | ✅ | **M7** Hub | Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal, Pausenmenü, Ladebildschirm, Einstellungen, Hud an Ankern, Gold, Truhe, Händler, Platzhalter-Boss mit Boss-Raum und Freischaltung des nächsten Kreises. Etappe 4 liegt seit dem 01.10.2026 auf `master`, dazu der ruhigere PS1-Look und die Sichtlinie der Mauern | mittel |
 | ✅ | **M7.5** Renderskalierung | Vorgezogen aus M9: Die Welt rendert im Raster der PS1 statt in voller Fenstergröße, gebaut am 01.10.2026 auf `master_RenderScaling`, seit demselben Tag auf `master` | klein |
-| 🔨 | **M8** Höllenkreis | Wollust als kompletter Kreis in Endqualität: freie Flächen hintereinander, Dungeons per Ladezone, Sturm mit Windschatten, sechs Gegnertypen, Minos als Boss, Events, alle 16 Slots mit Item-Basen, Affixe nach der Slot-Tabelle, Balance, Ton und Musik. Etappe 1 von 20 liegt seit dem 02.10.2026 auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal, der Inhaltsstand im Spielstand. Etappe 2 liegt seit dem 05.10.2026 auf `master`: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests. Etappe 3a liegt seit demselben Tag auf `master`: der Generator für freie Flächen im Kern. Etappe 3b liegt seit demselben Tag auf `master`: Wollust besteht aus drei freien Flächen, mit Kette hin und zurück, Karte und Spielstand Version 6. Ebenfalls seit demselben Tag liegen auf `master` 139 Affixe aus Path of Exile für die sieben Item-Basen, mit hybriden Affixen, Bonusschaden, Reflect, Obergrenze der Resistenzen und weiteren Mechaniken, Spielstand Version 7. Vorgezogen liegt seit demselben Tag auf `master` der erste neue Skill: Cleave, dazu Stehenbleiben mit `Shift`, sichtbare Hiebe im Nahkampf und Skills, die das Laufen unterbrechen | groß |
+| 🔨 | **M8** Höllenkreis | Wollust als kompletter Kreis in Endqualität: freie Flächen hintereinander, Dungeons per Ladezone, Sturm mit Windschatten, sechs Gegnertypen, Minos als Boss, Events, alle 16 Slots mit Item-Basen, Affixe nach der Slot-Tabelle, Balance, Ton und Musik. Etappe 1 von 20 liegt seit dem 02.10.2026 auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal, der Inhaltsstand im Spielstand. Etappe 2 liegt seit dem 05.10.2026 auf `master`: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests. Etappe 3a liegt seit demselben Tag auf `master`: der Generator für freie Flächen im Kern. Etappe 3b liegt seit demselben Tag auf `master`: Wollust besteht aus drei freien Flächen, mit Kette hin und zurück, Karte und Spielstand Version 6. Ebenfalls seit demselben Tag liegen auf `master` 139 Affixe aus Path of Exile für die sieben Item-Basen, mit hybriden Affixen, Bonusschaden, Reflect, Obergrenze der Resistenzen und weiteren Mechaniken, Spielstand Version 7. Vorgezogen liegt seit demselben Tag auf `master` der erste neue Skill: Cleave, dazu Stehenbleiben mit `Shift`, sichtbare Hiebe im Nahkampf und Skills, die das Laufen unterbrechen. Der zweite, Magma Strike, ist am selben Tag auf `master_MagmaStrike` umgesetzt | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
 | 💤 | **M10** Koop | Optional, baut auf Kern und Seeds auf | groß |
 

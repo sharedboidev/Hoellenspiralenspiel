@@ -31,6 +31,10 @@ public static class SkillTooltip
             text.Append("[color=red]Needs a melee weapon[/color]").Append(NewLine);
         text.Append($"[color=orange]DPS: {Format(estimate.Dps)}[/color]").Append(NewLine);
         text.Append($"Average Hit: {Format(estimate.AverageHit)}").Append(NewLine);
+
+        if (estimate.ScatterCount > 0)
+            text.Append($"Per Ball: {Format(estimate.ScatterAverageHit)} ({estimate.ScatterCount} Balls)").Append(NewLine);
+
         text.Append($"Crit Chance: {estimate.CriticalHitChance:0.#}%").Append(NewLine);
         text.Append($"{uses} per Second: {estimate.UsesPerSecond:0.##}");
 

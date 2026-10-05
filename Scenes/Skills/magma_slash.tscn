@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Skills/Effects/MeleeSlash.cs" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_slash"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+
+[node name="MagmaSlash" type="Node3D" node_paths=PackedStringArray("Band")]
+script = ExtResource("1_script")
+Band = NodePath("Band")
+WidthFraction = 0.35
+HeightMeters = 0.8
+Color = Color(1, 0.5, 0.12, 1)
+TailAlpha = 0.3
+
+[node name="Band" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+material_override = SubResource("Mat_slash")

@@ -22,6 +22,13 @@ public class SkillGateTests
         Sweep = new SweepSettings(180f, 1.5f)
     };
 
+    private static readonly SkillDefinition MagmaStrike = SkillDefinition.ForAttack("magma_strike", new AttackDefinition("Magma Strike", 80f, DamageType.Fire)) with
+    {
+        ManaCost = 2,
+        Delivery = SkillDelivery.MeleeStrike,
+        Scatter = new ScatterSettings(3, 65f, 75f, 0.6f)
+    };
+
     [Test]
     public void GenugManaUndKeineAbklingzeit_IstBereit()
         => Assert.That(SkillGate.Check(Fireball, new SkillCooldowns(), 2), Is.EqualTo(SkillUseCheck.Ready));
@@ -66,6 +73,17 @@ public class SkillGateTests
             Assert.That(SkillGate.Check(Cleave, new SkillCooldowns(), 10, true), Is.EqualTo(SkillUseCheck.NeedsMeleeWeapon));
             Assert.That(SkillGate.Check(Cleave, new SkillCooldowns(), 10, false), Is.EqualTo(SkillUseCheck.Ready));
             Assert.That(SkillGate.Check(Cleave, new SkillCooldowns(), 10), Is.EqualTo(SkillUseCheck.Ready), "ohne Angabe gilt eine Nahkampfwaffe");
+        });
+    }
+
+    [Test]
+    public void NahkampfschlagMitBogen_WirdAbgelehnt()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(SkillGate.Check(MagmaStrike, new SkillCooldowns(), 10, true), Is.EqualTo(SkillUseCheck.NeedsMeleeWeapon));
+            Assert.That(SkillGate.Check(MagmaStrike, new SkillCooldowns(), 10, false), Is.EqualTo(SkillUseCheck.Ready));
+            Assert.That(SkillGate.Check(MagmaStrike, new SkillCooldowns(), 1.9f, false), Is.EqualTo(SkillUseCheck.NotEnoughMana));
         });
     }
 

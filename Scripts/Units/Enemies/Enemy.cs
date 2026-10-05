@@ -512,6 +512,7 @@ public partial class Enemy : BaseUnit
         var skillRange = definition.Delivery switch
         {
             SkillDelivery.Weapon           => Weapon.Range,
+            SkillDelivery.MeleeStrike      => Weapon.Range,
             SkillDelivery.WeaponSweep      => definition.Sweep.GetEngageRange(Weapon),
             SkillDelivery.Projectile       => definition.Projectile.Reach * EngageFraction,
             SkillDelivery.AreaAroundCaster => definition.Area.Radius * EngageFraction,

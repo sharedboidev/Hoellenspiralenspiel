@@ -28,6 +28,10 @@ public sealed record SkillDamageEstimate
     public StatusEffectKind? DamagingEffect { get; init; }
     public float             EffectDps      { get; init; }
 
+    //Kugeln, die nach einem gelandeten Treffer aus dem Ziel springen. HitDps und EffectDps zählen sie mit
+    public int   ScatterCount      { get; init; }
+    public float ScatterAverageHit { get; init; }
+
     public float Dps => HitDps + EffectDps;
 
     public float ManaPerSecond { get; init; }
