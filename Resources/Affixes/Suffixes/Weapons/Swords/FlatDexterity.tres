@@ -90,7 +90,7 @@ MinItemLevelToAppearOn = 82
 Weight = 500
 MinValue = 51.0
 MaxValue = 55.0
-ItemnameAddition = "of the Zephyr"
+ItemnameAddition = "of the Breeze"
 metadata/_custom_type_script = "uid://sdx5y8g2wvor"
 
 [resource]

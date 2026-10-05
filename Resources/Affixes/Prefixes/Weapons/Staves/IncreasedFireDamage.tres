@@ -1,0 +1,93 @@
+[gd_resource type="Resource" script_class="Prefix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_prefix"]
+
+[sub_resource type="Resource" id="Resource_tier8"]
+script = ExtResource("1_tier")
+Tier = 8
+MinItemLevelToAppearOn = 2
+Weight = 500
+MinValue = 18.0
+MaxValue = 34.0
+ItemnameAddition = "Scalding"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier7"]
+script = ExtResource("1_tier")
+Tier = 7
+MinItemLevelToAppearOn = 11
+Weight = 500
+MinValue = 35.0
+MaxValue = 52.0
+ItemnameAddition = "Sputtering"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier6"]
+script = ExtResource("1_tier")
+Tier = 6
+MinItemLevelToAppearOn = 23
+Weight = 500
+MinValue = 53.0
+MaxValue = 69.0
+ItemnameAddition = "Torrid"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier5"]
+script = ExtResource("1_tier")
+Tier = 5
+MinItemLevelToAppearOn = 35
+Weight = 500
+MinValue = 70.0
+MaxValue = 95.0
+ItemnameAddition = "Branding"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier4"]
+script = ExtResource("1_tier")
+Tier = 4
+MinItemLevelToAppearOn = 46
+Weight = 500
+MinValue = 96.0
+MaxValue = 120.0
+ItemnameAddition = "Eruptive"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier3"]
+script = ExtResource("1_tier")
+Tier = 3
+MinItemLevelToAppearOn = 58
+Weight = 150
+MinValue = 121.0
+MaxValue = 149.0
+ItemnameAddition = "Molten"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 79
+Weight = 40
+MinValue = 150.0
+MaxValue = 174.0
+ItemnameAddition = "Ashen"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 84
+Weight = 13
+MinValue = 175.0
+MaxValue = 200.0
+ItemnameAddition = "Pyrelord's"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_prefix")
+AffectedCombatStat = 34
+ModificationType = 1
+AffectableItemTypes = Array[int]([18])
+AffectableWeaponTypes = Array[int]([4])
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier8"), SubResource("Resource_tier7"), SubResource("Resource_tier6"), SubResource("Resource_tier5"), SubResource("Resource_tier4"), SubResource("Resource_tier3"), SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

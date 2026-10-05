@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="Prefix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_prefix"]
+
+[sub_resource type="Resource" id="Resource_tier3"]
+script = ExtResource("1_tier")
+Tier = 3
+MinItemLevelToAppearOn = 30
+Weight = 1000
+MinValue = 20.0
+MaxValue = 32.0
+ItemnameAddition = "Clam's"
+HybridMinValue = 18.0
+HybridMaxValue = 23.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 46
+Weight = 1000
+MinValue = 33.0
+MaxValue = 48.0
+ItemnameAddition = "Porcupine's"
+HybridMinValue = 24.0
+HybridMaxValue = 28.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 62
+Weight = 1000
+MinValue = 49.0
+MaxValue = 96.0
+ItemnameAddition = "Ammonite's"
+HybridMinValue = 29.0
+HybridMaxValue = 33.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_prefix")
+AffectedCombatStat = 13
+AffectableItemTypes = Array[int]([6])
+IsInherentMod = true
+IsHybrid = true
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier3"), SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

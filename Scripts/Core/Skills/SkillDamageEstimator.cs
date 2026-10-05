@@ -57,7 +57,7 @@ public static class SkillDamageEstimator
             UsesPerSecond       = usesPerSecond,
             HitDps              = GetHitDps(averageHit, usesPerSecond * landingShare),
             DamagingEffect      = StatusEffectRules.FindDamageOverTime(hit.DamageType)?.Kind,
-            EffectDps           = GetEffectDps(parts, critShare, hit.DamageOverTimeMultiplier, usesPerSecond * landingShare),
+            EffectDps           = GetEffectDps(parts, critShare, hit, usesPerSecond * landingShare),
             ManaPerSecond       = manaPerSecond
         };
 
@@ -71,7 +71,7 @@ public static class SkillDamageEstimator
         return estimate with
         {
             IsLimitedByMana = true,
-            SustainedDps    = GetHitDps(averageHit, sustainedLandings) + GetEffectDps(parts, critShare, hit.DamageOverTimeMultiplier, sustainedLandings)
+            SustainedDps    = GetHitDps(averageHit, sustainedLandings) + GetEffectDps(parts, critShare, hit, sustainedLandings)
         };
     }
 
@@ -83,7 +83,7 @@ public static class SkillDamageEstimator
         //Ein Zauber kommt erst wieder, wenn seine Abklingzeit um ist und der Held das Wirken beendet hat
         var intervalSec = skill.Kind == SkillKind.Attack
                 ? Math.Max(1.0 / Math.Max(CombatRules.MinAttacksPerSecond, attacker.GetFinal(CombatStat.Attackspeed)), skill.CooldownSec)
-                : Math.Max(Math.Max(CombatRules.MinSpellCooldownSec, skill.CooldownSec), skill.CastSec);
+                : Math.Max(Math.Max(CombatRules.MinSpellCooldownSec, skill.CooldownSec), skill.GetCastSec(attacker));
 
         return 1.0 / intervalSec;
     }
@@ -110,7 +110,7 @@ public static class SkillDamageEstimator
     }
 
     //Jeder Teil löst den Effekt seiner Schadensart aus. Wie viele Instanzen zugleich wirken, bestimmt die Stapelregel des Effekts
-    private static float GetEffectDps(List<(DamageType DamageType, DamageRange Range)> parts, float critShare, float damageOverTimeMultiplier, double landingsPerSecond)
+    private static float GetEffectDps(List<(DamageType DamageType, DamageRange Range)> parts, float critShare, HitRequest hit, double landingsPerSecond)
     {
         var effectDps = 0f;
 
@@ -123,7 +123,7 @@ public static class SkillDamageEstimator
             var maxInstances    = rule.Stacking == StackingRule.Sum ? rule.MaxInstances : 1;
             var instances       = Math.Min(maxInstances, landingsPerSecond * dot.DurationSec);
             var averageHit      = (range.Min + range.Max) / 2f * critShare;
-            var damagePerSecond = averageHit * dot.DamageFraction / dot.DurationSec * damageOverTimeMultiplier;
+            var damagePerSecond = averageHit * dot.DamageFraction / dot.DurationSec * (hit.DamageOverTimeMultiplier * hit.DamageOverTimeByType.For(damageType));
 
             effectDps += (float)(damagePerSecond * instances);
         }

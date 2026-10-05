@@ -1,0 +1,93 @@
+[gd_resource type="Resource" script_class="Prefix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_prefix"]
+
+[sub_resource type="Resource" id="Resource_tier8"]
+script = ExtResource("1_tier")
+Tier = 8
+MinItemLevelToAppearOn = 3
+Weight = 1000
+MinValue = 15.0
+MaxValue = 26.0
+ItemnameAddition = "Strengthened"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier7"]
+script = ExtResource("1_tier")
+Tier = 7
+MinItemLevelToAppearOn = 17
+Weight = 1000
+MinValue = 27.0
+MaxValue = 42.0
+ItemnameAddition = "Laminated"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier6"]
+script = ExtResource("1_tier")
+Tier = 6
+MinItemLevelToAppearOn = 29
+Weight = 1000
+MinValue = 43.0
+MaxValue = 55.0
+ItemnameAddition = "Segmented"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier5"]
+script = ExtResource("1_tier")
+Tier = 5
+MinItemLevelToAppearOn = 42
+Weight = 1000
+MinValue = 56.0
+MaxValue = 67.0
+ItemnameAddition = "Braced"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier4"]
+script = ExtResource("1_tier")
+Tier = 4
+MinItemLevelToAppearOn = 60
+Weight = 1000
+MinValue = 68.0
+MaxValue = 79.0
+ItemnameAddition = "Dense"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier3"]
+script = ExtResource("1_tier")
+Tier = 3
+MinItemLevelToAppearOn = 72
+Weight = 1000
+MinValue = 80.0
+MaxValue = 91.0
+ItemnameAddition = "Strapped"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 84
+Weight = 1000
+MinValue = 92.0
+MaxValue = 100.0
+ItemnameAddition = "Unassailable"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 86
+Weight = 1000
+MinValue = 101.0
+MaxValue = 110.0
+ItemnameAddition = "Inviolable"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_prefix")
+AffectedCombatStat = 13
+ModificationType = 1
+AffectableItemTypes = Array[int]([15])
+IsInherentMod = true
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier8"), SubResource("Resource_tier7"), SubResource("Resource_tier6"), SubResource("Resource_tier5"), SubResource("Resource_tier4"), SubResource("Resource_tier3"), SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

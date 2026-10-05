@@ -296,6 +296,15 @@ public partial class Enemy : BaseUnit
         base.ReceiveDamage(hit, attacker);
     }
 
+    //Stirbt das Monster am Reflect, bekommt der Verteidiger den Kill
+    public override void ReceiveReflectedDamage(float damage, BaseUnit source)
+    {
+        if (IsTargetable && IsInstanceValid(source))
+            LastAttacker = source;
+
+        base.ReceiveReflectedDamage(damage, source);
+    }
+
     //Auch ein abgewehrter Treffer und der Hilferuf der Gruppe wecken das Monster, egal wie weit das Ziel entfernt ist
     public void Provoke()
         => brain.Provoke();

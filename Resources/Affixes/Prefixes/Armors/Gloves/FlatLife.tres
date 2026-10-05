@@ -1,0 +1,100 @@
+[gd_resource type="Resource" script_class="Prefix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_prefix"]
+
+[sub_resource type="Resource" id="Resource_tier9"]
+script = ExtResource("1_tier")
+Tier = 9
+MinItemLevelToAppearOn = 1
+Weight = 1000
+MinValue = 3.0
+MaxValue = 9.0
+ItemnameAddition = "Wholesome"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier8"]
+script = ExtResource("1_tier")
+Tier = 8
+MinItemLevelToAppearOn = 5
+Weight = 1000
+MinValue = 10.0
+MaxValue = 24.0
+ItemnameAddition = "Fit"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier7"]
+script = ExtResource("1_tier")
+Tier = 7
+MinItemLevelToAppearOn = 11
+Weight = 1000
+MinValue = 25.0
+MaxValue = 39.0
+ItemnameAddition = "Ruddy"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier6"]
+script = ExtResource("1_tier")
+Tier = 6
+MinItemLevelToAppearOn = 18
+Weight = 1000
+MinValue = 40.0
+MaxValue = 54.0
+ItemnameAddition = "Dauntless"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier5"]
+script = ExtResource("1_tier")
+Tier = 5
+MinItemLevelToAppearOn = 24
+Weight = 1000
+MinValue = 55.0
+MaxValue = 69.0
+ItemnameAddition = "Burly"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier4"]
+script = ExtResource("1_tier")
+Tier = 4
+MinItemLevelToAppearOn = 30
+Weight = 1000
+MinValue = 70.0
+MaxValue = 84.0
+ItemnameAddition = "Rugged"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier3"]
+script = ExtResource("1_tier")
+Tier = 3
+MinItemLevelToAppearOn = 36
+Weight = 1000
+MinValue = 85.0
+MaxValue = 99.0
+ItemnameAddition = "Portly"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 44
+Weight = 1000
+MinValue = 100.0
+MaxValue = 114.0
+ItemnameAddition = "Potent"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 54
+Weight = 1000
+MinValue = 115.0
+MaxValue = 129.0
+ItemnameAddition = "Gymnast's"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_prefix")
+AffectableItemTypes = Array[int]([12])
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier9"), SubResource("Resource_tier8"), SubResource("Resource_tier7"), SubResource("Resource_tier6"), SubResource("Resource_tier5"), SubResource("Resource_tier4"), SubResource("Resource_tier3"), SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

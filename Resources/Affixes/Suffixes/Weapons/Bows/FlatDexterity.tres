@@ -1,0 +1,102 @@
+[gd_resource type="Resource" script_class="Suffix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://bwwyi50jc5koy" path="res://Resources/Affixes/Suffixes/Suffix.cs" id="2_suffix"]
+
+[sub_resource type="Resource" id="Resource_tier9"]
+script = ExtResource("1_tier")
+Tier = 9
+MinItemLevelToAppearOn = 1
+Weight = 1000
+MinValue = 8.0
+MaxValue = 12.0
+ItemnameAddition = "of the Weasel"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier8"]
+script = ExtResource("1_tier")
+Tier = 8
+MinItemLevelToAppearOn = 11
+Weight = 1000
+MinValue = 13.0
+MaxValue = 17.0
+ItemnameAddition = "of the Bobcat"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier7"]
+script = ExtResource("1_tier")
+Tier = 7
+MinItemLevelToAppearOn = 22
+Weight = 1000
+MinValue = 18.0
+MaxValue = 22.0
+ItemnameAddition = "of the Vixen"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier6"]
+script = ExtResource("1_tier")
+Tier = 6
+MinItemLevelToAppearOn = 33
+Weight = 1000
+MinValue = 23.0
+MaxValue = 27.0
+ItemnameAddition = "of the Hawk"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier5"]
+script = ExtResource("1_tier")
+Tier = 5
+MinItemLevelToAppearOn = 44
+Weight = 1000
+MinValue = 28.0
+MaxValue = 32.0
+ItemnameAddition = "of the Puma"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier4"]
+script = ExtResource("1_tier")
+Tier = 4
+MinItemLevelToAppearOn = 55
+Weight = 1000
+MinValue = 33.0
+MaxValue = 37.0
+ItemnameAddition = "of the Cheetah"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier3"]
+script = ExtResource("1_tier")
+Tier = 3
+MinItemLevelToAppearOn = 66
+Weight = 1000
+MinValue = 38.0
+MaxValue = 42.0
+ItemnameAddition = "of the Ocelot"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 74
+Weight = 1000
+MinValue = 43.0
+MaxValue = 50.0
+ItemnameAddition = "of the Wraith"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 82
+Weight = 1000
+MinValue = 51.0
+MaxValue = 55.0
+ItemnameAddition = "of the Breeze"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_suffix")
+AffectedCombatStat = 15
+AffectableItemTypes = Array[int]([1])
+AffectableWeaponTypes = Array[int]([6])
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier9"), SubResource("Resource_tier8"), SubResource("Resource_tier7"), SubResource("Resource_tier6"), SubResource("Resource_tier5"), SubResource("Resource_tier4"), SubResource("Resource_tier3"), SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://bwwyi50jc5koy"

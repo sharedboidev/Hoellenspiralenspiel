@@ -103,7 +103,10 @@ internal static class FightSimulator
                 return new FightResult(true, step * StepSec, actions, landed, hitDamage, effectDamage);
 
             foreach (var effect in hit.InflictedEffects)
-                effects.Apply(effect);
+            {
+                if (!StatusEffectRules.IsAvoided(defenderStats, random))
+                    effects.Apply(effect);
+            }
         }
 
         return new FightResult(false, steps * StepSec, actions, landed, hitDamage, effectDamage);

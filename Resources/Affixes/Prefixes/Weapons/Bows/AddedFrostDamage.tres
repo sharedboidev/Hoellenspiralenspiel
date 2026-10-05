@@ -1,0 +1,133 @@
+[gd_resource type="Resource" script_class="Prefix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_prefix"]
+
+[sub_resource type="Resource" id="Resource_tier10"]
+script = ExtResource("1_tier")
+Tier = 10
+MinItemLevelToAppearOn = 2
+Weight = 1400
+MinValue = 2.0
+MaxValue = 3.0
+ItemnameAddition = "Rimed"
+MinValueTo = 6.0
+MaxValueTo = 7.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier9"]
+script = ExtResource("1_tier")
+Tier = 9
+MinItemLevelToAppearOn = 12
+Weight = 1400
+MinValue = 12.0
+MaxValue = 17.0
+ItemnameAddition = "Cooled"
+MinValueTo = 26.0
+MaxValueTo = 30.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier8"]
+script = ExtResource("1_tier")
+Tier = 8
+MinItemLevelToAppearOn = 19
+Weight = 1400
+MinValue = 21.0
+MaxValue = 28.0
+ItemnameAddition = "Frosty"
+MinValueTo = 42.0
+MaxValueTo = 48.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier7"]
+script = ExtResource("1_tier")
+Tier = 7
+MinItemLevelToAppearOn = 27
+Weight = 1400
+MinValue = 29.0
+MaxValue = 40.0
+ItemnameAddition = "Gelid"
+MinValueTo = 58.0
+MaxValueTo = 68.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier6"]
+script = ExtResource("1_tier")
+Tier = 6
+MinItemLevelToAppearOn = 34
+Weight = 1400
+MinValue = 41.0
+MaxValue = 55.0
+ItemnameAddition = "Wintry"
+MinValueTo = 81.0
+MaxValueTo = 95.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier5"]
+script = ExtResource("1_tier")
+Tier = 5
+MinItemLevelToAppearOn = 43
+Weight = 1400
+MinValue = 57.0
+MaxValue = 77.0
+ItemnameAddition = "Icebound"
+MinValueTo = 114.0
+MaxValueTo = 132.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier4"]
+script = ExtResource("1_tier")
+Tier = 4
+MinItemLevelToAppearOn = 52
+Weight = 1400
+MinValue = 77.0
+MaxValue = 104.0
+ItemnameAddition = "Glacial"
+MinValueTo = 154.0
+MaxValueTo = 178.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier3"]
+script = ExtResource("1_tier")
+Tier = 3
+MinItemLevelToAppearOn = 63
+Weight = 1120
+MinValue = 99.0
+MaxValue = 136.0
+ItemnameAddition = "Arctic"
+MinValueTo = 200.0
+MaxValueTo = 232.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 75
+Weight = 490
+MinValue = 124.0
+MaxValue = 170.0
+ItemnameAddition = "Interring"
+MinValueTo = 250.0
+MaxValueTo = 290.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 82
+Weight = 126
+MinValue = 149.0
+MaxValue = 204.0
+ItemnameAddition = "Vitrifying"
+MinValueTo = 300.0
+MaxValueTo = 348.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_prefix")
+AffectedCombatStat = 35
+AffectableItemTypes = Array[int]([1])
+AffectableWeaponTypes = Array[int]([6])
+IsInherentMod = true
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier10"), SubResource("Resource_tier9"), SubResource("Resource_tier8"), SubResource("Resource_tier7"), SubResource("Resource_tier6"), SubResource("Resource_tier5"), SubResource("Resource_tier4"), SubResource("Resource_tier3"), SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

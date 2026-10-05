@@ -20,7 +20,7 @@ MinItemLevelToAppearOn = 11
 Weight = 1000
 MinValue = 50.0
 MaxValue = 64.0
-ItemnameAddition = "Jagged"
+ItemnameAddition = "Toothed"
 metadata/_custom_type_script = "uid://sdx5y8g2wvor"
 
 [sub_resource type="Resource" id="Resource_tier6"]

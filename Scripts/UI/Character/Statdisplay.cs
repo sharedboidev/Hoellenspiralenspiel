@@ -81,9 +81,18 @@ public partial class Statdisplay : PanelContainer
         spellBlockLabel.Text    = AsChance(stats, CombatStat.SpellBlock);
         meleeParryLabel.Text    = AsChance(stats, CombatStat.MeleeParry);
         spellParryLabel.Text    = AsChance(stats, CombatStat.SpellParry);
-        fireResiLabel.Text      = stats.GetFinalWhole(CombatStat.FireResistance).ToString("N0") + "%";
-        frostResistance.Text    = stats.GetFinalWhole(CombatStat.FrostResistance).ToString("N0") + "%";
-        lightningResiLabel.Text = stats.GetFinalWhole(CombatStat.LightningResistance).ToString("N0") + "%";
+        fireResiLabel.Text      = AsResistance(stats, DamageType.Fire);
+        frostResistance.Text    = AsResistance(stats, DamageType.Frost);
+        lightningResiLabel.Text = AsResistance(stats, DamageType.Lightning);
+    }
+
+    //Über dem Maximum zählt nur das Maximum
+    private static string AsResistance(StatSheet stats, DamageType element)
+    {
+        var resistance = stats.GetFinalWhole(element.GetMitigatingStat());
+        var maximum    = Defences.GetMaximumResistance(stats, element);
+
+        return resistance > maximum ? maximum.ToString("N0") + "% (max)" : resistance.ToString("N0") + "%";
     }
 
     private void RenderRessources(StatSheet stats)

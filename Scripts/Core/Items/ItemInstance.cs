@@ -82,6 +82,16 @@ public sealed class ItemInstance
                 : PerElement<DamageRange>.From(element => new DamageRange((int)GetLocalValue(0f, element.GetElementStat()),
                                                                           (int)GetLocalValue(0f, element.GetElementStat(), true)));
 
+    //"Bow Attacks fire an additional Arrow" gilt nur für die Angriffe mit dieser Waffe
+    public int ExtraProjectiles => Definition.Weapon is null ? 0 : (int)GetLocalValue(0f, CombatStat.ProjectileCount);
+
+    //Block und Parry der Basis, ein Schild erhöht seinen Block über "% increased Chance to Block"
+    public GuardStats Guard
+        => new(GetLocalValue(Definition.Guard.MeleeBlock, CombatStat.MeleeBlock),
+               GetLocalValue(Definition.Guard.SpellBlock, CombatStat.SpellBlock),
+               GetLocalValue(Definition.Guard.MeleeParry, CombatStat.MeleeParry),
+               GetLocalValue(Definition.Guard.SpellParry, CombatStat.SpellParry));
+
     //Lokale Affixe senken die Anforderungen an Attribute, die an das Level nie. Gerundet wird zur nächsten ganzen Zahl
     public IReadOnlyDictionary<Requirement, int> Requirements
     {
@@ -104,8 +114,9 @@ public sealed class ItemInstance
         affixes.Add(affix);
     }
 
-    public bool HasAffixLike(AffixType type, CombatStat stat, ModificationType modification)
-        => affixes.Any(affix => affix.Type == type && affix.Stat == stat && affix.Modification == modification);
+    //Ein hybrider Affix gehört zu einer eigenen Familie: "+# to Armour" und "+# to Armour, +# to maximum Life" passen auf dasselbe Item
+    public bool HasAffixLike(AffixType type, CombatStat stat, ModificationType modification, CombatStat? hybridStat = null)
+        => affixes.Any(affix => affix.Type == type && affix.Stat == stat && affix.Modification == modification && affix.Hybrid?.Stat == hybridStat);
 
     public bool CanStackWith(ItemInstance other)
         => other is not null && other != this && Definition.IsStackable && other.Definition.Id == Definition.Id;
@@ -126,26 +137,43 @@ public sealed class ItemInstance
                                  weapon.IsRanged,
                                  weapon.ProjectileSpeed)
         {
-            AddedDamage = AddedDamage
+            AddedDamage      = AddedDamage,
+            ExtraProjectiles = ExtraProjectiles
         };
     }
 
     public IReadOnlyList<CombatStatModifier> GetEquipModifiers()
     {
         var modifiers = new List<CombatStatModifier>();
+        var guard     = Guard;
 
         if (Definition.Kind == ItemKind.Armor)
             AddFlat(modifiers, CombatStat.Armor, ArmorValue);
 
-        AddFlat(modifiers, CombatStat.MeleeBlock, Definition.Guard.MeleeBlock);
-        AddFlat(modifiers, CombatStat.SpellBlock, Definition.Guard.SpellBlock);
-        AddFlat(modifiers, CombatStat.MeleeParry, Definition.Guard.MeleeParry);
-        AddFlat(modifiers, CombatStat.SpellParry, Definition.Guard.SpellParry);
+        AddFlat(modifiers, CombatStat.MeleeBlock, guard.MeleeBlock);
+        AddFlat(modifiers, CombatStat.SpellBlock, guard.SpellBlock);
+        AddFlat(modifiers, CombatStat.MeleeParry, guard.MeleeParry);
+        AddFlat(modifiers, CombatStat.SpellParry, guard.SpellParry);
 
-        foreach (var affix in affixes.Where(affix => !affix.IsLocal))
-            modifiers.Add(new CombatStatModifier(affix.Stat, affix.Modification, affix.Value, InstanceId));
+        foreach (var affix in affixes)
+        {
+            if (!affix.IsLocal)
+                AddGlobal(modifiers, affix);
+
+            if (affix.Hybrid is { IsLocal: false } hybrid)
+                modifiers.Add(new CombatStatModifier(hybrid.Stat, hybrid.Modification, hybrid.Value, InstanceId));
+        }
 
         return modifiers;
+    }
+
+    //Ein globales "Adds X to Y" legt X in den Stat des Affixes und Y in dessen Gegenstück mit Max
+    private void AddGlobal(List<CombatStatModifier> modifiers, ItemAffix affix)
+    {
+        modifiers.Add(new CombatStatModifier(affix.Stat, affix.Modification, affix.Value, InstanceId));
+
+        if (affix.HasRange && CombatStatGroups.TryGetRangeMaximum(affix.Stat, out var maximum))
+            modifiers.Add(new CombatStatModifier(maximum, affix.Modification, affix.ValueTo, InstanceId));
     }
 
     private void AddFlat(List<CombatStatModifier> modifiers, CombatStat stat, float value)
@@ -154,7 +182,8 @@ public sealed class ItemInstance
             modifiers.Add(new CombatStatModifier(stat, ModificationType.Flat, value, InstanceId));
     }
 
-    //Ein Affix "Adds X to Y" gibt dem unteren Wert X und dem oberen Y, jeder andere flache Affix beiden dasselbe
+    //Ein Affix "Adds X to Y" gibt dem unteren Wert X und dem oberen Y, jeder andere flache Affix beiden dasselbe.
+    //Der zweite Stat eines hybriden Affixes zählt mit, wenn er lokal ist
     private float GetLocalValue(float baseValue, CombatStat stat, bool isUpperValue = false)
     {
         var addedFlat = 0f;
@@ -163,26 +192,32 @@ public sealed class ItemInstance
 
         foreach (var affix in affixes)
         {
-            if (!affix.IsLocal || affix.Stat != stat)
-                continue;
+            if (affix.IsLocal && affix.Stat == stat)
+                Accumulate(affix.Modification, isUpperValue && affix.HasRange ? affix.ValueTo : affix.Value, ref addedFlat, ref increased, ref more);
 
-            switch (affix.Modification)
-            {
-                case ModificationType.Flat:
-                    addedFlat += isUpperValue && affix.HasRange ? affix.ValueTo : affix.Value;
-
-                    break;
-                case ModificationType.Percentage:
-                    increased += affix.Value;
-
-                    break;
-                case ModificationType.More:
-                    more *= 1 + affix.Value;
-
-                    break;
-            }
+            if (affix.Hybrid is { IsLocal: true } hybrid && hybrid.Stat == stat)
+                Accumulate(hybrid.Modification, hybrid.Value, ref addedFlat, ref increased, ref more);
         }
 
         return StatFormulas.Combine(baseValue, addedFlat, increased, more);
+    }
+
+    private static void Accumulate(ModificationType modification, float value, ref float addedFlat, ref float increased, ref float more)
+    {
+        switch (modification)
+        {
+            case ModificationType.Flat:
+                addedFlat += value;
+
+                break;
+            case ModificationType.Percentage:
+                increased += value;
+
+                break;
+            case ModificationType.More:
+                more *= 1 + value;
+
+                break;
+        }
     }
 }

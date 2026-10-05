@@ -24,6 +24,9 @@ public sealed record WeaponProfile(float      MinDamage,
     //Zusatzschaden der Elemente aus lokalen Affixen. Er gehört zum Grundschaden und wächst mit dem Waffenschaden eines Skills
     public PerElement<DamageRange> AddedDamage { get; init; }
 
+    //Weitere Pfeile je Schuss aus Affixen der Waffe, nur für ihre eigenen Angriffe
+    public int ExtraProjectiles { get; init; }
+
     public float Reach => Range * RangeTolerance;
 
     public void ApplyTo(StatSheet stats)

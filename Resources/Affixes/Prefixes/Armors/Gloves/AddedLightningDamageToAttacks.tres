@@ -1,0 +1,83 @@
+[gd_resource type="Resource" script_class="Prefix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_prefix"]
+
+[sub_resource type="Resource" id="Resource_tier6"]
+script = ExtResource("1_tier")
+Tier = 6
+MinItemLevelToAppearOn = 3
+Weight = 500
+MinValue = 1.0
+MaxValue = 1.0
+ItemnameAddition = "Droning"
+MinValueTo = 5.0
+MaxValueTo = 5.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier5"]
+script = ExtResource("1_tier")
+Tier = 5
+MinItemLevelToAppearOn = 13
+Weight = 500
+MinValue = 1.0
+MaxValue = 1.0
+ItemnameAddition = "Whirring"
+MinValueTo = 14.0
+MaxValueTo = 15.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier4"]
+script = ExtResource("1_tier")
+Tier = 4
+MinItemLevelToAppearOn = 22
+Weight = 500
+MinValue = 1.0
+MaxValue = 2.0
+ItemnameAddition = "Popping"
+MinValueTo = 22.0
+MaxValueTo = 23.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier3"]
+script = ExtResource("1_tier")
+Tier = 3
+MinItemLevelToAppearOn = 28
+Weight = 500
+MinValue = 1.0
+MaxValue = 2.0
+ItemnameAddition = "Crepitant"
+MinValueTo = 27.0
+MaxValueTo = 28.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 35
+Weight = 500
+MinValue = 1.0
+MaxValue = 3.0
+ItemnameAddition = "Flickering"
+MinValueTo = 33.0
+MaxValueTo = 34.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 44
+Weight = 500
+MinValue = 1.0
+MaxValue = 4.0
+ItemnameAddition = "Forking"
+MinValueTo = 40.0
+MaxValueTo = 43.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_prefix")
+AffectedCombatStat = 49
+AffectableItemTypes = Array[int]([12])
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier6"), SubResource("Resource_tier5"), SubResource("Resource_tier4"), SubResource("Resource_tier3"), SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

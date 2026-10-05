@@ -1,0 +1,122 @@
+[gd_resource type="Resource" script_class="Prefix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_prefix"]
+
+[sub_resource type="Resource" id="Resource_tier11"]
+script = ExtResource("1_tier")
+Tier = 11
+MinItemLevelToAppearOn = 1
+Weight = 1000
+MinValue = 6.0
+MaxValue = 12.0
+ItemnameAddition = "Varnished"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier10"]
+script = ExtResource("1_tier")
+Tier = 10
+MinItemLevelToAppearOn = 11
+Weight = 1000
+MinValue = 13.0
+MaxValue = 35.0
+ItemnameAddition = "Riveted"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier9"]
+script = ExtResource("1_tier")
+Tier = 9
+MinItemLevelToAppearOn = 17
+Weight = 1000
+MinValue = 36.0
+MaxValue = 63.0
+ItemnameAddition = "Ridged"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier8"]
+script = ExtResource("1_tier")
+Tier = 8
+MinItemLevelToAppearOn = 23
+Weight = 1000
+MinValue = 64.0
+MaxValue = 82.0
+ItemnameAddition = "Bolstered"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier7"]
+script = ExtResource("1_tier")
+Tier = 7
+MinItemLevelToAppearOn = 29
+Weight = 1000
+MinValue = 83.0
+MaxValue = 101.0
+ItemnameAddition = "Scaled"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier6"]
+script = ExtResource("1_tier")
+Tier = 6
+MinItemLevelToAppearOn = 35
+Weight = 1000
+MinValue = 102.0
+MaxValue = 120.0
+ItemnameAddition = "Shelled"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier5"]
+script = ExtResource("1_tier")
+Tier = 5
+MinItemLevelToAppearOn = 43
+Weight = 1000
+MinValue = 121.0
+MaxValue = 150.0
+ItemnameAddition = "Sheathed"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier4"]
+script = ExtResource("1_tier")
+Tier = 4
+MinItemLevelToAppearOn = 51
+Weight = 1000
+MinValue = 151.0
+MaxValue = 200.0
+ItemnameAddition = "Shrouded"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier3"]
+script = ExtResource("1_tier")
+Tier = 3
+MinItemLevelToAppearOn = 60
+Weight = 1000
+MinValue = 201.0
+MaxValue = 300.0
+ItemnameAddition = "Dampening"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 69
+Weight = 1000
+MinValue = 301.0
+MaxValue = 400.0
+ItemnameAddition = "Immovable"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 77
+Weight = 1000
+MinValue = 401.0
+MaxValue = 500.0
+ItemnameAddition = "Impermeable"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_prefix")
+AffectedCombatStat = 13
+AffectableItemTypes = Array[int]([15])
+IsInherentMod = true
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier11"), SubResource("Resource_tier10"), SubResource("Resource_tier9"), SubResource("Resource_tier8"), SubResource("Resource_tier7"), SubResource("Resource_tier6"), SubResource("Resource_tier5"), SubResource("Resource_tier4"), SubResource("Resource_tier3"), SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

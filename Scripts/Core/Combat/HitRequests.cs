@@ -18,12 +18,15 @@ public static class HitRequests
         var skillFactor = attack.WeaponDamagePercent / 100f;
         var addedFlat   = attacker.GetAddedFlat(damageType.GetScalingStat());
         var multiplier  = GetMultiplier(attacker, damageType, SkillKind.Attack);
+        var physical    = GetAddedToBase(attacker, CombatStat.AddedPhysicalToAttacks);
 
-        var main = new DamageRange((weapon.MinDamage * skillFactor + addedFlat) * multiplier,
-                                   (weapon.MaxDamage * skillFactor + addedFlat) * multiplier);
+        //"Adds X to Y Physical Damage to Attacks" zählt wie die Waffe zum Grundschaden und wächst mit dem Waffenschaden des Skills
+        var main = new DamageRange(((weapon.MinDamage + physical.Min) * skillFactor + addedFlat) * multiplier,
+                                   ((weapon.MaxDamage + physical.Max) * skillFactor + addedFlat) * multiplier);
 
-        //Der Zusatzschaden gehört zum Grundschaden der Waffe: Er wächst mit dem Waffenschaden des Skills und mit den Erhöhungen seines Elements
-        var added = weapon.AddedDamage.Select((element, range) => range.Times(skillFactor * GetMultiplier(attacker, element, SkillKind.Attack)));
+        //Der Zusatzschaden der Waffe und der für alle Angriffe gehören zum Grundschaden: Er wächst mit dem Waffenschaden des Skills und mit den Erhöhungen seines Elements
+        var added = weapon.AddedDamage.Select((element, range) => (range + GetAddedToBase(attacker, GetAddedToAttacksStat(element)))
+                                                                     .Times(skillFactor * GetMultiplier(attacker, element, SkillKind.Attack)));
 
         //Wandelt der Skill den Schaden in ein Element, zählt der Zusatzschaden desselben Elements zum Hauptteil
         if (damageType.IsElemental())
@@ -37,11 +40,12 @@ public static class HitRequests
                               damageType,
                               SkillKind.Attack,
                               attacker.GetFinal(CombatStat.HitChance),
-                              GetCriticalHitChance(attacker, weapon.CriticalHitChance),
+                              GetCriticalHitChance(attacker, weapon.CriticalHitChance, SkillKind.Attack),
                               attacker.GetFinal(CombatStat.CriticalDamage))
         {
             AddedDamage              = added,
-            DamageOverTimeMultiplier = StatusEffectRules.GetDamageOverTimeMultiplier(attacker)
+            DamageOverTimeMultiplier = StatusEffectRules.GetDamageOverTimeMultiplier(attacker),
+            DamageOverTimeByType     = StatusEffectRules.GetDamageOverTimeByType(attacker)
         };
     }
 
@@ -50,18 +54,35 @@ public static class HitRequests
         ArgumentNullException.ThrowIfNull(attacker);
         ArgumentNullException.ThrowIfNull(spell);
 
-        var addedFlat  = attacker.GetAddedFlat(CombatStat.SpellDamage);
-        var multiplier = attacker.GetTotalMultiplier(CombatStat.SpellDamage) * GetMultiplier(attacker, spell.DamageType, SkillKind.Spell);
+        var addedFlat   = attacker.GetAddedFlat(CombatStat.SpellDamage);
+        var spellFactor = attacker.GetTotalMultiplier(CombatStat.SpellDamage);
+        var multiplier  = spellFactor * GetMultiplier(attacker, spell.DamageType, SkillKind.Spell);
 
-        return new HitRequest((spell.MinDamage + addedFlat) * multiplier,
-                              (spell.MaxDamage + addedFlat) * multiplier,
+        var main = new DamageRange((spell.MinDamage + addedFlat) * multiplier,
+                                   (spell.MaxDamage + addedFlat) * multiplier);
+
+        //"Adds X to Y Fire Damage to Spells" zählt zum Grundschaden des Zaubers und wächst wie er mit dem Zauberschaden und seinem Element
+        var added = PerElement<DamageRange>.From(element => GetAddedToBase(attacker, GetAddedToSpellsStat(element))
+                                                               .Times(spellFactor * GetMultiplier(attacker, element, SkillKind.Spell)));
+
+        //Hat der Zauber selbst dieses Element, zählt der Zusatzschaden zu seinem Hauptteil
+        if (spell.DamageType.IsElemental())
+        {
+            main  += added[spell.DamageType];
+            added =  added.With(spell.DamageType, default);
+        }
+
+        return new HitRequest(main.Min,
+                              main.Max,
                               spell.DamageType,
                               SkillKind.Spell,
                               attacker.GetFinal(CombatStat.HitChance),
-                              GetCriticalHitChance(attacker, spell.CriticalHitChance),
+                              GetCriticalHitChance(attacker, spell.CriticalHitChance, SkillKind.Spell),
                               attacker.GetFinal(CombatStat.CriticalDamage))
         {
-            DamageOverTimeMultiplier = StatusEffectRules.GetDamageOverTimeMultiplier(attacker)
+            AddedDamage              = added,
+            DamageOverTimeMultiplier = StatusEffectRules.GetDamageOverTimeMultiplier(attacker),
+            DamageOverTimeByType     = StatusEffectRules.GetDamageOverTimeByType(attacker)
         };
     }
 
@@ -98,6 +119,41 @@ public static class HitRequests
         more      *= attacker.GetMoreMultiplier(stat);
     }
 
-    private static float GetCriticalHitChance(StatSheet attacker, float baseChance)
-        => (baseChance + attacker.GetAddedFlat(CombatStat.CriticalHitChance)) * attacker.GetTotalMultiplier(CombatStat.CriticalHitChance);
+    //Erhöhte Krit-Chance für Zauber zählt mit der allgemeinen zusammen
+    private static float GetCriticalHitChance(StatSheet attacker, float baseChance, SkillKind skillKind)
+    {
+        var increased = attacker.GetIncreasedMultiplier(CombatStat.CriticalHitChance);
+        var more      = attacker.GetMoreMultiplier(CombatStat.CriticalHitChance);
+
+        if (skillKind == SkillKind.Spell)
+            AddScaling(attacker, CombatStat.SpellCriticalHitChance, ref increased, ref more);
+
+        return (baseChance + attacker.GetAddedFlat(CombatStat.CriticalHitChance)) * (increased * more);
+    }
+
+    //Ein globales "Adds X to Y" steht in zwei Stats, X im genannten und Y in seinem Gegenstück mit Max
+    private static DamageRange GetAddedToBase(StatSheet attacker, CombatStat minimumStat)
+    {
+        CombatStatGroups.TryGetRangeMaximum(minimumStat, out var maximumStat);
+
+        return new DamageRange(attacker.GetFinal(minimumStat), attacker.GetFinal(maximumStat));
+    }
+
+    private static CombatStat GetAddedToAttacksStat(DamageType element)
+        => element switch
+        {
+            DamageType.Fire      => CombatStat.AddedFireToAttacks,
+            DamageType.Frost     => CombatStat.AddedFrostToAttacks,
+            DamageType.Lightning => CombatStat.AddedLightningToAttacks,
+            _                    => throw new ArgumentOutOfRangeException(nameof(element), element, "Kein Element")
+        };
+
+    private static CombatStat GetAddedToSpellsStat(DamageType element)
+        => element switch
+        {
+            DamageType.Fire      => CombatStat.AddedFireToSpells,
+            DamageType.Frost     => CombatStat.AddedFrostToSpells,
+            DamageType.Lightning => CombatStat.AddedLightningToSpells,
+            _                    => throw new ArgumentOutOfRangeException(nameof(element), element, "Kein Element")
+        };
 }

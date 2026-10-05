@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="Suffix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://bwwyi50jc5koy" path="res://Resources/Affixes/Suffixes/Suffix.cs" id="2_suffix"]
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 75
+Weight = 125
+MinValue = 1.0
+MaxValue = 1.0
+ItemnameAddition = "of the Eternal"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 81
+Weight = 125
+MinValue = 2.0
+MaxValue = 2.0
+ItemnameAddition = "of the Undying"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_suffix")
+AffectedCombatStat = 62
+AffectableItemTypes = Array[int]([6])
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://bwwyi50jc5koy"

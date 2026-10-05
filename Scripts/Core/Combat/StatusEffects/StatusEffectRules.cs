@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Core.Stats;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
@@ -44,6 +45,28 @@ public static class StatusEffectRules
         ArgumentNullException.ThrowIfNull(attacker);
 
         return attacker.GetTotalMultiplier(CombatStat.DamageOverTime);
+    }
+
+    //Kälte und Blitz haben noch keinen Effekt mit Schaden über Zeit und darum keinen eigenen Stat
+    public static DamageOverTimeByType GetDamageOverTimeByType(StatSheet attacker)
+    {
+        ArgumentNullException.ThrowIfNull(attacker);
+
+        return new DamageOverTimeByType(attacker.GetTotalMultiplier(CombatStat.PhysicalDamageOverTime),
+                                        attacker.GetTotalMultiplier(CombatStat.FireDamageOverTime),
+                                        1f,
+                                        1f);
+    }
+
+    //Ein Treffer bringt jeden Effekt einzeln, "chance to Avoid Ailments" würfelt für jeden. Ohne Chance fällt kein Wurf
+    public static bool IsAvoided(StatSheet defender, IRandomSource random)
+    {
+        ArgumentNullException.ThrowIfNull(defender);
+        ArgumentNullException.ThrowIfNull(random);
+
+        var chance = CombatFormulas.ClampChance(defender.GetFinal(CombatStat.AilmentAvoidance));
+
+        return chance > 0f && random.NextPercent() < chance;
     }
 
     public static StatusEffectApplication GetEffectOfHit(DamageType damageType, float unmitigatedDamage, int finalDamage, float damageOverTimeMultiplier = 1f)

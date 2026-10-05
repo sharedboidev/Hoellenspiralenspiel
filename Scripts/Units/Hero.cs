@@ -520,7 +520,7 @@ public partial class Hero
         if (!Report(TryPayFor(skill, CombatRules.MinSpellCooldownSec), isRepeat))
             return false;
 
-        BeginAction(skill, aim, aim.CurrentPoint - GlobalPosition, skill.Definition.CastSec);
+        BeginAction(skill, aim, aim.CurrentPoint - GlobalPosition, skill.Definition.GetCastSec(Stats));
 
         return true;
     }

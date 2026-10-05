@@ -28,7 +28,10 @@ public static class SaveGameMapper
                               Value        = affix.Value,
                               NameAddition = affix.NameAddition,
                               IsLocal      = affix.IsLocal,
-                              ValueTo      = affix.ValueTo
+                              ValueTo      = affix.ValueTo,
+                              Hybrid       = affix.Hybrid is { } line
+                                      ? new AffixLineSave { Stat = line.Stat, Modification = line.Modification, Value = line.Value, IsLocal = line.IsLocal }
+                                      : null
                           })
                           .ToList()
         };
@@ -46,10 +49,13 @@ public static class SaveGameMapper
         var item = new ItemInstance(definition, save.ItemLevel, Math.Max(1, save.StackSize)) { RareName = save.RareName };
 
         foreach (var affix in save.Affixes ?? [])
-            item.AddAffix(new ItemAffix(affix.Type, affix.Stat, affix.Modification, affix.Value, affix.NameAddition, affix.IsLocal, affix.ValueTo));
+            item.AddAffix(new ItemAffix(affix.Type, affix.Stat, affix.Modification, affix.Value, affix.NameAddition, affix.IsLocal, affix.ValueTo, ToLine(affix.Hybrid)));
 
         return item;
     }
+
+    private static ItemAffixLine ToLine(AffixLineSave line)
+        => line is null ? null : new ItemAffixLine(line.Stat, line.Modification, line.Value, line.IsLocal);
 
     public static void CaptureItems(CharacterItems items, SaveGame save)
     {

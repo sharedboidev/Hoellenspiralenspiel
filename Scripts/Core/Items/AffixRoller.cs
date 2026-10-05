@@ -88,13 +88,16 @@ public sealed class AffixRoller
         return CreateAffix(type, lastAffix, lastTier, random);
     }
 
-    //Nur eine Spanne "Adds X to Y" würfelt ein zweites Mal, für das Y
+    //Nur eine Spanne "Adds X to Y" würfelt ein zweites Mal, für das Y, und ein hybrider Affix für seinen zweiten Stat
     private static ItemAffix CreateAffix(AffixType type, AffixDefinition affix, AffixTierDefinition tier, IRandomSource random)
     {
-        var value   = RollValue(affix, tier.MinValue, tier.MaxValue, random);
-        var valueTo = tier.HasRange ? RollValue(affix, tier.MinValueTo, tier.MaxValueTo, random) : 0f;
+        var value   = RollValue(affix.Modification, affix.AllowsFractions, tier.MinValue, tier.MaxValue, random);
+        var valueTo = tier.HasRange ? RollValue(affix.Modification, affix.AllowsFractions, tier.MinValueTo, tier.MaxValueTo, random) : 0f;
+        var hybrid  = affix.Hybrid is { } line
+                ? new ItemAffixLine(line.Stat, line.Modification, RollValue(line.Modification, affix.AllowsFractions, tier.HybridMinValue, tier.HybridMaxValue, random), line.IsLocal)
+                : null;
 
-        return new ItemAffix(type, affix.Stat, affix.Modification, value, tier.NameAddition, affix.IsLocal, valueTo);
+        return new ItemAffix(type, affix.Stat, affix.Modification, value, tier.NameAddition, affix.IsLocal, valueTo, hybrid);
     }
 
     private List<(AffixDefinition Affix, AffixTierDefinition Tier)> FindCandidates(AffixType type, ItemInstance item)
@@ -103,7 +106,7 @@ public sealed class AffixRoller
 
         foreach (var affix in affixes)
         {
-            if (affix.Type != type || !affix.CanAppearOn(item.Definition) || item.HasAffixLike(type, affix.Stat, affix.Modification))
+            if (affix.Type != type || !affix.CanAppearOn(item.Definition) || item.HasAffixLike(type, affix.Stat, affix.Modification, affix.Hybrid?.Stat))
                 continue;
 
             foreach (var tier in affix.Tiers)
@@ -116,15 +119,15 @@ public sealed class AffixRoller
         return candidates;
     }
 
-    private static float RollValue(AffixDefinition affix, float minValue, float maxValue, IRandomSource random)
+    private static float RollValue(ModificationType modification, bool allowsFractions, float minValue, float maxValue, IRandomSource random)
     {
         var low  = Math.Min(minValue, maxValue);
         var high = Math.Max(minValue, maxValue);
 
-        var value = affix.AllowsFractions
+        var value = allowsFractions
                 ? random.NextRange(low, high)
                 : (int)low + random.NextInt(0, (int)high - (int)low + 1);
 
-        return affix.Modification is ModificationType.Percentage or ModificationType.More ? value / 100f : value;
+        return modification is ModificationType.Percentage or ModificationType.More ? value / 100f : value;
     }
 }

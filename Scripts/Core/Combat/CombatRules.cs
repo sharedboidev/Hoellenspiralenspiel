@@ -7,6 +7,13 @@ public static class CombatRules
     public const float BaseCriticalDamage = 50f;
     public const float BaseBlockReduction = 50f;
 
+    //Eine Resistenz zählt bis zu ihrem Maximum. Das beginnt bei 75 %, Affixe heben es, doch mehr als 90 % zählt nie
+    public const float BaseMaximumResistance = 75f;
+    public const float ResistanceHardCap     = 90f;
+
+    //Zusätzliche Minderung physischen Schadens nach der Rüstung, in Prozent
+    public const float MaxPhysicalDamageReduction = 90f;
+
     public const float CrushMoreDamage = 0.2f;
 
     public const float PierceLessHitChance = 0.5f;

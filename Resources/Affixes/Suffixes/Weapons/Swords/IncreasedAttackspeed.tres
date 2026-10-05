@@ -10,7 +10,7 @@ MinItemLevelToAppearOn = 1
 Weight = 1000
 MinValue = 5.0
 MaxValue = 7.0
-ItemnameAddition = "of Finesse"
+ItemnameAddition = "of Deftness"
 metadata/_custom_type_script = "uid://sdx5y8g2wvor"
 
 [sub_resource type="Resource" id="Resource_tier7"]
@@ -30,7 +30,7 @@ MinItemLevelToAppearOn = 22
 Weight = 1000
 MinValue = 11.0
 MaxValue = 13.0
-ItemnameAddition = "of Expertise"
+ItemnameAddition = "of Proficiency"
 metadata/_custom_type_script = "uid://sdx5y8g2wvor"
 
 [sub_resource type="Resource" id="Resource_tier5"]

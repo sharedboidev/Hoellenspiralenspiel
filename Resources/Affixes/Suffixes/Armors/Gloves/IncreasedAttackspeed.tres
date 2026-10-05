@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="Suffix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://bwwyi50jc5koy" path="res://Resources/Affixes/Suffixes/Suffix.cs" id="2_suffix"]
+
+[sub_resource type="Resource" id="Resource_tier4"]
+script = ExtResource("1_tier")
+Tier = 4
+MinItemLevelToAppearOn = 1
+Weight = 500
+MinValue = 5.0
+MaxValue = 7.0
+ItemnameAddition = "of Deftness"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier3"]
+script = ExtResource("1_tier")
+Tier = 3
+MinItemLevelToAppearOn = 11
+Weight = 500
+MinValue = 8.0
+MaxValue = 10.0
+ItemnameAddition = "of Fluency"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 22
+Weight = 500
+MinValue = 11.0
+MaxValue = 13.0
+ItemnameAddition = "of Proficiency"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 76
+Weight = 500
+MinValue = 14.0
+MaxValue = 16.0
+ItemnameAddition = "of Supremacy"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_suffix")
+AffectedCombatStat = 9
+ModificationType = 1
+AffectableItemTypes = Array[int]([12])
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier4"), SubResource("Resource_tier3"), SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://bwwyi50jc5koy"

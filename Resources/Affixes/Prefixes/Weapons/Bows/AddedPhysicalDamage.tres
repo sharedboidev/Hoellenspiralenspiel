@@ -1,0 +1,121 @@
+[gd_resource type="Resource" script_class="Prefix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_prefix"]
+
+[sub_resource type="Resource" id="Resource_tier9"]
+script = ExtResource("1_tier")
+Tier = 9
+MinItemLevelToAppearOn = 2
+Weight = 1000
+MinValue = 2.0
+MaxValue = 2.0
+ItemnameAddition = "Glimmering"
+MinValueTo = 4.0
+MaxValueTo = 5.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier8"]
+script = ExtResource("1_tier")
+Tier = 8
+MinItemLevelToAppearOn = 13
+Weight = 1000
+MinValue = 6.0
+MaxValue = 8.0
+ItemnameAddition = "Buffed"
+MinValueTo = 12.0
+MaxValueTo = 15.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier7"]
+script = ExtResource("1_tier")
+Tier = 7
+MinItemLevelToAppearOn = 21
+Weight = 1000
+MinValue = 10.0
+MaxValue = 13.0
+ItemnameAddition = "Lustrous"
+MinValueTo = 21.0
+MaxValueTo = 25.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier6"]
+script = ExtResource("1_tier")
+Tier = 6
+MinItemLevelToAppearOn = 29
+Weight = 1000
+MinValue = 13.0
+MaxValue = 17.0
+ItemnameAddition = "Whetted"
+MinValueTo = 28.0
+MaxValueTo = 32.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier5"]
+script = ExtResource("1_tier")
+Tier = 5
+MinItemLevelToAppearOn = 36
+Weight = 1000
+MinValue = 16.0
+MaxValue = 22.0
+ItemnameAddition = "Shining"
+MinValueTo = 35.0
+MaxValueTo = 40.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier4"]
+script = ExtResource("1_tier")
+Tier = 4
+MinItemLevelToAppearOn = 46
+Weight = 800
+MinValue = 20.0
+MaxValue = 28.0
+ItemnameAddition = "Hardened"
+MinValueTo = 43.0
+MaxValueTo = 51.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier3"]
+script = ExtResource("1_tier")
+Tier = 3
+MinItemLevelToAppearOn = 54
+Weight = 600
+MinValue = 25.0
+MaxValue = 33.0
+ItemnameAddition = "Keen-edged"
+MinValueTo = 52.0
+MaxValueTo = 61.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 65
+Weight = 400
+MinValue = 30.0
+MaxValue = 40.0
+ItemnameAddition = "Toughened"
+MinValueTo = 63.0
+MaxValueTo = 73.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 77
+Weight = 200
+MinValue = 34.0
+MaxValue = 47.0
+ItemnameAddition = "Resplendent"
+MinValueTo = 72.0
+MaxValueTo = 84.0
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_prefix")
+AffectedCombatStat = 8
+AffectableItemTypes = Array[int]([1])
+AffectableWeaponTypes = Array[int]([6])
+IsInherentMod = true
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier9"), SubResource("Resource_tier8"), SubResource("Resource_tier7"), SubResource("Resource_tier6"), SubResource("Resource_tier5"), SubResource("Resource_tier4"), SubResource("Resource_tier3"), SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

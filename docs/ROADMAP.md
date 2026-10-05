@@ -56,7 +56,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | Modifier-System | Flat, Percentage (increased) und More, sauber getrennt | Trägt das ganze Stat-Konzept |
 | Waffen | Schadensspanne, Angriffe pro Sekunde, Swingtimer, Typ, Schadensart, Krit, Anforderungen | Seit M2 bestimmen die Werte den Nahkampf, seit M3 gibt es Fernkampfwaffen mit Projektil. Seit M4 sind Waffen Resources und bringen Parry oder Block mit. Klassen-Anforderung fehlt. |
 | Rüstung | Helm, Torso, Handschuhe und Schild mit Rüstungswert | 4 von 16 Slots haben Item-Basen |
-| Affixe | 35 Affixe mit Tiers, Gewichten, Itemlevel-Grenze, Prefix/Suffix, lokale und globale Mods, seit dem 05.10.2026 18 davon nur für Schwerter, nach den Einhandschwertern aus Path of Exile | Slot-Tabelle aus dem PDF nur teilweise abgedeckt |
+| Affixe | 156 Affixe mit Tiers, Gewichten, Itemlevel-Grenze, Prefix/Suffix, lokale und globale Mods, seit dem 05.10.2026 139 davon nach Path of Exile für die sieben Basen des Spiels | Slot-Tabelle aus dem PDF nur teilweise abgedeckt |
 | Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen. Seit dem Nachtrag zu M5.5 liegt Beute in einem Gitter und trägt Schilder mit dem Namen des Items. Seit Etappe 3 von M7 lassen Gegner auch Gold fallen. | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle. Seit M5 bestimmt das Monsterlevel das Itemlevel. |
 | Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. Seit M5.5 hängt sie an der Schnittstelle `IHero` und läuft auch in 3D. Seit Etappe 3 von M7 kennt das Modell eine Truhe, und eine Gitteransicht zeigt Inventar, Truhe und Händler. |
 | Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. Seit M5.5 ist sie in 3D am Helden zu sehen. |
@@ -3046,6 +3046,95 @@ Bewusst offen gelassen:
 - Der Filter kennt nur Waffentypen. Zweihandschwerter bräuchten eigene Werte und einen Filter nach Führung (`WieldStrategy`), noch gibt es keine.
 - Der Charakterbogen zeigt die neuen Stats nicht. Leben je Treffer, je Kill und Leech zeigen keine Zahl über dem Helden.
 - "Adds X to Y" gibt es nur lokal auf der Waffe, nicht global für alle Angriffe.
+
+#### Nebenbei: Affixe der übrigen Item-Basen
+
+Umgesetzt am 05.10.2026 auf `master_BaseAffixes`, abgezweigt von `664f119`. Wunsch des Users: die übrigen Affixe aus Path of Exile für alle Item-Basen, die es im Spiel schon gibt, nach denselben Regeln wie bei den Schwertern. Das heißt: Namen als Synonyme, ohne Socketed und Chaos, Werte 1:1, und jedes Affix, das einen neuen Stat oder eine neue Mechanik braucht, erst absprechen. Zuerst kamen 90 Affixe mit vorhandenen Stats. Für 18 Mechaniken habe ich danach Vorschläge gemacht, und der User hat jede einzeln entschieden. So kamen 31 weitere dazu.
+
+- Erledigt: 121 neue Affixe für die sechs übrigen Basen, mit allen Stufen, Itemlevels und Gewichten von poedb.tw. Die Daten stammen aus dem JSON der Seiten (`new ModsView(...)`, Feld `normal`, eine Zeile je Stufe mit Gewicht). Ein Generator hat aus denselben Daten auch die 18 Affixe der Schwerter gebaut, gleich bis auf die Umbenennungen unten.
+- Erledigt: Hybride Affixe. Ein Affix trägt optional einen zweiten Stat mit eigener Spanne je Stufe (`Affix.IsHybrid`, `HybridCombatStat`, `AffixTier.HybridMinValue/MaxValue`). Er kann global sein, wo der erste lokal ist: "+# to Armour, +# to maximum Life" auf Rüstung, "% increased Spell Damage, +# to maximum Mana" auf dem Stab.
+- Erledigt: Neue Mechaniken nach den Entscheidungen unten, mit 27 neuen Stats und dem bisher ungelesenen `Damagereduction`.
+- Erledigt: Texte im Tooltip näher am Original. "+46% to Fire Resistance" steht in Prozent, dazu "Regenerate 8,1 Life per second", "+130 to maximum Life", "14% increased Attack Speed", "Reflects 25% of Physical Damage to Melee Attackers", "Bow Attacks fire an additional Arrow" und ein hybrider Affix in zwei Zeilen. Der Block eines Schilds steht mit seinem Affix im Tooltip, der Charakterbogen zeigt eine Resistenz über dem Maximum als "75% (max)".
+- Erledigt: Sieben Namen der Schwerter umbenannt, weil sie in Path of Exile ein anderes Affix bezeichnen. Aus "Searing" (dort erhöhter Feuerschaden) wird "Seething", dazu Jagged → Toothed, Sizzling → Crepitant, of Convalescence → of Restitution, of Expertise → of Proficiency, of Finesse → of Deftness, of the Zephyr → of the Breeze.
+
+| Basis | Seite auf poedb | Slot und Filter | Prefixe | Suffixe |
+|---|---|---|---|---|
+| Training Sword | One Hand Swords | PhysicalWeapon, Sword | 6 | 12 |
+| Short Bow | Bows | PhysicalWeapon, Bow | 6 | 13 |
+| Wooden Staff | Staves (Zauberstäbe, nicht Warstaves) | SpellWeapon, Staff | 15 | 19 |
+| Gugel | Helmets (str) | Helmet | 5 | 8 |
+| Peasant Tunic | Body Armours (str) | Torso | 5 | 7 |
+| Wool Gloves | Gloves (str) | Hands | 8 | 14 |
+| Wooden Shield | Shields (str) | Offhand | 7 | 14 |
+
+Getroffene Entscheidungen des Users vom 05.10.2026 zu den 18 Vorschlägen:
+
+| Nr. | Affixe | Entscheidung | Umgesetzt als |
+|---|---|---|---|
+| 1 | "+# to Armour, +# to maximum Life", "% increased Spell Damage, +# to maximum Mana" | Hybride Affixe, beide Stats gibt es ja | Zweiter Stat am Affix, siehe oben |
+| 2 | "Adds X to Y Physical/Fire/Cold/Lightning Damage to Attacks" (Handschuhe) | Der Bonusschaden geht auf den Grundschaden einer Attack | `AddedPhysicalToAttacks` bis `AddedLightningToAttacksMax`. Er wächst mit dem Prozentsatz des Skills wie der Schaden der Waffe |
+| 3 | "Adds X to Y Fire/Cold/Lightning Damage to Spells" (Stab) | Auf den Grundschaden eines Zaubers | `AddedFireToSpells` bis `AddedLightningToSpellsMax`. Er wächst mit Zauberschaden und Element, beim Zauber desselben Elements zählt er zum Hauptteil |
+| 4 | "% increased Rarity of Items found" | Ignorieren | Nicht übernommen |
+| 5 | "Reflects # Physical Damage to Melee Attackers" | Der Wert gilt als Prozent des physischen, ungeminderten Schadens | `ReflectPhysical`: ein Nahkampftreffer wirft diesen Anteil seines physischen Schadens vor der Minderung ungemindert zurück. Stirbt der Angreifer daran, gehört der Kill dem Verteidiger |
+| 6 | "% additional Physical Damage Reduction" | Wirkt nach der Minderung durch Rüstung | `Damagereduction`, nach der Rüstung, auch für Pierce, höchstens 90 % |
+| 7 | "% increased Chance to Block" (Schild) | Wie vorgeschlagen | Lokal: `MeleeBlock` in Prozent auf den Block des Schilds |
+| 8 | "+% to all Elemental Resistances" | Wie vorgeschlagen | Sammel-Stat `AllElementalResistances`, das StatSheet gibt ihn an alle drei Resistenzen weiter |
+| 9 | "% to maximum Fire/Cold/Lightning Resistance", "% to all maximum Resistances" | Obergrenze 90 % | Eine Resistenz zählt bis zu ihrem Maximum. Das beginnt bei 75 %, die Affixe heben es, mehr als 90 % zählt nie |
+| 10 | "% chance to Avoid Elemental Ailments" | Dazu auch Bleed und die anderen Ailments von Waffen | `AilmentAvoidance` würfelt für jeden Effekt eines Treffers: Bleed, Burn, Chill und Shock |
+| 11 | "You take % reduced Extra Damage from Critical Strikes" | Wie vorgeschlagen | `ReducedCriticalDamageTaken` kürzt den Zusatzschaden eines Krits |
+| 12 | "% increased Cast Speed" | Wie vorgeschlagen | `CastSpeed` teilt die Wirkzeit, `SkillDefinition.GetCastSec` |
+| 13 | "% increased Spell Critical Strike Chance" | Wie vorgeschlagen | `SpellCriticalHitChance` zählt mit der allgemeinen Erhöhung zusammen, nur für Zauber |
+| 14 | "% chance to Ignite/Freeze/Shock" | Weglassen | Nicht übernommen |
+| 15 | "+% to Fire/Cold/Physical Damage over Time Multiplier" | Wie vorgeschlagen, als More-Modifier | `FireDamageOverTime` für Burn und `PhysicalDamageOverTime` für Bleed, beide als More neben dem allgemeinen Multiplikator. Kälte hat noch keinen Effekt mit Schaden über Zeit, ihr Affix kommt mit ihm |
+| 16 | "% increased Projectile Speed" | Wie vorgeschlagen | `ProjectileSpeed`: schnellere Projektile, die Reichweite bleibt |
+| 17 | "Bow Attacks fire # additional Arrows" | Wie vorgeschlagen | Lokal am Bogen über `ProjectileCount`, nur für seine eigenen Angriffe (`WeaponProfile.ExtraProjectiles`) |
+| 18 | Level der Skill-Gems | Weglassen | Nicht übernommen |
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Verteidigungsart | Rüstungsteile im Spiel kennen nur Rüstung, darum die Fassung mit Armour (str). Evasion und Energy Shield gibt es nicht |
+| Stab | Der Wooden Staff liegt im Slot für Zauberwaffen, darum die Zauberstäbe (Staves) mit Zauber- und Angriffsaffixen |
+| Lokal und global | Auf Waffen sind Schaden, Angriffstempo, Krit, weitere Pfeile und Anforderungen lokal, auf Rüstung nur Rüstung, Block und Anforderungen. Angriffstempo auf Handschuhen gilt dem Helden |
+| Namen | Ein PoE-Name bekommt überall dasselbe Synonym, wie PoE eine Stufe in jeder Klasse gleich nennt. Kein Synonym ist selbst ein PoE-Name. Wo PoE zwei Familien gleich nennt ("of Recuperation" für Leben je Treffer und für Lebensregeneration), bekommt jede ihren eigenen Namen ("of Restitution", "of Wellness"). "Adds Fire Damage" auf der Waffe, für Angriffe und für Zauber teilen sich die Namen wie im Original |
+| Hybride Familie | Ein hybrider Affix ist eine eigene Familie. "+# to Armour" und "+# to Armour, +# to maximum Life" passen auf dasselbe Item wie in Path of Exile |
+| Alte Affixe | Bleiben wie bei den Schwertern. Wo sie dieselbe Familie für denselben Slot tragen, etwa Leben auf dem Helm, liegen beide im Topf, ein Item bekommt nur eine davon |
+| Ausgelassen | Socketed, Chaos (Schaden, Resistenz, Schaden über Zeit, Zauber-Gems, maximale Resistenz), Stun (auch "% increased Armour" zusammen mit "Stun and Block Recovery"), Rarity, Gem-Level, die Chancen auf Ignite, Freeze und Shock und, wie beim Schwert, Accuracy |
+| Lebensregeneration | Mit Brüchen gewürfelt wie im Original. Das Spiel regeneriert weiter ganze Punkte je Sekunde, der Rest zählt erst zusammen mit anderen Quellen |
+| Volle Resistenz | Mit der Obergrenze gibt es keine 100 % mehr. Der Test `VolleResistenz_ZaehltNurBisZumMaximum` ersetzt den alten, der sie verlangte. Die Blobs mit 75 % Resistenz bleiben, wie sie waren |
+
+So funktioniert es:
+
+- `CombatStatGroups` kennt die Sammel-Stats ("all Elemental Resistances", "all maximum Resistances"), die `StatSheet.Accumulate` an ihre Stats weitergibt, und die Paare eines globalen "Adds X to Y". `ItemInstance.GetEquipModifiers` legt X in den Stat des Affixes und Y in dessen Gegenstück mit Max.
+- `HitRequests.ForAttack` rechnet den Bonusschaden für Angriffe zum Grundschaden der Waffe, `ForSpell` den für Zauber zum Grundschaden des Zaubers. Beide tragen `DamageOverTimeByType`, die More-Multiplikatoren je Schadensart, neben dem allgemeinen.
+- `Defences` rechnet Maximum und wirksamen Wert einer Resistenz, die Minderung physischen Schadens nach der Rüstung und den Krit-Schaden, den der Verteidiger nimmt. `HitResolver` nutzt sie für jeden Teil eines Treffers.
+- `SkillCast.ApplyTo(unit, isMelee)` ruft nach einem Schlag im Nahkampf `BaseUnit.ReflectMeleeHit`. `BaseUnit.ReceiveDamage` und der Kampfsimulator fragen `StatusEffectRules.IsAvoided` für jeden Effekt, ohne Chance fällt dabei kein Wurf.
+- `SkillExecutor.LaunchProjectile` zählt die weiteren Pfeile der Waffe nur bei Angriffen mit ihr und teilt mit dem Projektiltempo die Flugzeit, sodass die Reichweite gleich bleibt.
+
+Neue Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| `Affix` | `IsHybrid`, `HybridCombatStat`, `HybridModificationType`, `HybridIsInherentMod` | aus | Der zweite Stat eines hybriden Affixes |
+| `AffixTier` | `HybridMinValue`, `HybridMaxValue` | 0 | Seine Spanne in dieser Stufe |
+| `CombatRules` | `BaseMaximumResistance`, `ResistanceHardCap`, `MaxPhysicalDamageReduction` | 75, 90, 90 | Maximum und Obergrenze der Resistenzen, Obergrenze der zusätzlichen Minderung |
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Unit-Tests | Der Test der Schwerter ist jetzt `PoeAffixDataTests` für alle sieben Klassen. Er prüft je Klasse die erwarteten Dateien und Itemlevel 1 mit Prefix und Suffix, je Datei Stat, Art, lokal, Brüche, Slot, Waffentyp und den zweiten Stat der hybriden Affixe, außerdem vollständige und steigende Stufen, verschiedene Namen, Y nur bei Adds und jeden portierten Name in genau einer Familie. Dazu 29 Tests der Mechaniken: Maximum und Obergrenze der Resistenzen, Sammel-Stats, Minderung nach der Rüstung auch für Pierce, weniger Krit-Schaden, Abwehr der Ailments ohne Wurf ohne Chance, Reflect nur aus physischem Schaden, DoT je Schadensart als More, hybride Affixe am Item, im Würfler und im Spielstand, Bonusschaden für Angriffe mit dem Prozentsatz des Skills, für Zauber mit dem Zauberschaden, Block des Schilds, Pfeile nur am Bogen, Krit nur für Zauber, Zaubertempo in Wirkzeit und Schätzung. Einer geändert: volle Resistenz zählt nur bis 75 %. Zusammen 1785 |
+| Alte Zahlen | Alle Kampf-, Schätzungs- und Bilanztests von vorher laufen unverändert durch |
+| Laufendes Spiel, headless | 36 Schritte mit den ersten 90 Affixen, dann 37 mit allen: 156 Affixe geladen, 139 aus poedb, 5 hybride mit zweitem Stat. Für jede Basis passen alle eigenen Affixe und keine fremden, je 300 Items bei Itemlevel 86 würfeln hybride und bauen ihre Tooltips ohne Fehler. Im Testgelände: Ein hybrider Helm gibt 30 Rüstung und 18 Leben, Handschuhe geben Feuer für Angriffe mit 150 % des Skills, ein Schild blockt 22,5 statt 15. Ein Nahkampftreffer auf den Helden wirft genau die Hälfte seines physischen Schadens vor der Minderung zurück, ein Treffer aus der Ferne nichts, und der Held blutet nicht. Der Bogen schießt zwei Pfeile, mit 100 % Projektiltempo doppelt so schnell bei gleicher Reichweite. 20 Texte im Tooltip |
+| Spielstand | Die Proben liefen mit eigenem Spielstand und eigenen Einstellungen |
+
+Bewusst offen gelassen:
+
+- Accuracy mit drei Affixen wartet weiter, siehe das ToDo bei den Schwertern. Ebenso der Multiplikator für Kälte über Zeit, bis Kälte einen Effekt mit Schaden über Zeit hat.
+- Die alten Affixe tragen ihre Fehler weiter, etwa `FlatManaWeapon` auf Helm und Körper. Das bereinigt Etappe 11, sie kann auf dieser Grundlage die Slot-Tabelle umsetzen.
+- Die Werte sind die von Path of Exile mit Itemlevel bis 86. In Wollust bei Itemlevel 5 bis 8 fallen nur die untersten Stufen, die Balance stellt Etappe 12 ein.
 
 ### M9: Inhalt und Politur (L, fortlaufend)
 

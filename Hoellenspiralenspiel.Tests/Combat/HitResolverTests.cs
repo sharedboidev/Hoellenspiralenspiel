@@ -90,8 +90,9 @@ public class HitResolverTests
         Assert.That(result.FinalDamage, Is.EqualTo(100));
     }
 
+    //Seit den Affixen der Schilde zählt eine Resistenz nur bis zu ihrem Maximum von 75 %, volle Resistenz gibt es nicht mehr
     [Test]
-    public void VolleResistenz_VerhindertSchadenUndEffekt()
+    public void VolleResistenz_ZaehltNurBisZumMaximum()
     {
         var defender = Defender((CombatStat.FireResistance, 100));
 
@@ -100,8 +101,8 @@ public class HitResolverTests
         Assert.Multiple(() =>
         {
             Assert.That(result.HasLanded, Is.True);
-            Assert.That(result.FinalDamage, Is.Zero);
-            Assert.That(result.InflictedEffect, Is.Null);
+            Assert.That(result.FinalDamage, Is.EqualTo(25));
+            Assert.That(result.InflictedEffect.Kind, Is.EqualTo(StatusEffectKind.Burn));
         });
     }
 

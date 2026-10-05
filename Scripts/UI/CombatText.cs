@@ -45,6 +45,10 @@ public static class CombatText
     public static void ShowHeal(BaseUnit target, float amount)
         => Show(target, amount.ToString("N0"), Colors.LimeGreen, NormalFontSize);
 
+    //Schaden, den ein Verteidiger mit Reflect zurückwirft
+    public static void ShowReflected(BaseUnit target, int amount)
+        => Show(target, amount.ToString("N0"), Colors.Silver, NormalFontSize);
+
     public static void ShowStatusTick(BaseUnit target, StatusTick tick)
         => Show(target, tick.Damage.ToString("N0"), GetColorOf(tick.Kind), StatusFontSize);
 

@@ -4,18 +4,24 @@ using Hoellenspiralenspiel.Enums;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Items;
 
-//Bei "Adds X to Y" kommt X aus MinValue bis MaxValue und Y aus MinValueTo bis MaxValueTo
+//Bei "Adds X to Y" kommt X aus MinValue bis MaxValue und Y aus MinValueTo bis MaxValueTo.
+//Ein hybrider Affix würfelt seinen zweiten Stat aus HybridMinValue bis HybridMaxValue
 public sealed record AffixTierDefinition(int    Tier,
                                          int    MinItemLevel,
                                          int    Weight,
                                          float  MinValue,
                                          float  MaxValue,
                                          string NameAddition,
-                                         float  MinValueTo = 0f,
-                                         float  MaxValueTo = 0f)
+                                         float  MinValueTo     = 0f,
+                                         float  MaxValueTo     = 0f,
+                                         float  HybridMinValue = 0f,
+                                         float  HybridMaxValue = 0f)
 {
     public bool HasRange => MaxValueTo > 0f;
 }
+
+//Der zweite Stat eines hybriden Affixes, etwa das Leben in "+# to Armour, +# to maximum Life". Er kann global sein, wenn der erste lokal ist
+public sealed record AffixHybridDefinition(CombatStat Stat, ModificationType Modification, bool IsLocal);
 
 public sealed record AffixDefinition(AffixType Type, CombatStat Stat, ModificationType Modification)
 {
@@ -24,6 +30,7 @@ public sealed record AffixDefinition(AffixType Type, CombatStat Stat, Modificati
     public IReadOnlyList<AffixTierDefinition> Tiers              { get; init; } = Array.Empty<AffixTierDefinition>();
     public bool                               AllowsFractions    { get; init; }
     public bool                               IsLocal            { get; init; }
+    public AffixHybridDefinition              Hybrid             { get; init; }
 
     public bool CanAppearOn(ItemSlot slot)
     {

@@ -13,4 +13,7 @@ public sealed record HitRequest(float      MinDamage,
 
     //Faktor des Angreifers auf jeden Effekt, der Schaden über Zeit macht
     public float DamageOverTimeMultiplier { get; init; } = 1f;
+
+    //Dazu der Faktor der Schadensart des Effekts
+    public DamageOverTimeByType DamageOverTimeByType { get; init; } = DamageOverTimeByType.None;
 }

@@ -38,17 +38,18 @@ public static class HitResolver
 
         var isCritical = critRoll < CombatFormulas.ClampChance(request.CriticalHitChance);
         var wasBlocked = blockRoll < CombatFormulas.ClampChance(defender.GetFinal(GetBlockStat(request.SkillKind)));
-        var damage     = Strike(rolledDamage, request.DamageType, request, defender, isCritical, wasBlocked);
+        var critFactor = isCritical ? CombatFormulas.GetCriticalFactor(Defences.GetCriticalDamageBonusTaken(defender, request.CriticalDamageBonus)) : 1f;
+        var damage     = Strike(rolledDamage, request.DamageType, defender, critFactor, wasBlocked);
 
         var finalDamage = (int)MathF.Round(Mitigate(damage, request.DamageType, defender));
 
         //Der Zusatzschaden der Elemente trifft mit demselben Wurf, kritisch und geblockt wie der Hauptteil
         var addedUnmitigated = request.AddedDamage.Select((element, range) => range.IsEmpty
                                                                                   ? 0f
-                                                                                  : Strike(Roll(range, damageRoll), element, request, defender, isCritical, wasBlocked));
+                                                                                  : Strike(Roll(range, damageRoll), element, defender, critFactor, wasBlocked));
 
         var addedDamage  = addedUnmitigated.Select((element, unmitigated) => (int)MathF.Round(Mitigate(unmitigated, element, defender)));
-        var addedEffects = addedUnmitigated.Select((element, unmitigated) => StatusEffectRules.GetEffectOfHit(element, unmitigated, addedDamage[element], request.DamageOverTimeMultiplier));
+        var addedEffects = addedUnmitigated.Select((element, unmitigated) => StatusEffectRules.GetEffectOfHit(element, unmitigated, addedDamage[element], GetDamageOverTimeMultiplier(request, element)));
 
         return new HitResult
         {
@@ -60,7 +61,7 @@ public static class HitResolver
             RolledDamage      = rolledDamage,
             UnmitigatedDamage = damage,
             FinalDamage       = finalDamage + addedDamage.Fire + addedDamage.Frost + addedDamage.Lightning,
-            InflictedEffect   = StatusEffectRules.GetEffectOfHit(request.DamageType, damage, finalDamage, request.DamageOverTimeMultiplier),
+            InflictedEffect   = StatusEffectRules.GetEffectOfHit(request.DamageType, damage, finalDamage, GetDamageOverTimeMultiplier(request, request.DamageType)),
             AddedDamage       = addedDamage,
             AddedEffects      = addedEffects
         };
@@ -69,12 +70,16 @@ public static class HitResolver
     private static float Roll(DamageRange range, float damageRoll)
         => Math.Max(0f, range.Min + damageRoll * (range.Max - range.Min));
 
-    private static float Strike(float rolledDamage, DamageType damageType, HitRequest request, StatSheet defender, bool isCritical, bool wasBlocked)
+    //Der allgemeine Multiplikator und der der Schadensart, beides More
+    private static float GetDamageOverTimeMultiplier(HitRequest request, DamageType damageType)
+        => request.DamageOverTimeMultiplier * request.DamageOverTimeByType.For(damageType);
+
+    private static float Strike(float rolledDamage, DamageType damageType, StatSheet defender, float critFactor, bool wasBlocked)
     {
         var damage = rolledDamage;
 
-        if (isCritical)
-            damage *= CombatFormulas.GetCriticalFactor(request.CriticalDamageBonus);
+        if (critFactor != 1f)
+            damage *= critFactor;
 
         damage *= damageType.GetDamageFactor();
 
@@ -102,16 +107,17 @@ public static class HitResolver
         return HitAvoidance.None;
     }
 
+    //Pierce geht an der Rüstung vorbei, die zusätzliche Minderung physischen Schadens trifft ihn trotzdem
     private static float Mitigate(float damage, DamageType damageType, StatSheet defender)
     {
-        if (damageType == DamageType.Pierce)
-            return Math.Max(0f, damage);
+        if (damageType.IsElemental())
+            return CombatFormulas.MitigateByResistance(damage, Defences.GetEffectiveResistance(defender, damageType));
 
-        var mitigatingValue = defender.GetFinal(damageType.GetMitigatingStat());
+        var afterArmor = damageType == DamageType.Pierce
+                ? Math.Max(0f, damage)
+                : CombatFormulas.MitigateByArmor(damage, defender.GetFinal(CombatStat.Armor));
 
-        return damageType.IsPhysical()
-                ? CombatFormulas.MitigateByArmor(damage, mitigatingValue)
-                : CombatFormulas.MitigateByResistance(damage, mitigatingValue);
+        return afterArmor * (1f - Defences.GetPhysicalDamageReduction(defender) / 100f);
     }
 
     private static CombatStat GetParryStat(SkillKind skillKind)

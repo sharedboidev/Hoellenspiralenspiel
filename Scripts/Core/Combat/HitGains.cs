@@ -21,6 +21,14 @@ public static class HitGains
     public static float GetLifeOnKill(StatSheet attacker)
         => Positive(attacker, CombatStat.LifeOnKill);
 
+    //Reflect gibt dem Nahkämpfer einen Teil des physischen Schadens vor der Minderung zurück, selbst ungemindert
+    public static float GetReflectedDamage(StatSheet defender, HitResult hit)
+    {
+        ArgumentNullException.ThrowIfNull(hit);
+
+        return hit.HasLanded && hit.DamageType.IsPhysical() ? hit.UnmitigatedDamage * Positive(defender, CombatStat.ReflectPhysical) / 100f : 0f;
+    }
+
     public static float GetManaOnKill(StatSheet attacker)
         => Positive(attacker, CombatStat.ManaOnKill);
 

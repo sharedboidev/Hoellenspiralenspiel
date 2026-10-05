@@ -1,11 +1,15 @@
 using System;
+using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Stats;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Skills;
 
 //Genau eines von Attack und Spell ist gesetzt
 public sealed record SkillDefinition
 {
+    private const float MinCastSpeedFactor = 0.1f;
+
     private SkillDefinition(string id, string name)
     {
         if (string.IsNullOrWhiteSpace(id))
@@ -35,6 +39,14 @@ public sealed record SkillDefinition
     public AreaSettings Area { get; init; }
 
     public bool IsArea => Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint;
+
+    //Erhöhtes Zaubertempo teilt die Wirkzeit: 50 % mehr ergibt zwei Drittel der Zeit
+    public double GetCastSec(StatSheet caster)
+    {
+        ArgumentNullException.ThrowIfNull(caster);
+
+        return CastSec / Math.Max(MinCastSpeedFactor, caster.GetTotalMultiplier(CombatStat.CastSpeed));
+    }
 
     public static SkillDefinition ForAttack(string id, AttackDefinition attack)
     {

@@ -106,6 +106,17 @@ public sealed class AffixSave
 
     //Fehlt vor Version 7. Das Y eines Affixes "Adds X to Y", sonst 0
     public float            ValueTo      { get; set; }
+
+    //Fehlt vor Version 7. Der zweite Stat eines hybriden Affixes, sonst null
+    public AffixLineSave    Hybrid       { get; set; }
+}
+
+public sealed class AffixLineSave
+{
+    public CombatStat       Stat         { get; set; }
+    public ModificationType Modification { get; set; }
+    public float            Value        { get; set; }
+    public bool             IsLocal      { get; set; }
 }
 
 public sealed class VendorSave

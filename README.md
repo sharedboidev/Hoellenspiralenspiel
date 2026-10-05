@@ -103,13 +103,13 @@ Beispiel: 14 % und 22 % increased von der Ausrüstung, dazu 2,97 % more aus Inte
 | Reichweiten | Zählen vom Rand des Körpers bis zum Rand des Ziels. Ein großer Elite ist so gut zu erreichen wie ein kleiner Blob |
 | ATTACK und SPELL | Attacks skalieren mit dem Waffenschaden, Spells bringen eigenen Grundschaden mit |
 | Sechs Schadensarten | Crush, Pierce, Slash, Fire, Frost, Lightning, jede mit eigenem Effekt |
-| Statuseffekte | Stapelnder Bleed und Burn, Shock mit Fehlschlägen, Chill mit Verlangsamung. Erhöhter Schaden über Zeit addiert sich, der Damage over Time Multiplier wirkt als More auf Bleed, Burn und jeden künftigen Effekt mit Schaden |
-| Elementarschaden der Waffe | "Adds X to Y Fire Damage" und Frost und Blitz gehören zum Grundschaden der Waffe: Eine Attack mit 150 % Waffenschaden nimmt sie mit. Jedes Element wird für sich gemindert, löst seinen eigenen Effekt aus und wächst mit erhöhtem Elementarschaden, dem eigenen Element und Elementarschaden mit Angriffen, die zusammen zählen |
+| Statuseffekte | Stapelnder Bleed und Burn, Shock mit Fehlschlägen, Chill mit Verlangsamung. Erhöhter Schaden über Zeit addiert sich, der Damage over Time Multiplier wirkt als More auf Bleed, Burn und jeden künftigen Effekt mit Schaden, dazu als More der Multiplikator seiner Schadensart: physisch für Bleed, Feuer für Burn. "Chance to Avoid Ailments" wehrt jeden Effekt eines Treffers ab, auch Bleed |
+| Zusatzschaden | "Adds X to Y Fire Damage" und Frost und Blitz gehören zum Grundschaden der Waffe: Eine Attack mit 150 % Waffenschaden nimmt sie mit. Ebenso "Adds X to Y … to Attacks" von Handschuhen und "… to Spells" vom Stab für den Grundschaden jeder Attack oder jedes Zaubers. Jedes Element wird für sich gemindert, löst seinen eigenen Effekt aus und wächst mit erhöhtem Elementarschaden, dem eigenen Element und bei Angriffen mit Elementarschaden mit Angriffen, die zusammen zählen |
 | Leben je Treffer und Kill | Life per Enemy Hit gilt für jeden getroffenen Gegner einer Attack einzeln, zehn Gegner geben zehnmal Leben. Leben und Mana je Kill bekommt, wer zuletzt traf, auch wenn ein Bleed den Gegner beendet |
 | Leech | Ein Teil des physischen Schadens einer Attack kommt als Leben oder Mana zurück, gleichmäßig über 3 Sekunden. Jeder Treffer bringt eine eigene Instanz, alle heilen zugleich. Der Orb zeigt, was noch kommt, halb durchsichtig in seiner Farbe über dem Stand |
-| Schadensminderung | Rüstung gegen physischen Schaden, Resistenzen gegen Feuer, Frost und Blitz |
+| Schadensminderung | Rüstung gegen physischen Schaden, danach "additional Physical Damage Reduction" bis 90 %. Resistenzen gegen Feuer, Frost und Blitz zählen bis zu ihrem Maximum von 75 %, das "maximum Resistance" bis höchstens 90 % hebt. "Reflects % of Physical Damage" wirft einem Nahkämpfer diesen Anteil seines physischen Schadens vor der Minderung zurück |
 | Parry und Block | Parry wehrt ganz ab, Block fängt 50 % ab. Schilde und Stäbe blocken, Schwerter parieren |
-| Kritische Treffer | Chance von Waffe oder Zauber, verstärkt durch Awareness |
+| Kritische Treffer | Chance von Waffe oder Zauber, verstärkt durch Awareness. "Spell Critical Strike Chance" zählt nur für Zauber, "reduced Extra Damage from Critical Strikes" kürzt den Zusatzschaden eines Krits gegen den Helden |
 | Tod und Respawn | Todesanzeige, Verlust von 10 % der XP des Levels, Rückkehr zum Startpunkt |
 | Schadenszahlen | Schweben über dem Ziel, mit eigenen Farben für Krit, Heilung und jeden Statuseffekt |
 
@@ -180,7 +180,7 @@ DPS = Mittlerer Treffer × Einsätze pro Sekunde × Trefferchance + Schaden des 
 | Trefferchance | Pierce trifft nur halb so oft |
 | Schadensart | Crush verursacht 20 % mehr Schaden |
 | Bleed und Burn | Ihr Schaden über Zeit zählt zur DPS, mit dem Multiplikator für Schaden über Zeit. Burn endet bei 10 Stapeln, Bleed hat keine Obergrenze |
-| Elementarschaden der Waffe | Zählt zum Treffer, sein Feuer brennt auch, wenn der Hauptteil nichts auslöst |
+| Zusatzschaden | Zählt zum Treffer, sein Feuer brennt auch, wenn der Hauptteil nichts auslöst. Zaubertempo kürzt die Wirkzeit |
 | Chill und Shock auf dem Helden | Chill senkt das Angriffstempo, unter Shock schlagen Einsätze fehl |
 
 Mana zählt nicht zur DPS. Die Zahl gilt, solange das Mana reicht.
@@ -240,10 +240,10 @@ Auslöser und Aktionen lassen sich im Inspector frei kombinieren, zum Beispiel "
 | Item-Basen | Schwert, Stab, Bogen, Schild, Helm, Torso, Handschuhe, Heil- und Manatrank |
 | Items als Daten | Jede Item-Basis ist eine Resource mit Werten, Größe, Anforderungen und Icon. Ein neues Item braucht keinen Code |
 | Parry und Block | Jede Basis kann beides mitbringen, einstellbar im Inspector |
-| Affixe | 35 Affixe mit Stufen, Gewichten und Mindest-Itemlevel. Ein Affix gilt für Slots und auf Wunsch nur für bestimmte Waffentypen. Eine Stufe kann eine zweite Spanne für "Adds X to Y" tragen |
-| Affixe der Schwerter | 6 Prefixe und 12 Suffixe nur für Schwerter, nach den Basis-Affixen der Einhandschwerter in Path of Exile mit allen Stufen, mit eigenen Namen: erhöhter und zusätzlicher physischer Schaden, Feuer, Frost und Blitz, Elementarschaden mit Angriffen, Stärke, Geschick, Angriffstempo, Kritische Trefferchance, Kritischer Schaden, Leben je Treffer, Leben und Mana je Kill, Life und Mana Leech, Damage over Time Multiplier und gesenkte Anforderungen. Accuracy fehlt noch, Stun und Socketed bleiben weg |
+| Affixe | 156 Affixe mit Stufen, Gewichten und Mindest-Itemlevel. Ein Affix gilt für Slots und auf Wunsch nur für bestimmte Waffentypen. Eine Stufe kann eine zweite Spanne für "Adds X to Y" tragen, ein hybrider Affix einen zweiten Stat mit eigener Spanne, etwa "+# to Armour, +# to maximum Life" |
+| Affixe aus Path of Exile | 139 Affixe für die sieben Basen des Spiels, nach den Basis-Affixen von poedb.tw mit allen Stufen, Itemlevels und Gewichten und mit eigenen Namen: Schwert 18, Bogen 19, Stab 34, Helm 13, Körper 12, Handschuhe 22, Schild 21. Rüstungsteile nehmen die Fassung mit Armour. Ein Name steht überall für dieselbe Stufe derselben Familie. Accuracy fehlt noch, Socketed, Chaos, Stun, Rarity, Gem-Level und die Chancen auf Ignite, Freeze und Shock bleiben weg |
 | Prefix und Suffix | Bis zu 8 Affixe pro Item, keiner doppelt |
-| Lokal und global | Manche Affixe verbessern das Item selbst, andere den Charakter |
+| Lokal und global | Manche Affixe verbessern das Item selbst, andere den Charakter. Lokal sind etwa Rüstung, der Block des Schilds und weitere Pfeile eines Bogens, die nur für seine eigenen Angriffe gelten |
 | Seltenheit | Normal, Magic in Blau, Rare in Gelb mit erzeugtem Namen |
 | Loot-Tabellen | Gewichtete Einträge, Mengen, verschachtelte Tabellen |
 | Beute mit Seed | Derselbe Seed ergibt dieselbe Beute |
@@ -302,7 +302,7 @@ Die Einstellungen liegen als `settings.json` eine Ebene darüber, direkt in `%AP
 | Ohne Spielstand testen | Im Inspector am `GameController` den Schalter `SavingEnabled` ausschalten |
 
 Leben, Mana, Position, Beute und Gold am Boden und der Rückkauf des Händlers stehen nicht im Spielstand.
-Der Spielstand hat Version 7. Ältere Spielstände lädt das Spiel weiter. Vor Version 3 beginnen sie mit 0 Gold und leerer Truhe. Bis Version 3 liegen keine Tränke auf der Leiste, und ein gespeicherter Bestand des Händlers wird beim Laden einmal nach Itemtyp neu ausgelegt, ohne neu zu würfeln. Seit Version 5 steht je Kreis der Inhaltsstand im Spielstand, mit dem seine Ebenen entstanden sind: Ändert sich ein Kreis, beginnt ein gespeicherter Abstieg dort neu, die Checkpoints bleiben. Ein Abstieg aus Version 4 gilt als passend, bis sich der Kreis das nächste Mal ändert. Seit Version 6 hängen Karte und Gefallene an einem Ort wie `f2`, ab Etappe 5 auch `f2/d0/l1` für eine Ebene im Dungeon einer Fläche. Version 5 liest Tiefe N als Fläche N. Seit Version 7 trägt ein Affix "Adds X to Y" sein Y, ältere Affixe laden ohne. Eine ältere Fassung des Spiels legt einen Spielstand einer neueren Version als `.broken` zur Seite.
+Der Spielstand hat Version 7. Ältere Spielstände lädt das Spiel weiter. Vor Version 3 beginnen sie mit 0 Gold und leerer Truhe. Bis Version 3 liegen keine Tränke auf der Leiste, und ein gespeicherter Bestand des Händlers wird beim Laden einmal nach Itemtyp neu ausgelegt, ohne neu zu würfeln. Seit Version 5 steht je Kreis der Inhaltsstand im Spielstand, mit dem seine Ebenen entstanden sind: Ändert sich ein Kreis, beginnt ein gespeicherter Abstieg dort neu, die Checkpoints bleiben. Ein Abstieg aus Version 4 gilt als passend, bis sich der Kreis das nächste Mal ändert. Seit Version 6 hängen Karte und Gefallene an einem Ort wie `f2`, ab Etappe 5 auch `f2/d0/l1` für eine Ebene im Dungeon einer Fläche. Version 5 liest Tiefe N als Fläche N. Seit Version 7 trägt ein Affix "Adds X to Y" sein Y und ein hybrider Affix seinen zweiten Stat, ältere Affixe laden ohne. Eine ältere Fassung des Spiels legt einen Spielstand einer neueren Version als `.broken` zur Seite.
 Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints und das Town-Portal.
 
 </details>

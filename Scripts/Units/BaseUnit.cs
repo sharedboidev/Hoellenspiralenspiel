@@ -255,7 +255,8 @@ public abstract partial class BaseUnit : CharacterBody3D
                 if (IsDead)
                     break;
 
-                StatusEffects.Apply(effect);
+                if (!StatusEffectRules.IsAvoided(Stats, GameRandom.Shared))
+                    StatusEffects.Apply(effect);
             }
         }
 
@@ -320,6 +321,30 @@ public abstract partial class BaseUnit : CharacterBody3D
             GainFromHit(hit);
 
         HitDealt?.Invoke(this, hit, victim);
+    }
+
+    //Ein Nahkampftreffer auf diese Einheit kann einen Teil seines physischen Schadens zum Angreifer zurückwerfen
+    public void ReflectMeleeHit(HitResult hit, BaseUnit attacker)
+    {
+        if (attacker is null || attacker == this || !IsInstanceValid(attacker))
+            return;
+
+        var damage = HitGains.GetReflectedDamage(Stats, hit);
+
+        if (damage > 0f)
+            attacker.ReceiveReflectedDamage(damage, this);
+    }
+
+    public virtual void ReceiveReflectedDamage(float damage, BaseUnit source)
+    {
+        var amount = (int)MathF.Round(damage);
+
+        if (!IsTargetable || amount <= 0)
+            return;
+
+        LifeCurrent -= amount;
+
+        CombatText.ShowReflected(this, amount);
     }
 
     //Wer zuletzt traf, bekommt den Kill, auch wenn ein Bleed ihn beendet hat

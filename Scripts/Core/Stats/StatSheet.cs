@@ -209,25 +209,39 @@ public sealed class StatSheet
     private float CombineFor(CombatStat stat)
         => StatFormulas.Combine(effectiveBase[(int)stat], addedFlat[(int)stat], increased[(int)stat], more[(int)stat]);
 
+    //Ein Sammel-Stat wie "all Elemental Resistances" wirkt auf jeden seiner Stats
     private void Accumulate(CombatStatModifier modifier)
     {
-        var index = (int)modifier.AffectedStat;
+        if (!CombatStatGroups.TryGetMembers(modifier.AffectedStat, out var members))
+        {
+            Accumulate(modifier.AffectedStat, modifier.ModificationType, modifier.Value);
 
-        switch (modifier.ModificationType)
+            return;
+        }
+
+        foreach (var member in members)
+            Accumulate(member, modifier.ModificationType, modifier.Value);
+    }
+
+    private void Accumulate(CombatStat stat, ModificationType modificationType, float value)
+    {
+        var index = (int)stat;
+
+        switch (modificationType)
         {
             case ModificationType.Flat:
-                addedFlat[index] += modifier.Value;
+                addedFlat[index] += value;
 
                 break;
             case ModificationType.Percentage:
-                increased[index] += modifier.Value;
+                increased[index] += value;
 
                 break;
             case ModificationType.More:
-                more[index] *= 1 + modifier.Value;
+                more[index] *= 1 + value;
 
                 break;
-            default: throw new ArgumentOutOfRangeException(nameof(modifier), modifier.ModificationType, "Unbekannte Art von Modifier");
+            default: throw new ArgumentOutOfRangeException(nameof(modificationType), modificationType, "Unbekannte Art von Modifier");
         }
     }
 }

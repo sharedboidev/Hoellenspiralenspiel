@@ -31,6 +31,13 @@ public partial class AffixTier : Resource
     [Export]
     public float MaxValueTo { get; set; }
 
+    //Nur für hybride Affixe: die Spanne ihres zweiten Stats
+    [Export]
+    public float HybridMinValue { get; set; }
+
+    [Export]
+    public float HybridMaxValue { get; set; }
+
     public AffixTierDefinition ToDefinition()
-        => new(Tier, MinItemLevelToAppearOn, Weight, MinValue, MaxValue, ItemnameAddition, MinValueTo, MaxValueTo);
+        => new(Tier, MinItemLevelToAppearOn, Weight, MinValue, MaxValue, ItemnameAddition, MinValueTo, MaxValueTo, HybridMinValue, HybridMaxValue);
 }

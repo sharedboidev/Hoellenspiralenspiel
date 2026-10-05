@@ -1,0 +1,94 @@
+[gd_resource type="Resource" script_class="Prefix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://d2himjbu3lvto" path="res://Resources/Affixes/Prefixes/Prefix.cs" id="2_prefix"]
+
+[sub_resource type="Resource" id="Resource_tier8"]
+script = ExtResource("1_tier")
+Tier = 8
+MinItemLevelToAppearOn = 1
+Weight = 1000
+MinValue = 40.0
+MaxValue = 49.0
+ItemnameAddition = "Weighty"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier7"]
+script = ExtResource("1_tier")
+Tier = 7
+MinItemLevelToAppearOn = 11
+Weight = 1000
+MinValue = 50.0
+MaxValue = 64.0
+ItemnameAddition = "Toothed"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier6"]
+script = ExtResource("1_tier")
+Tier = 6
+MinItemLevelToAppearOn = 23
+Weight = 1000
+MinValue = 65.0
+MaxValue = 84.0
+ItemnameAddition = "Vile"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier5"]
+script = ExtResource("1_tier")
+Tier = 5
+MinItemLevelToAppearOn = 35
+Weight = 400
+MinValue = 85.0
+MaxValue = 109.0
+ItemnameAddition = "Ferocious"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier4"]
+script = ExtResource("1_tier")
+Tier = 4
+MinItemLevelToAppearOn = 46
+Weight = 200
+MinValue = 110.0
+MaxValue = 134.0
+ItemnameAddition = "Murderous"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier3"]
+script = ExtResource("1_tier")
+Tier = 3
+MinItemLevelToAppearOn = 60
+Weight = 100
+MinValue = 135.0
+MaxValue = 154.0
+ItemnameAddition = "Heartless"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 73
+Weight = 50
+MinValue = 155.0
+MaxValue = 169.0
+ItemnameAddition = "Despotic"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 83
+Weight = 25
+MinValue = 170.0
+MaxValue = 179.0
+ItemnameAddition = "Pitiless"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_prefix")
+AffectedCombatStat = 8
+ModificationType = 1
+AffectableItemTypes = Array[int]([1])
+AffectableWeaponTypes = Array[int]([6])
+IsInherentMod = true
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier8"), SubResource("Resource_tier7"), SubResource("Resource_tier6"), SubResource("Resource_tier5"), SubResource("Resource_tier4"), SubResource("Resource_tier3"), SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://d2himjbu3lvto"

@@ -34,6 +34,16 @@ public static class DamageTypeExtensions
     public static CombatStat GetScalingStat(this DamageType damageType)
         => damageType.IsPhysical() ? CombatStat.PhysicalDamage : CombatStat.ElementalDamage;
 
+    //Was ein Affix wie "+3% to maximum Fire Resistance" zum Maximum der Resistenz legt
+    public static CombatStat GetMaximumResistanceStat(this DamageType damageType)
+        => damageType switch
+        {
+            DamageType.Fire      => CombatStat.MaxFireResistance,
+            DamageType.Frost     => CombatStat.MaxFrostResistance,
+            DamageType.Lightning => CombatStat.MaxLightningResistance,
+            _                    => throw new ArgumentOutOfRangeException(nameof(damageType), damageType, "Nur Elemente haben eine Resistenz")
+        };
+
     //Der Stat eines Elements selbst, physischer Schaden hat keinen eigenen neben PhysicalDamage
     public static CombatStat GetElementStat(this DamageType damageType)
         => damageType switch

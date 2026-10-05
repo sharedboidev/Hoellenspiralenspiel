@@ -129,18 +129,19 @@ public sealed class ItemTooltipContent : ITooltipObject
 
     private void AppendGuard(StringBuilder text)
     {
-        var guard = item.Definition.Guard;
+        var guard     = item.Guard;
+        var baseGuard = item.Definition.Guard;
 
-        AppendGuardLine(text, "Block Chance", guard.MeleeBlock);
-        AppendGuardLine(text, "Spell Block Chance", guard.SpellBlock);
-        AppendGuardLine(text, "Parry Chance", guard.MeleeParry);
-        AppendGuardLine(text, "Spell Parry Chance", guard.SpellParry);
+        AppendGuardLine(text, "Block Chance", guard.MeleeBlock, baseGuard.MeleeBlock);
+        AppendGuardLine(text, "Spell Block Chance", guard.SpellBlock, baseGuard.SpellBlock);
+        AppendGuardLine(text, "Parry Chance", guard.MeleeParry, baseGuard.MeleeParry);
+        AppendGuardLine(text, "Spell Parry Chance", guard.SpellParry, baseGuard.SpellParry);
     }
 
-    private static void AppendGuardLine(StringBuilder text, string label, float value)
+    private static void AppendGuardLine(StringBuilder text, string label, float value, float baseValue)
     {
         if (value > 0f)
-            text.AppendLine($"{label}: {value:0.##}%");
+            text.AppendLine($"{label}: {Styled(value, baseValue)}%");
     }
 
     private void AppendRequirements(StringBuilder text)
@@ -154,33 +155,50 @@ public sealed class ItemTooltipContent : ITooltipObject
         }
     }
 
+    //Ein hybrider Affix zeigt beide Stats, jeden in seiner Zeile
     private void AppendAffixes(StringBuilder text)
     {
         foreach (var affix in item.Affixes.OrderBy(affix => affix.Type))
-            text.AppendLine($"[color={AffixColor}]{Describe(affix)}[/color]");
+        {
+            text.AppendLine($"[color={AffixColor}]{Describe(affix.Stat, affix.Modification, affix.Value, affix.ValueTo, affix.IsLocal)}[/color]");
+
+            if (affix.Hybrid is { } hybrid)
+                text.AppendLine($"[color={AffixColor}]{Describe(hybrid.Stat, hybrid.Modification, hybrid.Value, 0f, hybrid.IsLocal)}[/color]");
+        }
     }
 
-    private static string Describe(ItemAffix affix)
-        => (affix.Stat, affix.Modification) switch
+    private static string Describe(CombatStat stat, ModificationType modification, float value, float valueTo, bool isLocal)
+        => (stat, modification) switch
         {
-            _ when affix.HasRange                                        => $"Adds {affix.Value:0.##} to {affix.ValueTo:0.##} {affix.Stat.GetDescription()}",
-            (CombatStat.Attackspeed, ModificationType.Flat)              => $"+{affix.Value:0.##} to Attacks per Second",
-            (CombatStat.LifeOnHit, ModificationType.Flat)                => $"Grants {affix.Value:0.##} Life per Enemy Hit",
-            (CombatStat.LifeOnKill, ModificationType.Flat)               => $"Gain {affix.Value:0.##} Life per Enemy Killed",
-            (CombatStat.ManaOnKill, ModificationType.Flat)               => $"Gain {affix.Value:0.##} Mana per Enemy Killed",
-            (CombatStat.Leech, ModificationType.Flat)                    => $"{affix.Value:0.##}% of Physical Attack Damage Leeched as Life",
-            (CombatStat.ManaLeech, ModificationType.Flat)                => $"{affix.Value:0.##}% of Physical Attack Damage Leeched as Mana",
-            (CombatStat.DamageOverTime, ModificationType.More)           => $"+{affix.Value * 100:N0}% to Damage over Time Multiplier",
-            (_, ModificationType.Flat) when IsShownAsPercent(affix.Stat) => $"+{affix.Value:0.##}% to {affix.Stat.GetDescription()}",
-            (_, ModificationType.Flat)                                   => $"+{affix.Value:0.##} to {affix.Stat.GetDescription()}",
-            (_, ModificationType.Percentage) when affix.Value < 0        => $"{-affix.Value * 100:N0}% reduced {affix.Stat.GetDescription()}",
-            (_, ModificationType.Percentage)                             => $"{affix.Value * 100:N0}% increased {affix.Stat.GetDescription()}",
-            (_, ModificationType.More)                                   => $"{affix.Value * 100:N0}% More {affix.Stat.GetDescription()}",
-            _                                                            => throw new ArgumentOutOfRangeException(nameof(affix), affix.Modification, null)
+            _ when valueTo > 0f                                                   => $"Adds {value:0.##} to {valueTo:0.##} {stat.GetDescription()}",
+            (CombatStat.Attackspeed, ModificationType.Flat)                       => $"+{value:0.##} to Attacks per Second",
+            (CombatStat.Liferegeneration, ModificationType.Flat)                  => $"Regenerate {value:0.#} Life per second",
+            (CombatStat.LifeOnHit, ModificationType.Flat)                         => $"Grants {value:0.##} Life per Enemy Hit",
+            (CombatStat.LifeOnKill, ModificationType.Flat)                        => $"Gain {value:0.##} Life per Enemy Killed",
+            (CombatStat.ManaOnKill, ModificationType.Flat)                        => $"Gain {value:0.##} Mana per Enemy Killed",
+            (CombatStat.Leech, ModificationType.Flat)                             => $"{value:0.##}% of Physical Attack Damage Leeched as Life",
+            (CombatStat.ManaLeech, ModificationType.Flat)                         => $"{value:0.##}% of Physical Attack Damage Leeched as Mana",
+            (CombatStat.ReflectPhysical, ModificationType.Flat)                   => $"Reflects {value:0.##}% of Physical Damage to Melee Attackers",
+            (CombatStat.Damagereduction, ModificationType.Flat)                   => $"{value:0.##}% additional Physical Damage Reduction",
+            (CombatStat.AilmentAvoidance, ModificationType.Flat)                  => $"{value:0.##}% chance to Avoid Ailments",
+            (CombatStat.ReducedCriticalDamageTaken, ModificationType.Flat)        => $"You take {value:0.##}% reduced Extra Damage from Critical Strikes",
+            (CombatStat.ProjectileCount, ModificationType.Flat) when isLocal      => value > 1f ? $"Bow Attacks fire {value:0} additional Arrows" : "Bow Attacks fire an additional Arrow",
+            (CombatStat.MeleeBlock, ModificationType.Percentage) when isLocal     => $"{value * 100:N0}% increased Chance to Block",
+            (CombatStat.DamageOverTime, ModificationType.More)                    => $"+{value * 100:N0}% to Damage over Time Multiplier",
+            (CombatStat.PhysicalDamageOverTime, ModificationType.More)            => $"+{value * 100:N0}% to Physical Damage over Time Multiplier",
+            (CombatStat.FireDamageOverTime, ModificationType.More)                => $"+{value * 100:N0}% to Fire Damage over Time Multiplier",
+            (_, ModificationType.Flat) when IsShownAsPercent(stat)                => $"+{value:0.##}% to {stat.GetDescription()}",
+            (_, ModificationType.Flat)                                            => $"+{value:0.##} to {stat.GetDescription()}",
+            (_, ModificationType.Percentage) when value < 0                       => $"{-value * 100:N0}% reduced {stat.GetDescription()}",
+            (_, ModificationType.Percentage)                                      => $"{value * 100:N0}% increased {stat.GetDescription()}",
+            (_, ModificationType.More)                                            => $"{value * 100:N0}% More {stat.GetDescription()}",
+            _                                                                     => throw new ArgumentOutOfRangeException(nameof(modification), modification, null)
         };
 
     private static bool IsShownAsPercent(CombatStat stat)
-        => stat is CombatStat.CriticalHitChance or CombatStat.CriticalDamage or CombatStat.BlockReduction or CombatStat.MeleeBlock or CombatStat.SpellBlock or CombatStat.MeleeParry or CombatStat.SpellParry;
+        => stat is CombatStat.CriticalHitChance or CombatStat.CriticalDamage or CombatStat.BlockReduction or CombatStat.MeleeBlock or CombatStat.SpellBlock or CombatStat.MeleeParry or CombatStat.SpellParry
+                or CombatStat.FireResistance or CombatStat.FrostResistance or CombatStat.LightningResistance or CombatStat.AllElementalResistances
+                or CombatStat.MaxFireResistance or CombatStat.MaxFrostResistance or CombatStat.MaxLightningResistance or CombatStat.AllMaximumResistances;
 
     private static string Styled(double finalValue, double baseValue)
     {

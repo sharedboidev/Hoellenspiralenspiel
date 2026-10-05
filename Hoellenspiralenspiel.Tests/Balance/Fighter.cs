@@ -104,7 +104,7 @@ internal sealed class Fighter
 
         var durationSec = skill.Kind == SkillKind.Attack
                 ? 1.0 / Math.Max(CombatRules.MinAttacksPerSecond, stats.GetFinal(CombatStat.Attackspeed))
-                : skill.CastSec;
+                : skill.GetCastSec(stats);
 
         return (durationSec * HeroImpactFraction, durationSec * (1 - HeroImpactFraction));
     }

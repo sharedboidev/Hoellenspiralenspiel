@@ -20,7 +20,7 @@ public static class SkillExecutor
         switch (definition.Delivery)
         {
             case SkillDelivery.Weapon when caster.Weapon.IsRanged:
-                LaunchProjectile(caster, cast, caster.WeaponProjectileScene, caster.Weapon.GetProjectile(), aim);
+                LaunchProjectile(caster, cast, caster.WeaponProjectileScene, caster.Weapon.GetProjectile(), aim, caster.Weapon.ExtraProjectiles);
 
                 break;
             case SkillDelivery.Weapon:
@@ -47,10 +47,11 @@ public static class SkillExecutor
         if (!aim.HasTarget || !cast.CanHit(aim.Target) || caster.DistancePxTo(aim.Target) > caster.Weapon.Reach)
             return;
 
-        cast.ApplyTo(aim.Target);
+        cast.ApplyTo(aim.Target, true);
     }
 
-    private static void LaunchProjectile(BaseUnit caster, SkillCast cast, PackedScene scene, ProjectileSettings settings, SkillAim aim)
+    //Erhöhtes Projektiltempo lässt die Reichweite gleich. Weitere Pfeile einer Waffe zählen nur für ihre eigenen Angriffe
+    private static void LaunchProjectile(BaseUnit caster, SkillCast cast, PackedScene scene, ProjectileSettings settings, SkillAim aim, int extraProjectiles = 0)
     {
         if (scene is null || settings is null)
         {
@@ -61,7 +62,11 @@ public static class SkillExecutor
 
         var origin    = WorldScale.OnGround(caster.GlobalPosition);
         var direction = WorldScale.OnGround(aim.CurrentPoint) - origin;
-        var count     = Math.Max(1, caster.Stats.GetFinalWhole(CombatStat.ProjectileCount));
+        var count     = Math.Max(1, caster.Stats.GetFinalWhole(CombatStat.ProjectileCount)) + Math.Max(0, extraProjectiles);
+        var speedup   = caster.Stats.GetTotalMultiplier(CombatStat.ProjectileSpeed);
+
+        if (speedup > 0f && !speedup.Equals(1f))
+            settings = settings with { Speed = settings.Speed * speedup, LifetimeSec = settings.LifetimeSec / speedup };
 
         for (var i = 0; i < count; i++)
         {

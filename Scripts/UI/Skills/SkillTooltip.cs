@@ -32,7 +32,7 @@ public static class SkillTooltip
         text.Append($"{uses} per Second: {estimate.UsesPerSecond:0.##}");
 
         if (skill.Kind == SkillKind.Spell && skill.Definition.CastSec > 0)
-            text.Append(NewLine).Append($"Cast Time: {skill.Definition.CastSec:0.##} s");
+            text.Append(NewLine).Append($"Cast Time: {skill.Definition.GetCastSec(caster.Stats):0.##} s");
 
         if (skill.CooldownSec > 0)
             text.Append(NewLine).Append($"Cooldown: {skill.CooldownSec:0.##} s");
