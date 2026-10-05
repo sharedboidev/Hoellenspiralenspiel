@@ -134,15 +134,19 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 | Feature | Beschreibung |
 |---|---|
 | Skills als Daten | Jeder Skill ist eine Resource mit Kosten, Abklingzeit, Schaden und Szene. Ein neuer Skill braucht keinen Code |
-| Fünf Skills | Attack, Lightning Strike, Fireball, Frost Nova und Thunderbolt |
+| Sechs Skills | Attack, Cleave, Lightning Strike, Fireball, Frost Nova und Thunderbolt |
 | Projektile | Fliegen bis zum ersten Feind oder zur Wand. Der Feuerball spaltet sich und sucht die nächsten Gegner |
 | Flächen | Um den Helden oder am Mauszeiger, sofort oder mit Verzögerung |
+| Bogenschlag | Ein Schlag der Nahkampfwaffe trifft jeden in einem Bogen vor dem Helden. Der Radius wächst mit der Reichweite der Waffe |
+| Hiebe sichtbar | Jeder Schlag mit einer Nahkampfwaffe zieht mit dem Treffer einen hellen Bogen von rechts nach links, zusammen mit der Waffe und auch ins Leere. Ein Treffer läuft durch das Ziel, Cleave zieht einen weiten Halbkreis |
 | Für jeden gleich | Wen ein Skill trifft, entscheidet die Fraktion. Gegner setzen dieselben Skills ein wie der Held |
 | Skill-Leiste | Zehn Plätze mit Icon, Taste und Abklingzeit |
 | Freie Belegung | Rechtsklick auf einen Platz öffnet die Liste aller Skills, darunter im Abschnitt Consumables alle Trankarten mit ihrer Zahl im Inventar |
 | Tränke auf der Leiste | Ein Platz kann statt eines Skills eine Trankart halten. Oben links steht, wie viele davon im Inventar liegen. Bei 0 wird das Bild grau, der Platz bleibt belegt. Die Taste trinkt einen Trank aus dem Inventar, den kleinsten Stapel zuerst, gehalten nur einen. Truhe und Item an der Maus zählen nicht |
 | Gehaltene Taste | Wiederholt den Skill, sobald er wieder bereit ist |
-| Schlag und Zauber binden | Ein Schlag dauert so lange, wie das Angriffstempo vorgibt, ein Zauber seine Wirkzeit, Standard 0,4 s. Beide lösen nach der Hälfte aus. Bis zum Ende steht der Held, dreht sich nicht und beginnt nichts Neues. Wird währenddessen eine Skill-Taste gedrückt und gehalten, folgt ihr Skill danach |
+| Stehenbleiben | Mit gehaltenem `Shift` greift der Held aus dem Stand Richtung Maus an, statt zum Gegner zu laufen, auch ohne Gegner unter der Maus. Ohne `Shift` braucht ein Nahkampfangriff einen Gegner unter der Maus. Zauber wirkt er ohnehin aus dem Stand |
+| Passende Waffe | Skills für Nahkampfwaffen liegen rot hinterlegt auf der Leiste, solange der Held einen Bogen trägt, und lösen nicht aus. Ihr Tooltip sagt, warum |
+| Schlag und Zauber binden | Ein Schlag dauert so lange, wie das Angriffstempo vorgibt, ein Zauber seine Wirkzeit, Standard 0,4 s. Beide lösen nach der Hälfte aus. Ein Nahkampfschlag holt bis dahin aus und zieht mit dem Treffer in 0,15 s durch. Bis zum Ende steht der Held, dreht sich nicht und beginnt nichts Neues. Wird währenddessen eine Skill-Taste gedrückt und gehalten, folgt ihr Skill danach |
 | Kosten | Mana und Abklingzeit pro Skill, Ton bei leerem Mana |
 | Tooltip mit DPS | Schaden pro Sekunde, mittlerer Treffer, Krit-Chance, Einsätze pro Sekunde, Wirkzeit und Abklingzeit, gerechnet mit den Werten des Helden |
 
@@ -152,6 +156,7 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 | Skill | Art | Schaden | Mana | Dauer | Abklingzeit | Wirkung |
 |---|---|---|---|---|---|---|
 | Attack | ATTACK | 100 % Waffenschaden | 0 | 1 / Angriffstempo | keine | Treffer der Waffe, mit dem Bogen ein Pfeil |
+| Cleave | ATTACK | 120 % Waffenschaden | 1 | 1 / Angriffstempo | keine | Halbkreis vor dem Helden mit der anderthalbfachen Reichweite der Waffe, trifft jeden darin. Nur mit Nahkampfwaffen |
 | Lightning Strike | ATTACK | 180 % Waffenschaden als Lightning | 3 | 1 / Angriffstempo | keine | Schwung mit Blitzprojektil |
 | Fireball | SPELL | 50 bis 75 Fire | 2 | 0,4 s | 0,25 s | Projektil, das sich bis zu zweimal aufspaltet |
 | Frost Nova | SPELL | 10 bis 50 Frost | 2 | 0,4 s | 0,5 s | Ring um den Helden |
@@ -351,7 +356,7 @@ Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints
 |---|---|
 | Display | Window Mode: Borderless Fullscreen als Standard, Exclusive Fullscreen oder Windowed. Window Size gilt nur im Fenster und bietet feste Größen von 1280 x 720 bis 3840 x 2160, soweit sie samt Rahmen auf den Bildschirm passen. Dazu VSync, Frame Limit (Unlimited, 30, 60, 120, 144, 240), Show FPS, Brightness von 50 bis 150 %, Pixel Size, Dithering, Wobbly Vertices und Real Shadows |
 | Audio | Master, Music und Effects von 0 bis 100 %. 50 % sind rund -12 dB, 0 % ist stumm. Die Musik läuft in der Pause weiter, Effekte halten an |
-| Controls | Belegung der 19 Aktionen. Klick auf die Belegung, dann die neue Taste drücken, bei Skill-Plätzen auch eine Maustaste. `Esc` bricht ab. Reset to Defaults stellt den Standard wieder her. Aktionen und Regeln stehen unter [Steuerung](#-steuerung) |
+| Controls | Belegung der 20 Aktionen. Klick auf die Belegung, dann die neue Taste drücken, bei Skill-Plätzen auch eine Maustaste. `Esc` bricht ab. Reset to Defaults stellt den Standard wieder her. Aktionen und Regeln stehen unter [Steuerung](#-steuerung) |
 
 Alles wirkt sofort und wird gespeichert, nur Modus und Größe des Fensters nicht.
 Sie greifen erst mit Apply und springen nach 10 Sekunden zurück, wenn Keep nicht gedrückt ist. `Esc` und Revert nehmen sie sofort zurück.
@@ -499,9 +504,9 @@ Das Mausrad wirkt immer.
 
 Die Tabelle zeigt die Standardbelegung. Die Skills liegen zu Beginn wie unten auf den Tasten. Jeder Platz der Leiste lässt sich im Spiel mit einem anderen Skill oder einem Trank belegen.
 
-Unter Settings im Reiter Controls lassen sich 19 Aktionen umbelegen: Bewegen, die zehn Skill-Plätze, Charakterbogen, Karte, Schilder der Beute, Town-Portal und Close Windows.
+Unter Settings im Reiter Controls lassen sich 20 Aktionen umbelegen: Bewegen, Stehenbleiben, die zehn Skill-Plätze, Charakterbogen, Karte, Schilder der Beute, Town-Portal und Close Windows.
 Fest bleiben `Esc`, das Mausrad, die Klicks auf Items, Schilder, Beutel, Durchgänge, Truhe und Händler, `Strg` beim Klick auf ein Item, `Shift` für den Vergleich und der Rechtsklick auf die Leiste.
-Jede Aktion hat eine Taste, Kombinationen gibt es nicht. Maustasten (links, rechts, Mitte, Seitentasten) gibt es nur für die Skill-Plätze.
+Jede Aktion hat eine Taste, Kombinationen gibt es nicht. Stehenbleiben ist eine eigene Aktion, die man zur Skill-Taste gedrückt hält. Maustasten (links, rechts, Mitte, Seitentasten) gibt es nur für die Skill-Plätze.
 Hält eine andere Aktion die Taste schon, tauschen beide, sofern die andere die bisherige Taste nehmen darf. Sonst bleibt die Belegung, wie sie war. `F1` bis `F6` und das Mausrad lassen sich keiner Aktion geben.
 Die Skill-Leiste zeigt immer die aktuelle Taste.
 
@@ -514,7 +519,9 @@ Die Skill-Leiste zeigt immer die aktuelle Taste.
 | `E` | Frost Nova um den Spieler |
 | `R` | Thunderbolt am Mauszeiger |
 | `F` | Fireball in Richtung der Maus |
-| `Q`, `1` bis `4` | Freie Plätze der Skill-Leiste |
+| `Q` | Cleave: auf einen Gegner zeigen, der Held läuft hin und schlägt einen Halbkreis |
+| `1` bis `4` | Freie Plätze der Skill-Leiste |
+| `Shift` halten + Skill-Taste | Angriff aus dem Stand Richtung Maus, ohne hinzulaufen, auch ohne Gegner unter der Maus |
 | Taste gedrückt halten | Wiederholt den Skill |
 | Taste eines Platzes mit Trank | Einen Trank dieser Art aus dem Inventar trinken, gehalten nur einen |
 | Rechtsklick auf einen Platz der Leiste | Skill oder Trank für diesen Platz auswählen |

@@ -468,7 +468,7 @@ public partial class Enemy : BaseUnit
         if (hasTarget && skill is not null)
         {
             engageRange = GetEngageRange(skill);
-            canAttack   = SkillGate.Check(skill.Definition, SkillCooldowns, AvailableMana) == SkillUseCheck.Ready;
+            canAttack   = SkillGate.Check(skill.Definition, SkillCooldowns, AvailableMana, Weapon.IsRanged) == SkillUseCheck.Ready;
 
             if (distance <= engageRange && NeedsSight(skill) && !HasSightOfTarget(delta))
                 engageRange = 0f;
@@ -512,6 +512,7 @@ public partial class Enemy : BaseUnit
         var skillRange = definition.Delivery switch
         {
             SkillDelivery.Weapon           => Weapon.Range,
+            SkillDelivery.WeaponSweep      => definition.Sweep.GetEngageRange(Weapon),
             SkillDelivery.Projectile       => definition.Projectile.Reach * EngageFraction,
             SkillDelivery.AreaAroundCaster => definition.Area.Radius * EngageFraction,
             _                              => float.MaxValue

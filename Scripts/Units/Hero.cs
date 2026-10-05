@@ -41,8 +41,13 @@ public partial class Hero
     private const float  StuckSpeedFraction = 0.1f;
     private const float  PickSearchPx       = 600f;
     private const float  SwingArcDegrees    = 70f;
+    private const float  MaxSwingArcDegrees = 90f;
     private const float  SwingRaiseDegrees  = 40f;
     private const float  AimRaiseDegrees    = 80f;
+
+    //So lange wie SweepSec der Hiebe in melee_slash.tscn und cleave.tscn, damit Waffe und Hieb zusammen durchziehen
+    private const double StrikeSec             = 0.15;
+    private const double StrikeShareOfRecovery = 0.6;
 
     private static readonly List<BaseUnit> UnitsNearPoint = new();
 
@@ -54,6 +59,7 @@ public partial class Hero
     private          PathFollower  approachPath;
     private          double        approachStuckSec;
     private          Vector3       attackAimPoint;
+    private          bool          attackInPlace;
     private          BaseUnit      attackTarget;
     private          ItemInstance  equippedWeapon;
     private          bool          hasDied;
@@ -498,16 +504,19 @@ public partial class Hero
     {
         var skill = GetSkill(slot);
 
-        return skill is not null && UseSkill(skill, new SkillAim(GetMouseGroundPoint(), FindHostileUnitUnderMouse()), isRepeat);
+        return skill is not null && UseSkill(skill, new SkillAim(GetMouseGroundPoint(), FindHostileUnitUnderMouse()), isRepeat, IsStandingStill);
     }
 
-    public bool UseSkill(SkillResource skill, SkillAim aim, bool isRepeat = false)
+    //Zauber wirkt der Held ohnehin aus dem Stand. Für Angriffe heißt Stehenbleiben: nicht zum Ziel laufen, sofort Richtung Maus
+    public bool UseSkill(SkillResource skill, SkillAim aim, bool isRepeat = false, bool standsStill = false)
     {
         if (IsDead || skill is null || IsActing)
             return false;
 
-        return skill.Kind == SkillKind.Attack ? OrderAttack(skill, aim, isRepeat) : CastSpell(skill, aim, isRepeat);
+        return skill.Kind == SkillKind.Attack ? OrderAttack(skill, aim, isRepeat, standsStill) : CastSpell(skill, aim, isRepeat);
     }
+
+    private static bool IsStandingStill => Input.IsActionPressed(InputActions.StandStill);
 
     private SkillResource GetSkill(int slot)
         => SkillLibrary.Find(Loadout.GetSkillId(slot));
@@ -525,15 +534,17 @@ public partial class Hero
         return true;
     }
 
-    private bool OrderAttack(SkillResource skill, SkillAim aim, bool isRepeat)
+    private bool OrderAttack(SkillResource skill, SkillAim aim, bool isRepeat, bool standsStill)
     {
-        if (!aim.HasTarget && IsMelee(skill))
+        var order = AttackOrders.Choose(IsMelee(skill), aim.HasTarget, standsStill);
+
+        if (order == AttackOrder.None)
             return false;
 
         if (aim.HasTarget && !IsHostileTo(aim.Target))
             return false;
 
-        if (!Report(SkillGate.Check(skill.Definition, SkillCooldowns, AvailableMana), isRepeat))
+        if (!Report(SkillGate.Check(skill.Definition, SkillCooldowns, AvailableMana, Weapon.IsRanged), isRepeat))
             return false;
 
         var previousTarget = attackTarget;
@@ -541,6 +552,7 @@ public partial class Hero
         useTarget        = null;
         orderedSkill     = skill;
         attackTarget     = aim.HasTarget ? aim.Target : null;
+        attackInPlace    = order == AttackOrder.InPlace;
         attackAimPoint   = aim.Point;
         approachStuckSec = 0;
 
@@ -551,7 +563,7 @@ public partial class Hero
     }
 
     private bool IsMelee(SkillResource skill)
-        => skill.Delivery == SkillDelivery.Weapon && !Weapon.IsRanged;
+        => (skill.Delivery is SkillDelivery.Weapon or SkillDelivery.WeaponSweep) && !Weapon.IsRanged;
 
     //Bei gehaltener Taste bleibt der Ton für fehlendes Mana aus, sonst liefe er in Dauerschleife
     private bool Report(SkillUseCheck check, bool isQuiet)
@@ -611,9 +623,9 @@ public partial class Hero
         if (orderedSkill is null)
             return Vector3.Zero;
 
-        if (attackTarget is null)
+        if (attackTarget is null || attackInPlace)
         {
-            StartSwing(attackAimPoint - GlobalPosition);
+            StartSwing((IsValidTarget(attackTarget) ? attackTarget.GlobalPosition : attackAimPoint) - GlobalPosition);
 
             return Vector3.Zero;
         }
@@ -652,6 +664,7 @@ public partial class Hero
         => skill.Delivery switch
         {
             SkillDelivery.Weapon           => Weapon.Range,
+            SkillDelivery.WeaponSweep      => skill.Sweep.GetEngageRange(Weapon),
             SkillDelivery.Projectile       => skill.Projectile.Reach * EngageFraction,
             SkillDelivery.AreaAroundCaster => skill.Area.Radius * EngageFraction,
             _                              => float.MaxValue
@@ -720,7 +733,7 @@ public partial class Hero
         actionCycle.Start(durationSec * ImpactFraction, durationSec * (1 - ImpactFraction));
 
         Face(toTarget);
-        PlayActionLook(durationSec, skill.Kind == SkillKind.Attack);
+        PlayActionLook(skill, durationSec);
     }
 
     private void Release()
@@ -756,18 +769,20 @@ public partial class Hero
         if (skill is null || skill.Kind != SkillKind.Attack)
             return;
 
-        var target = FindHostileUnitUnderMouse();
+        var target      = FindHostileUnitUnderMouse();
+        var standsStill = IsStandingStill;
 
-        if (target is null && IsMelee(skill) && IsValidTarget(previousTarget))
+        if (target is null && !standsStill && IsMelee(skill) && IsValidTarget(previousTarget))
             target = previousTarget;
 
-        OrderAttack(skill, new SkillAim(GetMouseGroundPoint(), target), true);
+        OrderAttack(skill, new SkillAim(GetMouseGroundPoint(), target), true, standsStill);
     }
 
     private void ClearOrder()
     {
-        orderedSkill = null;
-        attackTarget = null;
+        orderedSkill  = null;
+        attackTarget  = null;
+        attackInPlace = false;
     }
 
     //Vergisst, wohin der Held wollte. Ein begonnener Schlag oder Zauber läuft weiter
@@ -796,29 +811,41 @@ public partial class Hero
     private static bool IsValidTarget(BaseUnit unit)
         => IsInstanceValid(unit) && unit.IsTargetable;
 
-    //Ein Nahkampfschlag zieht die Waffe quer vor dem Körper durch. Fernkampf und Zauber heben sie
-    private void PlayActionLook(double durationSec, bool isAttack)
+    //Ein Nahkampfschlag holt bis zum Treffer zur Seite aus und zieht die Waffe mit dem Treffer quer vor dem Körper durch.
+    //Fernkampf und Zauber heben sie. Der Tween läuft im Takt der Physik wie actionCycle, sonst läge er bis zu ein Frame daneben
+    private void PlayActionLook(SkillResource skill, double durationSec)
     {
         if (weaponPivot is null)
             return;
 
         actionLook?.Kill();
 
-        actionLook = CreateTween();
+        actionLook = CreateTween().SetProcessMode(Tween.TweenProcessMode.Physics);
 
-        if (!isAttack || Weapon.IsRanged)
+        var windupSec   = durationSec * ImpactFraction;
+        var recoverySec = durationSec - windupSec;
+
+        if (skill.Kind != SkillKind.Attack || Weapon.IsRanged)
         {
-            actionLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(AimRaiseDegrees, 0, 0), durationSec * ImpactFraction);
-        }
-        else
-        {
-            weaponPivot.RotationDegrees = new Vector3(SwingRaiseDegrees, -SwingArcDegrees, 0);
+            actionLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(AimRaiseDegrees, 0, 0), windupSec);
+            actionLook.TweenProperty(weaponPivot, "rotation_degrees", Vector3.Zero, recoverySec);
 
-            actionLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(SwingRaiseDegrees, SwingArcDegrees, 0), durationSec * ImpactFraction);
+            return;
         }
 
-        actionLook.TweenProperty(weaponPivot, "rotation_degrees", Vector3.Zero, durationSec * (1 - ImpactFraction));
+        var halfArc   = GetSwingHalfArc(skill.Definition);
+        var strikeSec = Math.Min(StrikeSec, recoverySec * StrikeShareOfRecovery);
+
+        actionLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(SwingRaiseDegrees, -halfArc, 0), windupSec)
+                  .SetTrans(Tween.TransitionType.Sine)
+                  .SetEase(Tween.EaseType.Out);
+        actionLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(SwingRaiseDegrees, halfArc, 0), strikeSec);
+        actionLook.TweenProperty(weaponPivot, "rotation_degrees", Vector3.Zero, recoverySec - strikeSec);
     }
+
+    //Ein Bogenschlag schwingt so weit wie sein Bogen, höchstens bis zur Seite
+    private static float GetSwingHalfArc(SkillDefinition skill)
+        => skill.Sweep is { } sweep ? Math.Clamp(sweep.ArcDegrees / 2f, SwingArcDegrees, MaxSwingArcDegrees) : SwingArcDegrees;
 
     private void EndActionLook()
     {

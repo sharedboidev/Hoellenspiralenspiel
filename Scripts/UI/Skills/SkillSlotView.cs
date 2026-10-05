@@ -20,6 +20,7 @@ public partial class SkillSlotView : Control
     private IHero                  owner;
     private SkillResource          skill;
     private Label                  timeLabel;
+    private Control                wrongWeapon;
 
     [Export]
     public Color OutOfStockTint { get; set; } = new(0.35f, 0.35f, 0.35f);
@@ -36,6 +37,7 @@ public partial class SkillSlotView : Control
         keyLabel        = GetNode<Label>("%KeyLabel");
         timeLabel       = GetNode<Label>("%TimeLabel");
         countLabel      = GetNode<Label>("%CountLabel");
+        wrongWeapon     = GetNode<Control>("%WrongWeapon");
 
         Slot          = slot;
         owner         = skillOwner;
@@ -58,6 +60,7 @@ public partial class SkillSlotView : Control
         countLabel.Visible = false;
 
         RefreshCooldown();
+        RefreshWeaponFit();
     }
 
     public void ShowConsumable(ConsumableBaseResource newConsumable, int countInInventory)
@@ -79,7 +82,12 @@ public partial class SkillSlotView : Control
         countLabel.Visible = true;
 
         RefreshCooldown();
+        RefreshWeaponFit();
     }
+
+    //Ein Skill für Nahkampfwaffen liegt rot hinterlegt, solange der Held einen Bogen trägt. Einsetzen lässt er sich dann nicht
+    public void RefreshWeaponFit()
+        => wrongWeapon.Visible = skill is not null && owner is not null && !SkillGate.FitsWeapon(skill.Definition, owner.Weapon.IsRanged);
 
     public bool Shows(string skillId)
         => skill is not null && skill.Id == skillId;

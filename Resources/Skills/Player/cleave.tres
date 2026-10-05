@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AttackSkillResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Skills/AttackSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" path="res://Textures/Skills/Icons/cleave.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/cleave.tscn" id="3_scene"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "cleave"
+DisplayName = "Cleave"
+Description = "Swings the melee weapon in a wide arc and hits every enemy in front of you. Needs a melee weapon."
+Icon = ExtResource("2_icon")
+ManaCost = 1.0
+Delivery = 4
+EffectScene = ExtResource("3_scene")
+SweepRangeFactor = 1.5
+WeaponDamagePercent = 120.0

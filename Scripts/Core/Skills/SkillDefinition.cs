@@ -38,7 +38,12 @@ public sealed record SkillDefinition
 
     public AreaSettings Area { get; init; }
 
+    public SweepSettings Sweep { get; init; }
+
     public bool IsArea => Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint;
+
+    //Ein Bogen ist keine Klinge: Mit einer Fernkampfwaffe in der Hand lassen sich diese Skills nicht einsetzen
+    public bool NeedsMeleeWeapon => Delivery == SkillDelivery.WeaponSweep;
 
     //Erhöhtes Zaubertempo teilt die Wirkzeit: 50 % mehr ergibt zwei Drittel der Zeit
     public double GetCastSec(StatSheet caster)

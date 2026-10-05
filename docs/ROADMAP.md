@@ -3136,6 +3136,101 @@ Bewusst offen gelassen:
 - Die alten Affixe tragen ihre Fehler weiter, etwa `FlatManaWeapon` auf Helm und Körper. Das bereinigt Etappe 11, sie kann auf dieser Grundlage die Slot-Tabelle umsetzen.
 - Die Werte sind die von Path of Exile mit Itemlevel bis 86. In Wollust bei Itemlevel 5 bis 8 fallen nur die untersten Stufen, die Balance stellt Etappe 12 ein.
 
+### Neue Skills (vorgezogen, läuft neben M8)
+
+Der User will neue Attacks und Spells vorziehen, einen Skill nach dem anderen. Jeder bekommt einen eigenen Branch und wartet auf Rückmeldung, bevor der nächste beginnt.
+
+#### Skill 1: Cleave, Stehenbleiben und sichtbare Hiebe
+
+Umgesetzt am 05.10.2026 auf `master_Cleave`, abgezweigt von `6f81c15`. Wunsch des Users: ein klassischer Cleave. Die Attack trifft in einem Halbkreis von 180° vor dem Helden mit 120 % Waffenschaden. Während des Baus kamen drei Wünsche dazu: stehen bleiben mit `Shift`, sichtbare Hiebe im Nahkampf und eine rote Leiste bei falscher Waffe.
+
+Getroffene Entscheidungen des Users vom 05.10.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| Radius | Die Reichweite der Waffe plus 50 % |
+| Auslösen | Skills brauchen grundsätzlich einen Gegner unter der Maus, beim Cleave läuft der Held zu ihm hin |
+| Stehenbleiben | Mit `Shift` und der Taste eines Skills bleibt der Held stehen und löst den Skill aus, egal ob Spell oder Attack |
+| Fernkampfwaffe | Cleave geht nur mit Nahkampfwaffen |
+| Kosten | 1 Mana, keine Abklingzeit |
+| Sichtbarkeit | Nahkampfangriffe brauchen einen sichtbaren Hieb, etwa Strike-Linien |
+| Falsche Waffe | Nahkampf-Skills liegen rot hinterlegt, wenn eine unpassende Waffe angelegt ist, und funktionieren dann nicht |
+
+- Erledigt: Cleave als `Resources/Skills/Player/cleave.tres`. Eine neue Art der Lieferung `SkillDelivery.WeaponSweep` (am Ende angehängt, Wert 4) trifft jeden im Bogen vor dem Helden. Bogen und Radius stehen als `SweepSettings` im Kern, mit `ArcDegrees` und `RangeFactor` aus der Resource.
+- Erledigt: Stehenbleiben als neue Eingabeaktion `stand_still`, Standard `Shift`, in den Einstellungen als "Stand Still" umbelegbar. Mit gehaltener Taste schlägt oder schießt der Held aus dem Stand Richtung Maus. Er läuft nicht hin und braucht keinen Gegner unter der Maus. Die Regel steht in `AttackOrders` im Kern.
+- Erledigt: Sichtbare Hiebe. `MeleeSlash` zeichnet einen hellen Bogen in Hüfthöhe, der wie die Waffe von rechts nach links läuft und einen spitz auslaufenden Schweif hinter sich herzieht. Attack zeigt einen kurzen Hieb (`melee_slash.tscn`, 100°), der bei einem Treffer durch das Ziel läuft. Cleave zeigt den Halbkreis in voller Reichweite (`cleave.tscn`).
+- Erledigt: Falsche Waffe. `SkillGate` lehnt einen Skill mit `NeedsMeleeWeapon` ab, solange eine Fernkampfwaffe in der Hand liegt (`SkillUseCheck.NeedsMeleeWeapon`, am Ende angehängt). Der Platz auf der Leiste liegt dann unter einer roten Fläche, der Tooltip sagt "Needs a melee weapon". Gegner prüfen dieselbe Regel.
+- Zusätzlich: Ein Tipp im Ladebildschirm nennt die Taste zum Stehenbleiben. Ein Platzhalter-Icon für Cleave unter `Textures/Skills/Icons/cleave.png`.
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Reichweite | Zählt wie beim einfachen Schlag von Körperrand zu Körperrand. Der Held läuft bis auf das Anderthalbfache der Waffenreichweite heran, beim Schwert 1,5 m. Getroffen wird mit der üblichen Toleranz von 25 %, beim Schwert bis 1,875 m |
+| Bogen | Getroffen ist, wessen Körper in den Halbkreis ragt, auch wenn die Mitte knapp dahinter liegt |
+| Richtung | Der Bogen zeigt, wohin der Held beim Ausholen schaute. Wer währenddessen hinter ihn läuft, entgeht ihm. Dafür merkt sich jede Einheit ihre Blickrichtung (`BaseUnit.FacingDirection`) |
+| Reflect | Cleave ist ein Nahkampfschlag. Jeder Getroffene kann Reflect auslösen |
+| Hieb ins Leere | Ist zu sehen. Attack mit `Shift` trifft das Ziel unter der Maus nur, wenn es in Reichweite steht |
+| Zauber mit `Shift` | Ändert nichts. Zauber wirkt der Held schon immer aus dem Stand, ohne hinzulaufen |
+| Fernkampf mit `Shift` | Schießt aus dem Stand, auch wenn ein Gegner außer Reichweite unter der Maus steht |
+| Gehaltene Taste | Mit `Shift` wiederholt sie den Skill aus dem Stand und fällt nicht auf das letzte Ziel zurück |
+| Startbelegung | Cleave liegt bei neuen Charakteren auf `Q`. Bestehende Charaktere behalten ihre Leiste und legen ihn per Rechtsklick auf einen Platz |
+| Gegner | Schlagen weiter ohne sichtbaren Hieb, ihr Standardangriff hat keine Szene. Ein Gegner mit einem Skill vom Typ `WeaponSweep` würde den Bogen schlagen und zeigen |
+| Tooltip | Die DPS rechnen wie bei Flächen mit einem Ziel |
+
+So funktioniert es:
+
+- `SkillExecutor.Sweep` holt die Kandidaten aus `UnitRegistry.FindNear` und fragt für jeden `SweepSettings.Reaches` mit dem Abstand auf dem Boden, der Blickrichtung und beiden Körperradien. Jeder Treffer geht über `SkillCast.ApplyTo(unit, true)`, jeder Gegner höchstens einmal.
+- `SkillExecutor.StrikeInMelee` und `Sweep` zeigen den Hieb aus `EffectScene` der Skill-Resource. Ohne Szene bleibt der Schlag unsichtbar wie bisher.
+- `Hero.OrderAttack` fragt `AttackOrders.Choose(isMelee, hasTarget, standsStill)`: `None` tut nichts, `InPlace` schlägt im nächsten Physik-Frame aus dem Stand, `Approach` läuft zum Ziel.
+- `SkillGate.Check` nimmt die Waffe als vierten Wert und prüft sie vor Abklingzeit und Mana. `SkillGate.FitsWeapon` benutzen auch Leiste und Tooltip. Die Leiste fragt neu, sobald `IHero.SheetChanged` meldet, also auch nach jedem Waffenwechsel.
+- `MeleeSlash` baut sein Netz jedes Frame neu als `ImmediateMesh`, aus höchstens `Segments` + 1 Punktpaaren. Nach `SweepSec + TrailSec` entfernt es sich selbst.
+
+Neue Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| `SkillResource`, Gruppe Sweep | `SweepArcDegrees` | 180 | Breite des Bogens |
+| | `SweepRangeFactor` | 1 | Radius in Vielfachen der Reichweite der Waffe, Cleave 1,5 |
+| `MeleeSlash` | `ArcDegrees` | 100 | Bogen des Hiebs, wenn der Skill keinen mitgibt |
+| | `WidthFraction` | 0,3 | Breite des Bands an der Spitze in Teilen des Radius |
+| | `HeightMeters` | 1 | Höhe über dem Boden, in beiden Szenen 0,8 |
+| | `SweepSec`, `TrailSec` | 0,15, 0,12 | So lange läuft die Spitze, so lange folgt ihr das Ende. Cleave 0,15 und 0,14. `SweepSec` muss zu `Hero.StrikeSec` passen |
+| | `Segments`, `Color`, `TailAlpha` | 24, warmweiß, 0,25 | Feinheit, Farbe und Deckkraft am Ende des Schweifs |
+| `skill_slot.tscn` | `WrongWeapon` | rot, 50 % | Die Fläche über dem Icon bei unpassender Waffe |
+
+Ein neuer Bogenschlag, etwa ein Wirbel über 360°: eine `AttackSkillResource` mit `Delivery` WeaponSweep, `SweepArcDegrees` und `SweepRangeFactor`, dazu als `EffectScene` eine Kopie von `cleave.tscn`. Code braucht er keinen.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Unit-Tests | 21 neue: Radius aus Waffe und Faktor, auch unbewaffnet; Treffer vorn, seitlich, knapp hinter der Seite nur mit dem Körper, nicht hinten, nicht außer Reichweite, von Rand zu Rand auch für große Körper; schmaler Bogen, voller Kreis, Ziel auf dem Schlagenden, Blickrichtung ohne Normierung; die vier Fälle von Hinlaufen, Stehenbleiben und Nichtstun; Bogen lehnt Cleave ab, vor Abklingzeit und Mana, Attack und Zauber passen zu jeder Waffe. Zusammen 1806 |
+| Laufendes Spiel, headless und mit Fenster | Je 43 Schritte im Hub mit sechs Skeletten: Cleave aus dem Stand trifft genau die drei vor dem Helden, nicht den knapp hinter der Seite, hinter ihm und außer Reichweite. Er kostet 1 Mana beim Ausholen, der Held bleibt stehen, der Bogen zeigt in Blickrichtung und verschwindet wieder. Ohne `Shift` und ohne Ziel startet nichts. Attack aus dem Stand trifft nur das Ziel und zeigt einen Hieb, auch ins Leere. Cleave auf ein fernes Ziel läuft bis auf 148 von 150 Pixeln heran und trifft. Echte Tasten: `Shift` + `Q` schlägt aus dem Stand, `Q` allein ohne Gegner unter der Maus nicht. Mit dem Bogen liegt Cleave rot, Attack nicht, der Tooltip nennt den Grund, und Cleave startet weder auf ein Ziel noch aus dem Stand. Mit dem Schwert ist der Platz wieder frei. Bilder vom Halbkreis mitten im Schwung, vom Hieb des Attack und von der roten Leiste |
+| Spielstand | Die Proben liefen in einem eigenen Worktree mit eigenem Spielstand und eigenen Einstellungen, die des Users blieben unberührt |
+
+Bewusst offen gelassen:
+
+- Das Icon ist ein gezeichneter Platzhalter, bis der User ein eigenes liefert.
+- Ton für Schwung und Treffer fehlt, er kommt mit Etappe 13 von M8.
+- Mauern halten den Bogen nicht auf, wie bei Flächen und beim einfachen Schlag.
+- Die Gegner zeigen ihre Schläge nicht als Hieb. Ob sie das sollen, entscheidet der User.
+- Die Projekteinstellungen haben eine neue Aktion. Ein Editor, der schon vor dem Merge offen war, kennt sie nicht und könnte sie beim Speichern der Projekteinstellungen verwerfen. Vorher neu starten.
+
+Rückmeldung des Users nach dem ersten Spielen, am selben Tag: Der Treffer ist nicht synchron mit der Animation, Treffer und Hieb kommen gefühlt zu spät.
+
+Ursache: Der Held zog die Waffe schon während des Ausholens durch, von 0 bis 0,36 s. Treffer und Hieb kamen erst, als die Waffe am Ende des Schwungs war, und der Hieb lief dann noch einmal von vorn.
+
+- Erledigt: Ein Nahkampfschlag holt bis zum Treffer zur Seite aus, mit langsamer werdender Bewegung. Mit dem Treffer zieht er die Waffe in 0,15 s quer vor dem Körper durch, so lange wie der Hieb. Danach kehrt sie in Ruhe zurück. Der Zeitpunkt des Treffers bleibt bei der Hälfte des Schlags.
+- Erledigt: Cleave schwingt die Waffe über 180° statt 140°, wie sein Bogen. `Hero.GetSwingHalfArc` nimmt den halben Bogen eines Bogenschlags, mindestens 70° und höchstens 90°.
+- Erledigt: Der Tween der Waffe läuft im Takt der Physik wie der Schlag selbst. Bei hohem Angriffstempo bleibt das Durchziehen bei höchstens 60 % der Erholung.
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Laufendes Spiel, headless und mit Fenster | Je 16 Schritte mit Cleave und Attack aus dem Stand, je Physik-Frame die Drehung der Waffe. Bei 1,43 Angriffen pro Sekunde kommt der Treffer nach 0,350 s, im selben Frame wie der Hieb. Bis dahin zieht die Waffe nie nach vorn, beim Treffer steht sie bei −89,4° (Cleave) und −69,5° (Attack). Danach zieht sie in 0,150 s bis +90° und +70° durch und steht am Ende wieder in Ruhe. Bilder von Ausholen, Treffer und drei Momenten des Durchziehens |
+
 ### M9: Inhalt und Politur (L, fortlaufend)
 
 - Die übrigen acht Kreise nach dem Muster aus M8.

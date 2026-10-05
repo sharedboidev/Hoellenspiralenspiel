@@ -11,6 +11,7 @@ public static class InputActions
     public static readonly StringName MoveRight            = "move_right";
     public static readonly StringName MoveUp               = "move_up";
     public static readonly StringName MoveDown             = "move_down";
+    public static readonly StringName StandStill           = "stand_still";
     public static readonly StringName ToggleCharacterSheet = "toggle_character_sheet";
     public static readonly StringName ToggleOverlayMap     = "toggle_overlay_map";
     public static readonly StringName ToggleLootLabels     = "toggle_loot_labels";
@@ -39,6 +40,7 @@ public static class InputActions
         (MoveLeft, "Move Left"),
         (MoveDown, "Move Down"),
         (MoveRight, "Move Right"),
+        (StandStill, "Stand Still"),
         (SkillSlots[0], "Skill 1"),
         (SkillSlots[1], "Skill 2"),
         (SkillSlots[2], "Skill 3"),

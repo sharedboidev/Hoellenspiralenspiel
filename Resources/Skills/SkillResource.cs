@@ -61,6 +61,14 @@ public abstract partial class SkillResource : Resource
     [Export]
     public float AreaDelaySec { get; set; }
 
+    [ExportGroup("Sweep")]
+    [Export(PropertyHint.Range, "1, 360, 1")]
+    public float SweepArcDegrees { get; set; } = 180f;
+
+    //Der Radius des Bogens in Vielfachen der Reichweite der Waffe
+    [Export]
+    public float SweepRangeFactor { get; set; } = 1f;
+
     //Bleibt leer, bis entschieden ist, wie der Held Skills bekommt
     [ExportGroup("Requirements")]
     [Export]
@@ -74,7 +82,8 @@ public abstract partial class SkillResource : Resource
         CooldownSec = CooldownSec,
         Delivery = Delivery,
         Projectile = Delivery == SkillDelivery.Projectile ? new ProjectileSettings(ProjectileSpeed, ProjectileLifetimeSec, ForkCount, ForkGenerations, ForkRange) : null,
-        Area = Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint ? new AreaSettings(AreaRadius, AreaExpansionSec, AreaDelaySec) : null
+        Area = Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint ? new AreaSettings(AreaRadius, AreaExpansionSec, AreaDelaySec) : null,
+        Sweep = Delivery == SkillDelivery.WeaponSweep ? new SweepSettings(SweepArcDegrees, SweepRangeFactor) : null
     };
 
     public string NameOrId => string.IsNullOrWhiteSpace(DisplayName) ? Id : DisplayName;

@@ -46,6 +46,7 @@ public partial class SkillBarView : HBoxContainer
         hero.Loadout.SlotChanged    += ShowSlot;
         hero.SkillCooldowns.Started += OnCooldownStarted;
         hero.Items.Changed          += ShowConsumableCounts;
+        hero.SheetChanged           += ShowWeaponFit;
 
         //Nach einer Neubelegung in den Einstellungen stehen die neuen Tasten auf den Plätzen
         if (UserSettings.Instance is { } settings)
@@ -63,6 +64,7 @@ public partial class SkillBarView : HBoxContainer
         hero.Loadout.SlotChanged    -= ShowSlot;
         hero.SkillCooldowns.Started -= OnCooldownStarted;
         hero.Items.Changed          -= ShowConsumableCounts;
+        hero.SheetChanged           -= ShowWeaponFit;
     }
 
     private void AddSlot(int slot)
@@ -97,6 +99,13 @@ public partial class SkillBarView : HBoxContainer
             if (hero.Loadout.GetConsumableId(slot) is not null)
                 ShowSlot(slot);
         }
+    }
+
+    //Eine andere Waffe ändert die Werte des Helden. Ob ein Skill zu ihr passt, steht danach fest
+    private void ShowWeaponFit()
+    {
+        foreach (var slotView in slots)
+            slotView.RefreshWeaponFit();
     }
 
     private void ShowKeys()

@@ -6,5 +6,6 @@ public enum SkillDelivery
     Weapon,
     Projectile,
     AreaAroundCaster,
-    AreaAtPoint
+    AreaAtPoint,
+    WeaponSweep
 }

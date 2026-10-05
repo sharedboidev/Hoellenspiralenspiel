@@ -7,7 +7,8 @@
 [ext_resource type="Resource" path="res://Resources/Skills/Player/frost_nova.tres" id="5_nova"]
 [ext_resource type="Resource" path="res://Resources/Skills/Player/thunderbolt.tres" id="6_thunder"]
 [ext_resource type="Resource" path="res://Resources/Skills/Player/fireball.tres" id="7_fireball"]
+[ext_resource type="Resource" path="res://Resources/Skills/Player/cleave.tres" id="8_cleave"]
 
 [resource]
 script = ExtResource("1_script")
-Slots = Array[ExtResource("2_skill")]([ExtResource("3_attack"), ExtResource("4_strike"), null, ExtResource("5_nova"), ExtResource("6_thunder"), ExtResource("7_fireball"), null, null, null, null])
+Slots = Array[ExtResource("2_skill")]([ExtResource("3_attack"), ExtResource("4_strike"), ExtResource("8_cleave"), ExtResource("5_nova"), ExtResource("6_thunder"), ExtResource("7_fireball"), null, null, null, null])

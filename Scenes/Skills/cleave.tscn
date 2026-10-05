@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Skills/Effects/MeleeSlash.cs" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_cleave"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+
+[node name="Cleave" type="Node3D" node_paths=PackedStringArray("Band")]
+script = ExtResource("1_script")
+Band = NodePath("Band")
+ArcDegrees = 180.0
+WidthFraction = 0.45
+HeightMeters = 0.8
+SweepSec = 0.15
+TrailSec = 0.14
+Segments = 32
+Color = Color(1, 0.9, 0.75, 1)
+
+[node name="Band" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+material_override = SubResource("Mat_cleave")

@@ -72,6 +72,9 @@ public abstract partial class BaseUnit : CharacterBody3D
 
     public float BodyRadiusPx => WorldScale.ToPx(BodyRadius);
 
+    //Auf dem Boden und normiert. Null, bis die Einheit sich zum ersten Mal ausrichtet
+    public Vector3 FacingDirection { get; private set; }
+
     //Ein Körper ohne Kollision versperrt niemandem den Platz
     public virtual bool IsSolid => true;
 
@@ -221,7 +224,7 @@ public abstract partial class BaseUnit : CharacterBody3D
     public SkillUseCheck TryPayFor(SkillResource skill, double minCooldownSec = 0)
     {
         var definition = skill.Definition;
-        var check      = SkillGate.Check(definition, SkillCooldowns, AvailableMana);
+        var check      = SkillGate.Check(definition, SkillCooldowns, AvailableMana, Weapon.IsRanged);
 
         if (check != SkillUseCheck.Ready)
             return check;
@@ -295,7 +298,12 @@ public abstract partial class BaseUnit : CharacterBody3D
     {
         var onGround = WorldScale.OnGround(direction);
 
-        if (Visual is null || onGround.LengthSquared() < 0.0001f)
+        if (onGround.LengthSquared() < 0.0001f)
+            return;
+
+        FacingDirection = onGround.Normalized();
+
+        if (Visual is null)
             return;
 
         Visual.Rotation = new Vector3(0, Mathf.Atan2(-onGround.X, -onGround.Z), 0);

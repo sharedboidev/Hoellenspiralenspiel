@@ -53,6 +53,19 @@ public class SkillDefinitionTests
     }
 
     [Test]
+    public void NurDerBogenschlag_BrauchtEineNahkampfwaffe()
+    {
+        var cleave = SkillDefinition.ForAttack("cleave", new AttackDefinition("Cleave", 120f)) with { Delivery = SkillDelivery.WeaponSweep };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cleave.NeedsMeleeWeapon, Is.True);
+            Assert.That(SkillDefinition.ForAttack("attack", AttackDefinition.Standard).NeedsMeleeWeapon, Is.False);
+            Assert.That(cleave.IsArea, Is.False, "der Bogen gehört zur Waffe, nicht zu den Flächen");
+        });
+    }
+
+    [Test]
     public void SkillOhneId_IstNichtErlaubt()
         => Assert.That(() => SkillDefinition.ForAttack(" ", AttackDefinition.Standard), Throws.InstanceOf<ArgumentException>());
 

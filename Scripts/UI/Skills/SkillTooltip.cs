@@ -26,6 +26,9 @@ public static class SkillTooltip
         var text     = new StringBuilder();
 
         text.Append(Title($"[color=gold]{skill.NameOrId}[/color]")).Append(NewLine).Append(NewLine);
+
+        if (!SkillGate.FitsWeapon(skill.Definition, caster.Weapon.IsRanged))
+            text.Append("[color=red]Needs a melee weapon[/color]").Append(NewLine);
         text.Append($"[color=orange]DPS: {Format(estimate.Dps)}[/color]").Append(NewLine);
         text.Append($"Average Hit: {Format(estimate.AverageHit)}").Append(NewLine);
         text.Append($"Crit Chance: {estimate.CriticalHitChance:0.#}%").Append(NewLine);
