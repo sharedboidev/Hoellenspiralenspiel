@@ -37,6 +37,13 @@ public partial class LevelMap : Control, IClosableWindow
     [Export]
     public Color WallColor { get; set; } = new(0.95f, 0.9f, 0.8f, 0.75f);
 
+    //Freier Boden einer Fläche ist heller als der Boden der Räume, Hindernisse sind dunkel
+    [Export]
+    public Color GroundColor { get; set; } = new(0.85f, 0.8f, 0.7f, 0.24f);
+
+    [Export]
+    public Color ObstacleColor { get; set; } = new(0.08f, 0.07f, 0.06f, 0.6f);
+
     [Export]
     public Color HeroColor { get; set; } = new(0.4f, 0.9f, 1f, 0.95f);
 
@@ -123,8 +130,12 @@ public partial class LevelMap : Control, IClosableWindow
         {
             for (var x = 0; x < level.Layout.Width; x++)
             {
-                if (IsShown(new Cell(x, y)))
-                    DrawCell(level, new Cell(x, y));
+                var cell = new Cell(x, y);
+
+                if (IsShown(cell))
+                    DrawCell(level, cell);
+                else if (level.Layout.GetKind(cell) == CellKind.Obstacle && IsBesideShown(cell))
+                    DrawObstacle(level, cell);
             }
         }
 
@@ -139,20 +150,47 @@ public partial class LevelMap : Control, IClosableWindow
         DrawMark(Hero.GlobalPosition, HeroMarkMeters, HeroColor);
     }
 
+    //Zwischen Boden und Hindernis zieht die Karte keine Mauer, das dunkle Hindernis zeigt die Grenze
     private void DrawCell(BuiltLevel level, Cell cell)
+    {
+        SetCorners(level, cell);
+
+        DrawColoredPolygon(corners, level.Layout.GetKind(cell) == CellKind.Ground ? GroundColor : FloorColor);
+
+        for (var side = 0; side < SideExtensions.All.Length; side++)
+        {
+            var across = SideExtensions.All[side];
+
+            if (level.Layout.HasWall(cell, across) && level.Layout.GetKind(cell.Step(across)) != CellKind.Obstacle)
+                DrawLine(corners[side], corners[(side + 1) % corners.Length], WallColor, WallWidthPx);
+        }
+    }
+
+    private void DrawObstacle(BuiltLevel level, Cell cell)
+    {
+        SetCorners(level, cell);
+
+        DrawColoredPolygon(corners, ObstacleColor);
+    }
+
+    private void SetCorners(BuiltLevel level, Cell cell)
     {
         corners[0] = ToMap(level.Grid.GetCorner(cell.X, cell.Y));
         corners[1] = ToMap(level.Grid.GetCorner(cell.X + 1, cell.Y));
         corners[2] = ToMap(level.Grid.GetCorner(cell.X + 1, cell.Y + 1));
         corners[3] = ToMap(level.Grid.GetCorner(cell.X, cell.Y + 1));
+    }
 
-        DrawColoredPolygon(corners, FloorColor);
-
-        for (var side = 0; side < SideExtensions.All.Length; side++)
+    //Ein Hindernis zeigt die Karte, sobald Boden daneben aufgedeckt ist
+    private bool IsBesideShown(Cell cell)
+    {
+        foreach (var side in SideExtensions.All)
         {
-            if (level.Layout.HasWall(cell, SideExtensions.All[side]))
-                DrawLine(corners[side], corners[(side + 1) % corners.Length], WallColor, WallWidthPx);
+            if (IsShown(cell.Step(side)))
+                return true;
         }
+
+        return false;
     }
 
     private void DrawMarkOf(BuiltLevel level, Node3D passage, Color color)

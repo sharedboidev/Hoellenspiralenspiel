@@ -202,14 +202,17 @@ public static class SaveGameMapper
             Seed           = descent.Seed,
             DeepestDepth   = descent.DeepestDepth,
             ContentVersion = descent.ContentVersion,
-            Levels = descent.RevealedByDepth.Keys
-                            .Union(descent.DepthsWithKills)
-                            .OrderBy(depth => depth)
-                            .Select(depth => new ExploredLevelSave
+            Levels = descent.RevealedByLocation.Keys
+                            .Union(descent.LocationsWithKills)
+                            .OrderBy(location => location.Field)
+                            .ThenBy(location => location.Dungeon)
+                            .ThenBy(location => location.DungeonLevel)
+                            .Select(location => new ExploredLevelSave
                             {
-                                Depth    = depth,
-                                Revealed = descent.GetRevealed(depth) ?? string.Empty,
-                                Killed   = descent.GetKilled(depth).ToList()
+                                Location = location.ToString(),
+                                Depth    = location.Field,
+                                Revealed = descent.GetRevealed(location) ?? string.Empty,
+                                Killed   = descent.GetKilled(location).ToList()
                             })
                             .ToList()
         };
@@ -250,9 +253,17 @@ public static class SaveGameMapper
     }
 
     private static void Restore(DescentState descent, int seed, int deepestDepth, List<ExploredLevelSave> levels, int contentVersion = 0)
-        => descent.Restore(seed,
-                           deepestDepth,
-                           (levels ?? []).Select(level => new KeyValuePair<int, string>(level.Depth, level.Revealed)),
-                           (levels ?? []).Select(level => new KeyValuePair<int, IEnumerable<int>>(level.Depth, level.Killed)),
-                           contentVersion);
+    {
+        var saved = (levels ?? []).Where(level => level is not null).Select(level => (Location: LocationOf(level), Level: level)).ToList();
+
+        descent.Restore(seed,
+                        deepestDepth,
+                        saved.Select(entry => new KeyValuePair<LocationKey, string>(entry.Location, entry.Level.Revealed)),
+                        saved.Select(entry => new KeyValuePair<LocationKey, IEnumerable<int>>(entry.Location, entry.Level.Killed)),
+                        contentVersion);
+    }
+
+    //Bis Version 5 stand nur die Tiefe im Spielstand
+    private static LocationKey LocationOf(ExploredLevelSave level)
+        => LocationKey.TryParse(level.Location, out var location) ? location : LocationKey.Of(level.Depth);
 }

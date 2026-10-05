@@ -8,7 +8,7 @@
 
 ![Engine](https://img.shields.io/badge/Godot-4.6_.NET-478cbf?logo=godotengine&logoColor=white)
 ![Sprache](https://img.shields.io/badge/C%23-.NET_10-512bd4?logo=dotnet&logoColor=white)
-![Tests](https://img.shields.io/badge/Unit--Tests-1246_gr%C3%BCn-2e7d32)
+![Tests](https://img.shields.io/badge/Unit--Tests-1274_gr%C3%BCn-2e7d32)
 ![Status](https://img.shields.io/badge/Status-Prototyp-f9a825)
 
 [Feature-Umfang](#-feature-umfang) · [Steuerung](#-steuerung) · [Meilensteine](#-meilensteine) · [Loslegen](#-loslegen) · [Aufbau](#-aufbau-des-projekts)
@@ -38,7 +38,7 @@ Gegner erschlagen, Beute sammeln, Charakter ausbauen.
 
 ## ✨ Feature-Umfang
 
-Das ist der Stand vom 02.10.2026. Das Spiel beginnt im Hauptmenü. Vom Hub führen Portale in die Höllenkreise: in einen Testkreis mit vier erzeugten Ebenen, nach Wollust, das in M8 entsteht, und an einem zehnten Portal ins Schlachthaus, ein Testlevel, das immer offen ist. Im Hub stehen eine Truhe und ein Händler, bezahlt wird mit Gold.
+Das ist der Stand vom 02.10.2026. Das Spiel beginnt im Hauptmenü. Vom Hub führen Portale in die Höllenkreise: in einen Testkreis mit vier erzeugten Ebenen, nach Wollust, das in M8 entsteht und aus drei freien Flächen besteht, und an einem zehnten Portal ins Schlachthaus, ein Testlevel, das immer offen ist. Im Hub stehen eine Truhe und ein Händler, bezahlt wird mit Gold.
 Das Spiel läuft in 3D, mehr dazu im Abschnitt [3D im PS1-Look](#-3d-im-ps1-look).
 
 ### 🧙 Charakter
@@ -297,7 +297,7 @@ Die Einstellungen liegen als `settings.json` eine Ebene darüber, direkt in `%AP
 | Ohne Spielstand testen | Im Inspector am `GameController` den Schalter `SavingEnabled` ausschalten |
 
 Leben, Mana, Position, Beute und Gold am Boden und der Rückkauf des Händlers stehen nicht im Spielstand.
-Der Spielstand hat Version 5. Ältere Spielstände lädt das Spiel weiter. Vor Version 3 beginnen sie mit 0 Gold und leerer Truhe. Bis Version 3 liegen keine Tränke auf der Leiste, und ein gespeicherter Bestand des Händlers wird beim Laden einmal nach Itemtyp neu ausgelegt, ohne neu zu würfeln. Seit Version 5 steht je Kreis der Inhaltsstand im Spielstand, mit dem seine Ebenen entstanden sind: Ändert sich ein Kreis, beginnt ein gespeicherter Abstieg dort neu, die Checkpoints bleiben. Ein Abstieg aus Version 4 gilt als passend, bis sich der Kreis das nächste Mal ändert. Eine ältere Fassung des Spiels legt einen Spielstand der Version 5 als `.broken` zur Seite.
+Der Spielstand hat Version 6. Ältere Spielstände lädt das Spiel weiter. Vor Version 3 beginnen sie mit 0 Gold und leerer Truhe. Bis Version 3 liegen keine Tränke auf der Leiste, und ein gespeicherter Bestand des Händlers wird beim Laden einmal nach Itemtyp neu ausgelegt, ohne neu zu würfeln. Seit Version 5 steht je Kreis der Inhaltsstand im Spielstand, mit dem seine Ebenen entstanden sind: Ändert sich ein Kreis, beginnt ein gespeicherter Abstieg dort neu, die Checkpoints bleiben. Ein Abstieg aus Version 4 gilt als passend, bis sich der Kreis das nächste Mal ändert. Seit Version 6 hängen Karte und Gefallene an einem Ort wie `f2`, ab Etappe 5 auch `f2/d0/l1` für eine Ebene im Dungeon einer Fläche. Version 5 liest Tiefe N als Fläche N. Eine ältere Fassung des Spiels legt einen Spielstand der Version 6 als `.broken` zur Seite.
 Der Held startet mit vollem Leben und Mana im Hub. Hinab führen die Checkpoints und das Town-Portal.
 
 </details>
@@ -364,12 +364,12 @@ Ein Klick auf ein Portal im Hub öffnet die Checkpoints seines Kreises. Jede Ebe
 
 | Feature | Beschreibung |
 |---|---|
-| Kreis | Ein Höllenkreis hat mehrere Ebenen, der Testkreis und das Schlachthaus je vier, Wollust vorerst drei. Auf der letzten Ebene steht statt des Ausgangs der Boss-Raum |
+| Kreis | Ein Höllenkreis hat mehrere Ebenen oder Flächen, der Testkreis und das Schlachthaus je vier Ebenen, Wollust drei freie Flächen. Auf der letzten Ebene steht statt des Ausgangs der Boss-Raum, auf der letzten Fläche die Arena |
 | Treppen | Die Kellertür im Ausgang führt hinab, die Treppe im Startraum hinauf, aus Ebene 1 in den Hub |
 | Boss-Raum | Ein Raum von 6 x 6 Zellen mit Thron, Feuerschalen und Pfeilern, am weitesten vom Start. Betritt der Held ihn, fallen Gitter in die Türen, bis der Boss fällt oder der Held stirbt |
 | Freischaltung | Fällt der Boss, öffnet sich im Hub das Portal des nächsten Kreises, und im Boss-Raum erscheint ein dämonisches Portal zurück in den Hub. Ein gefallener Boss bleibt gefallen, sein Portal steht beim nächsten Besuch von Anfang an |
 | Ortswechsel | Jeder Wechsel zeigt den Ladebildschirm. Solange er steht, hält die Welt an und der Held nimmt keine Eingaben an. Gebaut wird erst hinter dem schwarzen Vorhang, die Gegner stehen bei gleichem Seed am selben Ort. Die Musik eines Kreises spielt über die Treppen weiter, statt neu zu beginnen |
-| Checkpoints | Jede betretene Ebene schaltet ihren Start frei. Das Portal im Hub bietet alle freigeschalteten Ebenen an |
+| Checkpoints | Jede betretene Ebene oder Fläche schaltet ihren Start frei. Das Portal im Hub bietet alle freigeschalteten an, Flächen mit ihrem Namen |
 | Town-Portal | Town Portal, zu Beginn `T`, öffnet neben dem Helden ein Portal in den Hub, nach einer Sekunde ist es offen. Im Hub steht das Gegenstück und führt zurück an dieselbe Stelle, danach schließt es sich. Abklingzeit 60 Sekunden |
 | Bestand | Die Ebenen eines Kreises bleiben, wie der Held sie verließ, auch über einen Neustart des Spiels |
 | Tot bleibt tot | Gefallene Gegner stehen nicht wieder auf. Beute und Gold am Boden verfallen beim Verlassen der Ebene |
@@ -390,7 +390,7 @@ Ein Klick auf ein Portal im Hub öffnet die Checkpoints seines Kreises. Jede Ebe
 | Thema | Eine Resource legt Räume, Texturen, Licht, Musik, Gegnerpool und Spuren fest |
 | Spuren | Blutige Hände, große und sehr große verlaufene Flecken mit Spritzern drumherum, Blutlachen in Räumen und Gängen und höchstens ein Pentagramm je Ebene, gewürfelt aus dem Seed. Eine Spur an der Mauer öffnet sich mit dem Mauerwerk |
 | Schlachthaus | Das Testlevel am zehnten Portal: Holzplanken, grobe Zementwände, Blutspuren, Bereichslevel 5 bis 8. Es ist immer offen, sein Boss schaltet nichts frei. Es war bis zum 02.10.2026 der Platzhalter für den zweiten Kreis |
-| Wollust | Der zweite Kreis, Bereichslevel 5 bis 7, öffnet sich, sobald der Boss des Testkreises gefallen ist. Er entsteht in M8 und erbt bis dahin das Aussehen des Schlachthauses |
+| Wollust | Der zweite Kreis, Bereichslevel 5 bis 7, öffnet sich, sobald der Boss des Testkreises gefallen ist. Er entsteht in M8 und besteht seit Etappe 3b aus drei freien Flächen, siehe unten. Bis Etappe 6 trägt er Räume, Wände und Blutspuren des Schlachthauses |
 | Tiefe | Mit jeder Ebene steigt das Bereichslevel um 1, und die Ebene bekommt einen Raum mehr. Die erste Ebene des Testkreises hat Bereichslevel 1 |
 | Gegner | Räume bringen ihre Spawn-Marker mit, in Gängen stehen vereinzelt kleine Gruppen aus dem Gegnerpool |
 | Karte | Deckt sich beim Erkunden auf und steht im Spielstand. Sie zeigt Kellertür, Treppe und Town-Portal. `F5` zeigt im Debug-Build zum Testen die ganze Ebene |
@@ -402,6 +402,26 @@ Ein Klick auf ein Portal im Hub öffnet die Checkpoints seines Kreises. Jede Ebe
 <div align="center">
 <img src="docs/images/boss_und_schlachthaus_3d.webp" alt="Oben links der Skeleton King mit Krone und seinem Balken im Boss-Raum, oben rechts das dämonische Portal nach dem Sieg, unten links der Hub mit zwei offenen Portalen, unten rechts ein Gang im Schlachthaus mit Holzplanken, Zementwänden und einem blutigen Handabdruck" width="720">
 </div>
+
+### 🌫️ Freie Flächen
+
+Seit M8 Etappe 3b besteht Wollust aus drei großen, freien Flächen hintereinander: Sturmküste, Klagende Ebene und Richterfeld. Am Rand liegt der Abgrund, auf dem Boden stehen Ruinen, Felsen und tote Bäume.
+
+<div align="center">
+<img src="docs/images/wollust_flaechen_m8.webp" alt="Oben links der Held vor dem Torbogen am Rand der Sturmküste, oben rechts die ganze Karte der Fläche mit Ruinen, dunklen Hindernissen, Eingang und Ausgang, unten links die Sturmküste aus größerer Höhe mit dem Torbogen am Abgrund, unten rechts der Held vor der Arena am Ende des Richterfelds, von Blobs umringt" width="720">
+</div>
+
+| Feature | Beschreibung |
+|---|---|
+| Fläche | 32 x 24 Zellen von 4 m, also 128 x 96 m, rundum zwei Zellen Abgrund. Unsichtbare Mauern halten den Helden auf dem Boden, der Nebel deckt den Abgrund |
+| Eingang und Ausgang | Ein Torbogen am einen Rand, ein Pfad mit zwei Lampen am gegenüberliegenden. Der Pfad führt auf die nächste Fläche, der Torbogen zurück, aus der ersten Fläche in den Hub vor das Portal. Angekommen wird am Gegenstück |
+| Ruinen | 5 bis 8 je Fläche, verteilt mit Abstand zueinander. Vorerst sind es die Räume des Schlachthauses, mit Mauern und Türen |
+| Hindernisse | Gruppen aus 1 bis 6 Zellen mit Felsen und toten Bäumen, rund 8 % des Bodens. Kein Hindernis schneidet Boden ab, vor Türen und an den Toren liegt keins |
+| Gegner | Gruppen aus dem Pool des Kreises, eine je 40 Zellen Boden, nie am Eingang. Die Ruinen bringen ihre eigenen mit |
+| Arena | Auf der letzten Fläche steht statt des Ausgangs die Arena am fernen Ende, vorerst der Boss-Raum mit dem Skeleton King |
+| Karte | Freier Boden hell, Hindernisse dunkel, Ruinenmauern als Linien, Eingang und Ausgang als Zeichen. `F5` zeigt im Debug-Build die ganze Fläche |
+| Licht | Jede Fläche bringt Licht, Nebelfarbe und die Tiefe des Nebels mit |
+| Aus dem Seed | Derselbe Seed ergibt dieselbe Fläche mit denselben Gegnern am selben Ort, auch nach einem Neustart |
 
 ### 🧊 3D im PS1-Look
 
@@ -461,7 +481,7 @@ Das Mausrad wirkt immer.
 
 - Balance für Gold, Preise und den Boss, alle Werte sind geschätzt. Ein Kampfsimulator in den Tests rechnet die Kämpfe seit M8 Etappe 2 mit den echten Werten nach
 - Töne für Gold, Truhe, Händler, Gitter und Boss
-- Ein Höllenkreis in Endqualität, bisher gibt es das Testthema, das Schlachthaus als Testlevel und Wollust als Hülle, die das Schlachthaus erbt
+- Ein Höllenkreis in Endqualität, bisher gibt es das Testthema, das Schlachthaus als Testlevel und Wollust aus drei freien Flächen mit geliehenen Räumen als Ruinen, Platzhaltern als Requisiten und noch ohne Sturm und Dungeons
 - Ein echter Boss mit eigenem Modell, der Skeleton King ist ein Platzhalter aus dem Skelett
 - Eigene Modelle für den Held und die übrigen Gegner, bisher hat nur das Skelett eins
 - Item-Basen für die übrigen zwölf Ausrüstungsplätze
@@ -543,7 +563,7 @@ flowchart LR
 | ✅ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
 | ✅ | **M7** Hub | Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal, Pausenmenü, Ladebildschirm, Einstellungen, Hud an Ankern, Gold, Truhe, Händler, Platzhalter-Boss mit Boss-Raum und Freischaltung des nächsten Kreises. Etappe 4 liegt seit dem 01.10.2026 auf `master`, dazu der ruhigere PS1-Look und die Sichtlinie der Mauern | mittel |
 | ✅ | **M7.5** Renderskalierung | Vorgezogen aus M9: Die Welt rendert im Raster der PS1 statt in voller Fenstergröße, gebaut am 01.10.2026 auf `master_RenderScaling`, seit demselben Tag auf `master` | klein |
-| 🔨 | **M8** Höllenkreis | Wollust als kompletter Kreis in Endqualität: freie Flächen hintereinander, Dungeons per Ladezone, Sturm mit Windschatten, sechs Gegnertypen, Minos als Boss, Events, alle 16 Slots mit Item-Basen, Affixe nach der Slot-Tabelle, Balance, Ton und Musik. Etappe 1 von 20 liegt seit dem 02.10.2026 auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal, der Inhaltsstand im Spielstand. Etappe 2 liegt seit dem 05.10.2026 auf `master`: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests. Etappe 3a liegt seit demselben Tag auf `master`: der Generator für freie Flächen im Kern, im Spiel noch nicht zu sehen | groß |
+| 🔨 | **M8** Höllenkreis | Wollust als kompletter Kreis in Endqualität: freie Flächen hintereinander, Dungeons per Ladezone, Sturm mit Windschatten, sechs Gegnertypen, Minos als Boss, Events, alle 16 Slots mit Item-Basen, Affixe nach der Slot-Tabelle, Balance, Ton und Musik. Etappe 1 von 20 liegt seit dem 02.10.2026 auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal, der Inhaltsstand im Spielstand. Etappe 2 liegt seit dem 05.10.2026 auf `master`: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests. Etappe 3a liegt seit demselben Tag auf `master`: der Generator für freie Flächen im Kern. Etappe 3b ist am selben Tag auf `master_WollustFields` gebaut: Wollust besteht aus drei freien Flächen, mit Kette hin und zurück, Karte und Spielstand Version 6 | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
 | 💤 | **M10** Koop | Optional, baut auf Kern und Seeds auf | groß |
 
@@ -556,7 +576,7 @@ Aufgaben, Fertig-Kriterien und alle Befunde stehen in der [Roadmap](docs/ROADMAP
 | Kreis | Sünde | Stand |
 |---|---|---|
 | 1 | Limbus | geplant, bis dahin steht der Testkreis an seiner Stelle |
-| 2 | Wollust | im Bau seit dem 02.10.2026, M8: drei freie Flächen im ewigen Sturm, je ein Dungeon, Minos als Boss. Bis Etappe 3b erbt er das Aussehen des Schlachthauses |
+| 2 | Wollust | im Bau seit dem 02.10.2026, M8: drei freie Flächen im ewigen Sturm, je ein Dungeon, Minos als Boss. Die Flächen stehen seit Etappe 3b, mit Räumen und Aussehen des Schlachthauses |
 
 Das Schlachthaus, bis zum 02.10.2026 der Platzhalter für Kreis 2, bleibt als Testlevel am zehnten Portal des Hubs erhalten.
 | 3 | Völlerei | geplant |
@@ -639,18 +659,18 @@ Hoellenspiralenspiel
 │   ├── Items           Bibliothek aller Item-Basen
 │   ├── Enemies         Bibliothek aller Monster-Mods
 │   ├── World           Navigationsnetz, Kamera, PS1-Look, Spawn-Marker
-│   │   └── Levels      Wechsel zwischen Hub und Ebenen, Aufbau einer Ebene, Raumvorlagen, Orte, Mauerstücke, Spuren, Boss-Raum mit Gittern
+│   │   └── Levels      Wechsel zwischen Hub, Ebenen und Flächen, Aufbau einer Ebene und einer Fläche, Raumvorlagen, Orte, Mauerstücke, Spuren, Boss-Raum mit Gittern
 │   ├── Objects         Beutel und Münzhaufen am Boden, Truhe und Händler, Gitter des Boss-Raums, Suche nach Benutzbarem unter der Maus
-│   ├── Environment     Durchgänge: Kellertür, Treppe, Portal eines Kreises, Town-Portal, Portal des Bosses
+│   ├── Environment     Durchgänge: Kellertür, Treppe, Eingang und Ausgang einer Fläche, Portal eines Kreises, Town-Portal, Portal des Bosses
 │   ├── Saving          Dateien der Spielstände, drei Plätze, Datei der Einstellungen (SettingsStore), Autoload UserSettings
 │   ├── Controllers     Gegnersteuerung, Beute, Händler, Spielablauf, Speichern
 │   ├── Utils           Namen der Aktionen, Tastenbelegung in der InputMap (KeyBindings), Namen der Busse (AudioBuses), kleine Helfer
 │   └── UI              Charakterbogen, Inventar, Orbs, Skill-Leiste, Tooltips, Schadenszahlen, Namensschilder, Schilder der Beute, Karte der Ebene, Hauptmenü, Pausenmenü, Dialog am Portal, Ladebildschirm, Einstellungsfenster, Gitteransicht, Fenster von Truhe und Händler, Balken des Bosses
 │       └── Settings    Reiter des Einstellungsfensters: Display, Audio, Controls
-├── Scenes              Szenen für Hauptmenü, Spiel, Orte, Räume, Einheiten, Items, Skills, Objekte und Oberfläche
+├── Scenes              Szenen für Hauptmenü, Spiel, Orte, Räume, Einheiten, Items, Skills, Objekte, Requisiten und Oberfläche
 ├── Models              Modelle als .glb, unter Source die Dateien aus Blender. Godot übergeht Source
 ├── Shaders             Shader, unter Ps1 die für den PS1-Look, die Figuren und benutzbaren Dinge samt Umriss, die Sicht auf Gegner, die Spuren an Mauern und Boden und der Stern der Beutel, unter Archive2D die Effekte der 2D-Fassung
-├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Gegner, Monster-Mods, Themen der Ebenen samt Spuren, Themes
+├── Resources           Item-Basen, Affixe, Loot-Tabellen, Skills, Gegner, Monster-Mods, Themen der Ebenen samt Spuren, Flächen der Kreise, Themes
 ├── Interfaces          Schnittstellen, darunter IHero zwischen Held und Oberfläche
 ├── Enums               Gemeinsame Aufzählungen
 ├── Hoellenspiralenspiel.Tests   Unit-Tests mit NUnit, unter Balance ein Kampfsimulator, der die Resources des Spiels liest

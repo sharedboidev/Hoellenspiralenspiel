@@ -124,4 +124,31 @@ public class FieldCellsTests
             Assert.That(withoutDoor.IsRevealed(new Cell(7, 2)), Is.False, "Ohne Tür bleibt die Ruine dunkel");
         });
     }
+
+    [Test]
+    public void BodenUndHindernisse_ZerfallenInRechteckeOhneLueckeUndUeberlappung()
+    {
+        var layout = CreateField(false, true);
+        var rects  = layout.GetRects(CellKind.Ground, CellKind.Obstacle);
+        var count  = new int[layout.Width, layout.Height];
+
+        foreach (var rect in rects)
+        {
+            for (var y = rect.Y; y < rect.Bottom; y++)
+            {
+                for (var x = rect.X; x < rect.Right; x++)
+                    count[x, y]++;
+            }
+        }
+
+        for (var y = 0; y < layout.Height; y++)
+        {
+            for (var x = 0; x < layout.Width; x++)
+            {
+                var expected = layout.GetKind(new Cell(x, y)) == CellKind.Room ? 0 : 1;
+
+                Assert.That(count[x, y], Is.EqualTo(expected), $"Zelle {x}, {y}");
+            }
+        }
+    }
 }

@@ -21,10 +21,10 @@ public class EconomySaveTests
         return loaded;
     }
 
-    //Seit M8, Etappe 1: Version 5 trägt je Kreis den Inhaltsstand
+    //Seit M8, Etappe 3b: Version 6 nennt die Orte eines Abstiegs als Text, etwa "f2"
     [Test]
-    public void DerSpielstandHatVersion5()
-        => Assert.That(SaveGame.CurrentVersion, Is.EqualTo(5));
+    public void DerSpielstandHatVersion6()
+        => Assert.That(SaveGame.CurrentVersion, Is.EqualTo(6));
 
     [Test]
     public void Gold_UeberstehtDasSpeichern()

@@ -37,6 +37,11 @@ public partial class RoomTemplate : Node3D
     [Export]
     public int MaxPerLevel { get; set; }
 
+    //Nur auf Flächen: Die Vorlage bringt ihre Mauern selbst mit, der Aufbau zieht keine um sie herum und gibt ihr keine Zone.
+    //Jede offene Kante braucht dann eine Tür, denn der Generator geht nur durch Türen hinein
+    [Export]
+    public bool OpenToField { get; set; }
+
     public RoomBlueprint ToBlueprint(string id)
         => new()
         {
@@ -49,6 +54,7 @@ public partial class RoomTemplate : Node3D
             IsRequired   = IsRequired,
             CanRotate    = CanRotate,
             MaxPerLevel  = MaxPerLevel,
+            OpenToField  = OpenToField,
             Doors        = ReadDoors()
         };
 

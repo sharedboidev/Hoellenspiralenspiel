@@ -105,17 +105,19 @@ public partial class CircleDialog : Control, IClosableWindow
             child.QueueFree();
         }
 
-        for (var depth = 1; depth <= Circle.LevelCount; depth++)
+        for (var depth = 1; depth <= Circle.DepthCount; depth++)
             levelList.AddChild(CreateLevelButton(depth));
     }
 
+    //Ebenen tragen ihre Nummer, Flächen ihren Namen
     private Button CreateLevelButton(int depth)
     {
         var isReached = descent.HasReached(depth);
+        var name      = Circle.NameDepth(depth);
         var button = new Button
         {
             Name              = $"Level{depth}",
-            Text              = isReached ? $"Level {depth}" : $"Level {depth} · not reached",
+            Text              = isReached ? name : $"{name} · not reached",
             Disabled          = !isReached,
             CustomMinimumSize = LevelButtonSize,
             FocusMode         = FocusModeEnum.None

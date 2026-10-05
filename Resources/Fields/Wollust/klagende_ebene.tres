@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="FieldResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Levels/FieldResource.cs" id="1_field"]
+[ext_resource type="PackedScene" path="res://Scenes/Rooms/chamber.tscn" id="2_chamber"]
+[ext_resource type="PackedScene" path="res://Scenes/Rooms/hall.tscn" id="3_hall"]
+[ext_resource type="PackedScene" path="res://Scenes/Rooms/gallery.tscn" id="4_gallery"]
+[ext_resource type="PackedScene" path="res://Scenes/Props/rock.tscn" id="5_rock"]
+[ext_resource type="PackedScene" path="res://Scenes/Props/dead_tree.tscn" id="6_tree"]
+[ext_resource type="Texture2D" uid="uid://bp4uxrb2dhk7x" path="res://Textures/World/floor_stone.png" id="7_ground"]
+
+[resource]
+script = ExtResource("1_field")
+DisplayName = "Klagende Ebene"
+Ruins = Array[PackedScene]([ExtResource("2_chamber"), ExtResource("3_hall"), ExtResource("4_gallery")])
+Props = Array[PackedScene]([ExtResource("5_rock"), ExtResource("6_tree"), ExtResource("6_tree")])
+GroundTexture = ExtResource("7_ground")
+AmbientColor = Color(0.5, 0.58, 0.5, 1)
+FogColor = Color(0.03, 0.035, 0.03, 1)
+MoonlightColor = Color(0.65, 0.75, 0.65, 1)

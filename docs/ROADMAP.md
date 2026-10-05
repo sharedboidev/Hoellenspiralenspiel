@@ -7,13 +7,13 @@ Die Rückmeldungen aus dem Spielen von Etappe 3 sind am selben Tag auf `master_P
 Eine zweite Runde Rückmeldungen zu Etappe 3 ist am selben Tag auf `master_PlaytestFeedback3` gebaut: Umriss für alles Benutzbare, Blick zur Maus, Schlag und Zauber binden den Helden, Kaufen per Rechtsklick und der Vergleich oben bündig.
 Etappe 4 ist am 01.10.2026 auf `master_BossAndUnlock` gebaut und liegt seit demselben Tag auf `master`: der Skeleton King als Platzhalter-Boss mit Krone und Boss-Raum, die Freischaltung des nächsten Kreises und das Schlachthaus als Platzhalter für Kreis 2 mit neuen Texturen und Blutspuren. Auf demselben Branch kamen nach dem Spielen das ruhigere Bild des PS1-Looks und die Sichtlinie der Mauern dazu, beide ebenfalls auf `master`.
 Die Renderskalierung ist aus M9 vorgezogen und am 01.10.2026 als M7.5 auf `master_RenderScaling` gebaut und liegt seit demselben Tag auf `master`: Die Welt rendert im Raster der PS1 statt in voller Fenstergröße.
-M8 ist am 02.10.2026 geplant und läuft in 20 Etappen, siehe dort. Etappe 1 ist am selben Tag auf `master_CirclesAndTestPortal` gebaut und liegt seit demselben Tag auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal des Hubs, der Inhaltsstand eines Kreises im Spielstand. Etappe 2 ist am selben Tag auf `master_CoreDefinitions` gebaut und liegt seit dem 05.10.2026 auf `master`: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests, der mit den echten Resources rechnet. Etappe 3a ist am 05.10.2026 auf `master_FieldGenerator` gebaut und liegt seit demselben Tag auf `master`: der Generator für freie Flächen im Kern.
+M8 ist am 02.10.2026 geplant und läuft in 20 Etappen, siehe dort. Etappe 1 ist am selben Tag auf `master_CirclesAndTestPortal` gebaut und liegt seit demselben Tag auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal des Hubs, der Inhaltsstand eines Kreises im Spielstand. Etappe 2 ist am selben Tag auf `master_CoreDefinitions` gebaut und liegt seit dem 05.10.2026 auf `master`: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests, der mit den echten Resources rechnet. Etappe 3a ist am 05.10.2026 auf `master_FieldGenerator` gebaut und liegt seit demselben Tag auf `master`: der Generator für freie Flächen im Kern. Etappe 3b ist am selben Tag auf `master_WollustFields` gebaut und liegt noch nicht auf `master`: Wollust besteht aus drei freien Flächen, mit Kette hin und zurück, Karte und Orten im Spielstand.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
 Der Feature-Umfang für Leser steht in der [README](../README.md), dieses Dokument enthält Analyse, Befunde und Plan.
 Grundlage: Designdokument "Wyldes Gehirnsturmscribble" und der komplette C#-Code samt Szenen. Die Zeilenzahl aus der ersten Analyse, rund 5.500, galt für die 2D-Fassung.
-Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 bis 4 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 bis 4 auch mit Fenster. M7.5 ist randlos und mit Fenster geprüft. Etappe 1 von M8 ist headless und mit Fenster geprüft, dazu der Neustart mit einem Spielstand der Version 4. Etappe 2 von M8 ist headless und mit Fenster geprüft, dazu ein Vergleich aller Werte vor und nach dem Umbau. Etappe 3a ändert im Spiel nichts und ist mit Tests und einem Vergleich von 300 Ebenen vor und nach dem Umbau geprüft.
+Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, die Meilensteine M2 bis M6 und die Etappen 1 bis 4 von M7 wurden zusätzlich im laufenden Spiel geprüft, headless mit Godot 4.6, Etappe 2 bis 4 auch mit Fenster. M7.5 ist randlos und mit Fenster geprüft. Etappe 1 von M8 ist headless und mit Fenster geprüft, dazu der Neustart mit einem Spielstand der Version 4. Etappe 2 von M8 ist headless und mit Fenster geprüft, dazu ein Vergleich aller Werte vor und nach dem Umbau. Etappe 3a ändert im Spiel nichts und ist mit Tests und einem Vergleich von 300 Ebenen vor und nach dem Umbau geprüft. Etappe 3b ist headless und mit Fenster geprüft, dazu ein Neustart mit ihrem Spielstand, ein Spielstand der Version 5 und ein Vergleich des Schlachthauses mit `master`.
 
 ## Getroffene Richtungsentscheidungen
 
@@ -2531,7 +2531,7 @@ Bewusst offen gelassen:
 - Die Karte der Oberfläche rendert weiter in 2560 x 1440 und ohne Raster der PS1, wie bisher.
 - Mit Look aus rendert der Viewport in Fenstergröße. Das kostet gegenüber vorher wenige Prozent, weil das Bild einmal mehr kopiert wird. Der Schalter ist nur zum Vergleichen da.
 
-### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L, geplant am 02.10.2026, Etappe 1 umgesetzt am selben Tag auf `master_CirclesAndTestPortal`, Etappe 2 am selben Tag auf `master_CoreDefinitions`, Etappe 3a am 05.10.2026 auf `master_FieldGenerator`)
+### M8: Vertikaler Schnitt, ein kompletter Höllenkreis (L, geplant am 02.10.2026, Etappe 1 umgesetzt am selben Tag auf `master_CirclesAndTestPortal`, Etappe 2 am selben Tag auf `master_CoreDefinitions`, Etappe 3a am 05.10.2026 auf `master_FieldGenerator`, Etappe 3b am selben Tag auf `master_WollustFields`)
 
 Ziel: ein Kreis in Endqualität als Vorlage für alle weiteren. Der Kreis ist Wollust, der zweite Kreis aus dem Designdokument: "Strafe: ewiger Sturm/Umherwirbeln".
 
@@ -2559,7 +2559,7 @@ M8 läuft in 20 Etappen, jede für sich mergefähig, jede lässt `master` spielb
 | 1 | Kreise umsortieren: Schlachthaus als Testkreis am zehnten Portal, Wollust als Kreis 2, Inhaltsstand im Spielstand | S | Umgesetzt am 02.10.2026 auf `master_CirclesAndTestPortal`, liegt seit demselben Tag auf `master` |
 | 2 | Kern-Definitionen für Gegner und Held, Kampfsimulation in den Tests | S | Umgesetzt am 02.10.2026 auf `master_CoreDefinitions`, liegt seit dem 05.10.2026 auf `master` |
 | 3a | Freie Flächen I: der Generator im Kern | M | Umgesetzt am 05.10.2026 auf `master_FieldGenerator`, liegt seit demselben Tag auf `master` |
-| 3b | Freie Flächen II: Aufbau in Godot, Kette der Flächen, Karte, Spielstand | M | Offen |
+| 3b | Freie Flächen II: Aufbau in Godot, Kette der Flächen, Karte, Spielstand | M | Umgesetzt am 05.10.2026 auf `master_WollustFields` |
 | 4 | Der Sturm: Grundwind, Böen, Windschatten im Lee, Drift der Projektile, Streifen | M | Offen |
 | 5 | Dungeons per Ladezone und die Liebenden als Mini-Boss | M | Offen |
 | 6 | Das Aussehen von Wollust: Texturen, Ruinen, Requisiten, Spuren, Licht | M | Offen |
@@ -2868,6 +2868,81 @@ Bewusst offen gelassen:
 - `GetWallRuns` meldet auf Flächen auch Mauern zwischen Boden und Hindernis oder Abgrund, weil dort kein Boden mehr ist. Welche davon im Aufbau zu Mauern werden, entscheidet 3b: am Abgrund eine unsichtbare Mauer, auf Hindernissen Requisiten, um Ruinen mit `OpenToField` keine.
 - Die Erkundung deckt nur Boden auf, nicht die Hindernisse selbst. Die Karte in 3b zeichnet Hindernisse neben aufgedecktem Boden.
 - Die geliehenen Räume Kammer, Halle und Galerie brauchen für 3b Türen an jeder offenen Kante, wenn sie als Ruinen auf der Fläche stehen.
+
+#### Etappe 3b: Freie Flächen II, Aufbau in Godot, Kette der Flächen, Karte, Spielstand
+
+Umgesetzt am 05.10.2026 auf `master_WollustFields`, abgezweigt von `2424566`.
+
+- Erledigt: Wollust besteht aus drei freien Flächen hintereinander: Sturmküste mit Bereichslevel 5, Klagende Ebene mit 6 und Richterfeld mit 7. Jede entsteht aus dem Generator der Etappe 3a und wird in Godot gebaut: Boden aus `floor_stone`, unsichtbare Mauern am Abgrund, Felsen und tote Bäume mit Kollision auf den Hindernissen, die Ruinen wie Räume, ein Torbogen als Eingang, ein Pfad mit zwei Lampen als Ausgang und Gruppen auf dem freien Boden.
+- Erledigt: Die Kette. Der Ausgang führt auf die nächste Fläche, der Eingang zurück, aus der ersten Fläche in den Hub vor das Portal. Angekommen wird am Gegenstück. Auf dem Richterfeld steht statt des Ausgangs die Arena mit dem Skeleton King, sein Tod öffnet Kreis 3 wie bisher.
+- Erledigt: Checkpoints je Fläche wie bisher je Ebene. Der Dialog am Portal und der Ladebildschirm nennen die Flächen mit Namen. Das Town-Portal funktioniert wie bisher.
+- Erledigt: Orte im Spielstand. Karte und Gefallene hängen an einem `LocationKey`, als Text `f2`, ab Etappe 5 auch `f2/d0/l1`. Der Spielstand hat Version 6, Version 5 liest Tiefe N als Fläche N.
+- Erledigt: Die Karte zeichnet freien Boden heller als Räume, Hindernisse dunkel, die Mauern der Ruinen als Linien und Eingang und Ausgang als Zeichen. Aufgedeckt wird im Lichtradius über Boden.
+- Erledigt: Licht, Nebelfarbe und Tiefe des Nebels je Fläche. `IsoCamera.SetFogDepth` setzt die Tiefe, Hub und Ebenen bekommen über `ResetFogDepth` die Werte aus `game.tscn` zurück.
+- Zusätzlich: `LevelNavigation.LastBakeMsec` misst, wie lange das Backen im Hintergrund dauert. Auf einer Fläche waren es 75 bis 151 ms.
+- Zusätzlich: Platzhalter aus Grundkörpern: `Scenes/Props/rock.tscn` und `dead_tree.tscn`, die Durchgänge `Scenes/Objects/field_entry.tscn` und `field_exit.tscn`.
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Geliehene Räume als Ruinen | Kammer, Halle und Galerie behalten `OpenToField` aus. Sie haben keine eigenen Außenmauern, der Aufbau zieht ihnen Mauern mit Türen wie in den Ebenen. Mit `OpenToField` stünden sie ganz ohne Mauer auf der Fläche und gäben in Etappe 4 keinen Windschatten. Erst die Ruinen aus Etappe 6 bringen eigene Mauern mit und schalten es ein |
+| Rolle aus dem Platz | Die Rolle einer Vorlage ergibt sich aus ihrem Platz an der `FieldResource`: `Ruins` macht Ruinen, `Entrance` den Dungeon-Eingang, `Events` Events, `Arena` den Boss. So taugen die Räume des Schlachthauses als Ruinen, ohne dass sich ihre Szenen ändern |
+| Zone | Nur geschlossene Vorlagen bekommen eine `RoomZone`, eine offene Ruine verbirgt nichts |
+| Abgrund | Vier unsichtbare Mauern auf der Ebene Walls rund um den Boden, im Saum liegt kein Boden. Die Navigation endet so am Rand |
+| Requisiten | Eine je Zelle mit Hindernis, gewählt und gedreht nach dem Seed der Fläche, nicht skaliert, weil Godot skalierte Körper schlecht verträgt. Ein Felsen deckt mit 3,2 m fast die ganze Zelle, ein Baum steht auf einem Wurzelhügel mit 1,5 m Radius, so passt niemand zwischen zwei Hindernisse einer Gruppe. Fehlen Requisiten, versperrt ein unsichtbarer Block die Zelle, damit Wege und Grundriss übereinstimmen |
+| Tore | Torbogen und Pfad stehen am äußeren Rand ihrer Zelle, die Rückseite zum Abgrund. Angekommen wird 2,4 m davor auf dem Boden |
+| Raster | Auf einer Fläche liegt die Mitte des Bodens im Ursprung der Welt, in einer Ebene wie bisher die Mitte des Startraums |
+| Tiefen | `LevelThemeResource.DepthCount` ist die Zahl der Flächen, falls der Kreis welche hat, sonst `LevelCount`. `NameDepth` nennt die Fläche oder "Level N" |
+| Gegnerpool | Eine Fläche ohne eigenen Pool nimmt den des Kreises. Die drei Flächen von Wollust tun das vorerst, Etappe 7a gibt ihnen eigene |
+| Seeds der Orte | Eine Fläche nimmt den Seed ihrer Tiefe, so wie bisher eine Ebene, damit die Ebenen der älteren Spielstände bleiben, wie sie sind. Nur eine Ebene im Dungeon mischt Dungeon und Ebene in den Seed der Fläche. Der Plan sah `hash(key)` für alle Orte vor, das hätte jede gespeicherte Ebene verändert |
+| Inhaltsstand | Wollust trägt Stand 2. Ein Abstieg aus der Zeit der Ebenen beginnt beim nächsten Betreten neu, mit gleichem Seed und erhaltenen Checkpoints |
+| Räume von Wollust | Der Kreis listet keine Räume mehr, nur noch seine Flächen. Pool, Spuren und die Texturen für Böden und Mauern der Ruinen bleiben am Kreis |
+| Nebel | Die Flächen von Wollust tragen vorerst den Nebel des Spiels, 31,7 bis 55,7 m ab der Kamera, Etappe 6 stellt ihn ein |
+
+So funktioniert es:
+
+- Hat ein Kreis Flächen, ruft `Descent.BuildLevel` `PrepareField` statt `PrepareLevel`. Der Grundriss entsteht vorab mit `FieldGenerator` und den Einstellungen aus den Feldern von `Descent` über `FieldSettings.ForDepth`. Scheitert er, bleibt der Held, wo er ist. Gebaut wird erst, wenn der alte Ort abgebaut ist.
+- `FieldBuilder.Build` legt den Boden je Rechteck aus Boden und Hindernis (`LevelLayout.GetRects`), die Böden der Vorlagen, zieht Mauern nur zwischen Boden und geschlossenen Vorlagen (`LevelBuilder.RaiseWalls` mit Filter), richtet die Vorlagen mit `FurnishRooms` ein wie in den Ebenen und setzt Requisiten, Tore, Gruppen (`MarkPacks`) und Spuren. Heraus kommt ein `BuiltLevel` wie bei einer Ebene, jetzt mit `Location` und mit `Entrances` und `Exits` als allgemeine Durchgänge.
+- `Descent.ConnectPassages` verbindet Ausgänge und Eingänge für Ebenen und Flächen gleich. Spawnen, Gefallene, Boss und Arena laufen unverändert, nur am Ort statt an der Tiefe.
+- `DescentState` führt Karte und Gefallene je `LocationKey`, mit Überladungen für Tiefen. `SaveGameMapper` schreibt `Location` und liest den Ort oder, in älteren Spielständen, die Tiefe.
+
+Neue Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| `Descent` | `FieldWidth`, `FieldHeight` | 32, 24 | Größe einer Fläche in Zellen, mit Saum |
+| `Descent` | `ObstacleShare` | 0,08 | Anteil des freien Bodens mit Hindernis |
+| `Descent` | `CellsPerFieldPack` | 40 | Zellen Boden je Gruppe Gegner |
+| `LevelThemeResource` | `Fields` | Wollust: drei Flächen | Die Flächen des Kreises, hintereinander |
+| `FieldResource` | `DisplayName`, `Ruins`, `Entrance`, `Events`, `Arena` | | Name und Vorlagen der Fläche |
+| `FieldResource` | `Enemies`, `Props`, `Music`, `GroundTexture` | leer heißt: wie der Kreis | Pool, Requisiten, Musik, Boden |
+| `FieldResource` | Licht und Nebel | wie das Thema, Nebel 31,7 bis 55,7 m | Ambient, Nebelfarbe, Mondlicht, Tiefe des Nebels |
+| `RoomTemplate` | `OpenToField` | aus | Die Vorlage bringt eigene Mauern mit |
+
+So entsteht eine Fläche: eine `FieldResource` unter `Resources/Fields/<Kreis>/` mit Namen, Ruinen, Requisiten und Bodentextur, auf der letzten Fläche dazu eine Arena mit dem Skript `BossArena`. Jede Requisite braucht eine Kollision auf der Ebene Walls. Ein Kreis mit Flächen listet sie unter `Fields` und zählt seinen Inhaltsstand hoch. Unter `Resources/Levels` gehören nur Kreise, `Descent` lädt jede Datei dort als Kreis.
+
+<img src="images/wollust_flaechen_m8.webp" alt="Oben links der Held vor dem Torbogen am Rand der Sturmküste, oben rechts die ganze Karte der Fläche mit Ruinen, dunklen Hindernissen, Eingang und Ausgang, unten links die Sturmküste aus größerer Höhe mit dem Torbogen am Abgrund, unten rechts der Held vor der Arena am Ende des Richterfelds, von Blobs umringt" width="860">
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Unit-Tests | 28 neue: der Ort als Text, gelesen und geschrieben, fremder Text ist kein Ort, Gleichheit, kein Dungeon auch als Standardwert; Karte und Gefallene je Ort, Tiefe N und Fläche N sind derselbe Ort, Seeds der Flächen wie die der Tiefen und eigene im Dungeon; Orte im Dungeon überstehen das Speichern als Text, Version 5 liest Tiefe als Fläche; Bereichslevel und letzte Fläche aus den Feldern des Abstiegs; Boden und Hindernisse zerfallen lückenlos in Rechtecke. Einer geändert: Der Spielstand hat Version 6, zwei folgen den neuen Namen. Zusammen 1274 |
+| Laufendes Spiel, headless | 66 Schritte: Wollust mit drei Flächen und Stand 2. Auf Fläche 1 der Ort f1, Boden, Hindernisse und Abgrund, 5 bis 8 Ruinen, ein Eingang, ein Ausgang, der Held am Eingang, eine Requisite mit Kollision auf Walls je Hinderniszelle, die Gruppen mindestens 8 m auseinander, Gegner, Bereichslevel 5, Navigation in unter 500 ms. Der Held läuft auf einen Felsen zu und bleibt knapp 2 m vor seiner Mitte stehen. Die Karte deckt auf. Ein Gefallener und ein Town-Portal werden gemerkt. Über den Ausgang auf Fläche 2 mit eigenem Nebel, weiter auf Fläche 3 mit Arena, Skeleton King und ohne Ausgang. Über die Eingänge zurück bis in den Hub, jeweils am Gegenstück angekommen, im Hub wieder der Nebel des Spiels. Die Checkpoints nennen die drei Flächen. Fläche 1 ist beim zweiten Besuch gleich gebaut, mit denselben Gegnern am selben Ort ohne den Gefallenen, Karte und Town-Portal sind noch da. Der Spielstand hat Version 6 und nennt den Ort f1. Das Schlachthaus baut weiter Ebenen mit Treppe und Kellertür |
+| Neustart mit dem Spielstand | 8 Schritte: Checkpoint, Inhaltsstand, Gefallener, Karte und Town-Portal geladen. Fläche 1 gleich gebaut, dieselben Gegner ohne den Gefallenen, die Karte auch fern vom Eingang aufgedeckt, das Town-Portal an seiner Stelle |
+| Spielstand der Version 5 | 5 Schritte mit einem Abstieg in Wollust aus der Zeit der Ebenen: Tiefe 1 wird als f1 gelesen, beim Betreten beginnt der Abstieg neu mit gleichem Seed, Checkpoint 2 bleibt, die alten Toten sind vergessen |
+| Schlachthaus unverändert | Zwei Ebenen mit festem Seed, jeder Knoten mit Lage und Drehung und jeder Gegner mit Seltenheit und Ort, einmal auf `master` und einmal auf dem Branch: 2413 Zeilen, keine Abweichung |
+| Mit Fenster | Dieselben 66 Schritte, dazu die Bilder |
+| Spielstand | Die Proben liefen mit eigenen Spielständen und eigenen Einstellungen, die des Users blieben unberührt |
+
+Bewusst offen gelassen:
+
+- Noch kein Sturm (Etappe 4), keine Dungeons (Etappe 5) und kein eigenes Aussehen (Etappe 6). Die Ruinen sind die Räume des Schlachthauses mit Mauern, die Requisiten Grundkörper.
+- Auf einer Fläche stehen rund 60 bis 80 Gegner, so dicht wie in den Ebenen des Schlachthauses. Die Dichte stellt Etappe 12 nach der Laufzeit ein.
+- Die Erkundung deckt nur Boden auf. Hindernisse zeigt die Karte, sobald Boden daneben aufgedeckt ist.
+- Der Ladebildschirm nennt eine Fläche nur mit ihrem Namen, ohne "1 of 3".
 
 ### M9: Inhalt und Politur (L, fortlaufend)
 

@@ -3,11 +3,14 @@ using System.Collections.Generic;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Levels;
 
-//Der Abstieg in einen Kreis hat einen Seed, aus dem jede Ebene ihren eigenen ableitet. Tiefe 0 heißt, der Held ist nicht im Kreis
+//Der Abstieg in einen Kreis hat einen Seed, aus dem jeder Ort seinen eigenen ableitet. Tiefe 0 heißt, der Held ist nicht im Kreis.
+//Karte und Gefallene hängen am Ort, die Überladungen mit Tiefe meinen die Fläche oder Ebene dieser Tiefe
 public sealed class DescentState
 {
-    private readonly Dictionary<int, SortedSet<int>> killedByDepth   = new();
-    private readonly Dictionary<int, string>         revealedByDepth = new();
+    private const int DungeonSeedStep = 1000;
+
+    private readonly Dictionary<LocationKey, SortedSet<int>> killedByLocation   = new();
+    private readonly Dictionary<LocationKey, string>         revealedByLocation = new();
 
     public int Seed { get; private set; }
 
@@ -22,9 +25,9 @@ public sealed class DescentState
 
     public bool IsBelowGround => Depth > 0;
 
-    public IReadOnlyDictionary<int, string> RevealedByDepth => revealedByDepth;
+    public IReadOnlyDictionary<LocationKey, string> RevealedByLocation => revealedByLocation;
 
-    public IEnumerable<int> DepthsWithKills => killedByDepth.Keys;
+    public IEnumerable<LocationKey> LocationsWithKills => killedByLocation.Keys;
 
     //Die Checkpoints bleiben. Ebenen, Karten und Tote gehören zum alten Abstieg und verfallen
     public void Begin(int seed, int contentVersion = 0)
@@ -34,8 +37,8 @@ public sealed class DescentState
         HasBegun       = true;
         ContentVersion = contentVersion;
 
-        revealedByDepth.Clear();
-        killedByDepth.Clear();
+        revealedByLocation.Clear();
+        killedByLocation.Clear();
     }
 
     //Haben sich Räume oder Gegner des Kreises seit dem Spielstand geändert, passen Karten und Tote nicht mehr zu seinen Ebenen.
@@ -50,22 +53,26 @@ public sealed class DescentState
             ContentVersion = currentContentVersion;
     }
 
-    public void Restore(int seed, int deepestDepth, IEnumerable<KeyValuePair<int, string>> revealed, IEnumerable<KeyValuePair<int, IEnumerable<int>>> killed = null, int contentVersion = 0)
+    public void Restore(int seed,
+                        int deepestDepth,
+                        IEnumerable<KeyValuePair<LocationKey, string>> revealed,
+                        IEnumerable<KeyValuePair<LocationKey, IEnumerable<int>>> killed = null,
+                        int contentVersion = 0)
     {
         Begin(seed, contentVersion);
 
         DeepestDepth = Math.Max(0, deepestDepth);
 
-        foreach (var (levelDepth, encoded) in revealed ?? [])
+        foreach (var (location, encoded) in revealed ?? [])
         {
-            if (!string.IsNullOrEmpty(encoded))
-                revealedByDepth[levelDepth] = encoded;
+            if (location.IsValid && !string.IsNullOrEmpty(encoded))
+                revealedByLocation[location] = encoded;
         }
 
-        foreach (var (levelDepth, spawnIndices) in killed ?? [])
+        foreach (var (location, spawnIndices) in killed ?? [])
         {
             foreach (var spawnIndex in spawnIndices ?? [])
-                RememberKill(levelDepth, spawnIndex);
+                RememberKill(location, spawnIndex);
         }
     }
 
@@ -82,34 +89,58 @@ public sealed class DescentState
     public bool HasReached(int depth)
         => depth >= 1 && depth <= Math.Max(1, DeepestDepth);
 
-    public void Remember(int depth, ExplorationMap map)
+    public void Remember(LocationKey location, ExplorationMap map)
     {
-        if (map is not null && map.RevealedCount > 0)
-            revealedByDepth[depth] = map.Encode();
+        if (location.IsValid && map is not null && map.RevealedCount > 0)
+            revealedByLocation[location] = map.Encode();
     }
 
-    public string GetRevealed(int depth)
-        => revealedByDepth.GetValueOrDefault(depth);
+    public void Remember(int depth, ExplorationMap map)
+        => Remember(LocationKey.Of(depth), map);
 
-    public bool RememberKill(int depth, int spawnIndex)
+    public string GetRevealed(LocationKey location)
+        => revealedByLocation.GetValueOrDefault(location);
+
+    public string GetRevealed(int depth)
+        => GetRevealed(LocationKey.Of(depth));
+
+    public bool RememberKill(LocationKey location, int spawnIndex)
     {
-        if (depth < 1 || spawnIndex < 0)
+        if (!location.IsValid || spawnIndex < 0)
             return false;
 
-        if (!killedByDepth.TryGetValue(depth, out var killed))
-            killedByDepth[depth] = killed = new SortedSet<int>();
+        if (!killedByLocation.TryGetValue(location, out var killed))
+            killedByLocation[location] = killed = new SortedSet<int>();
 
         return killed.Add(spawnIndex);
     }
 
+    public bool RememberKill(int depth, int spawnIndex)
+        => RememberKill(LocationKey.Of(depth), spawnIndex);
+
+    public bool IsKilled(LocationKey location, int spawnIndex)
+        => killedByLocation.TryGetValue(location, out var killed) && killed.Contains(spawnIndex);
+
     public bool IsKilled(int depth, int spawnIndex)
-        => killedByDepth.TryGetValue(depth, out var killed) && killed.Contains(spawnIndex);
+        => IsKilled(LocationKey.Of(depth), spawnIndex);
+
+    public IReadOnlyCollection<int> GetKilled(LocationKey location)
+        => killedByLocation.TryGetValue(location, out var killed) ? killed : [];
 
     public IReadOnlyCollection<int> GetKilled(int depth)
-        => killedByDepth.TryGetValue(depth, out var killed) ? killed : [];
+        => GetKilled(LocationKey.Of(depth));
 
     public int GetSeedOf(int depth)
         => GetSeedOf(Seed, depth);
+
+    //Eine Fläche nimmt den Seed ihrer Tiefe, so bleiben die Ebenen der älteren Spielstände, wie sie waren.
+    //Eine Ebene im Dungeon leitet ihren Seed aus dem der Fläche ab
+    public int GetSeedOf(LocationKey location)
+    {
+        var fieldSeed = GetSeedOf(Seed, location.Field);
+
+        return location.IsInDungeon ? GetSeedOf(fieldSeed, (location.Dungeon + 1) * DungeonSeedStep + location.DungeonLevel) : fieldSeed;
+    }
 
     //Nachbarn im Seed und in der Tiefe dürfen keine ähnlichen Ebenen ergeben, deshalb die Streuung
     public static int GetSeedOf(int descentSeed, int depth)

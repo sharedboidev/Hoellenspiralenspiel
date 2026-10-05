@@ -221,8 +221,11 @@ public sealed class LevelLayout
         }
     }
 
-    //Zerlegt die Gänge in Rechtecke, erst zu Streifen je Zeile, dann gleiche Streifen untereinander zu einem
     public List<CellRect> GetCorridorRects()
+        => GetRects(CellKind.Corridor);
+
+    //Zerlegt die Zellen dieser Arten in Rechtecke, erst zu Streifen je Zeile, dann gleiche Streifen untereinander zu einem
+    public List<CellRect> GetRects(params CellKind[] wanted)
     {
         var rects = new List<CellRect>();
         var open  = new Dictionary<(int From, int To), int>();
@@ -234,12 +237,13 @@ public sealed class LevelLayout
 
             for (var x = 0; x <= Width; x++)
             {
-                var isCorridor = GetKind(new Cell(x, y)) == CellKind.Corridor;
+                var cell     = new Cell(x, y);
+                var isWanted = Contains(cell) && Array.IndexOf(wanted, GetKind(cell)) >= 0;
 
-                if (isCorridor && from == NoRoom)
+                if (isWanted && from == NoRoom)
                     from = x;
 
-                if (isCorridor || from == NoRoom)
+                if (isWanted || from == NoRoom)
                     continue;
 
                 strips.Add((from, x));

@@ -11,6 +11,12 @@ public sealed class RoomLibrary
     private readonly Dictionary<string, PackedScene> sceneOf    = new();
 
     public RoomLibrary(IEnumerable<PackedScene> scenes)
+        => Add(scenes);
+
+    public RoomLibrary() { }
+
+    //Mit Rolle bekommt jede Vorlage die Rolle ihres Platzes, etwa die Ruinen einer Fläche, egal was in ihrer Szene steht
+    public RoomLibrary Add(IEnumerable<PackedScene> scenes, RoomRole? role = null)
     {
         foreach (var scene in scenes)
         {
@@ -30,7 +36,9 @@ public sealed class RoomLibrary
 
             if (room is RoomTemplate template)
             {
-                blueprints.Add(template.ToBlueprint(id));
+                var blueprint = template.ToBlueprint(id);
+
+                blueprints.Add(role is { } slot ? blueprint with { Role = slot } : blueprint);
 
                 sceneOf[id] = scene;
             }
@@ -39,6 +47,8 @@ public sealed class RoomLibrary
 
             room.Free();
         }
+
+        return this;
     }
 
     public IReadOnlyList<RoomBlueprint> Blueprints => blueprints;

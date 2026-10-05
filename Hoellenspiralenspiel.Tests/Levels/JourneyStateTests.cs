@@ -1,3 +1,4 @@
+using System.Linq;
 using Hoellenspiralenspiel.Scripts.Core.Levels;
 using Hoellenspiralenspiel.Scripts.Core.Saving;
 using NUnit.Framework;
@@ -259,5 +260,53 @@ public class JourneyStateTests
         Assert.That(descent.ContentVersion, Is.Zero);
         Assert.That(descent.IsStale(3), Is.False);
         Assert.That(descent.DeepestDepth, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void OrteImDungeon_UeberstehenDasSpeichern_AlsText()
+    {
+        var journey = new JourneyState();
+        var dungeon = LocationKey.Of(2).InDungeon(0, 1);
+        var map     = CreateExplored(new Cell(4, 4));
+
+        journey.BeginAnew(Lust, 9);
+        journey.GetDescent(Lust).Remember(dungeon, map);
+        journey.GetDescent(Lust).RememberKill(dungeon, 3);
+        journey.GetDescent(Lust).RememberKill(2, 8);
+
+        var save = new SaveGame();
+
+        SaveGameMapper.CaptureJourney(journey, save);
+
+        var loaded = SaveAndLoad(journey).GetDescent(Lust);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(save.Journey.Circles[0].Levels.Select(level => level.Location), Is.EqualTo(new[] { "f2", "f2/d0/l1" }));
+            Assert.That(loaded.GetRevealed(dungeon), Is.EqualTo(map.Encode()));
+            Assert.That(loaded.IsKilled(dungeon, 3), Is.True);
+            Assert.That(loaded.IsKilled(2, 8), Is.True);
+            Assert.That(loaded.IsKilled(2, 3), Is.False);
+        });
+    }
+
+    [Test]
+    public void EinSpielstandDerVersion5_ZaehltTiefeNAlsFlaecheN()
+    {
+        const string json = "{\"Version\":5,\"Character\":{\"Level\":3},\"Journey\":{\"UnlockedCircles\":2,\"Circles\":[{\"CircleId\":\"lust\",\"Seed\":5,\"DeepestDepth\":3,\"ContentVersion\":1,\"Levels\":[{\"Depth\":2,\"Revealed\":\"AQ==\",\"Killed\":[4,9]}]}]}}";
+
+        var journey = new JourneyState();
+
+        Assert.That(SaveGameSerializer.TryDeserialize(json, out var read), Is.True);
+        Assert.That(SaveGameMapper.RestoreJourney(read, journey, Lust), Is.True);
+
+        var descent = journey.GetDescent(Lust);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(descent.GetKilled(LocationKey.Of(2)), Is.EqualTo(new[] { 4, 9 }));
+            Assert.That(descent.GetRevealed(LocationKey.Of(2)), Is.EqualTo("AQ=="));
+            Assert.That(descent.DeepestDepth, Is.EqualTo(3));
+        });
     }
 }

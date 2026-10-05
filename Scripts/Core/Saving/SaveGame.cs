@@ -6,7 +6,7 @@ namespace Hoellenspiralenspiel.Scripts.Core.Saving;
 
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 5;
+    public const int CurrentVersion = 6;
 
     public int                    Version   { get; set; } = CurrentVersion;
     public CharacterSave          Character { get; set; } = new();
@@ -37,6 +37,8 @@ public sealed class DescentSave
 
 public sealed class ExploredLevelSave
 {
+    //Seit Version 6 der Ort als Text, etwa "f2" oder "f2/d0/l1". Fehlt er, gilt die Tiefe: Tiefe N ist die Fläche N
+    public string    Location { get; set; } = string.Empty;
     public int       Depth    { get; set; }
     public string    Revealed { get; set; } = string.Empty;
     public List<int> Killed   { get; set; } = new();

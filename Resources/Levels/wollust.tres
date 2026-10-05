@@ -7,13 +7,10 @@
 [ext_resource type="Resource" path="res://Resources/Enemies/yellow_blob.tres" id="5_yellow"]
 [ext_resource type="Resource" path="res://Resources/Enemies/test_enemy.tres" id="6_caster"]
 [ext_resource type="Resource" path="res://Resources/Enemies/skeleton.tres" id="7_skeleton"]
-[ext_resource type="PackedScene" path="res://Scenes/Rooms/start_room.tscn" id="10_start"]
-[ext_resource type="PackedScene" path="res://Scenes/Rooms/exit_room.tscn" id="11_exit"]
-[ext_resource type="PackedScene" path="res://Scenes/Rooms/chamber.tscn" id="12_chamber"]
-[ext_resource type="PackedScene" path="res://Scenes/Rooms/hall.tscn" id="13_hall"]
-[ext_resource type="PackedScene" path="res://Scenes/Rooms/gallery.tscn" id="14_gallery"]
-[ext_resource type="PackedScene" path="res://Scenes/Rooms/shrine.tscn" id="15_shrine"]
-[ext_resource type="PackedScene" path="res://Scenes/Rooms/boss_room.tscn" id="16_boss"]
+[ext_resource type="Script" path="res://Resources/Levels/FieldResource.cs" id="8_field"]
+[ext_resource type="Resource" path="res://Resources/Fields/Wollust/sturmkueste.tres" id="10_coast"]
+[ext_resource type="Resource" path="res://Resources/Fields/Wollust/klagende_ebene.tres" id="11_plain"]
+[ext_resource type="Resource" path="res://Resources/Fields/Wollust/richterfeld.tres" id="12_judgement"]
 [ext_resource type="Texture2D" uid="uid://cciue45qhuupq" path="res://Textures/World/floor_planks.png" id="20_floor"]
 [ext_resource type="Texture2D" uid="uid://c3gbyfhybnfx5" path="res://Textures/World/wall_cement.png" id="21_wall"]
 [ext_resource type="Texture2D" uid="uid://dca5gsnui8e50" path="res://Textures/World/Marks/blood_hand.png" id="30_hand"]
@@ -108,9 +105,10 @@ script = ExtResource("1_theme")
 Id = "wollust"
 DisplayName = "Wollust"
 Number = 2
+ContentVersion = 2
 LevelCount = 3
 FirstAreaLevel = 5
-Rooms = Array[PackedScene]([ExtResource("10_start"), ExtResource("11_exit"), ExtResource("12_chamber"), ExtResource("13_hall"), ExtResource("14_gallery"), ExtResource("15_shrine"), ExtResource("16_boss")])
+Fields = Array[ExtResource("8_field")]([ExtResource("10_coast"), ExtResource("11_plain"), ExtResource("12_judgement")])
 Enemies = Array[ExtResource("2_entry")]([SubResource("Pool_blue"), SubResource("Pool_yellow"), SubResource("Pool_caster"), SubResource("Pool_skeleton")])
 Marks = Array[ExtResource("3_mark")]([SubResource("Mark_smear"), SubResource("Mark_stain"), SubResource("Mark_hand"), SubResource("Mark_splatter"), SubResource("Mark_pentagram"), SubResource("Mark_pool")])
 FloorTexture = ExtResource("20_floor")

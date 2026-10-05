@@ -21,18 +21,28 @@ public partial class LevelNavigation : NavigationRegion3D
     [Export]
     public float AgentHeight { get; set; } = 2f;
 
+    private ulong bakeStartMsec;
+
     public bool IsBaked { get; private set; }
+
+    //Wie lange das letzte Backen im Hintergrund gedauert hat
+    public ulong LastBakeMsec { get; private set; }
 
     public override void _Ready()
     {
-        BakeFinished += () => IsBaked = true;
+        BakeFinished += () =>
+        {
+            IsBaked      = true;
+            LastBakeMsec = Time.GetTicksMsec() - bakeStartMsec;
+        };
 
         Rebuild();
     }
 
     public void Rebuild()
     {
-        IsBaked = false;
+        IsBaked       = false;
+        bakeStartMsec = Time.GetTicksMsec();
 
         (SourceRoot ?? GetParent<Node3D>()).AddToGroup(SourceGroup);
 

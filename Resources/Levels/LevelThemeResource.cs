@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Godot.Collections;
 
@@ -26,12 +27,18 @@ public partial class LevelThemeResource : Resource
     [Export(PropertyHint.Range, "1,1000,1")]
     public int ContentVersion { get; set; } = 1;
 
+    //Ein Kreis mit Flächen hat so viele Tiefen wie Flächen, dieser Wert gilt dann nicht
     [Export(PropertyHint.Range, "1,20,1")]
     public int LevelCount { get; set; } = 4;
 
     //Bereichslevel der ersten Ebene, jede weitere liegt eins höher
     [Export]
     public int FirstAreaLevel { get; set; } = 1;
+
+    //Hat ein Kreis Flächen, besteht er aus ihnen, hintereinander. Ohne Flächen besteht er aus Ebenen, gebaut aus Rooms
+    [ExportGroup("Flächen")]
+    [Export]
+    public Array<FieldResource> Fields { get; set; } = new();
 
     [ExportGroup("Inhalt")]
     [Export]
@@ -79,4 +86,16 @@ public partial class LevelThemeResource : Resource
 
     [Export]
     public float MoonlightEnergy { get; set; } = 0.12f;
+
+    public bool HasFields => Fields.Count > 0;
+
+    public int DepthCount => HasFields ? Fields.Count : Math.Max(1, LevelCount);
+
+    //Die Fläche in dieser Tiefe, gezählt ab 1
+    public FieldResource GetField(int depth)
+        => HasFields ? Fields[Math.Clamp(depth, 1, Fields.Count) - 1] : null;
+
+    //Wie die Tiefe auf dem Ladebildschirm und am Portal heißt
+    public string NameDepth(int depth)
+        => GetField(depth) is { } field && !string.IsNullOrWhiteSpace(field.DisplayName) ? field.DisplayName : $"Level {depth}";
 }

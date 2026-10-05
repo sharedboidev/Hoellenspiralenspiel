@@ -70,7 +70,7 @@ public class DescentStateTests
 
         descent.Remember(1, CreateExplored());
 
-        Assert.That(descent.RevealedByDepth, Is.Empty);
+        Assert.That(descent.RevealedByLocation, Is.Empty);
     }
 
     [Test]
@@ -139,7 +139,7 @@ public class DescentStateTests
 
         Assert.That(descent.RememberKill(1, -1), Is.False);
         Assert.That(descent.RememberKill(0, 3), Is.False);
-        Assert.That(descent.DepthsWithKills, Is.Empty);
+        Assert.That(descent.LocationsWithKills, Is.Empty);
     }
 
     [Test]
@@ -197,5 +197,65 @@ public class DescentStateTests
         Assert.That(descent.Depth, Is.EqualTo(0));
         Assert.That(descent.DeepestDepth, Is.EqualTo(3));
         Assert.That(descent.IsKilled(2, 4), Is.False);
+    }
+
+    [Test]
+    public void KarteUndTote_HaengenAmOrt_EinDungeonIstEinEigenerOrt()
+    {
+        var descent = new DescentState();
+        var field   = LocationKey.Of(2);
+        var dungeon = field.InDungeon(0, 1);
+        var map     = CreateExplored(new Cell(3, 3));
+
+        descent.Begin(1);
+        descent.Remember(dungeon, map);
+        descent.RememberKill(dungeon, 5);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(descent.GetRevealed(dungeon), Is.EqualTo(map.Encode()));
+            Assert.That(descent.GetRevealed(field), Is.Null);
+            Assert.That(descent.IsKilled(dungeon, 5), Is.True);
+            Assert.That(descent.IsKilled(field, 5), Is.False);
+            Assert.That(descent.LocationsWithKills, Is.EqualTo(new[] { dungeon }));
+        });
+    }
+
+    [Test]
+    public void TiefeNUndFlaecheNSindDerselbeOrt()
+    {
+        var descent = new DescentState();
+
+        descent.Begin(1);
+        descent.RememberKill(2, 4);
+        descent.Remember(LocationKey.Of(3), CreateExplored(new Cell(1, 2)));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(descent.IsKilled(LocationKey.Of(2), 4), Is.True);
+            Assert.That(descent.GetKilled(LocationKey.Of(2)), Is.EqualTo(new[] { 4 }));
+            Assert.That(descent.GetRevealed(3), Is.Not.Null);
+        });
+    }
+
+    //Die Ebenen der alten Kreise behalten so ihre Seeds aus den Spielständen vor Version 6
+    [Test]
+    public void EineFlaecheNimmtDenSeedIhrerTiefe_EinDungeonEinenEigenen()
+    {
+        var descent = new DescentState();
+
+        descent.Begin(4711);
+
+        var field    = descent.GetSeedOf(LocationKey.Of(2));
+        var first    = descent.GetSeedOf(LocationKey.Of(2).InDungeon(0, 1));
+        var second   = descent.GetSeedOf(LocationKey.Of(2).InDungeon(0, 2));
+        var neighbor = descent.GetSeedOf(LocationKey.Of(2).InDungeon(1, 1));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(field, Is.EqualTo(descent.GetSeedOf(2)));
+            Assert.That(new[] { field, first, second, neighbor }.Distinct().Count(), Is.EqualTo(4));
+            Assert.That(descent.GetSeedOf(LocationKey.Of(2).InDungeon(0, 1)), Is.EqualTo(first));
+        });
     }
 }

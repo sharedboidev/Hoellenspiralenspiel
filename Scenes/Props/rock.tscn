@@ -1,0 +1,46 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="1_ps1"]
+[ext_resource type="Texture2D" path="res://Textures/World/floor_stone.png" id="2_stone"]
+
+[sub_resource type="BoxShape3D" id="Shape_rock"]
+size = Vector3(3.2, 1.8, 3.2)
+
+[sub_resource type="ShaderMaterial" id="Mat_rock"]
+shader = ExtResource("1_ps1")
+shader_parameter/albedo = Color(0.62, 0.6, 0.58, 1)
+shader_parameter/albedo_texture = ExtResource("2_stone")
+shader_parameter/world_uv_scale = 0.35
+
+[sub_resource type="BoxMesh" id="Mesh_main"]
+size = Vector3(2.9, 1.2, 2.5)
+
+[sub_resource type="BoxMesh" id="Mesh_top"]
+size = Vector3(1.8, 1.0, 1.6)
+
+[sub_resource type="BoxMesh" id="Mesh_side"]
+size = Vector3(1.2, 0.8, 1.3)
+
+[node name="Rock" type="StaticBody3D"]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("Shape_rock")
+debug_fill = false
+
+[node name="Main" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.97, 0, 0.24, 0, 1, 0, -0.24, 0, 0.97, 0, 0.6, 0)
+mesh = SubResource("Mesh_main")
+surface_material_override/0 = SubResource("Mat_rock")
+
+[node name="Top" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.87, 0.1, -0.48, -0.06, 0.99, 0.1, 0.49, -0.07, 0.87, 0.25, 1.45, -0.15)
+mesh = SubResource("Mesh_top")
+surface_material_override/0 = SubResource("Mat_rock")
+
+[node name="Side" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.94, 0, -0.34, 0, 1, 0, 0.34, 0, 0.94, -1.05, 0.4, 0.95)
+mesh = SubResource("Mesh_side")
+surface_material_override/0 = SubResource("Mat_rock")

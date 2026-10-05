@@ -1,0 +1,110 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Environment/FieldExit.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_object.gdshader" id="2_ps1"]
+[ext_resource type="Texture2D" path="res://Textures/World/wall_brick.png" id="3_brick"]
+
+[sub_resource type="BoxShape3D" id="Shape_pick"]
+size = Vector3(2.6, 1.6, 3.2)
+
+[sub_resource type="BoxShape3D" id="Shape_post"]
+size = Vector3(0.45, 1.6, 0.45)
+
+[sub_resource type="BoxMesh" id="Mesh_post"]
+size = Vector3(0.45, 1.6, 0.45)
+
+[sub_resource type="BoxMesh" id="Mesh_slab"]
+size = Vector3(1.4, 0.08, 0.9)
+
+[sub_resource type="ShaderMaterial" id="Mat_stone"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0.78, 0.76, 0.72, 1)
+shader_parameter/albedo_texture = ExtResource("3_brick")
+shader_parameter/world_uv_scale = 0.25
+
+[sub_resource type="BoxMesh" id="Mesh_lamp"]
+size = Vector3(0.22, 0.22, 0.22)
+
+[sub_resource type="ShaderMaterial" id="Mat_glow"]
+shader = ExtResource("2_ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/emission = Color(1, 0.85, 0.5, 1)
+shader_parameter/emission_energy = 4.0
+
+[node name="FieldExit" type="Area3D" node_paths=PackedStringArray("Glow")]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_script")
+Glow = NodePath("Glow")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, -0.2)
+shape = SubResource("Shape_pick")
+
+[node name="Slab1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.04, 1.1)
+cast_shadow = 0
+mesh = SubResource("Mesh_slab")
+surface_material_override/0 = SubResource("Mat_stone")
+
+[node name="Slab2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.96, 0, 0.28, 0, 1, 0, -0.28, 0, 0.96, -0.15, 0.04, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_slab")
+surface_material_override/0 = SubResource("Mat_stone")
+
+[node name="Slab3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 0.04, -1.1)
+cast_shadow = 0
+mesh = SubResource("Mesh_slab")
+surface_material_override/0 = SubResource("Mat_stone")
+
+[node name="PostLeft" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.15, 0.8, -1.4)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PostLeft"]
+shape = SubResource("Shape_post")
+debug_fill = false
+
+[node name="Mesh" type="MeshInstance3D" parent="PostLeft"]
+mesh = SubResource("Mesh_post")
+surface_material_override/0 = SubResource("Mat_stone")
+
+[node name="PostRight" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.15, 0.8, -1.4)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PostRight"]
+shape = SubResource("Shape_post")
+debug_fill = false
+
+[node name="Mesh" type="MeshInstance3D" parent="PostRight"]
+mesh = SubResource("Mesh_post")
+surface_material_override/0 = SubResource("Mat_stone")
+
+[node name="Glow" type="Node3D" parent="."]
+
+[node name="LampLeft" type="MeshInstance3D" parent="Glow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.15, 1.72, -1.4)
+cast_shadow = 0
+mesh = SubResource("Mesh_lamp")
+surface_material_override/0 = SubResource("Mat_glow")
+
+[node name="LampRight" type="MeshInstance3D" parent="Glow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.15, 1.72, -1.4)
+cast_shadow = 0
+mesh = SubResource("Mesh_lamp")
+surface_material_override/0 = SubResource("Mat_glow")
+
+[node name="Light" type="OmniLight3D" parent="Glow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, -0.6)
+light_color = Color(1, 0.85, 0.55, 1)
+light_energy = 3.0
+omni_range = 5.0
+
+[node name="Arrival" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.4)

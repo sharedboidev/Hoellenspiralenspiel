@@ -3,7 +3,8 @@ using Hoellenspiralenspiel.Scripts.Core.Levels;
 
 namespace Hoellenspiralenspiel.Scripts.World.Levels;
 
-//Rechnet zwischen den Zellen des Grundrisses und der Welt um. Die Mitte des Startraums liegt im Ursprung der Welt
+//Rechnet zwischen den Zellen des Grundrisses und der Welt um. In einer Ebene liegt die Mitte des Startraums im Ursprung der Welt,
+//auf einer Fläche die Mitte der Fläche
 public sealed class LevelGrid
 {
     //Raumvorlagen sind für dieses Maß gebaut. Eine Zelle ist zugleich die Breite eines Gangs
@@ -12,11 +13,16 @@ public sealed class LevelGrid
     private readonly Vector3 origin;
 
     public LevelGrid(LevelLayout layout)
-    {
-        var start = layout.Rooms[layout.StartRoom].Rect;
+        : this(CenterOn(layout.Rooms[layout.StartRoom].Rect)) { }
 
-        origin = new Vector3(-(start.X + start.Width / 2f) * CellMeters, 0f, -(start.Y + start.Height / 2f) * CellMeters);
-    }
+    private LevelGrid(Vector3 origin)
+        => this.origin = origin;
+
+    public static LevelGrid CenteredOn(CellRect rect)
+        => new(CenterOn(rect));
+
+    private static Vector3 CenterOn(CellRect rect)
+        => new(-(rect.X + rect.Width / 2f) * CellMeters, 0f, -(rect.Y + rect.Height / 2f) * CellMeters);
 
     public Vector3 GetCorner(int x, int y)
         => origin + new Vector3(x * CellMeters, 0f, y * CellMeters);

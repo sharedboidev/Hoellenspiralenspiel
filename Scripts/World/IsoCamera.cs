@@ -5,6 +5,8 @@ namespace Hoellenspiralenspiel.Scripts.World;
 public partial class IsoCamera : Camera3D
 {
     private float             baseDistance;
+    private float             defaultFogBegin;
+    private float             defaultFogEnd;
     private float             fogBegin;
     private float             fogEnd;
     private Godot.Environment fogEnvironment;
@@ -55,11 +57,24 @@ public partial class IsoCamera : Camera3D
         ApplyProjection();
 
         //Der Nebel zählt ab der Kamera. Er rückt beim Zoomen mit, damit er gleich weit hinter dem Helden bleibt
-        fogEnvironment = GetWorld3D()?.Environment;
-        baseDistance   = TargetDistance;
-        fogBegin       = fogEnvironment?.FogDepthBegin ?? 0f;
-        fogEnd         = fogEnvironment?.FogDepthEnd ?? 0f;
+        fogEnvironment  = GetWorld3D()?.Environment;
+        baseDistance    = TargetDistance;
+        defaultFogBegin = fogBegin = fogEnvironment?.FogDepthBegin ?? 0f;
+        defaultFogEnd   = fogEnd   = fogEnvironment?.FogDepthEnd ?? 0f;
     }
+
+    //Eine Fläche bringt ihre eigene Tiefe des Nebels mit, gemessen ab der Kamera beim Abstand zum Start
+    public void SetFogDepth(float begin, float end)
+    {
+        fogBegin = begin;
+        fogEnd   = Mathf.Max(begin, end);
+
+        ShiftFog();
+    }
+
+    //Hub und Ebenen nehmen den Nebel aus dem WorldEnvironment des Spiels
+    public void ResetFogDepth()
+        => SetFogDepth(defaultFogBegin, defaultFogEnd);
 
     public override void _Process(double delta)
         => Follow();

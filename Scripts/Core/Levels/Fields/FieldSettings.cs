@@ -1,3 +1,5 @@
+using System;
+
 namespace Hoellenspiralenspiel.Scripts.Core.Levels.Fields;
 
 //Eine freie Fläche in Zellen von 4 m. Der Saum am Rand ist Abgrund, alles darin Boden, Vorlagen und Hindernisse
@@ -29,4 +31,12 @@ public sealed record FieldSettings
     public string EventRoomId { get; init; } = string.Empty;
 
     public int MaxAttempts { get; init; } = 20;
+
+    //Die Fläche in dieser Tiefe eines Kreises: Jede liegt ein Bereichslevel höher als die davor, die letzte bekommt die Arena
+    public FieldSettings ForDepth(int firstAreaLevel, int depth, int fieldCount)
+        => this with
+        {
+            AreaLevel = firstAreaLevel + depth - 1,
+            IsLastField = depth >= Math.Max(1, fieldCount)
+        };
 }

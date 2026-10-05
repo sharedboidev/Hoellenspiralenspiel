@@ -20,15 +20,20 @@ public sealed class BuiltLevel
 
     public int Depth { get; init; }
 
+    //An diesem Ort hängen Karte und Gefallene im Abstieg
+    public LocationKey Location { get; init; }
+
     public Vector3 HeroStart { get; set; }
 
     public List<SpawnMarker> RoomMarkers { get; } = new();
 
+    //Gruppen außerhalb der Räume: in den Gängen einer Ebene, auf dem freien Boden einer Fläche
     public List<SpawnMarker> CorridorMarkers { get; } = new();
 
-    public List<CellarDoor> Exits { get; } = new();
+    //Kellertüren und Treppen einer Ebene, Ausgang und Eingang einer Fläche
+    public List<Passage> Exits { get; } = new();
 
-    public List<StairsUp> Entrances { get; } = new();
+    public List<Passage> Entrances { get; } = new();
 
     //Die Mauerstücke in der Reihenfolge ihrer Läufe, daran hängen die Spuren
     public List<(WallRun Run, WallSegment Wall)> Walls { get; } = new();
@@ -63,10 +68,11 @@ public static class LevelBuilder
 
         var level = new BuiltLevel
         {
-            Root   = new Node3D { Name = $"Level{layout.Seed}" },
-            Layout = layout,
-            Grid   = new LevelGrid(layout),
-            Depth  = depth
+            Root     = new Node3D { Name = $"Level{layout.Seed}" },
+            Layout   = layout,
+            Grid     = new LevelGrid(layout),
+            Depth    = depth,
+            Location = LocationKey.Of(depth)
         };
 
         parent.AddChild(level.Root);
@@ -74,23 +80,26 @@ public static class LevelBuilder
         LayFloors(level, theme);
         RaiseWalls(level, theme);
         FurnishRooms(level, rooms, theme);
-        MarkCorridorPacks(level);
+        MarkPacks(level, level.Layout.CorridorPacks, "CorridorPacks", LevelGrid.CellMeters / 2f);
         LevelMarks.Place(level, theme);
 
         return level;
     }
 
     private static void LayFloors(BuiltLevel level, LevelThemeResource theme)
+        => LayFloors(level, level.Layout.Rooms.Select(room => room.Rect).Concat(level.Layout.GetCorridorRects()), theme.FloorTexture, "Floors");
+
+    internal static void LayFloors(BuiltLevel level, IEnumerable<CellRect> rects, Texture2D texture, string containerName)
     {
-        var floors   = new Node3D { Name = "Floors" };
+        var floors   = new Node3D { Name = containerName };
         var material = new ShaderMaterial { Shader = GD.Load<Shader>(SurfaceShader) };
 
-        material.SetShaderParameter(AlbedoTexture, theme.FloorTexture);
+        material.SetShaderParameter(AlbedoTexture, texture);
         material.SetShaderParameter(WorldUvScale, TilesPerMeter);
 
         level.Root.AddChild(floors);
 
-        foreach (var rect in level.Layout.Rooms.Select(room => room.Rect).Concat(level.Layout.GetCorridorRects()))
+        foreach (var rect in rects)
             floors.AddChild(CreateFloor(level.Grid, rect, material));
     }
 
@@ -134,8 +143,8 @@ public static class LevelBuilder
     private static int GetCuts(float meters)
         => Math.Max(0, Mathf.CeilToInt(meters / MetersPerTile) - 1);
 
-    //Jedes Stück ragt an beiden Enden um die halbe Dicke über, so schließen sich die Ecken
-    private static void RaiseWalls(BuiltLevel level, LevelThemeResource theme)
+    //Jedes Stück ragt an beiden Enden um die halbe Dicke über, so schließen sich die Ecken. Ohne Filter steht jede Mauer des Grundrisses
+    internal static void RaiseWalls(BuiltLevel level, LevelThemeResource theme, Func<WallRun, bool> include = null)
     {
         var walls = new Node3D { Name = "Walls" };
 
@@ -143,6 +152,9 @@ public static class LevelBuilder
 
         foreach (var run in level.Layout.GetWallRuns())
         {
+            if (include?.Invoke(run) == false)
+                continue;
+
             var from   = run.IsAlongX ? level.Grid.GetCorner(run.From, run.Line) : level.Grid.GetCorner(run.Line, run.From);
             var length = run.Length * LevelGrid.CellMeters;
 
@@ -175,7 +187,7 @@ public static class LevelBuilder
         wall.PlinthBrightness = theme.PlinthBrightness;
     }
 
-    private static void FurnishRooms(BuiltLevel level, RoomLibrary rooms, LevelThemeResource theme)
+    internal static void FurnishRooms(BuiltLevel level, RoomLibrary rooms, LevelThemeResource theme)
     {
         var container = new Node3D { Name = "Rooms" };
 
@@ -194,7 +206,9 @@ public static class LevelBuilder
             foreach (var wall in room.GetAllChildren<WallSegment>())
                 Dress(wall, theme);
 
-            room.AddChild(RoomZone.Create(new Vector2(placed.Blueprint.Width, placed.Blueprint.Height) * LevelGrid.CellMeters, theme.WallHeight));
+            //Eine offene Ruine verbirgt nichts, nur geschlossene Vorlagen bekommen eine Zone
+            if (!placed.Blueprint.OpenToField)
+                room.AddChild(RoomZone.Create(new Vector2(placed.Blueprint.Width, placed.Blueprint.Height) * LevelGrid.CellMeters, theme.WallHeight));
 
             container.AddChild(room);
 
@@ -261,19 +275,19 @@ public static class LevelBuilder
         return [fallback];
     }
 
-    private static void MarkCorridorPacks(BuiltLevel level)
+    internal static void MarkPacks(BuiltLevel level, IEnumerable<Cell> cells, string containerName, float scatterMeters)
     {
-        var container = new Node3D { Name = "CorridorPacks" };
+        var container = new Node3D { Name = containerName };
 
         level.Root.AddChild(container);
 
-        foreach (var cell in level.Layout.CorridorPacks)
+        foreach (var cell in cells)
         {
             var marker = new SpawnMarker
             {
                 Name          = $"Pack{cell.X}x{cell.Y}",
                 Position      = level.Grid.GetCenter(cell),
-                ScatterRadius = WorldScale.ToPx(LevelGrid.CellMeters / 2f)
+                ScatterRadius = WorldScale.ToPx(scatterMeters)
             };
 
             container.AddChild(marker);

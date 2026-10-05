@@ -6,6 +6,7 @@ using Godot;
 using Hoellenspiralenspiel.Resources.Levels;
 using Hoellenspiralenspiel.Scripts.Controllers;
 using Hoellenspiralenspiel.Scripts.Core.Levels;
+using Hoellenspiralenspiel.Scripts.Core.Levels.Fields;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Environment;
 using Hoellenspiralenspiel.Scripts.Extensions;
@@ -41,7 +42,7 @@ public readonly record struct Arrival(ArrivalKind Kind, Vector3 Point = default,
         => new(ArrivalKind.CirclePortal, CircleNumber: circleNumber);
 }
 
-//Führt den Helden zwischen dem Hub und den Ebenen der Kreise hin und her. Held, Oberfläche und Steuerung bleiben, nur der Ort wechselt
+//Führt den Helden zwischen dem Hub und den Ebenen oder Flächen der Kreise hin und her. Held, Oberfläche und Steuerung bleiben, nur der Ort wechselt
 public partial class Descent : Node
 {
     private const int   PoolSeedOffset       = 104729;
@@ -51,13 +52,14 @@ public partial class Descent : Node
     private const int   TownPortalDirections = 8;
     private const float SouthDegrees         = 90f;
 
-    private readonly List<LevelThemeResource> circles = new();
-    private          bool                     areCirclesLoaded;
-    private          Cell?                    lastCell;
-    private          float                    lastRevealRadius;
-    private          AudioStreamPlayer        music;
-    private          TownPortal               openPortal;
-    private          SurfaceLook              surfaceLook;
+    private readonly List<LevelThemeResource>     circles    = new();
+    private          IReadOnlyList<EnemyPoolEntry> activePool = [];
+    private          bool                          areCirclesLoaded;
+    private          Cell?                         lastCell;
+    private          float                         lastRevealRadius;
+    private          AudioStreamPlayer             music;
+    private          TownPortal                    openPortal;
+    private          SurfaceLook                   surfaceLook;
 
     [Export]
     public Hero Hero { get; set; }
@@ -125,6 +127,20 @@ public partial class Descent : Node
 
     [Export]
     public int CellsPerCorridorPack { get; set; } = 14;
+
+    [ExportGroup("Flächen")]
+    [Export]
+    public int FieldWidth { get; set; } = 32;
+
+    [Export]
+    public int FieldHeight { get; set; } = 24;
+
+    [Export(PropertyHint.Range, "0,0.3,0.01")]
+    public float ObstacleShare { get; set; } = 0.08f;
+
+    //Auf so viele Zellen freien Boden kommt eine Gruppe Gegner
+    [Export]
+    public int CellsPerFieldPack { get; set; } = 40;
 
     public JourneyState Journey { get; } = new();
 
@@ -259,7 +275,9 @@ public partial class Descent : Node
         if (circle is null || IsTravelling)
             return;
 
-        Travel(circle.DisplayName, $"Level {ClampDepth(circle, depth)} of {circle.LevelCount}", () => BuildLevel(circle, depth, arrival));
+        var shown = ClampDepth(circle, depth);
+
+        Travel(circle.DisplayName, circle.HasFields ? circle.NameDepth(shown) : $"Level {shown} of {circle.DepthCount}", () => BuildLevel(circle, depth, arrival));
     }
 
     //Würfelt die Ebenen des Kreises neu. Die Checkpoints bleiben
@@ -276,8 +294,8 @@ public partial class Descent : Node
     //Eine Ebene aus einem früheren Abstieg gehört nicht mehr dazu, ihre Karte verfällt
     public void RememberExploration()
     {
-        if (Level is not null && State is not null && Level.Layout.Seed == State.GetSeedOf(Level.Depth))
-            State.Remember(Level.Depth, Exploration);
+        if (Level is not null && State is not null && Level.Layout.Seed == State.GetSeedOf(Level.Location))
+            State.Remember(Level.Location, Exploration);
     }
 
     public bool TryOpenTownPortal()
@@ -376,6 +394,7 @@ public partial class Descent : Node
             StandUpTownPortal(place.TownPortalSpot, true);
 
         surfaceLook.ApplyTo(Surroundings, Moonlight);
+        FindCamera()?.ResetFogDepth();
         StopMusic();
 
         Enemies.AreaLevel = place.AreaLevel;
@@ -459,13 +478,13 @@ public partial class Descent : Node
 
         state.AdoptContentVersion(circle.ContentVersion);
 
-        var depth    = ClampDepth(circle, wantedDepth);
-        var rooms    = new RoomLibrary(circle.Rooms);
-        var seed     = state.GetSeedOf(depth);
-        var settings = GetSettings(circle, depth);
-        var layout   = TryGenerate(rooms, settings, seed);
+        var depth     = ClampDepth(circle, wantedDepth);
+        var seed      = state.GetSeedOf(depth);
+        var areaLevel = circle.FirstAreaLevel + depth - 1;
+        var field     = circle.GetField(depth);
+        var build     = field is null ? PrepareLevel(circle, depth, seed) : PrepareField(circle, field, depth, seed);
 
-        if (layout is null)
+        if (build is null)
         {
             Arrive();
 
@@ -481,20 +500,24 @@ public partial class Descent : Node
         state.GoTo(depth);
         GameRandom.Reseed(seed);
 
-        Level       = LevelBuilder.Build(layout, rooms, circle, LevelRoot, depth);
-        Exploration = new ExplorationMap(layout.Width, layout.Height);
+        Level       = build(LevelRoot);
+        Exploration = new ExplorationMap(Level.Layout.Width, Level.Layout.Height);
         lastCell    = null;
+        activePool  = field is { Enemies.Count: > 0 } ? field.Enemies : circle.Enemies;
 
-        Exploration.TryRestore(state.GetRevealed(depth));
+        Exploration.TryRestore(state.GetRevealed(Level.Location));
 
-        ConnectStairs(Level, circle, depth);
+        ConnectPassages(Level, circle, depth);
 
         if (Journey.TownPortal is { } spot && spot.CircleId == circle.Id && spot.Depth == depth)
             StandUpTownPortal(new Vector3(spot.X, 0f, spot.Z), true);
 
-        ApplyLook(circle);
+        if (field is null)
+            ApplyLook(circle);
+        else
+            ApplyLook(field, circle);
 
-        Enemies.AreaLevel = settings.AreaLevel;
+        Enemies.AreaLevel = areaLevel;
 
         Hero.MoveToLevelStart(Level.HeroStart);
         Navigation?.Rebuild();
@@ -502,20 +525,37 @@ public partial class Descent : Node
         LevelEntered?.Invoke();
 
         if (isNewlyReached)
-            LevelReached?.Invoke(settings.AreaLevel);
+            LevelReached?.Invoke(areaLevel);
 
         Populate(Level, arrival);
     }
 
-    private static int ClampDepth(LevelThemeResource circle, int depth)
-        => Math.Clamp(depth, 1, Math.Max(1, circle.LevelCount));
+    //Der Grundriss entsteht vorab. Scheitert er, bleibt der Held, wo er ist. Gebaut wird erst, wenn der alte Ort abgebaut ist
+    private Func<Node3D, BuiltLevel> PrepareLevel(LevelThemeResource circle, int depth, int seed)
+    {
+        var rooms  = new RoomLibrary(circle.Rooms);
+        var layout = TryGenerate(rooms, GetSettings(circle, depth), seed);
 
-    //Die letzte Ebene hat keinen Weg hinab
-    private void ConnectStairs(BuiltLevel level, LevelThemeResource circle, int depth)
+        return layout is null ? null : root => LevelBuilder.Build(layout, rooms, circle, root, depth);
+    }
+
+    private Func<Node3D, BuiltLevel> PrepareField(LevelThemeResource circle, FieldResource field, int depth, int seed)
+    {
+        var rooms  = FieldBuilder.CollectTemplates(field);
+        var layout = TryGenerateField(rooms, GetFieldSettings(circle, depth), seed);
+
+        return layout is null ? null : root => FieldBuilder.Build(layout, rooms, field, circle, root, depth);
+    }
+
+    private static int ClampDepth(LevelThemeResource circle, int depth)
+        => Math.Clamp(depth, 1, circle.DepthCount);
+
+    //Die letzte Ebene oder Fläche hat keinen Weg weiter
+    private void ConnectPassages(BuiltLevel level, LevelThemeResource circle, int depth)
     {
         foreach (var exit in level.Exits.ToList())
         {
-            if (depth < circle.LevelCount)
+            if (depth < circle.DepthCount)
             {
                 exit.Used += _ => EnterCircle(circle, depth + 1);
 
@@ -580,6 +620,20 @@ public partial class Descent : Node
         }
     }
 
+    private static FieldLayout TryGenerateField(RoomLibrary rooms, FieldSettings settings, int seed)
+    {
+        try
+        {
+            return FieldGenerator.Generate(rooms.Blueprints, settings, seed);
+        }
+        catch (Exception exception) when (exception is LevelGenerationException or ArgumentOutOfRangeException)
+        {
+            GD.PushError($"Die Fläche mit dem Seed {seed} lässt sich nicht erzeugen: {exception.Message}");
+
+            return null;
+        }
+    }
+
     private LevelSettings GetSettings(LevelThemeResource circle, int depth)
         => new()
         {
@@ -589,8 +643,17 @@ public partial class Descent : Node
             LoopShare            = LoopShare,
             CellsPerCorridorPack = CellsPerCorridorPack,
             AreaLevel            = circle.FirstAreaLevel + depth - 1,
-            IsLastLevel          = depth >= Math.Max(1, circle.LevelCount)
+            IsLastLevel          = depth >= circle.DepthCount
         };
+
+    private FieldSettings GetFieldSettings(LevelThemeResource circle, int depth)
+        => new FieldSettings
+        {
+            Width             = FieldWidth,
+            Height            = FieldHeight,
+            ObstacleShare     = ObstacleShare,
+            CellsPerFieldPack = CellsPerFieldPack
+        }.ForDepth(circle.FirstAreaLevel, depth, circle.DepthCount);
 
     //Erst nach einem Schritt der Physik stehen die Mauern so, dass die Suche nach freien Plätzen sie sieht.
     //Der Held steht beim Spawnen immer am Start, sonst stünden dieselben Gegner bei jeder Ankunft woanders
@@ -619,9 +682,9 @@ public partial class Descent : Node
         Enemies.SpawnFrom(level.RoomMarkers.Concat(level.CorridorMarkers).Where(marker => marker.Enemy is not null));
 
         var boss       = Enemies.Enemies.FirstOrDefault(enemy => enemy.Definition?.IsBoss == true);
-        var bossKilled = boss is not null && State.IsKilled(level.Depth, boss.SpawnIndex);
+        var bossKilled = boss is not null && State.IsKilled(level.Location, boss.SpawnIndex);
 
-        foreach (var enemy in Enemies.Enemies.Where(enemy => State.IsKilled(level.Depth, enemy.SpawnIndex)).ToList())
+        foreach (var enemy in Enemies.Enemies.Where(enemy => State.IsKilled(level.Location, enemy.SpawnIndex)).ToList())
             Enemies.Remove(enemy);
 
         //Ein gefallener Boss bleibt gefallen, sein Portal steht dann von Anfang an
@@ -699,7 +762,7 @@ public partial class Descent : Node
 
     private EnemyPoolEntry PickFromPool(IRandomSource random)
     {
-        var allowed = Circle.Enemies.Where(entry => entry?.Enemy is not null && entry.MinAreaLevel <= Enemies.AreaLevel).ToList();
+        var allowed = activePool.Where(entry => entry?.Enemy is not null && entry.MinAreaLevel <= Enemies.AreaLevel).ToList();
         var total   = allowed.Sum(entry => Math.Max(0f, entry.Weight));
         var roll    = random.NextFloat() * total;
 
@@ -716,14 +779,14 @@ public partial class Descent : Node
 
     private void OnEnemyKilled(Enemy enemy)
     {
-        if (Level is not null && State.RememberKill(Level.Depth, enemy.SpawnIndex))
+        if (Level is not null && State.RememberKill(Level.Location, enemy.SpawnIndex))
             Changed?.Invoke();
 
         if (Level is null || Circle is null || enemy.Definition?.IsBoss != true)
             return;
 
         //Der Boss eines Testkreises öffnet nur sein Portal zurück in den Hub
-        var next = Circle.IsTestCircle ? 0 : CircleUnlockRule.NextCircle(Circle.Number, Level.Depth, Circle.LevelCount);
+        var next = Circle.IsTestCircle ? 0 : CircleUnlockRule.NextCircle(Circle.Number, Level.Depth, Circle.DepthCount);
 
         if (next > 0 && !Journey.IsUnlocked(next))
         {
@@ -835,8 +898,23 @@ public partial class Descent : Node
     {
         new SurfaceLook(theme.AmbientColor, theme.AmbientEnergy, theme.FogColor, theme.MoonlightColor, theme.MoonlightEnergy).ApplyTo(Surroundings, Moonlight);
 
+        FindCamera()?.ResetFogDepth();
+
         PlayMusic(theme.Music);
     }
+
+    //Eine Fläche bringt Licht und Nebel mit. Ohne eigene Musik spielt die des Kreises
+    private void ApplyLook(FieldResource field, LevelThemeResource circle)
+    {
+        new SurfaceLook(field.AmbientColor, field.AmbientEnergy, field.FogColor, field.MoonlightColor, field.MoonlightEnergy).ApplyTo(Surroundings, Moonlight);
+
+        FindCamera()?.SetFogDepth(field.FogDepthBegin, field.FogDepthEnd);
+
+        PlayMusic(field.Music ?? circle.Music);
+    }
+
+    private IsoCamera FindCamera()
+        => IsInsideTree() ? GetViewport().GetCamera3D() as IsoCamera : null;
 
     private void PlayMusic(AudioStream stream)
     {

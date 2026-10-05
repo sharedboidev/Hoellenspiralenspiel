@@ -70,7 +70,13 @@ public partial class GameScene : Node3D
     private string DescribePlace()
     {
         if (Descent?.Level is not null)
-            return $"{Descent.Circle.DisplayName} · Ebene {Descent.State.Depth} von {Descent.Circle.LevelCount} · Seed des Abstiegs {Descent.State.Seed} · Bereichslevel {Enemies?.AreaLevel}";
+        {
+            var circle = Descent.Circle;
+            var depth  = Descent.State.Depth;
+            var where  = circle.HasFields ? $"Fläche {depth} von {circle.DepthCount}, {circle.NameDepth(depth)}" : $"Ebene {depth} von {circle.DepthCount}";
+
+            return $"{circle.DisplayName} · {where} · Seed des Abstiegs {Descent.State.Seed} · Bereichslevel {Enemies?.AreaLevel}";
+        }
 
         return Descent?.Place?.DisplayName ?? string.Empty;
     }
