@@ -39,6 +39,11 @@ public interface IHero
 
     float ManaMaximum { get; }
 
+    //Was ein Leech noch heilt
+    float LifePending { get; }
+
+    float ManaPending { get; }
+
     int Level { get; }
 
     long XpTotal { get; }

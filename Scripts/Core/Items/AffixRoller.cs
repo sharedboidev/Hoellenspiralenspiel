@@ -80,12 +80,21 @@ public sealed class AffixRoller
             cumulativeWeight += tier.Weight;
 
             if (luckyNumber < cumulativeWeight)
-                return new ItemAffix(type, affix.Stat, affix.Modification, RollValue(affix, tier, random), tier.NameAddition, affix.IsLocal);
+                return CreateAffix(type, affix, tier, random);
         }
 
         var (lastAffix, lastTier) = candidates[^1];
 
-        return new ItemAffix(type, lastAffix.Stat, lastAffix.Modification, RollValue(lastAffix, lastTier, random), lastTier.NameAddition, lastAffix.IsLocal);
+        return CreateAffix(type, lastAffix, lastTier, random);
+    }
+
+    //Nur eine Spanne "Adds X to Y" würfelt ein zweites Mal, für das Y
+    private static ItemAffix CreateAffix(AffixType type, AffixDefinition affix, AffixTierDefinition tier, IRandomSource random)
+    {
+        var value   = RollValue(affix, tier.MinValue, tier.MaxValue, random);
+        var valueTo = tier.HasRange ? RollValue(affix, tier.MinValueTo, tier.MaxValueTo, random) : 0f;
+
+        return new ItemAffix(type, affix.Stat, affix.Modification, value, tier.NameAddition, affix.IsLocal, valueTo);
     }
 
     private List<(AffixDefinition Affix, AffixTierDefinition Tier)> FindCandidates(AffixType type, ItemInstance item)
@@ -94,7 +103,7 @@ public sealed class AffixRoller
 
         foreach (var affix in affixes)
         {
-            if (affix.Type != type || !affix.CanAppearOn(item.Definition.Slot) || item.HasAffixLike(type, affix.Stat, affix.Modification))
+            if (affix.Type != type || !affix.CanAppearOn(item.Definition) || item.HasAffixLike(type, affix.Stat, affix.Modification))
                 continue;
 
             foreach (var tier in affix.Tiers)
@@ -107,10 +116,10 @@ public sealed class AffixRoller
         return candidates;
     }
 
-    private static float RollValue(AffixDefinition affix, AffixTierDefinition tier, IRandomSource random)
+    private static float RollValue(AffixDefinition affix, float minValue, float maxValue, IRandomSource random)
     {
-        var low  = Math.Min(tier.MinValue, tier.MaxValue);
-        var high = Math.Max(tier.MinValue, tier.MaxValue);
+        var low  = Math.Min(minValue, maxValue);
+        var high = Math.Max(minValue, maxValue);
 
         var value = affix.AllowsFractions
                 ? random.NextRange(low, high)

@@ -56,7 +56,7 @@ Die Befunde stammen aus Code-Lektüre. Die als behoben markierten Fehler, F19, d
 | Modifier-System | Flat, Percentage (increased) und More, sauber getrennt | Trägt das ganze Stat-Konzept |
 | Waffen | Schadensspanne, Angriffe pro Sekunde, Swingtimer, Typ, Schadensart, Krit, Anforderungen | Seit M2 bestimmen die Werte den Nahkampf, seit M3 gibt es Fernkampfwaffen mit Projektil. Seit M4 sind Waffen Resources und bringen Parry oder Block mit. Klassen-Anforderung fehlt. |
 | Rüstung | Helm, Torso, Handschuhe und Schild mit Rüstungswert | 4 von 16 Slots haben Item-Basen |
-| Affixe | 17 Affixe mit Tiers, Gewichten, Itemlevel-Grenze, Prefix/Suffix, lokale und globale Mods | Slot-Tabelle aus dem PDF nur teilweise abgedeckt |
+| Affixe | 35 Affixe mit Tiers, Gewichten, Itemlevel-Grenze, Prefix/Suffix, lokale und globale Mods, seit dem 05.10.2026 18 davon nur für Schwerter, nach den Einhandschwertern aus Path of Exile | Slot-Tabelle aus dem PDF nur teilweise abgedeckt |
 | Loot | Gewichtete Loot-Tabellen, Lootbags, Magic/Rare-Namen. Seit dem Nachtrag zu M5.5 liegt Beute in einem Gitter und trägt Schilder mit dem Namen des Items. Seit Etappe 3 von M7 lassen Gegner auch Gold fallen. | Seit M4 würfelt der Kern mit der gemeinsamen Zufallsquelle. Seit M5 bestimmt das Monsterlevel das Itemlevel. |
 | Inventar | Tetris-Inventar, Drag-and-drop, Tauschen, Stapeln, Tooltips | Nicht im PDF. Seit M4 ein Modell im Kern, die Oberfläche zeigt nur an. Seit M5.5 hängt sie an der Schnittstelle `IHero` und läuft auch in 3D. Seit Etappe 3 von M7 kennt das Modell eine Truhe, und eine Gitteransicht zeigt Inventar, Truhe und Händler. |
 | Ausrüstung | 16 Slots inklusive 4 Ringe, Anforderungsprüfung | Entspricht dem PDF. Seit M4 sperrt eine Zweihandwaffe den Schildplatz. Seit M5.5 ist sie in 3D am Helden zu sehen. |
@@ -2943,6 +2943,109 @@ Bewusst offen gelassen:
 - Auf einer Fläche stehen rund 60 bis 80 Gegner, so dicht wie in den Ebenen des Schlachthauses. Die Dichte stellt Etappe 12 nach der Laufzeit ein.
 - Die Erkundung deckt nur Boden auf. Hindernisse zeigt die Karte, sobald Boden daneben aufgedeckt ist.
 - Der Ladebildschirm nennt eine Fläche nur mit ihrem Namen, ohne "1 of 3".
+
+#### Nebenbei: Affixe der Einhandschwerter
+
+Umgesetzt am 05.10.2026 auf `master_SwordAffixes`, abgezweigt von `341a7e3` (Etappe 3b). Wunsch des Users: die Basis-Affixe der Einhandschwerter von poedb.tw als Resources, die Namen der Stufen durch Synonyme ersetzt, ohne die Affixe zu "Socketed" und zu Chaos-Schaden. Von 23 Affixen hatten 8 schon einen passenden Stat, für die übrigen hat der User jede Mechanik einzeln entschieden.
+
+Getroffene Entscheidungen des Users vom 05.10.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| Fehlende Stats | Neue Stats mit Mechanik, jedes neue Affix vorher abgesprochen |
+| Einschränkung | Ein neuer Filter nach Waffentyp, die neuen Affixe gelten nur für `Sword` |
+| Alte Affixe | `FlatPhysicalDamage`, `IncreasedAttackspeed` und `FlatAttackspeed` bleiben für alle physischen Waffen |
+| % Elemental Damage | Wirkt nur auf Attack-Skills |
+| Elementarschaden der Waffe | Gehört zum Grundschaden der Waffe: Eine Attack mit 150 % Waffenschaden rechnet ihn mit. Der elementare Teil wächst mit erhöhtem Elementarschaden und mit dem erhöhten Schaden seines Elements |
+| Leben je Treffer und je Kill | Trifft eine Attack zehn Gegner, gibt es zehnmal Leben |
+| Leech | Heilt gleichmäßig über 3 Sekunden. Mehrere Leeches stapeln und heilen zugleich. Der Orb zeigt, was noch heilt, in der Farbe der Ressource mit 50 % Deckkraft, und füllt sich über die Zeit auf |
+| Damage over Time Multiplier | Ein More-Modifier. Daneben gibt es erhöhten Schaden über Zeit. Neue Effekte mit Schaden über Zeit sollen leicht dazukommen |
+| Reduced Attribute Requirements | Wie vorgeschlagen, lokal am Item |
+| Accuracy | Erst einmal nicht, steht unten im ToDo |
+| Stun | Entfällt |
+
+- Erledigt: Ein Affix kann sich auf Waffentypen beschränken (`Affix.AffectableWeaponTypes`, im Kern `AffixDefinition.AllowedWeaponTypes` und `CanAppearOn(ItemDefinition)`). Leer heißt wie bisher: alles im Slot.
+- Erledigt: 18 Affixe unter `Resources/Affixes/Prefixes/Weapons/Swords` und `Suffixes/Weapons/Swords`, mit allen Stufen, Itemlevels und Gewichten aus poedb und eigenen Namen. Zusammen lädt das Spiel jetzt 35 Affixe.
+- Erledigt: "Adds X to Y". Eine Stufe trägt eine zweite Spanne `MinValueTo` bis `MaxValueTo`, der gewürfelte Affix das Y als `ValueTo`. Auf der Waffe bekommt das Minimum X und das Maximum Y. Ein alter flacher Affix ohne Y gibt beiden denselben Wert wie bisher.
+- Erledigt: Feuer, Frost und Blitz auf der Waffe. `WeaponProfile.AddedDamage` und `HitRequest.AddedDamage` tragen je Element eine Spanne. Jedes Element trifft mit demselben Wurf, Krit und Block wie der Hauptteil, wird mit seiner Resistenz gemindert und löst Burn, Chill oder Shock aus. `HitResult.FinalDamage` enthält alles, `AddedDamage` und `AddedEffects` zeigen die Teile.
+- Erledigt: Neue Stats `ElementalAttackDamage` (nur Angriffe), `FireDamage`, `FrostDamage`, `LightningDamage`, `LifeOnHit`, `LifeOnKill`, `ManaOnKill`, `ManaLeech`, `DamageOverTime` und `AttributeRequirements`. `Leech` gab es schon, gelesen hat ihn bisher niemand.
+- Erledigt: Leben je Treffer, Leech und Lohn für Kills (`HitGains`, `BaseUnit.NotifyHitDealt` und `NotifyKill`). Der Leech läuft in `LeechTracker`, je Treffer eine Instanz.
+- Erledigt: Der Orb zeigt den Leech. `IHero.LifePending` und `ManaPending` gehen an `ResourceOrb`, der Shader zeichnet sie als `pending_amount` über dem Stand.
+- Erledigt: Schaden über Zeit. `StatusEffectRules` führt eine Tabelle der Effekte mit Schaden über Zeit, aus der Treffer, Multiplikator und Schätzung im Tooltip lesen.
+- Erledigt: Gesenkte Anforderungen. `ItemInstance.Requirements` senkt die Attribute, nie das Level. Anlegen, rote Anforderungen und Tooltip fragen das Item, nicht mehr die Basis.
+- Erledigt: Tooltip mit den Texten des Originals, etwa "Adds 1 to 3 Fire Damage", "Grants 3 Life per Enemy Hit", "+20% to Damage over Time Multiplier", "18% reduced Attribute Requirements". Die Waffe zeigt ihren Elementarschaden unter dem physischen, Kritischer Schaden steht in Prozent.
+- Erledigt: Die DPS im Tooltip eines Skills rechnet den Elementarschaden der Waffe, seinen Burn und den Multiplikator für Schaden über Zeit mit.
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Erhöhungen zählen zusammen | Erhöhter Elementarschaden, erhöhter Schaden des Elements und Elementarschaden mit Angriffen addieren sich, More-Modifier multiplizieren sich. Ein Zauber behält `SpellDamage` als eigenen Faktor wie bisher |
+| Gewandelter Angriff | Lightning Strike wandelt den Waffenschaden in Blitz. Blitz auf der Waffe zählt dann zum Hauptteil, statt einen zweiten Blitz zu würfeln. Feuer und Frost bleiben eigene Teile |
+| Würfe | Der Zusatzschaden nimmt denselben Schadenswurf wie der Hauptteil. Ein Treffer verbraucht weiter sechs Würfe, gleiche Seeds ergeben dieselben Kämpfe |
+| Leech | Saugt aus dem physischen Schaden einer Attack nach der Rüstung. Ein gewandelter Angriff ist nicht physisch und saugt nichts. Bei vollem Leben läuft ein Leech ab und verfällt, ohne Obergrenze für die Rate |
+| Kill | Gilt für den, der zuletzt traf (`Enemy.LastAttacker`), auch wenn ein Bleed den Gegner beendet |
+| Anforderungen | Gerundet zur nächsten ganzen Zahl. Eine Anforderung von 1 bleibt auch mit 32 % weniger bei 1 |
+| Namen | Synonyme, die sonst kein Affix trägt. "Flaring" auf Adds Physical heißt "Resplendent", nicht "Blazing", damit es nicht nach Feuer klingt |
+| Werte | 1:1 aus poedb, mit den Itemlevels des Originals. Bei Itemlevel 5 bis 8 in Wollust fallen nur die unteren Stufen. Etappe 12 stellt die Balance ein |
+| Spielstand | Version 7, wegen `ValueTo` und der neuen Stats. Affixe aus älteren Spielständen laden ohne Y |
+
+Die Affixe:
+
+| Datei | Typ | Stat | Lokal | Stufen | Beste Stufe |
+|---|---|---|---|---|---|
+| `IncreasedPhysicalDamage` | Prefix | PhysicalDamage % | ja | 8 | 170 bis 179 %, ab Itemlevel 83 |
+| `AddedPhysicalDamage` | Prefix | PhysicalDamage, Adds X to Y | ja | 9 | 22 bis 29 to 45 bis 52, ab 77 |
+| `AddedFireDamage` | Prefix | FireDamage, Adds X to Y | ja | 10 | 89 bis 121 to 180 bis 210, ab 82 |
+| `AddedFrostDamage` | Prefix | FrostDamage, Adds X to Y | ja | 10 | 81 bis 111 to 163 bis 189, ab 82 |
+| `AddedLightningDamage` | Prefix | LightningDamage, Adds X to Y | ja | 10 | 15 bis 21 to 296 bis 344, ab 82 |
+| `IncreasedElementalDamage` | Prefix | ElementalAttackDamage % | nein | 6 | 51 bis 59 %, ab 86 |
+| `FlatStrength`, `FlatDexterity` | Suffix | Strength, Dexterity | nein | je 9 | 51 bis 55, ab 82 |
+| `IncreasedAttackspeed` | Suffix | Attackspeed % | ja | 8 | 26 bis 27 %, ab 77 |
+| `IncreasedCriticalHitChance` | Suffix | CriticalHitChance % | ja | 6 | 35 bis 38 %, ab 73 |
+| `FlatCriticalDamage` | Suffix | CriticalDamage | nein | 6 | +35 bis 38 %, ab 73 |
+| `LifeOnHit` | Suffix | LifeOnHit | nein | 8 | 27 bis 30, ab 80 |
+| `LifeOnKill`, `ManaOnKill` | Suffix | LifeOnKill, ManaOnKill | nein | je 6 | 84 bis 110 und 38 bis 50, ab 81 |
+| `LifeLeech` | Suffix | Leech, mit Brüchen | nein | 3 | 3,5 bis 4,5 %, ab 70 |
+| `ManaLeech` | Suffix | ManaLeech, mit Brüchen | nein | 1 | 2,6 bis 3,2 %, ab 50 |
+| `DamageOverTimeMultiplier` | Suffix | DamageOverTime, More | nein | 5 | +24 bis 26 %, ab 82 |
+| `ReducedAttributeRequirements` | Suffix | AttributeRequirements %, negativ | ja | 2 | 32 % weniger, ab 60 |
+
+So funktioniert es:
+
+- `ItemInstance.AddedDamage` sammelt die lokalen flachen Affixe auf `FireDamage`, `FrostDamage` und `LightningDamage`, `ToWeaponProfile` gibt sie der Waffe mit. `HitRequests.ForAttack` multipliziert sie mit dem Prozentsatz des Skills und dem Faktor ihres Elements. `HitResolver` würfelt sie mit dem Hauptteil, mindert sie je Element und holt ihre Effekte über `StatusEffectRules.GetEffectOfHit`.
+- Ein neuer Effekt mit Schaden über Zeit, etwa Poison, braucht eine Zeile in `StatusEffectRules.DamageOverTimeRules` mit auslösender Schadensart, Anteil, Dauer und Minderung, dazu `DealsDamage` in seiner Regel. Multiplikator, Treffer und Tooltip greifen dann von selbst, ein Test prüft, dass keiner vergessen wird.
+- `SkillCast.ApplyTo` meldet jeden getroffenen Gegner einzeln an `BaseUnit.NotifyHitDealt`. Das gibt Leben je Treffer und startet Leech für Leben, beim Helden auch für Mana. `Enemy.BeginDeath` ruft `NotifyKill` beim letzten Angreifer.
+- `BaseUnit.RegenerateLife` und `Hero.RegenerateMana` lassen den Leech jedes Physik-Frame weiterheilen. Solange ein Leech läuft, meldet der Held `ResourcesChanged` jedes Frame, damit der Orb auch bei vollem Leben mitkommt.
+
+Neue Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| `Affix` | `AffectableWeaponTypes` | leer | Nur für Waffen dieser Typen, leer heißt jede Waffe im Slot |
+| `AffixTier` | `MinValueTo`, `MaxValueTo` | 0 | Die Spanne des Y bei "Adds X to Y" |
+| `resource_orb.gdshader` | `pending_amount`, `pending_opacity` | 0, 0,5 | Was noch heilt, als Anteil am Maximum, und seine Deckkraft |
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Unit-Tests | 89 neue: Filter nach Waffentyp; jede Schwert-Datei mit Stat, Art, lokal und Brüchen, vollständige und steigende Stufen, Y nur bei Adds, Namen sonst nirgends vergeben; Zusatzschaden mit dem Prozentsatz des Skills, Erhöhungen zählen zusammen, Elementarschaden mit Angriffen nicht auf Zauber, Blitz zum Hauptteil bei Lightning Strike, Minderung je Element, Krit, Effekte, sechs Würfe; Multiplikator und erhöhter Schaden über Zeit, nur auf Effekte mit Schaden, Bleed im Treffer, DPS-Schätzung; Leech über 3 Sekunden, Stapeln, Rest, viele kleine Schritte; Leben je Treffer nur für gelandete Attacks, zehn Gegner zehnmal, Leech nur aus physischem Schaden; Adds X to Y auf der Waffe und im Würfler, Elementarschaden im Waffenprofil, gesenkte Anforderungen beim Anlegen, Y im Spielstand und alte Affixe ohne Y. Einer geändert: Der Spielstand hat Version 7. Zusammen 1363 |
+| Alte Zahlen | Alle Kampf-, Schätzungs- und Bilanztests von vorher laufen unverändert durch, eine Waffe ohne Element rechnet Treffer, Bleed und DPS wie bisher |
+| Laufendes Spiel, mit Fenster | 29 Schritte: 35 Affixe geladen, 18 nur für Schwerter, die vier Adds mit Y in jeder Stufe, 400 Schwerter würfeln 120 Namen, 400 Bögen keinen. Ein Schwert mit Feuer, Leben je Treffer und Kill, Leech, Multiplikator und gesenkten Anforderungen: Tooltip mit allen Texten, Feuer mit 150 % des Skills und 50 % mehr Elementarschaden mit Angriffen, Multiplikator 1,5. Zehn Gegner getroffen: 10 × 5 Leben je Treffer und 6 × 20 je Kill auf den Punkt, 6 × 10 Mana, 10 Leech-Instanzen mit 4 % und 3 % des physischen Schadens, Burn und Bleed auf den Getroffenen. Nach 1,5 s ist der Leech halb, nach 3 s ganz geheilt, der Orb zeigt ihn erst und dann nicht mehr. Bilder der Orbs am Anfang, in der Mitte und am Ende |
+| Spielstand | Die Probe lief mit eigenem Spielstand und eigenen Einstellungen, die des Users blieben unberührt |
+
+ToDo:
+
+- Accuracy, drei Affixe: Accuracy Rating, % Physical Damage mit Accuracy, % Global Accuracy mit Light Radius. Die Trefferchance steht hier schon bei 100 %, Accuracy täte so nichts. Vorschlag aus der Absprache: Ein neuer Stat Accuracy senkt den Dodge des Ziels mit einer Formel nach Art der Rüstung. Die Mischformen brauchen einen zweiten Stat je Affix, Light Radius gibt es schon.
+
+Bewusst offen gelassen:
+
+- Stun mit zwei Affixen entfällt nach Entscheidung des Users, Socketed mit zwei und Chaos mit einem Affix wie gewünscht.
+- Der Filter kennt nur Waffentypen. Zweihandschwerter bräuchten eigene Werte und einen Filter nach Führung (`WieldStrategy`), noch gibt es keine.
+- Der Charakterbogen zeigt die neuen Stats nicht. Leben je Treffer, je Kill und Leech zeigen keine Zahl über dem Helden.
+- "Adds X to Y" gibt es nur lokal auf der Waffe, nicht global für alle Angriffe.
 
 ### M9: Inhalt und Politur (L, fortlaufend)
 

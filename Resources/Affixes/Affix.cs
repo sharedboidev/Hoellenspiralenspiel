@@ -18,6 +18,10 @@ public abstract partial class Affix : Resource
     [Export]
     public Array<ItemSlot> AffectableItemTypes { get; set; } = new();
 
+    //Leer heißt jede Waffe im Slot
+    [Export]
+    public Array<WeaponType> AffectableWeaponTypes { get; set; } = new();
+
     [Export]
     public bool AllowFractions { get; set; }
 
@@ -32,9 +36,10 @@ public abstract partial class Affix : Resource
     public AffixDefinition ToDefinition()
         => new(Type, AffectedCombatStat, ModificationType)
         {
-            AllowedSlots    = AffectableItemTypes.ToArray(),
-            AllowsFractions = AllowFractions,
-            IsLocal         = IsInherentMod,
-            Tiers           = Tiers.Where(tier => tier is not null).Select(tier => tier.ToDefinition()).ToArray()
+            AllowedSlots       = AffectableItemTypes.ToArray(),
+            AllowedWeaponTypes = AffectableWeaponTypes.ToArray(),
+            AllowsFractions    = AllowFractions,
+            IsLocal            = IsInherentMod,
+            Tiers              = Tiers.Where(tier => tier is not null).Select(tier => tier.ToDefinition()).ToArray()
         };
 }

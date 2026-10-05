@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
@@ -20,17 +21,27 @@ public static class SkillDamageEstimator
 
         var hit           = HitRequests.ForSkill(attacker, weapon, skill);
         var damageFactor  = hit.DamageType.GetDamageFactor();
-        var minHit        = Math.Max(0f, hit.MinDamage) * damageFactor;
-        var maxHit        = Math.Max(minHit, hit.MaxDamage * damageFactor);
+        var mainMin       = Math.Max(0f, hit.MinDamage) * damageFactor;
+        var mainMax       = Math.Max(mainMin, hit.MaxDamage * damageFactor);
         var critChance    = CombatFormulas.ClampChance(hit.CriticalHitChance);
         var critFactor    = CombatFormulas.GetCriticalFactor(hit.CriticalDamageBonus);
-        var averageHit    = (minHit + maxHit) / 2f * (1f + critChance / 100f * (critFactor - 1f));
+        var critShare     = 1f + critChance / 100f * (critFactor - 1f);
         var hitChance     = CombatFormulas.GetHitChance(hit);
         var failureChance = Math.Clamp(actionFailureChance, 0f, 1f);
         var landingShare  = (1f - failureChance) * hitChance / 100f;
         var usesPerSecond = GetUsesPerSecond(attacker, skill);
         var manaPerSecond = paysMana ? (float)(skill.ManaCost * usesPerSecond) : 0f;
-        var effect        = GetDamagingEffect(hit.DamageType);
+        var parts         = GetParts(hit, mainMin, mainMax);
+        var minHit        = 0f;
+        var maxHit        = 0f;
+
+        foreach (var part in parts)
+        {
+            minHit += part.Range.Min;
+            maxHit += part.Range.Max;
+        }
+
+        var averageHit = (minHit + maxHit) / 2f * critShare;
 
         var estimate = new SkillDamageEstimate
         {
@@ -45,8 +56,8 @@ public static class SkillDamageEstimator
             ActionFailureChance = failureChance,
             UsesPerSecond       = usesPerSecond,
             HitDps              = GetHitDps(averageHit, usesPerSecond * landingShare),
-            DamagingEffect      = effect,
-            EffectDps           = GetEffectDps(effect, averageHit, usesPerSecond * landingShare),
+            DamagingEffect      = StatusEffectRules.FindDamageOverTime(hit.DamageType)?.Kind,
+            EffectDps           = GetEffectDps(parts, critShare, hit.DamageOverTimeMultiplier, usesPerSecond * landingShare),
             ManaPerSecond       = manaPerSecond
         };
 
@@ -60,7 +71,7 @@ public static class SkillDamageEstimator
         return estimate with
         {
             IsLimitedByMana = true,
-            SustainedDps    = GetHitDps(averageHit, sustainedLandings) + GetEffectDps(effect, averageHit, sustainedLandings)
+            SustainedDps    = GetHitDps(averageHit, sustainedLandings) + GetEffectDps(parts, critShare, hit.DamageOverTimeMultiplier, sustainedLandings)
         };
     }
 
@@ -80,29 +91,43 @@ public static class SkillDamageEstimator
     private static float GetHitDps(float averageHit, double landingsPerSecond)
         => (float)(averageHit * landingsPerSecond);
 
-    private static StatusEffectKind? GetDamagingEffect(DamageType damageType)
-        => damageType switch
-        {
-            DamageType.Slash => StatusEffectKind.Bleed,
-            DamageType.Fire  => StatusEffectKind.Burn,
-            _                => null
-        };
-
-    //Wie viele Instanzen zugleich wirken, bestimmt die Stapelregel des Effekts
-    private static float GetEffectDps(StatusEffectKind? effect, float averageHit, double landingsPerSecond)
+    //Der Hauptteil und der Zusatzschaden je Element, jeder mit seiner Schadensart
+    private static List<(DamageType DamageType, DamageRange Range)> GetParts(HitRequest hit, float mainMin, float mainMax)
     {
-        if (effect is null)
-            return 0f;
+        var parts = new List<(DamageType, DamageRange)> { (hit.DamageType, new DamageRange(mainMin, mainMax)) };
 
-        var (damageFraction, durationSec) = effect == StatusEffectKind.Bleed
-                ? (CombatRules.BleedDamageFraction, CombatRules.BleedDurationSec)
-                : (CombatRules.BurnDamageFraction, CombatRules.BurnDurationSec);
+        foreach (var (element, range) in hit.AddedDamage.Entries)
+        {
+            if (range.IsEmpty)
+                continue;
 
-        var rule            = StatusEffectRules.Get(effect.Value);
-        var maxInstances    = rule.Stacking == StackingRule.Sum ? rule.MaxInstances : 1;
-        var instances       = Math.Min(maxInstances, landingsPerSecond * durationSec);
-        var damagePerSecond = averageHit * damageFraction / durationSec;
+            var min = Math.Max(0f, range.Min);
 
-        return (float)(damagePerSecond * instances);
+            parts.Add((element, new DamageRange(min, Math.Max(min, range.Max))));
+        }
+
+        return parts;
+    }
+
+    //Jeder Teil löst den Effekt seiner Schadensart aus. Wie viele Instanzen zugleich wirken, bestimmt die Stapelregel des Effekts
+    private static float GetEffectDps(List<(DamageType DamageType, DamageRange Range)> parts, float critShare, float damageOverTimeMultiplier, double landingsPerSecond)
+    {
+        var effectDps = 0f;
+
+        foreach (var (damageType, range) in parts)
+        {
+            if (StatusEffectRules.FindDamageOverTime(damageType) is not { } dot)
+                continue;
+
+            var rule            = StatusEffectRules.Get(dot.Kind);
+            var maxInstances    = rule.Stacking == StackingRule.Sum ? rule.MaxInstances : 1;
+            var instances       = Math.Min(maxInstances, landingsPerSecond * dot.DurationSec);
+            var averageHit      = (range.Min + range.Max) / 2f * critShare;
+            var damagePerSecond = averageHit * dot.DamageFraction / dot.DurationSec * damageOverTimeMultiplier;
+
+            effectDps += (float)(damagePerSecond * instances);
+        }
+
+        return effectDps;
     }
 }

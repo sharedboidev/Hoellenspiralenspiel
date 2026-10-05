@@ -105,6 +105,13 @@ public sealed class ItemTooltipContent : ITooltipObject
     {
         text.AppendLine($"{weapon.WieldStrategy.GetDescription()} {weapon.WeaponType.GetDescription()}");
         text.AppendLine($"{weapon.DamageType} Damage: {Styled(item.MinDamage, weapon.MinDamage)} to {Styled(item.MaxDamage, weapon.MaxDamage)}");
+
+        foreach (var (element, range) in item.AddedDamage.Entries)
+        {
+            if (!range.IsEmpty)
+                text.AppendLine($"{element} Damage: {Styled(range.Min, 0)} to {Styled(range.Max, 0)}");
+        }
+
         text.AppendLine($"Attacks per Second: {Styled(item.AttacksPerSecond, weapon.AttacksPerSecond)}");
         text.AppendLine($"Critical Hit Chance: {Styled(item.CriticalHitChance, weapon.CriticalHitChance)}%");
 
@@ -138,9 +145,10 @@ public sealed class ItemTooltipContent : ITooltipObject
 
     private void AppendRequirements(StringBuilder text)
     {
-        foreach (var (requirement, neededValue) in item.Definition.Requirements)
+        foreach (var (requirement, neededValue) in item.Requirements)
         {
-            var line = $"Required {requirement.GetDescription()}: {neededValue:N0}";
+            var value = neededValue < item.Definition.Requirements[requirement] ? $"[color={AffixColor}]{neededValue:N0}[/color]" : $"{neededValue:N0}";
+            var line  = $"Required {requirement.GetDescription()}: {value}";
 
             text.AppendLine(unmetRequirements.Contains(requirement) ? $"[color={UnmetColor}]{line}[/color]" : line);
         }
@@ -153,18 +161,26 @@ public sealed class ItemTooltipContent : ITooltipObject
     }
 
     private static string Describe(ItemAffix affix)
-        => affix.Modification switch
+        => (affix.Stat, affix.Modification) switch
         {
-            ModificationType.Flat when affix.Stat == CombatStat.Attackspeed => $"+{affix.Value:0.##} to Attacks per Second",
-            ModificationType.Flat when IsShownAsPercent(affix.Stat)         => $"+{affix.Value:0.##}% to {affix.Stat.GetDescription()}",
-            ModificationType.Flat                                           => $"+{affix.Value:0.##} to {affix.Stat.GetDescription()}",
-            ModificationType.Percentage                                     => $"{affix.Value * 100:N0}% increased {affix.Stat.GetDescription()}",
-            ModificationType.More                                           => $"{affix.Value * 100:N0}% More {affix.Stat.GetDescription()}",
-            _                                                               => throw new ArgumentOutOfRangeException(nameof(affix), affix.Modification, null)
+            _ when affix.HasRange                                        => $"Adds {affix.Value:0.##} to {affix.ValueTo:0.##} {affix.Stat.GetDescription()}",
+            (CombatStat.Attackspeed, ModificationType.Flat)              => $"+{affix.Value:0.##} to Attacks per Second",
+            (CombatStat.LifeOnHit, ModificationType.Flat)                => $"Grants {affix.Value:0.##} Life per Enemy Hit",
+            (CombatStat.LifeOnKill, ModificationType.Flat)               => $"Gain {affix.Value:0.##} Life per Enemy Killed",
+            (CombatStat.ManaOnKill, ModificationType.Flat)               => $"Gain {affix.Value:0.##} Mana per Enemy Killed",
+            (CombatStat.Leech, ModificationType.Flat)                    => $"{affix.Value:0.##}% of Physical Attack Damage Leeched as Life",
+            (CombatStat.ManaLeech, ModificationType.Flat)                => $"{affix.Value:0.##}% of Physical Attack Damage Leeched as Mana",
+            (CombatStat.DamageOverTime, ModificationType.More)           => $"+{affix.Value * 100:N0}% to Damage over Time Multiplier",
+            (_, ModificationType.Flat) when IsShownAsPercent(affix.Stat) => $"+{affix.Value:0.##}% to {affix.Stat.GetDescription()}",
+            (_, ModificationType.Flat)                                   => $"+{affix.Value:0.##} to {affix.Stat.GetDescription()}",
+            (_, ModificationType.Percentage) when affix.Value < 0        => $"{-affix.Value * 100:N0}% reduced {affix.Stat.GetDescription()}",
+            (_, ModificationType.Percentage)                             => $"{affix.Value * 100:N0}% increased {affix.Stat.GetDescription()}",
+            (_, ModificationType.More)                                   => $"{affix.Value * 100:N0}% More {affix.Stat.GetDescription()}",
+            _                                                            => throw new ArgumentOutOfRangeException(nameof(affix), affix.Modification, null)
         };
 
     private static bool IsShownAsPercent(CombatStat stat)
-        => stat is CombatStat.CriticalHitChance or CombatStat.BlockReduction or CombatStat.MeleeBlock or CombatStat.SpellBlock or CombatStat.MeleeParry or CombatStat.SpellParry;
+        => stat is CombatStat.CriticalHitChance or CombatStat.CriticalDamage or CombatStat.BlockReduction or CombatStat.MeleeBlock or CombatStat.SpellBlock or CombatStat.MeleeParry or CombatStat.SpellParry;
 
     private static string Styled(double finalValue, double baseValue)
     {

@@ -71,9 +71,31 @@ public sealed class ItemInstance
 
     public int    ArmorValue        => (int)GetLocalValue(Definition.Armor, CombatStat.Armor);
     public int    MinDamage         => (int)GetLocalValue(Definition.Weapon?.MinDamage ?? 0f, CombatStat.PhysicalDamage);
-    public int    MaxDamage         => (int)GetLocalValue(Definition.Weapon?.MaxDamage ?? 0f, CombatStat.PhysicalDamage);
+    public int    MaxDamage         => (int)GetLocalValue(Definition.Weapon?.MaxDamage ?? 0f, CombatStat.PhysicalDamage, true);
     public double AttacksPerSecond  => Math.Round(GetLocalValue(Definition.Weapon?.AttacksPerSecond ?? 0f, CombatStat.Attackspeed), 2);
     public double CriticalHitChance => Math.Round(GetLocalValue(Definition.Weapon?.CriticalHitChance ?? 0f, CombatStat.CriticalHitChance), 2);
+
+    //Zusatzschaden der Elemente aus lokalen Affixen. Eine Waffe bringt selbst keinen mit
+    public PerElement<DamageRange> AddedDamage
+        => Definition.Weapon is null
+                ? default
+                : PerElement<DamageRange>.From(element => new DamageRange((int)GetLocalValue(0f, element.GetElementStat()),
+                                                                          (int)GetLocalValue(0f, element.GetElementStat(), true)));
+
+    //Lokale Affixe senken die Anforderungen an Attribute, die an das Level nie. Gerundet wird zur nächsten ganzen Zahl
+    public IReadOnlyDictionary<Requirement, int> Requirements
+    {
+        get
+        {
+            if (!affixes.Any(affix => affix.IsLocal && affix.Stat == CombatStat.AttributeRequirements))
+                return Definition.Requirements;
+
+            return Definition.Requirements.ToDictionary(pair => pair.Key,
+                                                        pair => pair.Key == Requirement.CharacterLevel
+                                                                ? pair.Value
+                                                                : (int)MathF.Round(GetLocalValue(pair.Value, CombatStat.AttributeRequirements), MidpointRounding.AwayFromZero));
+        }
+    }
 
     public void AddAffix(ItemAffix affix)
     {
@@ -102,7 +124,10 @@ public sealed class ItemInstance
                                  weapon.DamageType,
                                  weapon.Range,
                                  weapon.IsRanged,
-                                 weapon.ProjectileSpeed);
+                                 weapon.ProjectileSpeed)
+        {
+            AddedDamage = AddedDamage
+        };
     }
 
     public IReadOnlyList<CombatStatModifier> GetEquipModifiers()
@@ -129,7 +154,8 @@ public sealed class ItemInstance
             modifiers.Add(new CombatStatModifier(stat, ModificationType.Flat, value, InstanceId));
     }
 
-    private float GetLocalValue(float baseValue, CombatStat stat)
+    //Ein Affix "Adds X to Y" gibt dem unteren Wert X und dem oberen Y, jeder andere flache Affix beiden dasselbe
+    private float GetLocalValue(float baseValue, CombatStat stat, bool isUpperValue = false)
     {
         var addedFlat = 0f;
         var increased = 0f;
@@ -143,7 +169,7 @@ public sealed class ItemInstance
             switch (affix.Modification)
             {
                 case ModificationType.Flat:
-                    addedFlat += affix.Value;
+                    addedFlat += isUpperValue && affix.HasRange ? affix.ValueTo : affix.Value;
 
                     break;
                 case ModificationType.Percentage:

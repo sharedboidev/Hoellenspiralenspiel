@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Core.Items;
@@ -48,6 +49,14 @@ public class AffixRollerTests
         Tiers        = [new AffixTierDefinition(1, 1, 100, 3, 9, "Hearty")]
     };
 
+    private static readonly AffixDefinition SwordDamage = new(AffixType.Prefix, CombatStat.PhysicalDamage, ModificationType.Percentage)
+    {
+        AllowedSlots       = [ItemSlot.PhysicalWeapon],
+        AllowedWeaponTypes = [WeaponType.Sword],
+        IsLocal            = true,
+        Tiers              = [new AffixTierDefinition(1, 1, 100, 40, 49, "Weighty")]
+    };
+
     private static readonly AffixDefinition[] AllAffixes = [FlatDamage, IncreasedSpeed, FlatSpeed, Strength, Life];
 
     [TestCase(1, 3)]
@@ -90,6 +99,40 @@ public class AffixRollerTests
 
             Assert.That(helmet.Affixes.Select(affix => affix.Stat), Is.SubsetOf(new[] { CombatStat.Strength, CombatStat.Life }), $"Seed {seed}");
         }
+    }
+
+    [Test]
+    public void AffixMitWaffentyp_ErscheintNurAufDiesemTyp()
+    {
+        var roller = new AffixRoller([SwordDamage, FlatDamage]);
+        var names  = new HashSet<string>();
+
+        for (var seed = 0; seed < 200; seed++)
+        {
+            var sword = TestItems.Create(TestItems.Sword, itemLevel: 1);
+            var bow   = TestItems.Create(TestItems.Bow, itemLevel: 1);
+
+            roller.RollAffixesFor(sword, new SeededRandom(seed));
+            roller.RollAffixesFor(bow, new SeededRandom(seed));
+
+            names.UnionWith(sword.Affixes.Select(affix => affix.NameAddition));
+
+            Assert.That(bow.Affixes.Select(affix => affix.NameAddition), Has.None.EqualTo("Weighty"), $"Seed {seed}");
+        }
+
+        Assert.That(names, Does.Contain("Weighty"));
+    }
+
+    [Test]
+    public void Waffentyp_PrueftAuchDenSlot()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(SwordDamage.CanAppearOn(TestItems.Sword), Is.True);
+            Assert.That(SwordDamage.CanAppearOn(TestItems.Bow), Is.False);
+            Assert.That(SwordDamage.CanAppearOn(TestItems.Helmet), Is.False);
+            Assert.That(FlatDamage.CanAppearOn(TestItems.Bow), Is.True);
+        });
     }
 
     [Test]

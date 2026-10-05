@@ -1,0 +1,94 @@
+[gd_resource type="Resource" script_class="Suffix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://bwwyi50jc5koy" path="res://Resources/Affixes/Suffixes/Suffix.cs" id="2_suffix"]
+
+[sub_resource type="Resource" id="Resource_tier8"]
+script = ExtResource("1_tier")
+Tier = 8
+MinItemLevelToAppearOn = 1
+Weight = 1000
+MinValue = 5.0
+MaxValue = 7.0
+ItemnameAddition = "of Finesse"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier7"]
+script = ExtResource("1_tier")
+Tier = 7
+MinItemLevelToAppearOn = 11
+Weight = 1000
+MinValue = 8.0
+MaxValue = 10.0
+ItemnameAddition = "of Fluency"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier6"]
+script = ExtResource("1_tier")
+Tier = 6
+MinItemLevelToAppearOn = 22
+Weight = 1000
+MinValue = 11.0
+MaxValue = 13.0
+ItemnameAddition = "of Expertise"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier5"]
+script = ExtResource("1_tier")
+Tier = 5
+MinItemLevelToAppearOn = 30
+Weight = 1000
+MinValue = 14.0
+MaxValue = 16.0
+ItemnameAddition = "of Repute"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier4"]
+script = ExtResource("1_tier")
+Tier = 4
+MinItemLevelToAppearOn = 37
+Weight = 1000
+MinValue = 17.0
+MaxValue = 19.0
+ItemnameAddition = "of Praise"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier3"]
+script = ExtResource("1_tier")
+Tier = 3
+MinItemLevelToAppearOn = 45
+Weight = 1000
+MinValue = 20.0
+MaxValue = 22.0
+ItemnameAddition = "of Glory"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 60
+Weight = 1000
+MinValue = 23.0
+MaxValue = 25.0
+ItemnameAddition = "of Notoriety"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 77
+Weight = 1000
+MinValue = 26.0
+MaxValue = 27.0
+ItemnameAddition = "of Jubilation"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_suffix")
+AffectedCombatStat = 9
+ModificationType = 1
+AffectableItemTypes = Array[int]([1])
+AffectableWeaponTypes = Array[int]([1])
+IsInherentMod = true
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier8"), SubResource("Resource_tier7"), SubResource("Resource_tier6"), SubResource("Resource_tier5"), SubResource("Resource_tier4"), SubResource("Resource_tier3"), SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://bwwyi50jc5koy"

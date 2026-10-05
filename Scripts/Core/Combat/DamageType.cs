@@ -1,3 +1,4 @@
+using System;
 using Hoellenspiralenspiel.Enums;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Combat;
@@ -32,6 +33,16 @@ public static class DamageTypeExtensions
 
     public static CombatStat GetScalingStat(this DamageType damageType)
         => damageType.IsPhysical() ? CombatStat.PhysicalDamage : CombatStat.ElementalDamage;
+
+    //Der Stat eines Elements selbst, physischer Schaden hat keinen eigenen neben PhysicalDamage
+    public static CombatStat GetElementStat(this DamageType damageType)
+        => damageType switch
+        {
+            DamageType.Fire      => CombatStat.FireDamage,
+            DamageType.Frost     => CombatStat.FrostDamage,
+            DamageType.Lightning => CombatStat.LightningDamage,
+            _                    => throw new ArgumentOutOfRangeException(nameof(damageType), damageType, "Nur Elemente haben einen eigenen Stat")
+        };
 
     public static float GetDamageFactor(this DamageType damageType)
         => damageType == DamageType.Crush ? 1f + CombatRules.CrushMoreDamage : 1f;

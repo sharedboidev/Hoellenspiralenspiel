@@ -392,6 +392,9 @@ public partial class Enemy : BaseUnit
 
         LifeChanged -= OnLifeChanged;
 
+        if (IsInstanceValid(LastAttacker))
+            LastAttacker.NotifyKill(this);
+
         RaiseDied();
 
         modRuntime.Release();

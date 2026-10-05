@@ -6,7 +6,7 @@ namespace Hoellenspiralenspiel.Scripts.Core.Saving;
 
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 6;
+    public const int CurrentVersion = 7;
 
     public int                    Version   { get; set; } = CurrentVersion;
     public CharacterSave          Character { get; set; } = new();
@@ -103,6 +103,9 @@ public sealed class AffixSave
     public float            Value        { get; set; }
     public string           NameAddition { get; set; }
     public bool             IsLocal      { get; set; }
+
+    //Fehlt vor Version 7. Das Y eines Affixes "Adds X to Y", sonst 0
+    public float            ValueTo      { get; set; }
 }
 
 public sealed class VendorSave

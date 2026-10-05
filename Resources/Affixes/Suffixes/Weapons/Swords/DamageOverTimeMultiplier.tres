@@ -1,0 +1,63 @@
+[gd_resource type="Resource" script_class="Suffix" format=3]
+
+[ext_resource type="Script" uid="uid://sdx5y8g2wvor" path="res://Resources/Affixes/AffixTier.cs" id="1_tier"]
+[ext_resource type="Script" uid="uid://bwwyi50jc5koy" path="res://Resources/Affixes/Suffixes/Suffix.cs" id="2_suffix"]
+
+[sub_resource type="Resource" id="Resource_tier5"]
+script = ExtResource("1_tier")
+Tier = 5
+MinItemLevelToAppearOn = 44
+Weight = 300
+MinValue = 7.0
+MaxValue = 11.0
+ItemnameAddition = "of Rancor"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier4"]
+script = ExtResource("1_tier")
+Tier = 4
+MinItemLevelToAppearOn = 55
+Weight = 300
+MinValue = 12.0
+MaxValue = 15.0
+ItemnameAddition = "of Spreading"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier3"]
+script = ExtResource("1_tier")
+Tier = 3
+MinItemLevelToAppearOn = 68
+Weight = 300
+MinValue = 16.0
+MaxValue = 19.0
+ItemnameAddition = "of Liquescence"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier2"]
+script = ExtResource("1_tier")
+Tier = 2
+MinItemLevelToAppearOn = 76
+Weight = 300
+MinValue = 20.0
+MaxValue = 23.0
+ItemnameAddition = "of Thawing"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[sub_resource type="Resource" id="Resource_tier1"]
+script = ExtResource("1_tier")
+Tier = 1
+MinItemLevelToAppearOn = 82
+Weight = 300
+MinValue = 24.0
+MaxValue = 26.0
+ItemnameAddition = "of Decomposition"
+metadata/_custom_type_script = "uid://sdx5y8g2wvor"
+
+[resource]
+script = ExtResource("2_suffix")
+AffectedCombatStat = 41
+ModificationType = 2
+AffectableItemTypes = Array[int]([1])
+AffectableWeaponTypes = Array[int]([1])
+Tiers = Array[ExtResource("1_tier")]([SubResource("Resource_tier5"), SubResource("Resource_tier4"), SubResource("Resource_tier3"), SubResource("Resource_tier2"), SubResource("Resource_tier1")])
+metadata/_custom_type_script = "uid://bwwyi50jc5koy"

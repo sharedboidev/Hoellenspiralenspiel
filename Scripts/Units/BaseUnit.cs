@@ -44,6 +44,8 @@ public abstract partial class BaseUnit : CharacterBody3D
 
     public StatusEffectTracker StatusEffects { get; }
 
+    public LeechTracker LifeLeech { get; } = new();
+
     public SkillCooldowns SkillCooldowns { get; } = new();
 
     public abstract Faction Faction { get; }
@@ -248,8 +250,13 @@ public abstract partial class BaseUnit : CharacterBody3D
         {
             LifeCurrent -= hit.FinalDamage;
 
-            if (hit.InflictedEffect is not null && !IsDead)
-                StatusEffects.Apply(hit.InflictedEffect);
+            foreach (var effect in hit.InflictedEffects)
+            {
+                if (IsDead)
+                    break;
+
+                StatusEffects.Apply(effect);
+            }
         }
 
         CombatText.ShowHit(this, hit);
@@ -306,8 +313,31 @@ public abstract partial class BaseUnit : CharacterBody3D
             mesh.SetInstanceShaderParameter(HighlightParameter, isHighlighted ? 1f : 0f);
     }
 
+    //Trifft ein Angriff zehn Gegner, kommt das zehnmal hierher
     public void NotifyHitDealt(HitResult hit, BaseUnit victim)
-        => HitDealt?.Invoke(this, hit, victim);
+    {
+        if (!IsDead)
+            GainFromHit(hit);
+
+        HitDealt?.Invoke(this, hit, victim);
+    }
+
+    //Wer zuletzt traf, bekommt den Kill, auch wenn ein Bleed ihn beendet hat
+    public void NotifyKill(BaseUnit victim)
+    {
+        if (!IsDead)
+            GainFromKill();
+    }
+
+    protected virtual void GainFromHit(HitResult hit)
+    {
+        LifeCurrent += HitGains.GetLifeOnHit(Stats, hit);
+
+        LifeLeech.Add(HitGains.GetLifeLeech(Stats, hit));
+    }
+
+    protected virtual void GainFromKill()
+        => LifeCurrent += HitGains.GetLifeOnKill(Stats);
 
     //Darstellung und Kollisionsform wachsen einzeln. Ein skalierter Körper brächte die Physik durcheinander
     protected void ScaleBody(float factor)
@@ -342,12 +372,20 @@ public abstract partial class BaseUnit : CharacterBody3D
     protected virtual void RegenerateLife(double delta)
     {
         if (IsDead)
+        {
+            LifeLeech.Clear();
+
             return;
+        }
 
         var regeneration = Stats.GetFinalWhole(CombatStat.Liferegeneration);
 
         if (regeneration > 0 && LifeCurrent < LifeMaximum)
             LifeCurrent += regeneration * (float)delta;
+
+        //Auch bei vollem Leben läuft der Leech weiter ab
+        if (LifeLeech.IsActive)
+            LifeCurrent += LifeLeech.Advance(delta);
     }
 
     private void AdvanceStatusEffects(double delta)

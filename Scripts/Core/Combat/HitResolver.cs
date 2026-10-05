@@ -38,17 +38,17 @@ public static class HitResolver
 
         var isCritical = critRoll < CombatFormulas.ClampChance(request.CriticalHitChance);
         var wasBlocked = blockRoll < CombatFormulas.ClampChance(defender.GetFinal(GetBlockStat(request.SkillKind)));
-        var damage     = rolledDamage;
-
-        if (isCritical)
-            damage *= CombatFormulas.GetCriticalFactor(request.CriticalDamageBonus);
-
-        damage *= request.DamageType.GetDamageFactor();
-
-        if (wasBlocked)
-            damage *= 1f - CombatFormulas.ClampChance(defender.GetFinal(CombatStat.BlockReduction)) / 100f;
+        var damage     = Strike(rolledDamage, request.DamageType, request, defender, isCritical, wasBlocked);
 
         var finalDamage = (int)MathF.Round(Mitigate(damage, request.DamageType, defender));
+
+        //Der Zusatzschaden der Elemente trifft mit demselben Wurf, kritisch und geblockt wie der Hauptteil
+        var addedUnmitigated = request.AddedDamage.Select((element, range) => range.IsEmpty
+                                                                                  ? 0f
+                                                                                  : Strike(Roll(range, damageRoll), element, request, defender, isCritical, wasBlocked));
+
+        var addedDamage  = addedUnmitigated.Select((element, unmitigated) => (int)MathF.Round(Mitigate(unmitigated, element, defender)));
+        var addedEffects = addedUnmitigated.Select((element, unmitigated) => StatusEffectRules.GetEffectOfHit(element, unmitigated, addedDamage[element], request.DamageOverTimeMultiplier));
 
         return new HitResult
         {
@@ -59,9 +59,29 @@ public static class HitResolver
             IsCritical        = isCritical,
             RolledDamage      = rolledDamage,
             UnmitigatedDamage = damage,
-            FinalDamage       = finalDamage,
-            InflictedEffect   = StatusEffectRules.GetEffectOfHit(request.DamageType, damage, finalDamage)
+            FinalDamage       = finalDamage + addedDamage.Fire + addedDamage.Frost + addedDamage.Lightning,
+            InflictedEffect   = StatusEffectRules.GetEffectOfHit(request.DamageType, damage, finalDamage, request.DamageOverTimeMultiplier),
+            AddedDamage       = addedDamage,
+            AddedEffects      = addedEffects
         };
+    }
+
+    private static float Roll(DamageRange range, float damageRoll)
+        => Math.Max(0f, range.Min + damageRoll * (range.Max - range.Min));
+
+    private static float Strike(float rolledDamage, DamageType damageType, HitRequest request, StatSheet defender, bool isCritical, bool wasBlocked)
+    {
+        var damage = rolledDamage;
+
+        if (isCritical)
+            damage *= CombatFormulas.GetCriticalFactor(request.CriticalDamageBonus);
+
+        damage *= damageType.GetDamageFactor();
+
+        if (wasBlocked)
+            damage *= 1f - CombatFormulas.ClampChance(defender.GetFinal(CombatStat.BlockReduction)) / 100f;
+
+        return damage;
     }
 
     private static HitAvoidance GetAvoidance(HitRequest request,

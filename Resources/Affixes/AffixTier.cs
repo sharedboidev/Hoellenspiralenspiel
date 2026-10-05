@@ -24,6 +24,13 @@ public partial class AffixTier : Resource
     [Export]
     public string ItemnameAddition { get; set; }
 
+    //Nur für "Adds X to Y": aus dieser Spanne kommt das Y, aus MinValue bis MaxValue das X
+    [Export]
+    public float MinValueTo { get; set; }
+
+    [Export]
+    public float MaxValueTo { get; set; }
+
     public AffixTierDefinition ToDefinition()
-        => new(Tier, MinItemLevelToAppearOn, Weight, MinValue, MaxValue, ItemnameAddition);
+        => new(Tier, MinItemLevelToAppearOn, Weight, MinValue, MaxValue, ItemnameAddition, MinValueTo, MaxValueTo);
 }

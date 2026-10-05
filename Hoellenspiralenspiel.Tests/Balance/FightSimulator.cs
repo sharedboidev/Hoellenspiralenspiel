@@ -102,8 +102,8 @@ internal static class FightSimulator
             if (life <= 0)
                 return new FightResult(true, step * StepSec, actions, landed, hitDamage, effectDamage);
 
-            if (hit.InflictedEffect is not null)
-                effects.Apply(hit.InflictedEffect);
+            foreach (var effect in hit.InflictedEffects)
+                effects.Apply(effect);
         }
 
         return new FightResult(false, steps * StepSec, actions, landed, hitDamage, effectDamage);

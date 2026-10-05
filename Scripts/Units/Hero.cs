@@ -66,6 +66,7 @@ public partial class Hero
     private          float         lightBaseRange;
     private          float         manaCurrent;
     private          SkillResource orderedSkill;
+    private          bool          wasLeeching;
     private readonly HeroProgress  progress = new();
     private          Vector3       spawnPosition;
     private          IUsable       useTarget;
@@ -172,6 +173,12 @@ public partial class Hero
     public float LightRadiusMeters => light?.OmniRange ?? 0f;
 
     public float ManaMaximum => Stats.GetFinalWhole(CombatStat.Mana);
+
+    public LeechTracker ManaLeech { get; } = new();
+
+    //Was der Leech noch heilt, die Orbs zeigen es halb durchsichtig über dem Stand
+    public float LifePending => LifeLeech.Pending;
+    public float ManaPending => ManaLeech.Pending;
 
     public float ManaCurrent
     {
@@ -359,6 +366,36 @@ public partial class Hero
     {
         if (ManaCurrent < ManaMaximum)
             ManaCurrent += Stats.GetFinal(CombatStat.Manaregeneration) * (float)delta;
+
+        if (ManaLeech.IsActive)
+            ManaCurrent += ManaLeech.Advance(delta);
+
+        ShowLeech();
+    }
+
+    //Was der Leech noch heilt, ändert sich auch bei vollem Leben und Mana. Dann melden sich LifeChanged und ManaCurrent nicht
+    private void ShowLeech()
+    {
+        var isLeeching = LifeLeech.IsActive || ManaLeech.IsActive;
+
+        if (isLeeching || wasLeeching)
+            ResourcesChanged?.Invoke();
+
+        wasLeeching = isLeeching;
+    }
+
+    protected override void GainFromHit(HitResult hit)
+    {
+        base.GainFromHit(hit);
+
+        ManaLeech.Add(HitGains.GetManaLeech(Stats, hit));
+    }
+
+    protected override void GainFromKill()
+    {
+        base.GainFromKill();
+
+        ManaCurrent += HitGains.GetManaOnKill(Stats);
     }
 
     public override void SpendMana(float amount)
@@ -1008,6 +1045,9 @@ public partial class Hero
         CancelAttack();
         actionCycle.Reset();
         StatusEffects.Clear();
+        LifeLeech.Clear();
+        ManaLeech.Clear();
+        ShowLeech();
 
         heldSlot = NoSlot;
         Velocity = Vector3.Zero;

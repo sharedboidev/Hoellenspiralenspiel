@@ -6,6 +6,10 @@ uniform vec4 glass_color : source_color = vec4(1, 1, 1.0, 0.6);
 uniform float wave_strength = 0.02;
 uniform float time_speed = 5;
 
+// Was ein Leech noch heilt, als Anteil am Maximum über dem Stand
+uniform float pending_amount : hint_range(0.0, 1.0) = 0.0;
+uniform float pending_opacity : hint_range(0.0, 1.0) = 0.5;
+
 void fragment() {
     // UV von 0..1 → -1..1
     vec2 uv = UV * 2.0 - 1.0;
@@ -45,6 +49,17 @@ void fragment() {
 	
 	vec3 final_rgb = mix(glass_col, col, liquid_mask);
 	float final_a  = mix(glass_color.a, liquid_color.a, liquid_mask);
-	
+
+	// Über dem Stand dieselbe Flüssigkeit, halb durchsichtig über dem Glas. Sie wandert mit der Welle
+	float pending_height = 1.0 - min(fill_amount + pending_amount, 1.0) * 2.0 + wave;
+	float pending_alpha  = step(pending_height, uv.y) * (1.0 - liquid_mask) * pending_opacity * liquid_color.a;
+
+	if (pending_alpha > 0.0) {
+		float over_a = pending_alpha + final_a * (1.0 - pending_alpha);
+
+		final_rgb = (col * pending_alpha + final_rgb * final_a * (1.0 - pending_alpha)) / over_a;
+		final_a   = over_a;
+	}
+
 	COLOR = vec4(final_rgb, final_a);
 }

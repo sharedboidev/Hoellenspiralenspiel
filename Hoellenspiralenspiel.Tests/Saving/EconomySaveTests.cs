@@ -21,10 +21,11 @@ public class EconomySaveTests
         return loaded;
     }
 
-    //Seit M8, Etappe 3b: Version 6 nennt die Orte eines Abstiegs als Text, etwa "f2"
+    //Seit M8, Etappe 3b: Version 6 nennt die Orte eines Abstiegs als Text, etwa "f2".
+    //Seit den Affixen der Schwerter: Version 7 kennt das Y eines Affixes "Adds X to Y" und neue Stats
     [Test]
-    public void DerSpielstandHatVersion6()
-        => Assert.That(SaveGame.CurrentVersion, Is.EqualTo(6));
+    public void DerSpielstandHatVersion7()
+        => Assert.That(SaveGame.CurrentVersion, Is.EqualTo(7));
 
     [Test]
     public void Gold_UeberstehtDasSpeichern()

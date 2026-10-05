@@ -27,7 +27,8 @@ public static class SaveGameMapper
                               Modification = affix.Modification,
                               Value        = affix.Value,
                               NameAddition = affix.NameAddition,
-                              IsLocal      = affix.IsLocal
+                              IsLocal      = affix.IsLocal,
+                              ValueTo      = affix.ValueTo
                           })
                           .ToList()
         };
@@ -45,7 +46,7 @@ public static class SaveGameMapper
         var item = new ItemInstance(definition, save.ItemLevel, Math.Max(1, save.StackSize)) { RareName = save.RareName };
 
         foreach (var affix in save.Affixes ?? [])
-            item.AddAffix(new ItemAffix(affix.Type, affix.Stat, affix.Modification, affix.Value, affix.NameAddition, affix.IsLocal));
+            item.AddAffix(new ItemAffix(affix.Type, affix.Stat, affix.Modification, affix.Value, affix.NameAddition, affix.IsLocal, affix.ValueTo));
 
         return item;
     }

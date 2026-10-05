@@ -23,6 +23,7 @@ public partial class ResourceOrb : Control
 	private         int            shownCurrent    = int.MinValue;
 	private         float          shownFillAmount = float.NaN;
 	private         int            shownMaximum    = int.MinValue;
+	private         float          shownPending    = float.NaN;
 	[Export] private ResourceType  type;
 
 	public override void _Ready()
@@ -50,7 +51,8 @@ public partial class ResourceOrb : Control
 	{
 		MaxRessource = type == ResourceType.Life ? hero.LifeMaximum : hero.ManaMaximum;
 
-		SetRessource(type == ResourceType.Life ? hero.LifeCurrent : hero.ManaCurrent);
+		SetRessource(type == ResourceType.Life ? hero.LifeCurrent : hero.ManaCurrent,
+		             type == ResourceType.Life ? hero.LifePending : hero.ManaPending);
 	}
 
 	private void ConfigureOrbColors()
@@ -79,17 +81,26 @@ public partial class ResourceOrb : Control
 		orbShader?.SetShaderParameter("liquid_color", c);
 	}
 
-	public void SetRessource(float newValue)
+	//pending ist, was ein Leech noch heilt. Es steht halb durchsichtig über dem Stand und füllt sich nach und nach auf
+	public void SetRessource(float newValue, float pending = 0f)
 	{
 		current = Mathf.Clamp(newValue, 0f, MaxRessource);
 
-		var fillAmount = MaxRessource > 0 ? current / MaxRessource : 0f;
+		var fillAmount    = MaxRessource > 0 ? current / MaxRessource : 0f;
+		var pendingAmount = MaxRessource > 0 ? Mathf.Clamp(pending / MaxRessource, 0f, 1f - fillAmount) : 0f;
 
 		if (!fillAmount.Equals(shownFillAmount))
 		{
 			shownFillAmount = fillAmount;
 
 			orbShader.SetShaderParameter("fill_amount", fillAmount);
+		}
+
+		if (!pendingAmount.Equals(shownPending))
+		{
+			shownPending = pendingAmount;
+
+			orbShader.SetShaderParameter("pending_amount", pendingAmount);
 		}
 
 		var currentToShow = (int)current;

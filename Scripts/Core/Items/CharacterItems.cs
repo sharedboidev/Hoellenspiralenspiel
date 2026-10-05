@@ -41,12 +41,12 @@ public sealed class CharacterItems
     public event Action<ItemInstance> Dropped;
 
     public IReadOnlyList<Requirement> GetUnmetRequirements(ItemInstance item)
-        => ItemRequirements.GetUnmet(item.Definition, getCharacterValue);
+        => ItemRequirements.GetUnmet(item, getCharacterValue);
 
     public bool CanEquip(ItemInstance item)
         => item is not null &&
            item.Definition.IsEquippable &&
-           ItemRequirements.AreMet(item.Definition, getCharacterValue) &&
+           ItemRequirements.AreMet(item, getCharacterValue) &&
            !IsBlockedByTwoHander(item);
 
     public bool HasRoomFor(ItemInstance item)
