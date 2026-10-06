@@ -1,4 +1,4 @@
-"""Welche Familie aus poedb welche Affix-Datei wird.
+"""Welche Familie aus der Datenbank welche Affix-Datei wird.
 
 Ein Eintrag je Vorlage aus data/<Seite>.json: (Datei, Stat, ModificationType, lokal, Brüche, negativ) und bei einem
 hybriden Affix dazu (Stat, ModificationType, lokal) seines zweiten Stats. Lokal heißt, der Affix verändert das Item selbst.
@@ -84,7 +84,7 @@ ARMOUR = {
     '#% to all maximum Resistances': ('AllMaximumResistances', 'AllMaximumResistances', FLAT, False, False, False),
 }
 
-# Seite auf poedb, Ordner unter Prefixes/ und Suffixes/, ItemSlot, WeaponType (None für Rüstung), Tabelle.
+# Seite der Datenbank, Ordner unter Prefixes/ und Suffixes/, ItemSlot, WeaponType (None für Rüstung), Tabelle.
 # Die Zahlen sind die der Enums ItemSlot und WeaponType
 SWORD, BOW, STAFF = 1, 6, 4
 PHYSICAL_WEAPON, HELMET, OFFHAND, HANDS, TORSO, SPELL_WEAPON = 1, 4, 6, 12, 15, 18
@@ -98,5 +98,5 @@ CLASSES = [
     ('Shields_str', 'Armors/Shields', OFFHAND, None, ARMOUR),
 ]
 
-# PoE nennt zwei Familien gleich, hier bekommt jede ihren eigenen Namen: (Datei, PoE-Name) → unser Name
+# Das Original nennt zwei Familien gleich, hier bekommt jede ihren eigenen Namen: (Datei, Name im Original) → unser Name
 FAMILY_NAMES = {('FlatLifeRegeneration', 'of Recuperation'): 'of Wellness'}

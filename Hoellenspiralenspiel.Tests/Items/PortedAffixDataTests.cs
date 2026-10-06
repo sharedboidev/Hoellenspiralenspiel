@@ -11,14 +11,14 @@ using NUnit.Framework;
 
 namespace Hoellenspiralenspiel.Tests.Items;
 
-//Die Affixe je Itemklasse stammen aus den Basis-Affixen von poedb.tw, mit allen Stufen und eigenen Namen.
+//Die Affixe je Itemklasse stammen aus den Basis-Affixen eines gängigen aRPG, der Vorlage, mit allen Stufen und eigenen Namen.
 //Rüstungsteile nehmen die Fassung mit Armour, der Stab die der Zauberstäbe
 [TestFixture]
-public class PoeAffixDataTests
+public class PortedAffixDataTests
 {
     private const string AffixFolder = "res://Resources/Affixes";
 
-    private static readonly PoeClass[] Classes =
+    private static readonly PortedClass[] Classes =
     [
         new("Weapons/Swords", ItemSlot.PhysicalWeapon, WeaponType.Sword,
             ["AddedFireDamage", "AddedFrostDamage", "AddedLightningDamage", "AddedPhysicalDamage", "IncreasedElementalDamage", "IncreasedPhysicalDamage"],
@@ -120,35 +120,35 @@ public class PoeAffixDataTests
     };
 
     private static IEnumerable<TestCaseData> ClassCases()
-        => Classes.Select(poeClass => new TestCaseData(poeClass).SetName($"Klasse_{poeClass.Folder.Replace('/', '_')}"));
+        => Classes.Select(portedClass => new TestCaseData(portedClass).SetName($"Klasse_{portedClass.Folder.Replace('/', '_')}"));
 
     private static IEnumerable<TestCaseData> FileCases()
-        => Classes.SelectMany(poeClass => poeClass.Files().Select(file => new TestCaseData(poeClass, file).SetName($"Datei_{poeClass.Folder.Replace('/', '_')}_{Path.GetFileNameWithoutExtension(file)}")));
+        => Classes.SelectMany(portedClass => portedClass.Files().Select(file => new TestCaseData(portedClass, file).SetName($"Datei_{portedClass.Folder.Replace('/', '_')}_{Path.GetFileNameWithoutExtension(file)}")));
 
-    private static IEnumerable<string> AllPoeFiles()
-        => Classes.SelectMany(poeClass => poeClass.Files());
+    private static IEnumerable<string> AllPortedFiles()
+        => Classes.SelectMany(portedClass => portedClass.Files());
 
     [TestCaseSource(nameof(ClassCases))]
-    public void Klasse_HatGenauDieErwartetenAffixe(PoeClass poeClass)
+    public void Klasse_HatGenauDieErwartetenAffixe(PortedClass portedClass)
     {
         Assert.Multiple(() =>
         {
-            Assert.That(Names(poeClass.PrefixFolder), Is.EquivalentTo(poeClass.Prefixes));
-            Assert.That(Names(poeClass.SuffixFolder), Is.EquivalentTo(poeClass.Suffixes));
+            Assert.That(Names(portedClass.PrefixFolder), Is.EquivalentTo(portedClass.Prefixes));
+            Assert.That(Names(portedClass.SuffixFolder), Is.EquivalentTo(portedClass.Suffixes));
         });
     }
 
     [TestCaseSource(nameof(FileCases))]
-    public void Affix_HatStatArtUndOrtWieErwartet(PoeClass poeClass, string path)
+    public void Affix_HatStatArtUndOrtWieErwartet(PortedClass portedClass, string path)
     {
         var name     = Path.GetFileNameWithoutExtension(path);
         var family   = Families[name];
         var tres     = TresFile.Read(path);
         var values   = tres.Resource;
         var isPrefix = path.Contains($"{Path.DirectorySeparatorChar}Prefixes{Path.DirectorySeparatorChar}", StringComparison.Ordinal);
-        var isLocal  = (poeClass.WeaponType is null ? LocalOnArmour : LocalOnWeapons).Contains(name);
+        var isLocal  = (portedClass.WeaponType is null ? LocalOnArmour : LocalOnWeapons).Contains(name);
         var script   = isPrefix ? "res://Resources/Affixes/Prefixes/Prefix.cs" : "res://Resources/Affixes/Suffixes/Suffix.cs";
-        var weapons  = poeClass.WeaponType is { } weaponType ? new[] { (int)weaponType } : [];
+        var weapons  = portedClass.WeaponType is { } weaponType ? new[] { (int)weaponType } : [];
 
         Assert.Multiple(() =>
         {
@@ -157,7 +157,7 @@ public class PoeAffixDataTests
             Assert.That(values.Enum("ModificationType", ModificationType.Flat), Is.EqualTo(family.Modification));
             Assert.That(values.Bool("AllowFractions", false), Is.EqualTo(family.AllowsFractions));
             Assert.That(values.Bool("IsInherentMod", false), Is.EqualTo(isLocal));
-            Assert.That(IntArray(values.String("AffectableItemTypes")), Is.EqualTo(new[] { (int)poeClass.Slot }));
+            Assert.That(IntArray(values.String("AffectableItemTypes")), Is.EqualTo(new[] { (int)portedClass.Slot }));
             Assert.That(IntArray(values.String("AffectableWeaponTypes")), Is.EqualTo(weapons));
             Assert.That(values.Bool("IsHybrid", false), Is.EqualTo(Hybrids.ContainsKey(name)));
 
@@ -172,7 +172,7 @@ public class PoeAffixDataTests
 
     //Höhere Stufen kommen später und sind stärker. Bei "reduced" zählt der Betrag, bei "Adds X to Y" beide Werte
     [TestCaseSource(nameof(FileCases))]
-    public void Stufen_SindVollstaendigUndSteigen(PoeClass poeClass, string path)
+    public void Stufen_SindVollstaendigUndSteigen(PortedClass portedClass, string path)
     {
         var tiers = Tiers(path);
 
@@ -213,22 +213,22 @@ public class PoeAffixDataTests
     [Test]
     public void AddsXtoY_HabenEineZweiteSpanne()
     {
-        var added = AllPoeFiles().Where(path => Path.GetFileName(path).StartsWith("Added", StringComparison.Ordinal)).ToList();
+        var added = AllPortedFiles().Where(path => Path.GetFileName(path).StartsWith("Added", StringComparison.Ordinal)).ToList();
 
         Assert.Multiple(() =>
         {
             Assert.That(added, Has.Count.EqualTo(19), "vier je Waffe, vier für Angriffe auf Handschuhen, drei für Zauber auf dem Stab");
             Assert.That(added.SelectMany(Tiers), Has.All.Matches<AffixTierDefinition>(tier => tier.HasRange));
-            Assert.That(AllPoeFiles().Except(added).SelectMany(Tiers), Has.None.Matches<AffixTierDefinition>(tier => tier.HasRange));
+            Assert.That(AllPortedFiles().Except(added).SelectMany(Tiers), Has.None.Matches<AffixTierDefinition>(tier => tier.HasRange));
         });
     }
 
-    //Ein Name aus poedb steht in jedem Affix des Spiels für dieselbe Familie, wie in Path of Exile dieselbe Stufe überall gleich heißt.
+    //Ein Name aus der Vorlage steht in jedem Affix des Spiels für dieselbe Familie, wie dort dieselbe Stufe überall gleich heißt.
     //Die alten Affixe teilen sich untereinander zwei Namen ("of Quickness", "of the Lizard"), das bereinigt Etappe 11
     [Test]
     public void JederName_GehoertZuGenauEinerFamilie()
     {
-        var ported = AllPoeFiles().SelectMany(Tiers).Select(tier => tier.NameAddition.Trim()).ToHashSet();
+        var ported = AllPortedFiles().SelectMany(Tiers).Select(tier => tier.NameAddition.Trim()).ToHashSet();
 
         var families = Directory.GetFiles(GameData.ToFile(AffixFolder), "*.tres", SearchOption.AllDirectories)
                                 .SelectMany(path => Tiers(path).Select(tier => (Name: tier.NameAddition.Trim(), Family: FamilyOf(path))))
@@ -241,20 +241,20 @@ public class PoeAffixDataTests
     }
 
     [TestCaseSource(nameof(FileCases))]
-    public void NamenInnerhalbEinerDatei_SindVerschieden(PoeClass poeClass, string path)
+    public void NamenInnerhalbEinerDatei_SindVerschieden(PortedClass portedClass, string path)
         => Assert.That(Tiers(path).Select(tier => tier.NameAddition), Is.Unique);
 
     [TestCaseSource(nameof(ClassCases))]
-    public void Itemlevel1_KannPrefixUndSuffixWuerfeln(PoeClass poeClass)
+    public void Itemlevel1_KannPrefixUndSuffixWuerfeln(PortedClass portedClass)
     {
         Assert.Multiple(() =>
         {
-            Assert.That(Files(poeClass.PrefixFolder).Select(path => Tiers(path).Min(tier => tier.MinItemLevel)), Has.Some.EqualTo(1));
-            Assert.That(Files(poeClass.SuffixFolder).Select(path => Tiers(path).Min(tier => tier.MinItemLevel)), Has.Some.EqualTo(1));
+            Assert.That(Files(portedClass.PrefixFolder).Select(path => Tiers(path).Min(tier => tier.MinItemLevel)), Has.Some.EqualTo(1));
+            Assert.That(Files(portedClass.SuffixFolder).Select(path => Tiers(path).Min(tier => tier.MinItemLevel)), Has.Some.EqualTo(1));
         });
     }
 
-    //"Adds X to Y Fire Damage" heißt in Path of Exile gleich, ob auf der Waffe, für alle Angriffe oder für Zauber. Hier sind das drei Stats einer Familie
+    //"Adds X to Y Fire Damage" heißt in der Vorlage gleich, ob auf der Waffe, für alle Angriffe oder für Zauber. Hier sind das drei Stats einer Familie
     private static readonly Dictionary<CombatStat, CombatStat> SameFamilyAs = new()
     {
         [CombatStat.AddedPhysicalToAttacks]  = CombatStat.PhysicalDamage,
@@ -313,13 +313,13 @@ public class PoeAffixDataTests
                 : [];
     }
 
-    public sealed record PoeClass(string Folder, ItemSlot Slot, WeaponType? WeaponType, string[] Prefixes, string[] Suffixes)
+    public sealed record PortedClass(string Folder, ItemSlot Slot, WeaponType? WeaponType, string[] Prefixes, string[] Suffixes)
     {
         public string PrefixFolder => $"{AffixFolder}/Prefixes/{Folder}";
         public string SuffixFolder => $"{AffixFolder}/Suffixes/{Folder}";
 
         public IEnumerable<string> Files()
-            => PoeAffixDataTests.Files(PrefixFolder).Concat(PoeAffixDataTests.Files(SuffixFolder));
+            => PortedAffixDataTests.Files(PrefixFolder).Concat(PortedAffixDataTests.Files(SuffixFolder));
 
         public override string ToString()
             => Folder;

@@ -1,6 +1,6 @@
-"""Gemeinsames für die Affixe aus Path of Exile: Pfade, das Lesen der Seiten von poedb.tw und die Stats des Spiels.
+"""Gemeinsames für die Affixe nach einem gängigen aRPG, dem Original: Pfade, das Lesen der Seiten seiner Datenbank und die Stats des Spiels.
 
-Eine Seite wie https://poedb.tw/us/Bows trägt alle Mods ihrer Itemklasse als JSON im Aufruf ``new ModsView({...})``.
+Eine Seite der Datenbank, etwa die der Bögen, trägt alle Mods ihrer Itemklasse als JSON im Aufruf ``new ModsView({...})``.
 Unter ``normal`` steht je Stufe ein Eintrag mit Name, Itemlevel, Prefix oder Suffix, Familie, Gewicht und Text.
 """
 
@@ -17,6 +17,7 @@ DATA = HERE / 'data'
 AFFIXES = REPO / 'Resources' / 'Affixes'
 COMBAT_STAT = REPO / 'Enums' / 'CombatStat.cs'
 SYNONYMS = HERE / 'synonyms.json'
+# Die Adresse der Datenbank steht nur hier
 URL = 'https://poedb.tw/us/{page}'
 
 NUMBER = r'[-+]?\d+(?:\.\d+)?'
@@ -106,5 +107,5 @@ def combat_stats():
 
 
 def synonyms():
-    """PoE-Name einer Stufe → unser Name. Dieselbe Stufe heißt in jeder Itemklasse gleich."""
+    """Name einer Stufe im Original → unser Name. Dieselbe Stufe heißt in jeder Itemklasse gleich."""
     return json.loads(SYNONYMS.read_text(encoding='utf-8'))

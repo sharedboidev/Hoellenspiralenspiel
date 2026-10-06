@@ -4,13 +4,13 @@
     python generate.py <Ordner>         schreibt in einen anderen Ordner, etwa zum Vergleichen mit diff -r
 
 Jede Familie aus mapping.CLASSES wird eine Datei unter Prefixes/<Ordner> oder Suffixes/<Ordner>. Die Stufen stehen von der
-niedrigsten zur höchsten, die höchste ist Tier 1. Die Werte kommen 1:1 von poedb, Prozente als ganze Zahlen wie 40 für 40 %.
+niedrigsten zur höchsten, die höchste ist Tier 1. Die Werte kommen 1:1 aus dem Original, Prozente als ganze Zahlen wie 40 für 40 %.
 """
 
 import sys
 from pathlib import Path
 
-import poedb
+import common
 from mapping import CLASSES, FAMILY_NAMES
 
 TIER_SCRIPT = ('uid://sdx5y8g2wvor', 'res://Resources/Affixes/AffixTier.cs')
@@ -19,8 +19,8 @@ SCRIPTS = {
     'Suffix': ('uid://bwwyi50jc5koy', 'res://Resources/Affixes/Suffixes/Suffix.cs', 'Suffixes'),
 }
 
-STATS = poedb.combat_stats()
-NAMES = poedb.synonyms()
+STATS = common.combat_stats()
+NAMES = common.synonyms()
 
 
 def number(value):
@@ -124,11 +124,11 @@ def tiers_of(family, file_name, negative, is_hybrid):
 
 
 def main(arguments):
-    target_root = Path(arguments[0]) if arguments else poedb.AFFIXES
+    target_root = Path(arguments[0]) if arguments else common.AFFIXES
     written = []
 
     for page, folder, slot, weapon_type, table in CLASSES:
-        for family in poedb.read_families(page):
+        for family in common.read_families(page):
             if family['template'] not in table:
                 continue
 
