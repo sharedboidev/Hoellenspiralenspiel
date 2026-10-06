@@ -7,43 +7,51 @@ public partial class Commandline : Control
 {
     public delegate void SpawnUnitsEvent(string unitId, int amount);
 
-    [Export] private TextEdit textEdit;
+    [Export] private LineEdit lineEdit;
     public event SpawnUnitsEvent SpawnUnits;
+
+    public override void _Ready()
+        => lineEdit.TextSubmitted += ExecuteCommand;
 
     public override void _UnhandledKeyInput(InputEvent @event)
     {
-        if (@event is not InputEventKey {Keycode: Key.Enter} keyEvent || !keyEvent.IsReleased())
+        if (!OS.IsDebugBuild() || @event is not InputEventKey { Pressed: true, Echo: false, Keycode: Key.Enter or Key.KpEnter })
             return;
 
-        if (Visible)
-            ExecuteCommand();
-        else
-            ShowCommandline();
+        ShowCommandline();
+
+        GetViewport().SetInputAsHandled();
     }
 
     private void ShowCommandline()
     {
         Visible = true;
-        
-        textEdit.GrabFocus();
+
+        lineEdit.Edit();
     }
 
-    private void ExecuteCommand()
+    private void ExecuteCommand(string commandInput)
     {
-        var commandInterpretation = CommandResolver.Resolve(textEdit.Text);
-
         HideCommandline();
-        
-        if (commandInterpretation is not SpawnDefinition spawnDefinition)
-            return;
 
-        SpawnUnits?.Invoke(spawnDefinition.UnitId, spawnDefinition.Amount);
+        switch (CommandResolver.Resolve(commandInput))
+        {
+            case SpawnDefinition spawnDefinition:
+                SpawnUnits?.Invoke(spawnDefinition.UnitId, spawnDefinition.Amount);
+
+                break;
+
+            case InvalidCommand invalidCommand:
+                GD.PushWarning(invalidCommand.Reason);
+
+                break;
+        }
     }
 
     private void HideCommandline()
     {
-        textEdit.Clear();
-        
+        lineEdit.Clear();
+
         Visible = false;
     }
 }

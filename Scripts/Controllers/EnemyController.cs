@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Resources.Enemies;
 using Hoellenspiralenspiel.Resources.MonsterMods;
 using Hoellenspiralenspiel.Scripts.Core.Economy;
@@ -33,6 +34,8 @@ public partial class EnemyController : Node
     private const float AggroMarginPx       = 100f;
     private const float EyeHeightMeters     = 1.5f;
     private const int   SightChecksPerFrame = 8;
+
+    private const string CommandSpawnGroup = "CommandSpawn";
 
     private readonly List<Node3D>   effects       = new();
     private readonly List<Enemy>    enemies       = new();
@@ -149,14 +152,18 @@ public partial class EnemyController : Node
         EnemyContainer.ChildEnteredTree += NoteEffect;
         EnemyContainer.ChildExitingTree += child => effects.Remove(child as Node3D);
 
-        if(Commandline is not null)
+        //Die Kommandozeile öffnet sich nur im Debug-Build, sonst bleibt ihre Liste der Gegner ungeladen
+        if (Commandline is not null && OS.IsDebugBuild())
+        {
             Commandline.SpawnUnits += CommandlineOnSpawnUnits;
-        
+
+            FillAvailableEnemies();
+        }
+
         if (SpawnMarkers is not null)
             SpawnFrom(SpawnMarkers.GetAllChildren<SpawnMarker>());
-
-        FillAvailableEnemies();
     }
+
     private void FillAvailableEnemies()
     {
         foreach (var enemyResourcePath in ResourceFiles.ListIn(EnemiesPath))
@@ -171,19 +178,19 @@ public partial class EnemyController : Node
         var enemy = availableEnemiesToSpawn.FirstOrDefault(enemy => enemy.Id == unitId);
 
         if (enemy is null)
-            return;
-
-        var markerMock = new SpawnMarker
         {
-            Name = "CommandSpawn",
-            GlobalPosition = Hero.GlobalPosition,
-            Enemy = enemy,
+            GD.PushWarning($"Die Kommandozeile kennt keinen Gegner \"{unitId}\". Bekannt sind: {string.Join(", ", availableEnemiesToSpawn.Select(known => known.Id))}.");
+
+            return;
+        }
+
+        var spawn = new CommandSpawnMarker
+        {
+            Enemy         = enemy,
             AmountToSpawn = amount
         };
-        
-        SpawnGroupAt(markerMock);
-        
-        markerMock.QueueFree();
+
+        SpawnGroupAt(spawn, Hero.GlobalPosition, CommandSpawnGroup);
     }
 
     //Neben den Gegnern hängen hier ihre Wirkungen: Projektile und Flächen
@@ -206,7 +213,7 @@ public partial class EnemyController : Node
     public void SpawnFrom(IEnumerable<SpawnMarker> markers)
     {
         foreach (var marker in markers)
-            SpawnGroupAt(marker);
+            SpawnGroupAt(marker, marker.GlobalPosition, marker.Name);
     }
 
     //Räumt die Karte für die nächste Ebene. Niemand stirbt dabei, es gibt weder XP noch Beute
@@ -343,26 +350,27 @@ public partial class EnemyController : Node
     private static bool IsInSight(PhysicsDirectSpaceState3D space, Vector3 eye, Vector3 point)
         => space.IntersectRay(PhysicsRayQueryParameters3D.Create(eye, point, CollisionLayers.Walls)).Count == 0;
 
-    private void SpawnGroupAt(SpawnMarker marker)
+    //Die Mitte kommt getrennt von den Angaben, weil ein Spawn aus der Kommandozeile keinen Knoten in der Szene hat
+    private void SpawnGroupAt(ISpawnDefinition spawn, Vector3 center, string spawnGroup)
     {
-        if (marker.Enemy is null)
+        if (spawn.Enemy is null)
         {
-            GD.PushWarning($"Der Spawn-Marker {marker.Name} hat keinen Gegner.");
+            GD.PushWarning($"Der Spawn-Marker {spawnGroup} hat keinen Gegner.");
 
             return;
         }
 
-        var level   = EnemyScaling.GetLevel(AreaLevel, marker.Enemy.LevelOffset, marker.LevelOffset);
+        var level   = EnemyScaling.GetLevel(AreaLevel, spawn.Enemy.LevelOffset, spawn.LevelOffset);
         var chances = new EnemyRarityChances(EliteChancePercent, RareEliteChancePercent);
 
-        for (var i = 0; i < marker.AmountToSpawn; i++)
+        for (var i = 0; i < spawn.AmountToSpawn; i++)
         {
             //Auch ein Boss verbraucht die beiden Würfe, damit die übrigen Spawns der Ebene bleiben, wo sie sind
             var modCount = EnemyRarityRules.RollModCount(chances, GameRandom.Shared);
-            var area     = new SpawnArea(marker.GlobalPosition, marker.ScatterRadius, marker.MinGap, marker.Enemy.AggroRange + AggroMarginPx);
-            var enemy    = marker.Enemy.IsBoss
-                                   ? Spawn(marker.Enemy, area, marker.Name, level, marker.Enemy.FixedMods.Where(mod => mod is not null).ToList(), EnemyRarity.Boss)
-                                   : Spawn(marker.Enemy, area, marker.Name, level, modCount);
+            var area     = new SpawnArea(center, spawn.ScatterRadius, spawn.MinGap, spawn.Enemy.AggroRange + AggroMarginPx);
+            var enemy    = spawn.Enemy.IsBoss
+                                   ? Spawn(spawn.Enemy, area, spawnGroup, level, spawn.Enemy.FixedMods.Where(mod => mod is not null).ToList(), EnemyRarity.Boss)
+                                   : Spawn(spawn.Enemy, area, spawnGroup, level, modCount);
 
             enemy.SpawnIndex = nextSpawnIndex++;
         }

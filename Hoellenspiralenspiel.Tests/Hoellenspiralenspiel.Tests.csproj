@@ -17,6 +17,7 @@
         <Compile Include="..\Enums\CombatStat.cs" Link="Enums\CombatStat.cs" />
         <Compile Include="..\Enums\ItemSlot.cs" Link="Enums\ItemSlot.cs" />
         <Compile Include="..\Enums\ModificationType.cs" Link="Enums\ModificationType.cs" />
+        <Compile Include="..\Scripts\Utils\CommandResolver.cs" Link="Utils\CommandResolver.cs" />
     </ItemGroup>
 
     <ItemGroup>

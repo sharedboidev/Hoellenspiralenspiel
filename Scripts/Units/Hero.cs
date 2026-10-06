@@ -654,6 +654,10 @@ public partial class Hero
     //Oben auf dem Bildschirm ist die Blickrichtung der Kamera auf dem Boden
     private Vector3 GetInputDirection()
     {
+        //Beim Tippen in ein Textfeld gehören die Richtungstasten dem Text
+        if (InputActions.IsTyping(GetViewport()))
+            return Vector3.Zero;
+
         var input = Input.GetVector(InputActions.MoveLeft, InputActions.MoveRight, InputActions.MoveUp, InputActions.MoveDown);
 
         if (input == Vector2.Zero)
