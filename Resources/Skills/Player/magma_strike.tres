@@ -1,12 +1,19 @@
-[gd_resource type="Resource" script_class="AttackSkillResource" format=3]
+[gd_resource type="Resource" script_class="AttackSkillResource" format=3 uid="uid://dcovp1vpjx87s"]
 
-[ext_resource type="Script" path="res://Resources/Skills/AttackSkillResource.cs" id="1_script"]
-[ext_resource type="Texture2D" path="res://Textures/Skills/Icons/magma_strike.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://06hypuyik5ex" path="res://Resources/Skills/AttackSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://b7tjtlaifb76" path="res://Textures/Skills/Icons/magma_strike.png" id="2_icon"]
 [ext_resource type="PackedScene" path="res://Scenes/Skills/magma_slash.tscn" id="3_slash"]
-[ext_resource type="PackedScene" path="res://Scenes/Skills/magma_ball.tscn" id="4_ball"]
+[ext_resource type="PackedScene" uid="uid://bsaeupplmahlc" path="res://Scenes/Skills/magma_ball.tscn" id="4_ball"]
 
 [resource]
 script = ExtResource("1_script")
+WeaponDamagePercent = 80.0
+ConvertsDamageType = true
+DealtAs = 3
+ScatterCount = 3
+ScatterWeaponDamagePercent = 65.0
+ScatterFlightSec = 0.6
+ScatterScene = ExtResource("4_ball")
 Id = "magma_strike"
 DisplayName = "Magma Strike"
 Description = "Strikes with the melee weapon and turns its physical damage into fire. A landed hit flings three magma balls out of the target that burst around it. Needs a melee weapon."
@@ -14,11 +21,3 @@ Icon = ExtResource("2_icon")
 ManaCost = 2.0
 Delivery = 5
 EffectScene = ExtResource("3_slash")
-WeaponDamagePercent = 80.0
-ConvertsDamageType = true
-DealtAs = 3
-ScatterCount = 3
-ScatterWeaponDamagePercent = 65.0
-ScatterImpactRadius = 75.0
-ScatterFlightSec = 0.6
-ScatterScene = ExtResource("4_ball")

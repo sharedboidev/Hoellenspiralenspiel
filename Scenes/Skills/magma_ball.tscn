@@ -1,7 +1,7 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bsaeupplmahlc"]
 
 [ext_resource type="Script" path="res://Scripts/Skills/Effects/LobbedArea.cs" id="1_script"]
-[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="90_ps1"]
+[ext_resource type="Shader" uid="uid://c2lknp40isk5w" path="res://Shaders/Ps1/ps1_surface.gdshader" id="90_ps1"]
 
 [sub_resource type="SphereMesh" id="Mesh_ball"]
 radius = 0.08
@@ -10,10 +10,17 @@ radial_segments = 8
 rings = 4
 
 [sub_resource type="ShaderMaterial" id="Mat_ball"]
+render_priority = 0
 shader = ExtResource("90_ps1")
 shader_parameter/albedo = Color(0.3, 0.06, 0, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
 shader_parameter/emission = Color(1, 0.42, 0.06, 1)
 shader_parameter/emission_energy = 3.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(852, 480)
+shader_parameter/affine = 1.0
 
 [sub_resource type="SphereMesh" id="Mesh_burst"]
 radius = 1.0
@@ -22,41 +29,49 @@ radial_segments = 8
 rings = 4
 
 [sub_resource type="ShaderMaterial" id="Mat_burst"]
+render_priority = 0
 shader = ExtResource("90_ps1")
 shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
 shader_parameter/emission = Color(1, 0.28, 0.04, 1)
 shader_parameter/emission_energy = 2.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(852, 480)
+shader_parameter/affine = 1.0
 
-[node name="MagmaBall" type="Node3D" node_paths=PackedStringArray("Ball", "Visual", "Impact")]
+[node name="MagmaBall" type="Node3D" unique_id=1132470248 node_paths=PackedStringArray("Ball", "Visual", "Impact")]
 script = ExtResource("1_script")
 Ball = NodePath("Ball")
 Visual = NodePath("Visual")
 Impact = NodePath("Visual/Impact")
 LingerSec = 0.25
 
-[node name="Ball" type="Node3D" parent="."]
+[node name="Ball" type="Node3D" parent="." unique_id=1030771842]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="Ball"]
+[node name="Mesh" type="MeshInstance3D" parent="Ball" unique_id=795564251]
 cast_shadow = 0
 mesh = SubResource("Mesh_ball")
 surface_material_override/0 = SubResource("Mat_ball")
 
-[node name="Glow" type="OmniLight3D" parent="Ball"]
+[node name="Glow" type="OmniLight3D" parent="Ball" unique_id=1005541746]
 light_color = Color(1, 0.45, 0.1, 1)
 light_energy = 2.0
 omni_range = 3.5
 
-[node name="Visual" type="Node3D" parent="."]
+[node name="Visual" type="Node3D" parent="." unique_id=1120663489]
 
-[node name="Impact" type="Node3D" parent="Visual"]
+[node name="Impact" type="Node3D" parent="Visual" unique_id=1262418755]
 
-[node name="Burst" type="MeshInstance3D" parent="Visual/Impact"]
+[node name="Burst" type="MeshInstance3D" parent="Visual/Impact" unique_id=1553241361]
 transform = Transform3D(1, 0, 0, 0, 0.18, 0, 0, 0, 1, 0, 0.02, 0)
 cast_shadow = 0
 mesh = SubResource("Mesh_burst")
 surface_material_override/0 = SubResource("Mat_burst")
 
-[node name="Flash" type="OmniLight3D" parent="Visual/Impact"]
+[node name="Flash" type="OmniLight3D" parent="Visual/Impact" unique_id=1778312263]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 light_color = Color(1, 0.45, 0.12, 1)
 light_energy = 3.0

@@ -1,7 +1,10 @@
-[gd_resource type="Resource" script_class="EnemyResource" format=3]
+[gd_resource type="Resource" script_class="EnemyResource" format=3 uid="uid://bcei57fk674k3"]
 
-[ext_resource type="Script" path="res://Resources/Enemies/EnemyResource.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://bmpu5y461n42y" path="res://Resources/Enemies/EnemyResource.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://dqp8m51rbyxy6" path="res://Resources/Items/EquippableBaseResource.cs" id="1_sdltj"]
 [ext_resource type="PackedScene" uid="uid://b3kq7skel0nmx" path="res://Scenes/Units/Enemies/skeleton.tscn" id="2_scene"]
+[ext_resource type="Script" uid="uid://bmdtfopxhfr80" path="res://Resources/MonsterMods/MonsterModResource.cs" id="2_v0fvh"]
+[ext_resource type="Script" uid="uid://dk01712rxao5r" path="res://Resources/Skills/SkillResource.cs" id="4_n5akn"]
 
 [resource]
 script = ExtResource("1_script")
