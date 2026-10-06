@@ -3280,7 +3280,7 @@ Von mir festgelegt, weil es sich aus dem Bau ergab:
 | Punkt | Festlegung |
 |---|---|
 | Startbelegung | Magma Strike liegt bei neuen Charakteren auf `1`. Bestehende Charaktere legen ihn per Rechtsklick auf einen Platz |
-| Größe der Kugel | 16 cm Durchmesser, der Kopf des Helden misst 32 cm |
+| Größe der Kugel | Gebaut mit 16 cm Durchmesser, der Kopf des Helden misst 32 cm. Seit dem 06.10.2026 sind es 32 cm, siehe die Rückmeldung unten |
 | Höhe | Die Spitze liegt bei 2,7 m über dem Boden, dem Anderthalbfachen der 1,8 m des Helden. Sie steht in `magma_ball.tscn` |
 | Start | Aus der Mitte des Körpers, bei einem Skelett 0,87 m hoch |
 | Flugzeit | 0,6 s, so steil, wie es die kurze Strecke erlaubt |
@@ -3323,10 +3323,70 @@ Geprüft, alles fehlerfrei:
 
 Bewusst offen gelassen:
 
-- Mit 16 cm Durchmesser ist eine Kugel in der Kamera des Spiels nur ein bis zwei Pixel groß. Sie leuchtet und färbt den Boden und die Figuren unter sich orange. Ob sie größer werden oder einen Schweif bekommen soll, entscheidet der User.
+- Entschieden am 06.10.2026, siehe die Rückmeldung unten: Mit 16 cm Durchmesser war eine Kugel in der Kamera des Spiels nur ein bis zwei Pixel groß.
 - Das Icon ist ein gezeichneter Platzhalter, bis der User ein eigenes liefert.
 - Ton für Schlag, Flug und Einschlag fehlt, er kommt mit Etappe 13 von M8.
 - Der Kampfsimulator der Balance-Tests liest die Kugeln, wertet sie aber nicht aus. Er schlägt nur mit dem Hauptteil.
+
+Rückmeldung des Users nach dem Spielen, am 06.10.2026: Er hat die Kugel selbst im Editor verdoppelt.
+
+- Erledigt vom User: Der Knoten `Ball` in `magma_ball.tscn` trägt Scale 2. Die Kugel misst damit 32 cm, so viel wie der Kopf des Helden. Ihr Licht hängt an demselben Knoten. Radius und Schaden des Einschlags bleiben, wie sie waren.
+- Dabei hat der Editor `magma_strike.tres`, `lightning_strike.tres` und `skeleton.tres` neu gespeichert, ohne Werte zu ändern. `ScatterImpactRadius` steht seither nicht mehr in `magma_strike.tres`, weil 75 der Standard des Felds ist. Die 1834 Unit-Tests laufen damit unverändert durch.
+
+#### Nebenbei: Kommandozeile zum Testen
+
+Gebaut vom User selbst am 05.10.2026 auf `master_MagmaStrike` (`02157f4`, `7251f2b`, `4712cec`). Am 06.10.2026 habe ich seinen Stand durchgesehen, fünf Befunde gemeldet und auf seinen Wunsch behoben (`263f3d2`).
+
+Was sie kann:
+
+- `Enter` öffnet im Debug-Build eine Textzeile oben links im Hud, auch das `Enter` auf dem Ziffernblock. `Enter` schickt den Befehl ab und schließt die Zeile, auf leerer Zeile schließt es sie nur.
+- `spawn <unit_id> <amount>` stellt Gegner um den Helden, etwa `spawn skeleton 3`. `unit_id` ist die `Id` einer `EnemyResource` unter `Resources/Enemies`: `skeleton`, `skeleton_king`, `blue_blob`, `yellow_blob` und `test_enemy`.
+- Die Gegner entstehen wie die aus einem Spawn-Marker: mit dem Level des Bereichs, mit den Würfen für Elite und Rare Elite, mit Beute, Gold und XP. Beim Erscheinen halten sie Abstand zum Helden, ihre Aggro-Reichweite plus 1 m. Zusammen bilden sie die Gruppe `CommandSpawn`.
+- Fehleingaben schreiben eine Warnung ins Log von Godot und tun sonst nichts: ein unbekannter Befehl, fehlende Angaben, eine Anzahl unter 1 oder keine Zahl, ein unbekannter Gegner samt der Liste der bekannten.
+
+So funktioniert es:
+
+- `Commandline` (`Scenes/UI/Commandline.tscn`, im Hud von `game.tscn`) öffnet sich in `_UnhandledKeyInput` und hört auf `TextSubmitted` ihres `LineEdit`.
+- `CommandResolver.Resolve` zerlegt die Eingabe und liefert `SpawnDefinition`, `InvalidCommand` mit Grund oder bei leerer Eingabe nichts. Er ist reines C# und im Testprojekt als Datei verlinkt.
+- `Commandline` meldet einen Spawn über das Ereignis `SpawnUnits`. `EnemyController` hört nur im Debug-Build darauf und lädt nur dann die Liste der Gegner.
+- `EnemyController.SpawnGroupAt` nimmt die Angaben als `ISpawnDefinition`, dazu Mitte und Gruppe. `SpawnMarker` liefert sie aus der Szene, `CommandSpawnMarker` aus der Kommandozeile, mit der Stelle des Helden als Mitte.
+
+Die fünf Befunde vom 06.10.2026 und ihre Korrektur:
+
+| Befund | Ursache | Korrektur |
+|---|---|---|
+| Die Gegner erschienen am Welt-Ursprung statt beim Helden | Der Spawn lief über einen `SpawnMarker`, der nie im Baum hing. Außerhalb des Baums schreibt `GlobalPosition` nur die lokale Position und liest (0, 0, 0), jeweils mit Fehlermeldung | `SpawnGroupAt` bekommt die Mitte getrennt, die Kommandozeile braucht keinen Knoten mehr |
+| Tippen steuerte das Spiel. Der Held lief bei `W`, `A`, `S` und `D`, `B` öffnete das Charakterblatt, und das nächste Leerzeichen schloss es und fehlte im Text. `spawn blue_blob 2` kam deshalb nie an | `InputActions.IsTyping` erkennt nur `LineEdit`, die Zeile war ein `TextEdit`. Der Held fragte die Richtungstasten ohne diese Prüfung ab | Die Zeile ist ein `LineEdit`. `Hero.GetInputDirection` liefert nichts, solange ein Textfeld den Fokus hat |
+| Fehleingaben warfen Ausnahmen, und die Zeile blieb offen | `CommandResolver` griff ohne Prüfung auf die Angaben zu und warf bei einer Nicht-Zahl | `InvalidCommand` statt Ausnahme. Die Zeile schließt, bevor der Befehl ausgewertet wird |
+| `gui_input` der Zeile hing an `_on_gui_input`, einer Methode, die es nicht gibt | Rest aus dem Editor | Verbindung entfernt |
+| Die Zeile öffnete sich auch im Release-Build | Keine Prüfung wie bei `F1` bis `F6` | `OS.IsDebugBuild()` beim Öffnen und vor dem Laden der Gegnerliste |
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Öffnen | Beim Drücken von `Enter`, nicht mehr beim Loslassen. Das `Enter` zum Abschicken nimmt das Textfeld selbst, sonst öffnete das Loslassen die Zeile gleich wieder |
+| Anzahl | Bleibt Pflicht. `spawn skeleton` ohne Zahl ist eine Fehleingabe, keine Abkürzung für einen Gegner |
+| Richtungstasten in Textfeldern | Die Regel gilt für jedes Textfeld, also auch für das Goldfeld der Truhe. Hat es den Fokus, läuft der Held nicht mit `W`, `A`, `S` und `D`. Ein Klick daneben, `Enter` oder ein Knopf der Truhe gibt den Fokus wie bisher ab |
+| Sprache der Meldungen | Deutsch wie die übrigen Warnungen im Log |
+
+Ein neuer Befehl: in `CommandResolver` ein Record für sein Ergebnis und ein Zweig in `Resolve`, in `Commandline.ExecuteCommand` ein Fall, der das Ergebnis über ein eigenes Ereignis weitergibt, und ein Empfänger, der im Debug-Build darauf hört.
+
+Geprüft:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Unit-Tests | 13 neue für `CommandResolver`: Gegner und Anzahl, überzählige Leerzeichen und Zeilenende, leere Eingabe, fehlende Angaben, keine Zahl, 0, negativ, Kommazahl, unbekannter Befehl mit Namen in der Meldung. Zusammen 1847 |
+| Laufendes Spiel, headless | 34 Prüfungen im Hub mit echten Tastendrücken, alle bestanden, keine Fehler im Log. Die Zeile öffnet und schließt mit `Enter` und mit dem `Enter` des Ziffernblocks. Bei offener Zeile bewegt ein gehaltenes `W` den Helden 0,00 m, und `B` öffnet das Charakterblatt nicht, beide Zeichen stehen im Text. Bei geschlossener Zeile läuft der Held mit `W` 2,50 m, und `B` öffnet das Blatt. Sechs Fehleingaben schließen die Zeile, spawnen nichts und schreiben je eine Warnung. `spawn skeleton 3` bringt drei Skelette 6,8 bis 8,4 m vom Helden, der 18 m vom Ursprung steht. `spawn blue_blob 2` bringt zwei Blue Blobs |
+| Gegenprobe mit dem alten Stand | Dieselbe Probe scheitert an 13 Stellen: Die Skelette stehen 16,2 bis 19,4 m vom Helden und 2,5 bis 3,9 m vom Ursprung, der Held läuft beim Tippen 2,50 m, das Charakterblatt geht auf, drei Eingaben werfen `IndexOutOfRangeException` und eine `ArgumentException`, aus `spawn blue_blob 2` wird `spawn blue_blob2` |
+| Spielstand | Die Proben liefen in einem eigenen Worktree mit eigenem Spielstand und eigenen Einstellungen, die des Users blieben unberührt. Die Probe ist wieder gelöscht |
+
+Bewusst offen gelassen:
+
+- Ein Release-Build ist nicht geprüft, der Schutz ist nur gelesen. Ein Lauf mit Fenster und echter Tastatur fehlt ebenfalls.
+- Meldungen stehen nur im Log von Godot, nicht im Spiel.
+- Die Zeile kennt nur `spawn`.
 
 ### M9: Inhalt und Politur (L, fortlaufend)
 

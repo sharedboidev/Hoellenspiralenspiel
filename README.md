@@ -472,10 +472,10 @@ Die 3D-Fassung hat die 2D-Fassung abgelöst und benutzt dieselbe Spiellogik und 
 </div>
 
 <details>
-<summary>Debug-Tasten und Mausrad</summary>
+<summary>Debug-Tasten, Kommandozeile und Mausrad</summary>
 
-`F1` bis `F6` wirken nur im Debug-Build, etwa beim Start aus dem Editor.
-Sie schalten nur zum Testen um und ändern die Einstellungen nicht.
+`F1` bis `F6` und die Kommandozeile wirken nur im Debug-Build, etwa beim Start aus dem Editor.
+Die Tasten schalten nur zum Testen um und ändern die Einstellungen nicht.
 Das Mausrad wirkt immer.
 
 | Taste | Aktion |
@@ -486,6 +486,7 @@ Das Mausrad wirkt immer.
 | `F4` | Dunkle Scheiben statt Schatten aus Lichtern und zurück. Es beginnt wie unter Real Shadows eingestellt. Der Held behält seinen Kreis in beiden Fällen |
 | `F5` | Ganze Karte der Ebene zeigen und zurück zum Erkundeten |
 | `F6` | Ins Testgelände und zurück in den Hub |
+| `Enter` | Kommandozeile oben links öffnen. `spawn <unit_id> <amount>` stellt Gegner um den Helden, außerhalb ihrer Aggro-Reichweite, etwa `spawn skeleton 3`. Bekannt sind `skeleton`, `skeleton_king`, `blue_blob`, `yellow_blob` und `test_enemy`. `Enter` schickt ab, auf leerer Zeile schließt es sie. Solange sie offen ist, gehören die Tasten dem Text. Fehleingaben stehen als Warnung im Log |
 | Mausrad | Kamera in Schritten näher heranholen und zurück. Weiter weg als zum Start geht es nicht. Im Debug-Build zeigt die Statuszeile, wie viele Meter das Bild zeigt und wie weit die Kamera entfernt ist. Der Nebel rückt mit. |
 
 </details>
@@ -544,7 +545,7 @@ Die Skill-Leiste zeigt immer die aktuelle Taste.
 | Rechte Maustaste im Inventar | Item anlegen oder Trank trinken |
 | `Shift` halten über einem Item | Das getragene Item am selben Platz links daneben zeigen, in Inventar, Truhe und Händler |
 | Mausrad | Kamera näher heranholen und zurück |
-| `F1` bis `F6` | Tasten zum Testen, nur im Debug-Build. Mehr unter [3D im PS1-Look](#-3d-im-ps1-look) |
+| `F1` bis `F6`, `Enter` | Tasten zum Testen und die Kommandozeile, nur im Debug-Build. Mehr unter [3D im PS1-Look](#-3d-im-ps1-look) |
 
 ---
 
