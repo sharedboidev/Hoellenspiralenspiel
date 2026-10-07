@@ -8,8 +8,9 @@ namespace Hoellenspiralenspiel.Scripts.Core.Skills;
 //Ein Wirbel, der läuft, solange die Taste gehalten wird. Er kostet Mana je Sekunde statt je Einsatz und trifft in Ticks:
 //je Angriff des Angriffstempos TicksPerAttack Ticks, jeder mit dem Waffenschaden des Skills auf alle im Kreis.
 //Der erste Tick kommt nach der Hälfte eines Intervalls wie der Treffer eines Schlags, danach einer je Intervall.
-//Geht das Mana aus, endet der Wirbel. Danach erholt sich der Held wie nach einem Angriff
-public sealed record ChannelSettings(float ManaPerSec, float TicksPerAttack = 1f)
+//Geht das Mana aus, endet der Wirbel. Danach erholt sich der Held wie nach einem Angriff.
+//TurnsPerTick ist nur Darstellung: so oft dreht der Wirbelnde sich zwischen zwei Ticks. Mit GrantsPhasing hat er solange keine Kollision mit Gegnern
+public sealed record ChannelSettings(float ManaPerSec, float TicksPerAttack = 1f, float TurnsPerTick = 1f, bool GrantsPhasing = false)
 {
     public const float FullTurnDegrees = 360f;
 
@@ -45,7 +46,7 @@ public sealed record ChannelSettings(float ManaPerSec, float TicksPerAttack = 1f
     public bool CanContinue(float availableMana, double deltaSec)
         => ManaPerSec <= 0f || availableMana >= GetManaFor(deltaSec);
 
-    //Eine Umdrehung je Tick: So streicht die Waffe zwischen zwei Treffern einmal an jedem vorbei
+    //TurnsPerTick Umdrehungen je Tick, mit schnellerem Angriffstempo also auch schneller. Unter 0 steht die Waffe still
     public double GetSpinDegreesPerSec(float attacksPerSec)
-        => FullTurnDegrees * GetTicksPerSec(attacksPerSec);
+        => FullTurnDegrees * Math.Max(0f, TurnsPerTick) * GetTicksPerSec(attacksPerSec);
 }

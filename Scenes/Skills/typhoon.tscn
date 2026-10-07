@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://Scripts/Skills/Effects/MeleeSlash.cs" id="1_script"]
+[ext_resource type="Script" path="res://Scripts/Skills/Effects/WhirlTrail.cs" id="1_script"]
 
 [sub_resource type="StandardMaterial3D" id="Mat_typhoon"]
 transparency = 1
@@ -11,11 +11,10 @@ vertex_color_use_as_albedo = true
 [node name="Typhoon" type="Node3D" node_paths=PackedStringArray("Band")]
 script = ExtResource("1_script")
 Band = NodePath("Band")
-ArcDegrees = 360.0
+TrailDegrees = 200.0
 WidthFraction = 0.4
 HeightMeters = 0.9
-SweepSec = 0.7
-TrailSec = 0.2
+FadeSec = 0.2
 Segments = 48
 Color = Color(0.8, 0.9, 1, 1)
 TailAlpha = 0.15

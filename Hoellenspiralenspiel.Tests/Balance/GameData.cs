@@ -194,7 +194,10 @@ internal static class GameData
                     ? new SweepSettings(values.Float("SweepArcDegrees", 180f), values.Float("SweepRangeFactor", 1f))
                     : null,
             Channel = delivery == SkillDelivery.WeaponWhirl
-                    ? new ChannelSettings(values.Float("ChannelManaPerSec", 3f), values.Float("ChannelTicksPerAttack", 1f))
+                    ? new ChannelSettings(values.Float("ChannelManaPerSec", 3f),
+                                          values.Float("ChannelTicksPerAttack", 1f),
+                                          values.Float("ChannelTurnsPerTick", 1f),
+                                          values.Bool("ChannelGrantsPhasing", false))
                     : null
         };
     }

@@ -12,6 +12,8 @@ using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.Skills;
 
+public record SkillExecutionDefinition(BaseUnit Caster, SkillResource Skill, SkillAim SkillAim);
+
 public static class SkillExecutor
 {
     //Die Kugeln springen aus der Mitte des Körpers
@@ -223,28 +225,32 @@ public static class SkillExecutor
         arrow.GlobalPosition = caster.GlobalPosition + Vector3.Up * SkyShotStartHeightMeters + facing * SkyShotStartAheadMeters;
     }
 
-    //Ein Tick des Wirbels trifft jeden im Kreis. Der Hieb beginnt an der Waffe und läuft bis zum nächsten Tick einmal herum,
-    //so wie der Wirbelnde sich dreht. Die Waffe zeigt nach vorn, der Hieb von MeleeSlash beginnt hinten, deshalb die Gegenrichtung
+    //Ein Tick des Wirbels trifft jeden im Kreis. Zu sehen gibt es je Tick nichts Eigenes: Der Schweif aus ShowWhirlTrail läuft die ganze Zeit mit der Waffe
     private static void Whirl(BaseUnit caster, SkillCast cast, SkillResource skill, SkillAim aim)
     {
         var definition = skill.Definition;
 
-        if (definition.Sweep is not { } sweep || definition.Channel is not { } channel)
+        if (definition.Sweep is not { } sweep)
         {
             GD.PushWarning($"{caster.Name} hat keinen Kreis für {definition.Name}.");
 
             return;
         }
 
-        var facing   = GetFacing(caster, aim);
-        var fullArc  = sweep with { ArcDegrees = SweepSettings.FullCircleDegrees };
-        var slashSec = channel.GetIntervalSec(ChannelSettings.GetAttacksPerSec(caster.Stats));
+        Sweep(caster, cast, null, sweep with { ArcDegrees = SweepSettings.FullCircleDegrees }, GetFacing(caster, aim));
+    }
 
-        Sweep(caster, cast, skill.EffectScene, fullArc, facing, -facing, slashSec);
+    //Der Schweif des Wirbels hängt am Wirbelnden und folgt seiner Waffe, bis er ihn mit Dismiss zurücknimmt. Sein Radius ist der Kreis der Ticks
+    public static WhirlTrail ShowWhirlTrail(BaseUnit caster, SkillResource skill)
+    {
+        if (skill.Definition.Sweep is not { } sweep)
+            return null;
+
+        return WhirlTrail.Show(skill.EffectScene, caster, WorldScale.ToMeters(caster.BodyRadiusPx + sweep.GetReach(caster.Weapon)));
     }
 
     //Der Bogen zeigt, wohin der Schlagende beim Ausholen schaute. Wer währenddessen hinter ihn läuft, entgeht ihm
-    private static void Sweep(BaseUnit caster, SkillCast cast, PackedScene slashScene, SweepSettings sweep, Vector3 facing, Vector3? slashFacing = null, double slashSec = 0)
+    private static void Sweep(BaseUnit caster, SkillCast cast, PackedScene slashScene, SweepSettings sweep, Vector3 facing)
     {
         if (sweep is null)
             return;
@@ -252,7 +258,7 @@ public static class SkillExecutor
         var reachPx = sweep.GetReach(caster.Weapon);
         var center  = caster.GlobalPosition;
 
-        ShowSlash(caster, slashScene, slashFacing ?? facing, caster.BodyRadiusPx + reachPx, sweep.ArcDegrees, slashSec);
+        ShowSlash(caster, slashScene, facing, caster.BodyRadiusPx + reachPx, sweep.ArcDegrees);
 
         UnitRegistry.FindNear(center, caster.BodyRadiusPx + reachPx, UnitsInReach);
 
@@ -276,8 +282,7 @@ public static class SkillExecutor
         return WorldScale.OnGround(aim.CurrentPoint - caster.GlobalPosition).Normalized();
     }
 
-    //Eine Dauer von 0 lässt dem Hieb die Zeit seiner Szene
-    private static void ShowSlash(BaseUnit caster, PackedScene scene, Vector3 facing, float radiusPx, float arcDegrees = 0f, double sweepSec = 0)
+    private static void ShowSlash(BaseUnit caster, PackedScene scene, Vector3 facing, float radiusPx, float arcDegrees = 0f)
     {
         if (scene is null)
             return;
@@ -285,9 +290,6 @@ public static class SkillExecutor
         var slash = scene.Instantiate<MeleeSlash>();
 
         slash.Launch(facing, WorldScale.ToMeters(radiusPx), arcDegrees);
-
-        if (sweepSec > 0)
-            slash.SweepSec = (float)sweepSec;
 
         caster.GetParent().AddChild(slash);
 

@@ -68,13 +68,30 @@ public class ChannelSettingsTests
     }
 
     //Eine Umdrehung je Tick: Die Waffe streicht zwischen zwei Treffern einmal an jedem vorbei
+    //Die Drehung ist nur Darstellung: TurnsPerTick Umdrehungen je Tick, Standard eine. Der User wollte sie am 07.10.2026 schneller und im Inspector einstellbar
     [Test]
-    public void DerHeldDrehtSichEinmalJeTick()
+    public void DerHeldDrehtSichTurnsPerTickMalJeTick()
     {
         Assert.Multiple(() =>
         {
+            Assert.That(Typhoon.TurnsPerTick, Is.EqualTo(1f), "Standard eine Umdrehung je Tick");
             Assert.That(Typhoon.GetSpinDegreesPerSec(1f), Is.EqualTo(360).Within(Tolerance));
-            Assert.That(new ChannelSettings(3f, 2f).GetSpinDegreesPerSec(1.5f), Is.EqualTo(1080).Within(Tolerance));
+            Assert.That(new ChannelSettings(3f, 2f).GetSpinDegreesPerSec(1.5f), Is.EqualTo(1080).Within(Tolerance), "drei Ticks je Sekunde, je eine Umdrehung");
+            Assert.That(new ChannelSettings(3f, 1f, 2f).GetSpinDegreesPerSec(1.5f), Is.EqualTo(1080).Within(Tolerance), "anderthalb Ticks je Sekunde, je zwei Umdrehungen");
+            Assert.That(new ChannelSettings(3f, 1f, 0.5f).GetSpinDegreesPerSec(2f), Is.EqualTo(360).Within(Tolerance), "eine halbe Umdrehung je Tick geht auch");
+            Assert.That(new ChannelSettings(3f, 1f, -1f).GetSpinDegreesPerSec(2f), Is.Zero, "unter null steht die Waffe");
+        });
+    }
+
+    //Phasing hebt die Kollision mit Gegnern auf, solange der Wirbel läuft. Ein Kanal hat es nur, wenn die Resource es sagt
+    [Test]
+    public void PhasingGibtEsNurAufWunsch()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(Typhoon.GrantsPhasing, Is.False, "ohne Angabe keines");
+            Assert.That(new ChannelSettings(3f, GrantsPhasing: true).GrantsPhasing, Is.True);
+            Assert.That(new ChannelSettings(3f, GrantsPhasing: true) with { GrantsPhasing = false }, Is.EqualTo(Typhoon), "sonst gleich");
         });
     }
 

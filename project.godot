@@ -160,3 +160,4 @@ skill_slot_10={
 3d_physics/layer_4="Walls"
 3d_physics/layer_5="Ground"
 3d_physics/layer_6="Interactive"
+3d_physics/layer_7="Phasing"

@@ -74,6 +74,9 @@ public partial class Hero
     private          BaseUnit      attackTarget;
     private readonly ChannelClock  channelClock = new();
     private          SkillResource channelSkill;
+    private          WhirlTrail    whirlTrail;
+    private          uint          solidLayer;
+    private          uint          solidMask;
     private          double        chargeAtMaxSec;
     private          ChargeLook    chargeLook;
     private          float         chargePercent;
@@ -239,6 +242,8 @@ public partial class Hero
         weaponPivot   = Visual?.GetNodeOrNull<Node3D>("WeaponPivot");
         light         = GetNodeOrNull<OmniLight3D>("Light");
         levelUpEffect = GetNodeOrNull<LevelUpEffect>("LevelUpEffect");
+        solidLayer    = CollisionLayer;
+        solidMask     = CollisionMask;
 
         if (light is not null)
         {
@@ -553,6 +558,9 @@ public partial class Hero
 
     //Solange der Held wirbelt, dreht er sich mit der Waffe, läuft langsamer, zahlt je Sekunde und beginnt nichts Neues
     public bool IsChanneling => channelSkill is not null;
+
+    //Phasing: keine Kollision mit Gegnern, in beide Richtungen. Zurzeit nur, solange ein Wirbel mit GrantsPhasing läuft
+    public bool IsPhasing { get; private set; }
 
     public float ChargePercent => chargePercent;
 
@@ -1049,7 +1057,8 @@ public partial class Hero
 
     #region Wirbel
 
-    //Der Wirbel beginnt sofort und läuft, solange die Taste gehalten wird. Bezahlt wird je Sekunde, der erste Tick kommt nach einem halben Intervall
+    //Der Wirbel beginnt sofort und läuft, solange die Taste gehalten wird. Bezahlt wird je Sekunde, der erste Tick kommt nach einem halben Intervall.
+    //Der Schweif hängt sich an den Helden und folgt der Waffe, bis der Wirbel endet
     private void BeginChannel(SkillResource skill, SkillAim aim)
     {
         ClearOrder();
@@ -1058,9 +1067,12 @@ public partial class Hero
         channelSkill = skill;
 
         channelClock.Start(skill.Definition.Channel.GetFirstTickSec(ChannelSettings.GetAttacksPerSec(Stats)));
+        SetPhasing(skill.Definition.Channel.GrantsPhasing);
 
         Face(aim.CurrentPoint - GlobalPosition);
         PlayWhirlLook();
+
+        whirlTrail = SkillExecutor.ShowWhirlTrail(this, skill);
     }
 
     //Taste losgelassen oder Mana leer beendet den Wirbel mit der Erholung eines Angriffs. Sonst zahlt der Held, dreht sich und trifft, wenn ein Tick fällig ist
@@ -1123,6 +1135,23 @@ public partial class Hero
         channelSkill = null;
 
         channelClock.Stop();
+        SetPhasing(false);
+
+        whirlTrail?.Dismiss();
+
+        whirlTrail = null;
+    }
+
+    //Mit Phasing liegt der Körper auf der Ebene Phasing statt Player und sucht keine Gegner mehr. Godot paart zwei Körper schon,
+    //wenn einer den anderen in seiner Maske hat, deshalb wechseln Ebene und Maske. Die Skills der Gegner treffen die Ebene Phasing weiter
+    private void SetPhasing(bool isPhasing)
+    {
+        if (IsPhasing == isPhasing)
+            return;
+
+        IsPhasing      = isPhasing;
+        CollisionLayer = isPhasing ? CollisionLayers.Phasing : solidLayer;
+        CollisionMask  = isPhasing ? solidMask & ~CollisionLayers.Monster : solidMask;
     }
 
     //Die Waffe geht waagerecht nach vorn und bleibt dort, bis der Wirbel endet

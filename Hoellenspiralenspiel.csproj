@@ -9,6 +9,7 @@
         <Folder Include="Resources\LootTables\" />
     </ItemGroup>
     <ItemGroup>
+        <Content Include=".mcp.json" />
         <Content Include="Resources\Desert.tres"/>
     </ItemGroup>
     <ItemGroup>

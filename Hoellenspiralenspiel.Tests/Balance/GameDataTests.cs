@@ -145,7 +145,8 @@ public class GameDataTests
     }
 
 
-    //Die Werte hat der User am 07.10.2026 vorgegeben: 60 % Waffenschaden je Tick, 3 Mana je Sekunde, ein Tick je Angriff, 1,25-fache Reichweite
+    //Die Werte hat der User am 07.10.2026 vorgegeben: 60 % Waffenschaden je Tick, 3 Mana je Sekunde, ein Tick je Angriff, 1,25-fache Reichweite.
+    //Am selben Tag dazu: zwei Umdrehungen je Tick und Phasing, solange er läuft
     [Test]
     public void Typhoon_BrauchtEineNahkampfwaffe_UndWirbeltMitDreiManaJeSekunde()
     {
@@ -161,7 +162,7 @@ public class GameDataTests
             Assert.That(typhoon.Attack, Is.EqualTo(new AttackDefinition("Typhoon", 60f)));
             Assert.That(typhoon.ManaCost, Is.Zero, "der Beginn kostet nichts, bezahlt wird je Sekunde");
             Assert.That(typhoon.CooldownSec, Is.Zero);
-            Assert.That(typhoon.Channel, Is.EqualTo(new ChannelSettings(3f, 1f)));
+            Assert.That(typhoon.Channel, Is.EqualTo(new ChannelSettings(3f, 1f, 2f, true)), "zwei Umdrehungen je Tick, Phasing solange er läuft");
             Assert.That(typhoon.Sweep, Is.EqualTo(new SweepSettings(360f, 1.25f)));
             Assert.That(GameData.PlayerSkill("cleave").Channel, Is.Null, "nur der Wirbel kanalisiert");
             Assert.That(GameData.PlayerSkill("cleave").Sweep, Is.EqualTo(new SweepSettings(180f, 1.5f)));

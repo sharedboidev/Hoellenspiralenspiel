@@ -18,7 +18,7 @@ public partial class AttackSkillResource : SkillResource
         nameof(ChargeArrowScene), nameof(ChargeAuraScene)
     ];
 
-    private static readonly HashSet ChannelFields = [nameof(ChannelManaPerSec), nameof(ChannelTicksPerAttack)];
+    private static readonly HashSet ChannelFields = [nameof(ChannelManaPerSec), nameof(ChannelTicksPerAttack), nameof(ChannelTurnsPerTick), nameof(ChannelGrantsPhasing)];
 
     [ExportGroup("Attack")]
     [Export]
@@ -111,6 +111,14 @@ public partial class AttackSkillResource : SkillResource
     [Export]
     public float ChannelTicksPerAttack { get; set; } = 1f;
 
+    //Nur Darstellung: so oft dreht der Held sich zwischen zwei Ticks mit der Waffe. 2 bei 1,5 Ticks je Sekunde sind drei Umdrehungen je Sekunde
+    [Export(PropertyHint.Range, "0, 10, 0.25")]
+    public float ChannelTurnsPerTick { get; set; } = 1f;
+
+    //Phasing: Solange der Wirbel läuft, laufen Held und Gegner durcheinander hindurch. Treffer und Projektile gehen weiter
+    [Export]
+    public bool ChannelGrantsPhasing { get; set; }
+
     public override SkillKind Kind => SkillKind.Attack;
 
     //Kugeln springen nur aus einem Schlag, Pfeile regnen nur nach dem Schuss in den Himmel, geladen wird nur der geladene Schuss, der Wirbel kanalisiert als Einziger
@@ -138,6 +146,6 @@ public partial class AttackSkillResource : SkillResource
             Charge  = Delivery == SkillDelivery.ChargedShot
                     ? new ChargeSettings(ChargeRatePerSec, ChargeMinPercent, ChargeMaxPercent, ChargeOverholdSec, ChargeOverholdCooldownSec)
                     : null,
-            Channel = Delivery == SkillDelivery.WeaponWhirl ? new ChannelSettings(ChannelManaPerSec, ChannelTicksPerAttack) : null
+            Channel = Delivery == SkillDelivery.WeaponWhirl ? new ChannelSettings(ChannelManaPerSec, ChannelTicksPerAttack, ChannelTurnsPerTick, ChannelGrantsPhasing) : null
         };
 }

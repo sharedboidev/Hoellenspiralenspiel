@@ -45,7 +45,12 @@ public static class SkillTooltip
         text.Append($"{uses} per Second: {estimate.UsesPerSecond:0.##}");
 
         if (skill.Definition.IsChanneled)
+        {
             text.Append(NewLine).Append($"Mana per Second: {skill.Definition.Channel.ManaPerSec:0.#} while held");
+
+            if (skill.Definition.Channel.GrantsPhasing)
+                text.Append(NewLine).Append("Phasing: you pass through enemies while held");
+        }
 
         if (skill.Kind == SkillKind.Spell && skill.Definition.CastSec > 0)
             text.Append(NewLine).Append($"Cast Time: {skill.Definition.GetCastSec(caster.Stats):0.##} s");
