@@ -3400,7 +3400,7 @@ Getroffene Entscheidungen des Users vom 07.10.2026:
 |---|---|
 | Streuung | Mittel: Die Pfeile fallen zufällig in einem Kreis von 2 m um den Zielpunkt, jeder trifft in 0,75 m. Ein einzelnes Ziel bekommt nur einen Teil ab, eine Gruppe wird breit getroffen |
 | Ziel läuft weg | Die Pfeile fallen um die Stelle, an der das Ziel beim Schuss stand, wie bei Magma Strike. Ein Zielgebiet am Boden verhält sich gleich |
-| Kosten | 3 Mana und 3 s Abklingzeit, die erste Attack mit Abklingzeit |
+| Kosten | 3 Mana. Geplant waren 3 s Abklingzeit, in `darken_sky.tres` steht keine. Am 08.10.2026 hat der User entschieden: keine Abklingzeit |
 | Reichweite | Die des Bogens. Steht das Ziel weiter weg, läuft der Held heran. Mit `Shift` schießt er aus dem Stand auf den Punkt |
 
 - Erledigt: Darken Sky als `Resources/Skills/Player/darken_sky.tres`. Eine neue Lieferung `SkillDelivery.ArrowRain` (am Ende angehängt, Wert 6) braucht einen Bogen: `SkillDefinition.NeedsBow`, `SkillUseCheck.NeedsBow`, und `SkillGate.FitsWeapon` lehnt ihn ohne Fernkampfwaffe ab. Der Platz auf der Leiste liegt dann rot wie bei Cleave mit Bogen, der Tooltip sagt "Needs a bow".
@@ -3551,7 +3551,7 @@ Bewusst offen gelassen:
 - Der Kampfsimulator der Balance-Tests schießt einen geladenen Schuss wie einen gewöhnlichen Angriff mit 300 %, ohne Ladezeit.
 - Beim Laden trägt die Aura nicht zum Licht bei; der fliegende Pfeil hat ein kleines Licht.
 
-Befund nebenbei: `darken_sky.tres` auf `master` hat keine `CooldownSec`, der Unit-Test `DarkenSky_BrauchtEinenBogen_UndLaesstFuenfPfeileFallen` erwartet 3 s und ist rot. Die Roadmap zu Skill 3 nennt 3 s. Ob die Abklingzeit absichtlich weg ist, klärt der User.
+Befund nebenbei: `darken_sky.tres` auf `master` hat keine `CooldownSec`, der Unit-Test `DarkenSky_BrauchtEinenBogen_UndLaesstFuenfPfeileFallen` erwartet 3 s und ist rot. Die Roadmap zu Skill 3 nennt 3 s. Ob die Abklingzeit absichtlich weg ist, klärt der User. Geklärt am 08.10.2026: Darken Sky hat keine Abklingzeit, der Test erwartet 0 s und ist grün.
 
 Rückmeldung des Users nach dem Spielen, am 07.10.2026, beides am selben Tag auf dem Branch umgesetzt:
 
@@ -3671,6 +3671,37 @@ Bewusst offen gelassen:
 - Phasing hat keine eigene Darstellung am Helden, etwa Durchsichtigkeit. Der Schweif ist das einzige Zeichen.
 - Ein Gegner mit einem Wirbel hätte keinen Schweif, nur der Held hängt ihn in `BeginChannel` an.
 - `BaseUnit.IsSolid` bleibt wahr: Ein Spawn stellt keinen Gegner auf den wirbelnden Helden.
+
+#### Nebenbei: Umbau von `SkillExecutor`
+
+Am 08.10.2026 auf `master` als `c627261`. Der User hat `SkillExecutor` selbst umgebaut: Alle Lieferungen bekommen statt einzelner Parameter (Wirkender, Cast, Szene, Werte, Ziel) eine `SkillExecutionDefinition` aus Wirkendem, Skill und Ziel. `Hero`, `Enemy` und `CastSkillAction` rufen `SkillExecutor.Execute(new SkillExecutionDefinition(...))` auf.
+
+Bei der Durchsicht vor dem Commit fielen drei Fehler auf, die die Unit-Tests nicht sehen, weil das Testprojekt nur `Scripts/Core` übersetzt:
+
+| Skill | Fehler | Ursache |
+|---|---|---|
+| Attack mit Bogen, bei Held und Gegnern | Kein Pfeil, nur die Warnung "hat kein Projektil" | Szene und Flugwerte kamen aus dem Skill, `attack.tres` hat keine. Vorher kamen sie und die Zusatzpfeile von der Waffe |
+| Charged Shot | Kein Pfeil, und auch sonst ohne Schaden aus der Ladung und ohne Durchstoßen | Wie oben, dazu fehlten der Cast mit `charge.GetAttack` und `Pierces` |
+| Typhoon | Kein Treffer | Das neue `Sweep` nahm die Szene des Skills. Bei Typhoon ist das der `WhirlTrail`, `Instantiate<MeleeSlash>` warf vor der Trefferschleife |
+
+Dazu schrieb `Whirl` den vollen Kreis in die gemeinsame, zwischengespeicherte `SkillDefinition`, wofür `SkillDefinition.Sweep` ein `set` bekommen hatte.
+
+Behoben im selben Commit: `SkillExecutionDefinition` trägt `Cast`, `EffectScene`, `Projectile`, `Area` und `Sweep` als `init`-Properties, vorbelegt mit den Werten des Skills. Wer abweicht, legt sich mit `with` eine Kopie an: der Bogenangriff mit Pfeil, Flugwerten und Zusatzpfeilen der Waffe, Charged Shot mit dem geladenen Angriff, durchstoßenden Flugwerten und dem Pfeil der Waffe als Rückfall, Typhoon ohne Szene und mit vollem Kreis, eine Fläche um den Wirkenden mit dem Radius ab dem Körperrand. `SkillDefinition.Sweep` ist wieder `init`, an der Definition ändert keiner etwas.
+
+Ebenfalls im Commit: Der Unit-Test zu Darken Sky erwartet 0 s Abklingzeit. Der User hat entschieden, dass Darken Sky keine hat, siehe Skill 3.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen im Spiel |
+| Unit-Tests | Keiner neu, einer geändert (Darken Sky ohne Abklingzeit). Zusammen 1921, alle grün |
+| Laufendes Spiel, headless | 15 Prüfungen im Hub, `SkillExecutor.Execute` direkt aufgerufen: Der Bogenangriff fliegt mit Pfeil und Flugwerten der Waffe. Charged Shot fliegt als `ChargedArrow`, durchstößt bei 150 % und nicht bei 50 %, Schaden 37 bis 82 statt 12 bis 27. Frost Nova hat den Radius 355 plus Körperradius 30. Typhoon trifft ein Skelett hinter dem Helden, zeigt je Tick nichts und lässt seine Definition bei 360°. Die Probe ist wieder gelöscht, Spielstand und Einstellungen des Users blieben unberührt |
+
+Bewusst offen gelassen:
+
+- `SkillExecutor` hat weiter keine Unit-Tests, er hängt an Godot. Fehler dort zeigt nur eine Probe im Spiel.
+- Ein `with`, das den Skill austauscht, behält Szene und Werte des alten Skills, weil `with` die Vorbelegung nicht neu ausführt. Für einen anderen Skill gehört eine neue `SkillExecutionDefinition` her.
 
 ### M9: Inhalt und Politur (L, fortlaufend)
 
