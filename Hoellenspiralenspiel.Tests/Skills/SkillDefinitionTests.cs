@@ -70,6 +70,23 @@ public class SkillDefinitionTests
     }
 
     [Test]
+    public void Pfeilregen_BrauchtEinenBogen_UndSonstNiemand()
+    {
+        var sky    = SkillDefinition.ForAttack("darken_sky", new AttackDefinition("Darken Sky", 80f)) with { Delivery = SkillDelivery.ArrowRain };
+        var cleave = SkillDefinition.ForAttack("cleave", new AttackDefinition("Cleave", 120f)) with { Delivery = SkillDelivery.WeaponSweep };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(sky.NeedsBow, Is.True);
+            Assert.That(sky.NeedsMeleeWeapon, Is.False);
+            Assert.That(sky.IsArea, Is.False, "die Pfeile sind eigene Flächen, der Skill selbst keine");
+            Assert.That(sky.Rain, Is.Null, "ohne Angabe fallen keine Pfeile");
+            Assert.That(cleave.NeedsBow, Is.False);
+            Assert.That(SkillDefinition.ForAttack("attack", AttackDefinition.Standard).NeedsBow, Is.False);
+        });
+    }
+
+    [Test]
     public void SkillOhneId_IstNichtErlaubt()
         => Assert.That(() => SkillDefinition.ForAttack(" ", AttackDefinition.Standard), Throws.InstanceOf<ArgumentException>());
 

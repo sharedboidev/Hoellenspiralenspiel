@@ -172,6 +172,13 @@ internal static class GameData
                     : null,
             Area = delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint
                     ? new AreaSettings(values.Float("AreaRadius", 300f), values.Float("AreaExpansionSec", 0f), values.Float("AreaDelaySec", 0f))
+                    : null,
+            Rain = delivery == SkillDelivery.ArrowRain
+                    ? new RainSettings(values.Int("RainCount", 5),
+                                       values.Float("RainRadius", 200f),
+                                       values.Float("RainImpactRadius", 75f),
+                                       values.Float("RainDelaySec", 0.5f),
+                                       values.Float("RainDurationSec", 1f))
                     : null
         };
     }

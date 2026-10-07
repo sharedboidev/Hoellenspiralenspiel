@@ -29,6 +29,14 @@ public class SkillGateTests
         Scatter = new ScatterSettings(3, 65f, 75f, 0.6f)
     };
 
+    private static readonly SkillDefinition DarkenSky = SkillDefinition.ForAttack("darken_sky", new AttackDefinition("Darken Sky", 80f)) with
+    {
+        ManaCost = 3,
+        CooldownSec = 3,
+        Delivery = SkillDelivery.ArrowRain,
+        Rain = new RainSettings(5, 200f, 75f, 0.5f, 1f)
+    };
+
     [Test]
     public void GenugManaUndKeineAbklingzeit_IstBereit()
         => Assert.That(SkillGate.Check(Fireball, new SkillCooldowns(), 2), Is.EqualTo(SkillUseCheck.Ready));
@@ -106,6 +114,34 @@ public class SkillGateTests
             Assert.That(SkillGate.FitsWeapon(Fireball, true), Is.True);
             Assert.That(SkillGate.FitsWeapon(Cleave, true), Is.False);
             Assert.That(SkillGate.FitsWeapon(Cleave, false), Is.True);
+        });
+    }
+
+    [Test]
+    public void PfeilregenOhneBogen_WirdAbgelehnt()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(SkillGate.Check(DarkenSky, new SkillCooldowns(), 10, false), Is.EqualTo(SkillUseCheck.NeedsBow));
+            Assert.That(SkillGate.Check(DarkenSky, new SkillCooldowns(), 10), Is.EqualTo(SkillUseCheck.NeedsBow), "ohne Angabe gilt eine Nahkampfwaffe");
+            Assert.That(SkillGate.Check(DarkenSky, new SkillCooldowns(), 10, true), Is.EqualTo(SkillUseCheck.Ready));
+            Assert.That(SkillGate.Check(DarkenSky, new SkillCooldowns(), 2.9f, true), Is.EqualTo(SkillUseCheck.NotEnoughMana));
+            Assert.That(SkillGate.FitsWeapon(DarkenSky, true), Is.True);
+            Assert.That(SkillGate.FitsWeapon(DarkenSky, false), Is.False);
+        });
+    }
+
+    [Test]
+    public void FehlenderBogen_WirdVorAbklingzeitUndManaGemeldet()
+    {
+        var cooldowns = new SkillCooldowns();
+
+        cooldowns.Start(DarkenSky.Id, DarkenSky.CooldownSec);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(SkillGate.Check(DarkenSky, cooldowns, 0, false), Is.EqualTo(SkillUseCheck.NeedsBow));
+            Assert.That(SkillGate.Check(DarkenSky, cooldowns, 0, true), Is.EqualTo(SkillUseCheck.OnCooldown), "mit Bogen zählt die Abklingzeit der Attack");
         });
     }
 }

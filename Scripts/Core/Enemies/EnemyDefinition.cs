@@ -87,7 +87,7 @@ public sealed record EnemyDefinition
         {
             var hasRangedWeapon = WieldedWeapon?.Weapon.IsRanged == true;
 
-            return Skills.Any(skill => skill.Delivery == SkillDelivery.Projectile || (skill.Delivery == SkillDelivery.Weapon && hasRangedWeapon)) ||
+            return Skills.Any(skill => skill.Delivery is SkillDelivery.Projectile or SkillDelivery.ArrowRain || (skill.Delivery == SkillDelivery.Weapon && hasRangedWeapon)) ||
                    (Skills.Count == 0 && hasRangedWeapon);
         }
     }

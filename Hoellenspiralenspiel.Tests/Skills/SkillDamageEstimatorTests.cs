@@ -671,5 +671,81 @@ public class SkillDamageEstimatorTests
         });
     }
 
+    [Test]
+    public void Bonusprojektile_WerfenMehrKugeln()
+    {
+        var weapon   = Weapon(DamageType.Slash, 0.25f);
+        var attacker = Attacker(weapon);
+
+        attacker.SetBase(CombatStat.ProjectileCount, 3);
+
+        var magma = SkillDamageEstimator.Estimate(attacker, weapon, MagmaStrike());
+        var plain = SkillDamageEstimator.Estimate(Attacker(weapon), weapon, MagmaStrike());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(magma.ScatterCount, Is.EqualTo(5), "drei Kugeln und zwei Projektile über das erste hinaus");
+            Assert.That(magma.HitDps - plain.HitDps, Is.EqualTo(2f * (plain.HitDps - plain.AverageHit * (float)plain.UsesPerSecond * plain.HitChance / 100f) / 3f).Within(Tolerance),
+                        "jede weitere Kugel zählt wie die drei ersten");
+        });
+    }
+
+    #endregion
+
+    #region Pfeilregen
+
+    private static SkillDefinition DarkenSky(int arrows = 5, double cooldownSec = 3)
+        => SkillDefinition.ForAttack("darken_sky", new AttackDefinition("Darken Sky", 80f)) with
+        {
+            ManaCost = 3f,
+            CooldownSec = cooldownSec,
+            Delivery = SkillDelivery.ArrowRain,
+            Rain = new RainSettings(arrows, 200f, 75f, 0.5f, 1f)
+        };
+
+    private static WeaponProfile Bow(float attacksPerSecond = 2f, int extraArrows = 0)
+        => new WeaponProfile(100, 200, attacksPerSecond, 0f, DamageType.Pierce, 600f, true, 1100f) with { ExtraProjectiles = extraArrows };
+
+    //Nur ein Teil der Pfeile erreicht ein Ziel in der Mitte, Einschlagradius durch Radius. Die Abklingzeit bremst die Attack
+    [Test]
+    public void Pfeilregen_ZaehltDiePfeileAufDasZiel_UndWartetDieAbklingzeitAb()
+    {
+        var bow      = Bow();
+        var attacker = Attacker(bow);
+        var shot     = SkillDamageEstimator.Estimate(attacker, bow, DarkenSky() with { Delivery = SkillDelivery.Weapon, Rain = null, CooldownSec = 0 });
+        var sky      = SkillDamageEstimator.Estimate(attacker, bow, DarkenSky());
+        var landing  = sky.HitChance / 100f;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(sky.AverageHit, Is.EqualTo(shot.AverageHit), "jeder Pfeil trifft wie ein Schuss mit 80 %");
+            Assert.That(sky.ArrowCount, Is.EqualTo(5));
+            Assert.That(shot.ArrowCount, Is.Zero);
+            Assert.That(sky.ArrowsOnTarget, Is.EqualTo(1.875f).Within(Tolerance));
+            Assert.That(sky.UsesPerSecond, Is.EqualTo(1.0 / 3).Within(Tolerance), "die Abklingzeit, nicht das Angriffstempo");
+            Assert.That(shot.UsesPerSecond, Is.EqualTo(attacker.GetFinal(CombatStat.Attackspeed)).Within(Tolerance));
+            Assert.That(sky.HitDps, Is.EqualTo(sky.AverageHit / 3f * 1.875f * landing).Within(Tolerance));
+            Assert.That(sky.ManaPerSecond, Is.EqualTo(1f).Within(Tolerance));
+        });
+    }
+
+    [Test]
+    public void Bonusprojektile_WerdenZuPfeilen_MitDenenDesBogens()
+    {
+        var bow      = Bow(extraArrows: 1);
+        var attacker = Attacker(bow);
+
+        attacker.SetBase(CombatStat.ProjectileCount, 2);
+
+        var sky = SkillDamageEstimator.Estimate(attacker, bow, DarkenSky());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(sky.ArrowCount, Is.EqualTo(7), "fünf Pfeile, einer aus dem Stat, einer vom Bogen");
+            Assert.That(sky.ArrowsOnTarget, Is.EqualTo(7f * 0.375f).Within(Tolerance));
+            Assert.That(SkillDamageEstimator.Estimate(Attacker(bow), bow, DarkenSky()).ArrowCount, Is.EqualTo(6), "der Bogen allein gibt einen");
+        });
+    }
+
     #endregion
 }

@@ -32,6 +32,10 @@ public sealed record SkillDamageEstimate
     public int   ScatterCount      { get; init; }
     public float ScatterAverageHit { get; init; }
 
+    //Pfeile eines Regens je Einsatz, samt Bonusprojektilen, und wie viele davon einen Punkt in der Mitte erreichen. AverageHit ist der Treffer eines Pfeils
+    public int   ArrowCount     { get; init; }
+    public float ArrowsOnTarget { get; init; }
+
     public float Dps => HitDps + EffectDps;
 
     public float ManaPerSecond { get; init; }

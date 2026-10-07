@@ -15,7 +15,12 @@ namespace Hoellenspiralenspiel.Scripts.Skills;
 public static class SkillExecutor
 {
     //Die Kugeln springen aus der Mitte des Körpers
-    private const float ScatterStartHeightShare = 0.5f;
+    private const float ScatterStartHeightShare  = 0.5f;
+
+    //Der Schuss in den Himmel geht so weit aus der Senkrechten Richtung Ziel, wie der Held den Bogen hebt (Hero.SkyAimDegrees), und verlässt den Bogen in dieser Höhe
+    private const float SkyShotTiltDegrees       = 20f;
+    private const float SkyShotStartHeightMeters = 1.4f;
+    private const float SkyShotStartAheadMeters  = 0.4f;
 
     private static readonly List<BaseUnit> UnitsInReach = new();
 
@@ -32,6 +37,14 @@ public static class SkillExecutor
                 break;
             case SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike when caster.Weapon.IsRanged:
                 GD.PushWarning($"{caster.Name} braucht für {definition.Name} eine Nahkampfwaffe.");
+
+                break;
+            case SkillDelivery.ArrowRain when !caster.Weapon.IsRanged:
+                GD.PushWarning($"{caster.Name} braucht für {definition.Name} einen Bogen.");
+
+                break;
+            case SkillDelivery.ArrowRain:
+                RainArrows(caster, skill, aim);
 
                 break;
             case SkillDelivery.Weapon or SkillDelivery.MeleeStrike:
@@ -89,8 +102,9 @@ public static class SkillExecutor
         var hit    = HitRequests.ForAttack(caster.Stats, caster.Weapon, scatter.GetAttack(skill.Definition.Attack));
         var area   = new AreaSettings(scatter.ImpactRadius, 0f, scatter.FlightSec);
         var center = WorldScale.OnGround(origin);
+        var count  = scatter.GetCount(BonusProjectiles.FromStats(caster.Stats));
 
-        foreach (var (x, y) in scatter.PickLandings(targetRadiusPx, GameRandom.Shared))
+        foreach (var (x, y) in scatter.PickLandings(count, targetRadiusPx, GameRandom.Shared))
         {
             var landing = center + new Vector3(WorldScale.ToMeters(x), 0f, WorldScale.ToMeters(y));
             var ball    = scene.Instantiate<LobbedArea>();
@@ -102,6 +116,56 @@ public static class SkillExecutor
 
             ball.GlobalPosition = landing;
         }
+    }
+
+    //Der Pfeil in den Himmel ist nur zu sehen. Die Pfeile des Regens fallen um die Stelle, auf die der Held beim Schuss zielte,
+    //schräg aus seiner Richtung. Wer von dort wegläuft, kann ihnen entkommen
+    private static void RainArrows(BaseUnit caster, SkillResource skill, SkillAim aim)
+    {
+        if (skill.Definition.Rain is not { } rain || skill is not AttackSkillResource { RainScene: { } scene })
+        {
+            GD.PushWarning($"{caster.Name} hat keine Pfeile für {skill.Definition.Name}.");
+
+            return;
+        }
+
+        var center    = WorldScale.OnGround(aim.CurrentPoint);
+        var direction = WorldScale.OnGround(center - caster.GlobalPosition);
+        var facing    = direction.LengthSquared() > 0f ? direction.Normalized() : GetFacing(caster, aim);
+        var count     = rain.GetCount(BonusProjectiles.ForBow(caster.Stats, caster.Weapon));
+        var hit       = HitRequests.ForSkill(caster.Stats, caster.Weapon, skill.Definition);
+        var delays    = rain.GetImpactDelays(count);
+        var landings  = rain.PickLandings(count, GameRandom.Shared);
+
+        ShowSkyShot(caster, skill.EffectScene, facing);
+
+        for (var i = 0; i < count; i++)
+        {
+            var landing = center + new Vector3(WorldScale.ToMeters(landings[i].X), 0f, WorldScale.ToMeters(landings[i].Y));
+            var arrow   = scene.Instantiate<FallingArea>();
+
+            arrow.Launch(new SkillCast(caster, hit), new AreaSettings(rain.ImpactRadius, 0f, delays[i]));
+            arrow.FallAlong(facing);
+
+            caster.GetParent().AddChild(arrow);
+
+            arrow.GlobalPosition = landing;
+        }
+    }
+
+    private static void ShowSkyShot(BaseUnit caster, PackedScene scene, Vector3 facing)
+    {
+        if (scene is null)
+            return;
+
+        var tilt  = Mathf.DegToRad(SkyShotTiltDegrees);
+        var arrow = scene.Instantiate<SkyArrow>();
+
+        arrow.Launch(Vector3.Up * Mathf.Cos(tilt) + facing * Mathf.Sin(tilt));
+
+        caster.GetParent().AddChild(arrow);
+
+        arrow.GlobalPosition = caster.GlobalPosition + Vector3.Up * SkyShotStartHeightMeters + facing * SkyShotStartAheadMeters;
     }
 
     //Der Bogen zeigt, wohin der Schlagende beim Ausholen schaute. Wer währenddessen hinter ihn läuft, entgeht ihm
@@ -164,7 +228,7 @@ public static class SkillExecutor
 
         var origin    = WorldScale.OnGround(caster.GlobalPosition);
         var direction = WorldScale.OnGround(aim.CurrentPoint) - origin;
-        var count     = Math.Max(1, caster.Stats.GetFinalWhole(CombatStat.ProjectileCount)) + Math.Max(0, extraProjectiles);
+        var count     = 1 + BonusProjectiles.FromStats(caster.Stats) + Math.Max(0, extraProjectiles);
         var speedup   = caster.Stats.GetTotalMultiplier(CombatStat.ProjectileSpeed);
 
         if (speedup > 0f && !speedup.Equals(1f))

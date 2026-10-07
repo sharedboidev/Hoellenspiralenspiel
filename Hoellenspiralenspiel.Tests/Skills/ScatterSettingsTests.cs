@@ -27,6 +27,27 @@ public class ScatterSettingsTests
         => Assert.That(MagmaBalls.PickLandings(TargetRadius, new SeededRandom(1)), Has.Count.EqualTo(3));
 
     [Test]
+    public void Bonusprojektile_KommenAlsKugelnDazu()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(MagmaBalls.GetCount(2), Is.EqualTo(5));
+            Assert.That(MagmaBalls.GetCount(0), Is.EqualTo(3));
+            Assert.That(MagmaBalls.GetCount(-1), Is.EqualTo(3), "weniger als null Bonus gibt es nicht");
+            Assert.That(MagmaBalls.PickLandings(5, TargetRadius, new SeededRandom(1)), Has.Count.EqualTo(5));
+            Assert.That(MagmaBalls.PickLandings(3, TargetRadius, new SeededRandom(1)), Is.EqualTo(MagmaBalls.PickLandings(TargetRadius, new SeededRandom(1))), "ohne Bonus wie bisher");
+        });
+    }
+
+    [Test]
+    public void AuchMitBonus_TrifftJederEinschlagDasStehendeZiel()
+    {
+        var landings = Enumerable.Range(0, 200).SelectMany(seed => MagmaBalls.PickLandings(6, TargetRadius, new SeededRandom(seed))).ToList();
+
+        Assert.That(landings.Count(landing => !AreaSettings.Contains(landing.X, landing.Y, MagmaBalls.ImpactRadius + TargetRadius)), Is.Zero);
+    }
+
+    [Test]
     public void OhneKugeln_GibtEsKeineEinschlaege_UndKeinenWurf()
     {
         var random = new FixedRandom(0.5f);

@@ -10,5 +10,8 @@ public enum SkillDelivery
     WeaponSweep,
 
     //Ein Schlag auf das Ziel wie Weapon, aber nur mit einer Nahkampfwaffe. Weapon schießt mit einer Fernkampfwaffe
-    MeleeStrike
+    MeleeStrike,
+
+    //Ein Schuss in den Himmel, nach dem Pfeile auf das Zielgebiet fallen. Nur mit einem Bogen
+    ArrowRain
 }

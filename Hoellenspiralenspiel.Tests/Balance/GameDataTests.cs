@@ -87,6 +87,26 @@ public class GameDataTests
         });
     }
 
+    //Die Werte hat der User am 07.10.2026 vorgegeben
+    [Test]
+    public void DarkenSky_BrauchtEinenBogen_UndLaesstFuenfPfeileFallen()
+    {
+        var sky = GameData.PlayerSkill("darken_sky");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(sky.Name, Is.EqualTo("Darken Sky"));
+            Assert.That(sky.Delivery, Is.EqualTo(SkillDelivery.ArrowRain));
+            Assert.That(sky.NeedsBow, Is.True);
+            Assert.That(sky.NeedsMeleeWeapon, Is.False);
+            Assert.That(sky.Attack, Is.EqualTo(new AttackDefinition("Darken Sky", 80f)));
+            Assert.That(sky.ManaCost, Is.EqualTo(3f));
+            Assert.That(sky.CooldownSec, Is.EqualTo(3));
+            Assert.That(sky.Rain, Is.EqualTo(new RainSettings(5, 200f, 75f, 0.5f, 1f)));
+            Assert.That(sky.Scatter, Is.Null);
+        });
+    }
+
     //Das Profil las die Laufzeitprüfung am Helden ab, der das Schwert trug
     [Test]
     public void Trainingsschwert_HatDasProfilAusDemSpiel_UndPariert()

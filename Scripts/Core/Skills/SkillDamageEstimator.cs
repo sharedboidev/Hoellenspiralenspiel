@@ -19,19 +19,24 @@ public static class SkillDamageEstimator
         ArgumentNullException.ThrowIfNull(attacker);
         ArgumentNullException.ThrowIfNull(skill);
 
-        var hit           = HitRequests.ForSkill(attacker, weapon, skill);
-        var main          = Measure(hit);
-        var critFactor    = CombatFormulas.GetCriticalFactor(hit.CriticalDamageBonus);
-        var failureChance = Math.Clamp(actionFailureChance, 0f, 1f);
-        var landingShare  = (1f - failureChance) * main.HitChance / 100f;
-        var usesPerSecond = GetUsesPerSecond(attacker, skill);
-        var manaPerSecond = paysMana ? (float)(skill.ManaCost * usesPerSecond) : 0f;
-        var hits          = new List<(MeasuredHit Hit, float LandingsPerUse)> { (main, landingShare) };
-        var scatter       = MeasureScatter(attacker, weapon, skill);
+        var hit            = HitRequests.ForSkill(attacker, weapon, skill);
+        var main           = Measure(hit);
+        var critFactor     = CombatFormulas.GetCriticalFactor(hit.CriticalDamageBonus);
+        var failureChance  = Math.Clamp(actionFailureChance, 0f, 1f);
+        var landingShare   = (1f - failureChance) * main.HitChance / 100f;
+        var usesPerSecond  = GetUsesPerSecond(attacker, skill);
+        var manaPerSecond  = paysMana ? (float)(skill.ManaCost * usesPerSecond) : 0f;
+        var arrowCount     = skill.Rain?.GetCount(BonusProjectiles.ForBow(attacker, weapon)) ?? 0;
+        var arrowsOnTarget = arrowCount * (skill.Rain?.GetShareOnCenter() ?? 0f);
+        var scatter        = MeasureScatter(attacker, weapon, skill);
+        var scatterCount   = scatter is null ? 0 : skill.Scatter.GetCount(BonusProjectiles.FromStats(attacker));
+
+        //Bei einem Pfeilregen ist der Haupttreffer ein Pfeil, und nur ein Teil der Pfeile erreicht ein Ziel in der Mitte
+        var hits = new List<(MeasuredHit Hit, float LandingsPerUse)> { (main, skill.Rain is null ? landingShare : landingShare * arrowsOnTarget) };
 
         //Die Kugeln springen nur aus einem gelandeten Treffer. Mit einem Ziel trifft es jede von ihnen
         if (scatter is not null)
-            hits.Add((scatter, landingShare * skill.Scatter.Count * scatter.HitChance / 100f));
+            hits.Add((scatter, landingShare * scatterCount * scatter.HitChance / 100f));
 
         var estimate = new SkillDamageEstimate
         {
@@ -48,8 +53,10 @@ public static class SkillDamageEstimator
             HitDps              = GetHitDps(hits, usesPerSecond),
             DamagingEffect      = StatusEffectRules.FindDamageOverTime(hit.DamageType)?.Kind,
             EffectDps           = GetEffectDps(hits, usesPerSecond),
-            ScatterCount        = scatter is null ? 0 : skill.Scatter.Count,
+            ScatterCount        = scatterCount,
             ScatterAverageHit   = scatter?.AverageHit ?? 0f,
+            ArrowCount          = arrowCount,
+            ArrowsOnTarget      = arrowsOnTarget,
             ManaPerSecond       = manaPerSecond
         };
 

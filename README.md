@@ -134,7 +134,7 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 | Feature | Beschreibung |
 |---|---|
 | Skills als Daten | Jeder Skill ist eine Resource mit Kosten, Abklingzeit, Schaden und Szene. Ein neuer Skill braucht keinen Code |
-| Sieben Skills | Attack, Cleave, Magma Strike, Lightning Strike, Fireball, Frost Nova und Thunderbolt |
+| Acht Skills | Attack, Cleave, Magma Strike, Darken Sky, Lightning Strike, Fireball, Frost Nova und Thunderbolt |
 | Projektile | Fliegen bis zum ersten Feind oder zur Wand. Der Feuerball spaltet sich und sucht die nächsten Gegner |
 | Flächen | Um den Helden oder am Mauszeiger, sofort oder mit Verzögerung |
 | Bogenschlag | Ein Schlag der Nahkampfwaffe trifft jeden in einem Bogen vor dem Helden. Der Radius wächst mit der Reichweite der Waffe |
@@ -146,11 +146,12 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 | Tränke auf der Leiste | Ein Platz kann statt eines Skills eine Trankart halten. Oben links steht, wie viele davon im Inventar liegen. Bei 0 wird das Bild grau, der Platz bleibt belegt. Die Taste trinkt einen Trank aus dem Inventar, den kleinsten Stapel zuerst, gehalten nur einen. Truhe und Item an der Maus zählen nicht |
 | Gehaltene Taste | Wiederholt den Skill, sobald er wieder bereit ist |
 | Stehenbleiben | Mit gehaltenem `Shift` greift der Held aus dem Stand Richtung Maus an, statt zum Gegner zu laufen, auch ohne Gegner unter der Maus. Ohne `Shift` braucht ein Nahkampfangriff einen Gegner unter der Maus. Zauber wirkt er ohnehin aus dem Stand |
-| Passende Waffe | Skills für Nahkampfwaffen liegen rot hinterlegt auf der Leiste, solange der Held einen Bogen trägt, und lösen nicht aus. Ihr Tooltip sagt, warum |
+| Passende Waffe | Skills für Nahkampfwaffen liegen rot hinterlegt auf der Leiste, solange der Held einen Bogen trägt, Skills für den Bogen, solange er keinen trägt. Beide lösen dann nicht aus, ihr Tooltip sagt, warum |
 | Skills unterbrechen das Laufen | Wer im Laufen einen Skill auslöst, bleibt stehen oder läuft zum Ziel, führt ihn aus und läuft danach in die gehaltene Richtung weiter |
 | Schlag und Zauber binden | Ein Schlag dauert so lange, wie das Angriffstempo vorgibt, ein Zauber seine Wirkzeit, Standard 0,4 s. Beide lösen nach der Hälfte aus. Ein Nahkampfschlag holt bis dahin aus und zieht mit dem Treffer in 0,15 s durch. Bis zum Ende steht der Held, dreht sich nicht und beginnt nichts Neues. Wird währenddessen eine Skill-Taste gedrückt und gehalten, folgt ihr Skill danach |
 | Kosten | Mana und Abklingzeit pro Skill, Ton bei leerem Mana |
-| Tooltip mit DPS | Schaden pro Sekunde, mittlerer Treffer, Krit-Chance, Einsätze pro Sekunde, Wirkzeit und Abklingzeit, gerechnet mit den Werten des Helden. Kugeln zählen mit, der Tooltip nennt ihren mittleren Treffer |
+| Tooltip mit DPS | Schaden pro Sekunde, mittlerer Treffer, Krit-Chance, Einsätze pro Sekunde, Wirkzeit und Abklingzeit, gerechnet mit den Werten des Helden. Kugeln zählen mit, der Tooltip nennt ihren mittleren Treffer. Bei einem Pfeilregen nennt er die Zahl der Pfeile und wie viele davon ein einzelnes Ziel treffen |
+| Bonusprojektile | Der Stat Projectiles gibt jedem Skill mit mehreren Geschossen weitere: dem Bogenschuss, den Pfeilen von Darken Sky und den Kugeln von Magma Strike. Die zusätzlichen Pfeile eines Bogens zählen nur für seine eigenen Angriffe |
 
 <details>
 <summary>Die Skills im Überblick</summary>
@@ -160,6 +161,7 @@ Alle Zahlen stehen an einer Stelle in `Scripts/Core/Combat/CombatRules.cs`.
 | Attack | ATTACK | 100 % Waffenschaden | 0 | 1 / Angriffstempo | keine | Treffer der Waffe, mit dem Bogen ein Pfeil |
 | Cleave | ATTACK | 120 % Waffenschaden | 1 | 1 / Angriffstempo | keine | Halbkreis vor dem Helden mit der anderthalbfachen Reichweite der Waffe, trifft jeden darin. Nur mit Nahkampfwaffen |
 | Magma Strike | ATTACK | 80 % Waffenschaden als Fire, jede Kugel 65 % | 2 | 1 / Angriffstempo | keine | Schlag auf ein Ziel, der physische Schaden der Waffe wird zu Feuer. Ein gelandeter Treffer wirft drei Magmakugeln aus dem Ziel, die mit 0,75 m Radius um es herum einschlagen. Nur mit Nahkampfwaffen |
+| Darken Sky | ATTACK | 80 % Waffenschaden je Pfeil | 3 | 1 / Angriffstempo | 3 s | Schuss in den Himmel. Nach 0,5 s fallen eine Sekunde lang fünf Pfeile auf das Ziel oder die Stelle, auf die der Held zielte, gestreut in 2 m Radius und dichter zur Mitte, jeder mit 0,75 m Einschlag. Bonusprojektile geben weitere Pfeile. Nur mit Bogen |
 | Lightning Strike | ATTACK | 180 % Waffenschaden als Lightning | 3 | 1 / Angriffstempo | keine | Schwung mit Blitzprojektil |
 | Fireball | SPELL | 50 bis 75 Fire | 2 | 0,4 s | 0,25 s | Projektil, das sich bis zu zweimal aufspaltet |
 | Frost Nova | SPELL | 10 bis 50 Frost | 2 | 0,4 s | 0,5 s | Ring um den Helden |
@@ -525,7 +527,8 @@ Die Skill-Leiste zeigt immer die aktuelle Taste.
 | `F` | Fireball in Richtung der Maus |
 | `Q` | Cleave: auf einen Gegner zeigen, der Held läuft hin und schlägt einen Halbkreis |
 | `1` | Magma Strike: auf einen Gegner zeigen, der Held läuft hin, schlägt mit Feuer zu, und drei Magmakugeln springen aus dem Ziel |
-| `2` bis `4` | Freie Plätze der Skill-Leiste |
+| `2` | Darken Sky: auf einen Gegner oder eine Stelle zeigen, der Held schießt einen Pfeil in den Himmel, und fünf Pfeile regnen dort herab. Nur mit Bogen, sonst liegt der Platz rot |
+| `3` bis `4` | Freie Plätze der Skill-Leiste |
 | `Shift` halten + Skill-Taste | Angriff aus dem Stand Richtung Maus, ohne hinzulaufen, auch ohne Gegner unter der Maus |
 | Taste gedrückt halten | Wiederholt den Skill |
 | Taste eines Platzes mit Trank | Einen Trank dieser Art aus dem Inventar trinken, gehalten nur einen |
@@ -580,7 +583,7 @@ flowchart LR
 | ✅ | **M6** Level | Prozedurale Level mit handgebauten Räumen, gesteuert über Seeds | groß |
 | ✅ | **M7** Hub | Hauptmenü, Hub, Portale, Treppen, Checkpoints, Town-Portal, Pausenmenü, Ladebildschirm, Einstellungen, Hud an Ankern, Gold, Truhe, Händler, Platzhalter-Boss mit Boss-Raum und Freischaltung des nächsten Kreises. Etappe 4 liegt seit dem 01.10.2026 auf `master`, dazu der ruhigere PS1-Look und die Sichtlinie der Mauern | mittel |
 | ✅ | **M7.5** Renderskalierung | Vorgezogen aus M9: Die Welt rendert im Raster der PS1 statt in voller Fenstergröße, gebaut am 01.10.2026 auf `master_RenderScaling`, seit demselben Tag auf `master` | klein |
-| 🔨 | **M8** Höllenkreis | Wollust als kompletter Kreis in Endqualität: freie Flächen hintereinander, Dungeons per Ladezone, Sturm mit Windschatten, sechs Gegnertypen, Minos als Boss, Events, alle 16 Slots mit Item-Basen, Affixe nach der Slot-Tabelle, Balance, Ton und Musik. Etappe 1 von 20 liegt seit dem 02.10.2026 auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal, der Inhaltsstand im Spielstand. Etappe 2 liegt seit dem 05.10.2026 auf `master`: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests. Etappe 3a liegt seit demselben Tag auf `master`: der Generator für freie Flächen im Kern. Etappe 3b liegt seit demselben Tag auf `master`: Wollust besteht aus drei freien Flächen, mit Kette hin und zurück, Karte und Spielstand Version 6. Ebenfalls seit demselben Tag liegen auf `master` 139 Affixe nach dem Vorbild eines gängigen aRPG für die sieben Item-Basen, mit hybriden Affixen, Bonusschaden, Reflect, Obergrenze der Resistenzen und weiteren Mechaniken, Spielstand Version 7. Vorgezogen liegt seit demselben Tag auf `master` der erste neue Skill: Cleave, dazu Stehenbleiben mit `Shift`, sichtbare Hiebe im Nahkampf und Skills, die das Laufen unterbrechen. Der zweite, Magma Strike, liegt seit dem 06.10.2026 auf `master`, zusammen mit einer Kommandozeile zum Testen, die im Debug-Build Gegner um den Helden stellt | groß |
+| 🔨 | **M8** Höllenkreis | Wollust als kompletter Kreis in Endqualität: freie Flächen hintereinander, Dungeons per Ladezone, Sturm mit Windschatten, sechs Gegnertypen, Minos als Boss, Events, alle 16 Slots mit Item-Basen, Affixe nach der Slot-Tabelle, Balance, Ton und Musik. Etappe 1 von 20 liegt seit dem 02.10.2026 auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal, der Inhaltsstand im Spielstand. Etappe 2 liegt seit dem 05.10.2026 auf `master`: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests. Etappe 3a liegt seit demselben Tag auf `master`: der Generator für freie Flächen im Kern. Etappe 3b liegt seit demselben Tag auf `master`: Wollust besteht aus drei freien Flächen, mit Kette hin und zurück, Karte und Spielstand Version 6. Ebenfalls seit demselben Tag liegen auf `master` 139 Affixe nach dem Vorbild eines gängigen aRPG für die sieben Item-Basen, mit hybriden Affixen, Bonusschaden, Reflect, Obergrenze der Resistenzen und weiteren Mechaniken, Spielstand Version 7. Vorgezogen liegt seit demselben Tag auf `master` der erste neue Skill: Cleave, dazu Stehenbleiben mit `Shift`, sichtbare Hiebe im Nahkampf und Skills, die das Laufen unterbrechen. Der zweite, Magma Strike, liegt seit dem 06.10.2026 auf `master`, zusammen mit einer Kommandozeile zum Testen, die im Debug-Build Gegner um den Helden stellt. Der dritte, Darken Sky, ist am 07.10.2026 auf `master_DarkenSky` umgesetzt: ein Pfeilregen für den Bogen, dazu Bonusprojektile für Pfeile und Magmakugeln | groß |
 | ⬜ | **M9** Inhalt | Die übrigen Kreise, Intro, Politur | groß |
 | 💤 | **M10** Koop | Optional, baut auf Kern und Seeds auf | groß |
 

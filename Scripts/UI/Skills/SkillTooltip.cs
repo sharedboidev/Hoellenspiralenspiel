@@ -28,12 +28,15 @@ public static class SkillTooltip
         text.Append(Title($"[color=gold]{skill.NameOrId}[/color]")).Append(NewLine).Append(NewLine);
 
         if (!SkillGate.FitsWeapon(skill.Definition, caster.Weapon.IsRanged))
-            text.Append("[color=red]Needs a melee weapon[/color]").Append(NewLine);
+            text.Append(skill.Definition.NeedsBow ? "[color=red]Needs a bow[/color]" : "[color=red]Needs a melee weapon[/color]").Append(NewLine);
         text.Append($"[color=orange]DPS: {Format(estimate.Dps)}[/color]").Append(NewLine);
         text.Append($"Average Hit: {Format(estimate.AverageHit)}").Append(NewLine);
 
         if (estimate.ScatterCount > 0)
             text.Append($"Per Ball: {Format(estimate.ScatterAverageHit)} ({estimate.ScatterCount} Balls)").Append(NewLine);
+
+        if (estimate.ArrowCount > 0)
+            text.Append($"Arrows: {estimate.ArrowCount}, about {estimate.ArrowsOnTarget:0.#} on a single target").Append(NewLine);
 
         text.Append($"Crit Chance: {estimate.CriticalHitChance:0.#}%").Append(NewLine);
         text.Append($"{uses} per Second: {estimate.UsesPerSecond:0.##}");

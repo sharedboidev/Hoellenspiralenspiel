@@ -513,6 +513,7 @@ public partial class Enemy : BaseUnit
         {
             SkillDelivery.Weapon           => Weapon.Range,
             SkillDelivery.MeleeStrike      => Weapon.Range,
+            SkillDelivery.ArrowRain        => Weapon.Range,
             SkillDelivery.WeaponSweep      => definition.Sweep.GetEngageRange(Weapon),
             SkillDelivery.Projectile       => definition.Projectile.Reach * EngageFraction,
             SkillDelivery.AreaAroundCaster => definition.Area.Radius * EngageFraction,
@@ -523,7 +524,7 @@ public partial class Enemy : BaseUnit
     }
 
     private bool NeedsSight(SkillResource skill)
-        => skill.Delivery == SkillDelivery.Projectile || (skill.Delivery == SkillDelivery.Weapon && Weapon.IsRanged);
+        => skill.Delivery is SkillDelivery.Projectile or SkillDelivery.ArrowRain || (skill.Delivery == SkillDelivery.Weapon && Weapon.IsRanged);
 
     private bool HasSightOfTarget(double delta)
     {

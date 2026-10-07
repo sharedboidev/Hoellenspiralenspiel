@@ -43,10 +43,16 @@ public sealed record SkillDefinition
     //Nur für Attacks: Kugeln, die nach einem gelandeten Treffer aus dem Ziel springen
     public ScatterSettings Scatter { get; init; }
 
+    //Nur für Attacks mit dem Bogen: Pfeile, die nach dem Schuss in den Himmel auf das Zielgebiet fallen
+    public RainSettings Rain { get; init; }
+
     public bool IsArea => Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint;
 
     //Ein Bogen ist keine Klinge: Mit einer Fernkampfwaffe in der Hand lassen sich diese Skills nicht einsetzen
     public bool NeedsMeleeWeapon => Delivery is SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike;
+
+    //Pfeile kommen nur aus einem Bogen, der einzigen Fernkampfwaffe
+    public bool NeedsBow => Delivery is SkillDelivery.ArrowRain;
 
     //Erhöhtes Zaubertempo teilt die Wirkzeit: 50 % mehr ergibt zwei Drittel der Zeit
     public double GetCastSec(StatSheet caster)

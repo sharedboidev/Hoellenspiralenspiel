@@ -7,7 +7,8 @@ public enum SkillUseCheck
     Ready,
     OnCooldown,
     NotEnoughMana,
-    NeedsMeleeWeapon
+    NeedsMeleeWeapon,
+    NeedsBow
 }
 
 public static class SkillGate
@@ -19,8 +20,11 @@ public static class SkillGate
         ArgumentNullException.ThrowIfNull(skill);
         ArgumentNullException.ThrowIfNull(cooldowns);
 
-        if (!FitsWeapon(skill, holdsRangedWeapon))
+        if (skill.NeedsMeleeWeapon && holdsRangedWeapon)
             return SkillUseCheck.NeedsMeleeWeapon;
+
+        if (skill.NeedsBow && !holdsRangedWeapon)
+            return SkillUseCheck.NeedsBow;
 
         if (!cooldowns.IsReady(skill.Id))
             return SkillUseCheck.OnCooldown;
@@ -32,5 +36,5 @@ public static class SkillGate
     }
 
     public static bool FitsWeapon(SkillDefinition skill, bool holdsRangedWeapon)
-        => skill is not null && !(skill.NeedsMeleeWeapon && holdsRangedWeapon);
+        => skill is not null && !(skill.NeedsMeleeWeapon && holdsRangedWeapon) && !(skill.NeedsBow && !holdsRangedWeapon);
 }

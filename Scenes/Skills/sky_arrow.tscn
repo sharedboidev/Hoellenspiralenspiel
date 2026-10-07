@@ -1,0 +1,60 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Skills/Effects/SkyArrow.cs" id="1_script"]
+[ext_resource type="Shader" uid="uid://c2lknp40isk5w" path="res://Shaders/Ps1/ps1_surface.gdshader" id="90_ps1"]
+
+[sub_resource type="BoxMesh" id="Mesh_shaft"]
+size = Vector3(0.07, 0.07, 0.8)
+
+[sub_resource type="ShaderMaterial" id="Mat_shaft"]
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0.32, 0.22, 0.12, 1)
+shader_parameter/emission = Color(0.12, 0.08, 0.04, 1)
+shader_parameter/emission_energy = 1.0
+
+[sub_resource type="BoxMesh" id="Mesh_head"]
+size = Vector3(0.1, 0.1, 0.12)
+
+[sub_resource type="ShaderMaterial" id="Mat_head"]
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0.55, 0.55, 0.6, 1)
+shader_parameter/emission = Color(0.25, 0.25, 0.28, 1)
+shader_parameter/emission_energy = 1.0
+
+[sub_resource type="BoxMesh" id="Mesh_vane_flat"]
+size = Vector3(0.16, 0.03, 0.16)
+
+[sub_resource type="BoxMesh" id="Mesh_vane_upright"]
+size = Vector3(0.03, 0.16, 0.16)
+
+[sub_resource type="ShaderMaterial" id="Mat_vane"]
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0.85, 0.82, 0.7, 1)
+shader_parameter/emission = Color(0.3, 0.28, 0.22, 1)
+shader_parameter/emission_energy = 1.0
+
+[node name="SkyArrow" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Shaft" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("Mesh_shaft")
+surface_material_override/0 = SubResource("Mat_shaft")
+
+[node name="Head" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.42)
+cast_shadow = 0
+mesh = SubResource("Mesh_head")
+surface_material_override/0 = SubResource("Mat_head")
+
+[node name="VaneFlat" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.32)
+cast_shadow = 0
+mesh = SubResource("Mesh_vane_flat")
+surface_material_override/0 = SubResource("Mat_vane")
+
+[node name="VaneUpright" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.32)
+cast_shadow = 0
+mesh = SubResource("Mesh_vane_upright")
+surface_material_override/0 = SubResource("Mat_vane")

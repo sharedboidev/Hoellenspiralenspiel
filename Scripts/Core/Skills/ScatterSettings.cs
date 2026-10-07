@@ -20,13 +20,21 @@ public sealed record ScatterSettings(int Count, float WeaponDamagePercent, float
         return strike with { WeaponDamagePercent = WeaponDamagePercent };
     }
 
+    //Zusätzliche Projektile kommen als weitere Kugeln dazu
+    public int GetCount(int bonusProjectiles)
+        => Math.Max(0, Count) + Math.Max(0, bonusProjectiles);
+
+    public IReadOnlyList<(float X, float Y)> PickLandings(float targetRadiusPx, IRandomSource random)
+        => PickLandings(Count, targetRadiusPx, random);
+
     //Versatz der Einschläge zur Mitte des Ziels. Jede Kugel bekommt einen gleich großen Sektor um das Ziel, damit nicht alle auf einer Seite landen.
     //Sie landet außerhalb seines Körpers, aber so nah, dass ihr Einschlag ihn noch erreicht
-    public IReadOnlyList<(float X, float Y)> PickLandings(float targetRadiusPx, IRandomSource random)
+    public IReadOnlyList<(float X, float Y)> PickLandings(int count, float targetRadiusPx, IRandomSource random)
     {
         ArgumentNullException.ThrowIfNull(random);
 
-        var count    = Math.Max(0, Count);
+        count = Math.Max(0, count);
+
         var landings = new List<(float X, float Y)>(count);
 
         if (count == 0)

@@ -45,6 +45,9 @@ public partial class Hero
     private const float  SwingRaiseDegrees  = 40f;
     private const float  AimRaiseDegrees    = 80f;
 
+    //Für den Schuss in den Himmel: steil nach oben, 20° Richtung Ziel geneigt wie der Pfeil in SkillExecutor.SkyShotTiltDegrees
+    private const float  SkyAimDegrees      = 160f;
+
     //So lange wie SweepSec der Hiebe in melee_slash.tscn und cleave.tscn, damit Waffe und Hieb zusammen durchziehen
     private const double StrikeSec             = 0.15;
     private const double StrikeShareOfRecovery = 0.6;
@@ -675,6 +678,7 @@ public partial class Hero
         {
             SkillDelivery.Weapon           => Weapon.Range,
             SkillDelivery.MeleeStrike      => Weapon.Range,
+            SkillDelivery.ArrowRain        => Weapon.Range,
             SkillDelivery.WeaponSweep      => skill.Sweep.GetEngageRange(Weapon),
             SkillDelivery.Projectile       => skill.Projectile.Reach * EngageFraction,
             SkillDelivery.AreaAroundCaster => skill.Area.Radius * EngageFraction,
@@ -838,7 +842,9 @@ public partial class Hero
 
         if (skill.Kind != SkillKind.Attack || Weapon.IsRanged)
         {
-            actionLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(AimRaiseDegrees, 0, 0), windupSec);
+            var raiseDegrees = skill.Delivery == SkillDelivery.ArrowRain ? SkyAimDegrees : AimRaiseDegrees;
+
+            actionLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(raiseDegrees, 0, 0), windupSec);
             actionLook.TweenProperty(weaponPivot, "rotation_degrees", Vector3.Zero, recoverySec);
 
             return;

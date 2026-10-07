@@ -7,7 +7,7 @@ Die Rückmeldungen aus dem Spielen von Etappe 3 sind am selben Tag auf `master_P
 Eine zweite Runde Rückmeldungen zu Etappe 3 ist am selben Tag auf `master_PlaytestFeedback3` gebaut: Umriss für alles Benutzbare, Blick zur Maus, Schlag und Zauber binden den Helden, Kaufen per Rechtsklick und der Vergleich oben bündig.
 Etappe 4 ist am 01.10.2026 auf `master_BossAndUnlock` gebaut und liegt seit demselben Tag auf `master`: der Skeleton King als Platzhalter-Boss mit Krone und Boss-Raum, die Freischaltung des nächsten Kreises und das Schlachthaus als Platzhalter für Kreis 2 mit neuen Texturen und Blutspuren. Auf demselben Branch kamen nach dem Spielen das ruhigere Bild des PS1-Looks und die Sichtlinie der Mauern dazu, beide ebenfalls auf `master`.
 Die Renderskalierung ist aus M9 vorgezogen und am 01.10.2026 als M7.5 auf `master_RenderScaling` gebaut und liegt seit demselben Tag auf `master`: Die Welt rendert im Raster der PS1 statt in voller Fenstergröße.
-M8 ist am 02.10.2026 geplant und läuft in 20 Etappen, siehe dort. Etappe 1 ist am selben Tag auf `master_CirclesAndTestPortal` gebaut und liegt seit demselben Tag auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal des Hubs, der Inhaltsstand eines Kreises im Spielstand. Etappe 2 ist am selben Tag auf `master_CoreDefinitions` gebaut und liegt seit dem 05.10.2026 auf `master`: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests, der mit den echten Resources rechnet. Etappe 3a ist am 05.10.2026 auf `master_FieldGenerator` gebaut und liegt seit demselben Tag auf `master`: der Generator für freie Flächen im Kern. Etappe 3b ist am selben Tag auf `master_WollustFields` gebaut und liegt seit demselben Tag auf `master`: Wollust besteht aus drei freien Flächen, mit Kette hin und zurück, Karte und Orten im Spielstand. Daneben liegen seit demselben Tag die Affixe nach dem Vorbild eines gängigen aRPG auf `master`, gebaut auf `master_SwordAffixes` und `master_BaseAffixes`. Ebenso der erste vorgezogene Skill, gebaut auf `master_Cleave`: Cleave, Stehenbleiben mit `Shift`, sichtbare Hiebe im Nahkampf, eine rote Leiste bei falscher Waffe, und Skills unterbrechen das Laufen. Der zweite vorgezogene Skill ist am selben Tag auf `master_MagmaStrike` gebaut und liegt seit dem 06.10.2026 auf `master`: Magma Strike, ein Feuerschlag auf ein Ziel, aus dem drei Magmakugeln springen. Mit ihm liegt eine Kommandozeile zum Testen auf `master`, die der User selbst gebaut hat: Im Debug-Build stellt `spawn` Gegner um den Helden.
+M8 ist am 02.10.2026 geplant und läuft in 20 Etappen, siehe dort. Etappe 1 ist am selben Tag auf `master_CirclesAndTestPortal` gebaut und liegt seit demselben Tag auf `master`: Wollust als Kreis 2, das Schlachthaus als Testlevel am zehnten Portal des Hubs, der Inhaltsstand eines Kreises im Spielstand. Etappe 2 ist am selben Tag auf `master_CoreDefinitions` gebaut und liegt seit dem 05.10.2026 auf `master`: die Grundwerte von Gegnern und Held im Kern und ein Kampfsimulator in den Tests, der mit den echten Resources rechnet. Etappe 3a ist am 05.10.2026 auf `master_FieldGenerator` gebaut und liegt seit demselben Tag auf `master`: der Generator für freie Flächen im Kern. Etappe 3b ist am selben Tag auf `master_WollustFields` gebaut und liegt seit demselben Tag auf `master`: Wollust besteht aus drei freien Flächen, mit Kette hin und zurück, Karte und Orten im Spielstand. Daneben liegen seit demselben Tag die Affixe nach dem Vorbild eines gängigen aRPG auf `master`, gebaut auf `master_SwordAffixes` und `master_BaseAffixes`. Ebenso der erste vorgezogene Skill, gebaut auf `master_Cleave`: Cleave, Stehenbleiben mit `Shift`, sichtbare Hiebe im Nahkampf, eine rote Leiste bei falscher Waffe, und Skills unterbrechen das Laufen. Der zweite vorgezogene Skill ist am selben Tag auf `master_MagmaStrike` gebaut und liegt seit dem 06.10.2026 auf `master`: Magma Strike, ein Feuerschlag auf ein Ziel, aus dem drei Magmakugeln springen. Mit ihm liegt eine Kommandozeile zum Testen auf `master`, die der User selbst gebaut hat: Im Debug-Build stellt `spawn` Gegner um den Helden. Der dritte vorgezogene Skill ist am 07.10.2026 auf `master_DarkenSky` gebaut: Darken Sky, ein Pfeilregen für den Bogen, dazu Bonusprojektile für Pfeile und Magmakugeln.
 Neben den Meilensteinen liegen auf `master`: das Skelett als erster Gegner mit Knochen und Animationen, der Umriss um Held und Gegner und das Mausrad für den Abstand der Kamera.
 Das Spiel läuft seit M5.5 in 3D im Look der PlayStation 1.
 Die 2D-Fassung ist abgelöst: Ihr Code und ihre Szenen sind entfallen. Die Hauptszene ist seit M7 das Hauptmenü.
@@ -3389,6 +3389,82 @@ Bewusst offen gelassen:
 - Ein Release-Build ist nicht geprüft, der Schutz ist nur gelesen. Ein Lauf mit Fenster und echter Tastatur fehlt ebenfalls.
 - Meldungen stehen nur im Log von Godot, nicht im Spiel.
 - Die Zeile kennt nur `spawn`.
+
+#### Skill 3: Darken Sky
+
+Umgesetzt am 07.10.2026 auf `master_DarkenSky`, abgezweigt von `f742162`. Wunsch des Users, als kleine Zwischenetappe: ein Bogen-Skill, der nur mit angelegtem Bogen auslösbar ist. Der Name spielt auf den Witz aus dem Film 300 an, in dem die Pfeile am Himmel die Sonne verdunkeln. Beim Auslösen zielt der Held mit dem Bogen steil nach oben, leicht in Zielrichtung geneigt, und schießt in den Himmel. Nach 0,5 s regnen eine Sekunde lang insgesamt fünf Pfeile auf das Ziel oder das Zielgebiet herab, jeder mit 80 % Waffenschaden. Die Zahl der Pfeile skaliert mit Bonusprojektilen, und das sollen die Magmakugeln von Magma Strike auch.
+
+Getroffene Entscheidungen des Users vom 07.10.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| Streuung | Mittel: Die Pfeile fallen zufällig in einem Kreis von 2 m um den Zielpunkt, jeder trifft in 0,75 m. Ein einzelnes Ziel bekommt nur einen Teil ab, eine Gruppe wird breit getroffen |
+| Ziel läuft weg | Die Pfeile fallen um die Stelle, an der das Ziel beim Schuss stand, wie bei Magma Strike. Ein Zielgebiet am Boden verhält sich gleich |
+| Kosten | 3 Mana und 3 s Abklingzeit, die erste Attack mit Abklingzeit |
+| Reichweite | Die des Bogens. Steht das Ziel weiter weg, läuft der Held heran. Mit `Shift` schießt er aus dem Stand auf den Punkt |
+
+- Erledigt: Darken Sky als `Resources/Skills/Player/darken_sky.tres`. Eine neue Lieferung `SkillDelivery.ArrowRain` (am Ende angehängt, Wert 6) braucht einen Bogen: `SkillDefinition.NeedsBow`, `SkillUseCheck.NeedsBow`, und `SkillGate.FitsWeapon` lehnt ihn ohne Fernkampfwaffe ab. Der Platz auf der Leiste liegt dann rot wie bei Cleave mit Bogen, der Tooltip sagt "Needs a bow".
+- Erledigt: Der Regen. `RainSettings` im Kern hält Zahl, Radius, Einschlagradius, Vorlauf und Dauer. `PickLandings` gibt jedem Pfeil einen gleich großen Sektor, der Abstand zur Mitte ist gleichverteilt über den Radius, also dichter zur Mitte hin. `GetImpactDelays` legt den ersten Einschlag auf den Vorlauf, den letzten ans Ende der Dauer, die übrigen gleichmäßig dazwischen. Jeder Pfeil ist ein eigener Treffer mit eigenem `SkillCast`, trifft jeden höchstens einmal und mit dem Element des Bogens.
+- Erledigt: Bonusprojektile. `BonusProjectiles` im Kern rechnet aus dem Stat `Projectiles` die Geschosse über das erste hinaus, für den Bogen dazu seine eigenen Zusatzpfeile. Darken Sky schießt 5 + Stat + Bogen, Magma Strike wirft 3 + Stat, der einfache Bogenschuss rechnet wie bisher über dieselbe Regel.
+- Erledigt: Die Darstellung. Der Held hebt den Bogen in der Schulter auf 160°, also 20° aus der Senkrechten Richtung Ziel (`Hero.SkyAimDegrees`). Ein Pfeil (`sky_arrow.tscn`, `SkyArrow`) steigt mit 30 m/s in derselben Neigung und verschwindet nach 0,45 s. Jeder Pfeil des Regens (`rain_arrow.tscn`, `FallingArea`) erscheint 0,35 s vor seinem Einschlag 9 m über der Stelle, zieht beim Fallen 2 m in Schussrichtung weiter, steckt danach 25 cm tief im Boden und verschwindet mit der Staubwolke nach 0,6 s.
+- Erledigt: Der Tooltip zählt die Pfeile ("Arrows: 5, about 1,9 on a single target") und rechnet die DPS mit dem Anteil der Pfeile, die einen Punkt in der Mitte erreichen, Einschlagradius durch Radius. Die Abklingzeit bremst die Einsätze pro Sekunde. Bei Magma Strike zählt "Per Ball" die Bonuskugeln mit.
+- Zusätzlich: Ein Platzhalter-Icon unter `Textures/Skills/Icons/darken_sky.png`, eine Sonne hinter einem Schwarm Pfeile.
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Startbelegung | Darken Sky liegt bei neuen Charakteren auf `2`. Bestehende Charaktere legen ihn per Rechtsklick auf einen Platz |
+| Bogen | Der Bogen ist die einzige Fernkampfwaffe, deshalb prüft `NeedsBow` auf `Weapon.IsRanged`, wie `NeedsMeleeWeapon` umgekehrt |
+| Zielpunkt | Mit einem Gegner unter der Maus seine Stelle beim Schuss, sonst der Punkt am Boden. Ohne `Shift` und ohne Gegner schießt der Held wie jeder Fernkampf aus dem Stand auf den Punkt |
+| Rhythmus | Fünf Pfeile schlagen bei 0,5, 0,75, 1,0, 1,25 und 1,5 s nach dem Schuss ein. Mehr Pfeile teilen dieselbe Sekunde feiner |
+| Schätzung | Ein Punkt in der Mitte liegt in 37,5 % der Einschläge. Ein Körper fängt mehr, ein Skelett mit 0,35 m Radius in der Probe 3 von 5 |
+| Treffer der Pfeile | Jeder Pfeil würfelt einzeln. Ein Bogen mit Pierce trifft nur halb so oft, der Tooltip rechnet das ein |
+| Abklingzeit | Läuft ab dem Bezahlen beim Ausholen, wie bei den Zaubern |
+| Bonusprojektile des Bogens | Zählen nur für Pfeile. Magma Strike braucht eine Nahkampfwaffe und bekommt nur den Stat |
+| Gegner | Ein Gegner mit Bogen und Darken Sky würde ihn auf die Reichweite seiner Waffe einsetzen und braucht dafür Sicht auf das Ziel |
+
+So funktioniert es:
+
+- `SkillExecutor.RainArrows` nimmt `aim.CurrentPoint` als Mitte, holt Zahl, Verzögerungen und Einschläge aus `RainSettings` und legt je Pfeil eine `FallingArea` mit `AreaSettings(Einschlagradius, 0, Verzögerung)` an. `FallAlong` gibt ihr die Schussrichtung auf dem Boden mit. `ShowSkyShot` setzt den Pfeil in den Himmel 1,4 m über und 0,4 m vor den Helden.
+- `FallingArea` ist eine `SkillArea` wie `LobbedArea`: Der Einschlag kommt im Takt der Physik, der Pfeil zieht im Takt des Bildes. `Arrow` liegt nicht unter `Visual`, weil `Visual` mit dem Radius skaliert.
+- `Hero.PlayActionLook` hebt für `ArrowRain` die Schulter auf `SkyAimDegrees` statt `AimRaiseDegrees`. `GetEngageRange` nimmt die Reichweite der Waffe, bei Held und Gegner.
+- `AttackSkillResource` hat die Gruppe Rain. `SkillResource.Definition` baut daraus `SkillDefinition.Rain`, nur bei `Delivery` ArrowRain.
+
+Neue Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| `AttackSkillResource`, Gruppe Rain | `RainCount` | 5 | Zahl der Pfeile ohne Bonus |
+| | `RainRadius` | 200 | Streuung um den Zielpunkt in Pixeln |
+| | `RainImpactRadius` | 75 | Radius eines Einschlags in Pixeln |
+| | `RainDelaySec`, `RainDurationSec` | 0,5, 1 | Vorlauf bis zum ersten Pfeil, Dauer des Regens |
+| | `RainScene` | `rain_arrow.tscn` | Szene eines Pfeils, ihr Wurzelknoten ist eine `FallingArea`. `EffectScene` ist der Schuss in den Himmel |
+| `FallingArea` | `Arrow` | Knoten `Arrow` | Was fällt, entlang -Z mit der Spitze vorn |
+| | `ArrowLengthMeters` | 0,8 | Damit er nach dem Einschlag richtig tief steckt |
+| | `FallHeightMeters`, `FallSec` | 9, 0,35 | Aus dieser Höhe fällt er, so lange ist er zu sehen |
+| | `DriftMeters` | 2 | So weit zieht er dabei in Schussrichtung |
+| | `StuckDepthMeters` | 0,25 | So tief steckt er danach |
+| `SkyArrow` | `SpeedMetersPerSec`, `LifetimeSec` | 30, 0,45 | Flug des Pfeils in den Himmel |
+
+Ein neuer Pfeilregen, etwa mit Feuer: eine `AttackSkillResource` mit `Delivery` ArrowRain, `ConvertsDamageType` und den Feldern der Gruppe Rain, dazu Kopien von `sky_arrow.tscn` und `rain_arrow.tscn`. Code braucht er keinen.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen |
+| Unit-Tests | 28 neue: Bonus als weitere Pfeile, Einschläge vom Vorlauf über die Dauer, auch bei neun Pfeilen und bei einem, Einschlag je Pfeil, kein Wurf ohne Pfeile, keiner außerhalb des Radius, die Hälfte in der inneren Hälfte, jeder in seinem Sektor und fünf in fünf Fünfteln, gleicher Seed gleiche Einschläge, Anteil auf die Mitte; Bonus aus dem Stat, aus dem Bogen, nie negativ; Pfeilregen braucht den Bogen, vor Abklingzeit und Mana, `NeedsBow` nur für ihn; Kugeln mit Bonus und weiter auf dem stehenden Ziel; DPS mit Anteil und Abklingzeit, Pfeile mit Stat und Bogen, Kugeln mit Stat; die Werte aus `darken_sky.tres`. Zusammen 1875 |
+| Laufendes Spiel, headless und mit Fenster | Je 48 Prüfungen im Hub mit einem Skelett. Darken Sky liegt beim neuen Charakter auf `2`. Mit dem Schwert startet er nicht, kostet nichts, und der Tooltip sagt "Needs a bow". Mit dem Kurzbogen: aus dem Stand kostet er 3 Mana, die Abklingzeit läuft, der Pfeil startet 1,4 m über dem Helden, steigt 6,1 m in 0,2 s und neigt sich zum Ziel, die Schulter steht bei 157°. Fünf Pfeile landen 0,07 bis 1,80 m um den Zielpunkt und schlagen 0,53, 0,77, 1,02, 1,27 und 1,53 s nach dem Schuss ein. Das stehende Skelett trifft genau die 3 Pfeile, deren Einschlag es erreicht, physisch mit 4,6 bis 5,8 Schaden. Ein zweiter Schuss startet nicht, nach 2,6 s ist der Skill wieder bereit. Ein Skelett, das nach dem Schuss 4 m wegläuft, wird nicht getroffen, die Pfeile fallen um seine alte Stelle. Auf ein Skelett 9,35 m entfernt läuft der Held 2,4 m heran und schießt bei 6,93 m. Mit Projectiles 2 fallen sechs Pfeile, und Magma Strike wirft vier Kugeln. Bilder vom Schuss in den Himmel, von fallenden und steckenden Pfeilen |
+| Spielstand | Die Proben liefen mit eigenem Spielstand und eigenen Einstellungen, die des Users blieben unberührt. Die Probe ist wieder gelöscht |
+
+Bewusst offen gelassen:
+
+- Das Icon ist ein gezeichneter Platzhalter, bis der User ein eigenes liefert.
+- Ton für Schuss, Fall und Einschlag fehlt, er kommt mit Etappe 13 von M8.
+- Mauern halten die Pfeile nicht auf, sie kommen von oben.
+- Der Kurzbogen verlangt 2 Dexterity. Ein neuer Charakter kann ihn erst anlegen, wenn er den Punkt hat; bis dahin liegt Darken Sky rot.
+- Der Kampfsimulator der Balance-Tests liest den Regen, schießt aber je Einsatz nur einen Pfeil.
 
 ### M9: Inhalt und Politur (L, fortlaufend)
 

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AttackSkillResource" format=3 uid="uid://tud4ve2u1bhm"]
+
+[ext_resource type="Script" uid="uid://06hypuyik5ex" path="res://Resources/Skills/AttackSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dl28v7dml6c6g" path="res://Textures/Skills/Icons/darken_sky.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/sky_arrow.tscn" id="3_shot"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/rain_arrow.tscn" id="4_arrow"]
+
+[resource]
+script = ExtResource("1_script")
+WeaponDamagePercent = 80.0
+RainScene = ExtResource("4_arrow")
+Id = "darken_sky"
+DisplayName = "Darken Sky"
+Description = "Shoots an arrow into the sky. Half a second later, five arrows rain down on the target area for a second, each dealing 80% weapon damage. Additional projectiles add arrows. Needs a bow."
+Icon = ExtResource("2_icon")
+ManaCost = 3.0
+Delivery = 6
+EffectScene = ExtResource("3_shot")
