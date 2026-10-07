@@ -782,7 +782,7 @@ public partial class Hero
         }
 
         if (actionSkill is not null)
-            SkillExecutor.Execute(this, actionSkill, actionAim, actionCharge);
+            SkillExecutor.Execute(new SkillExecutionDefinition(this, actionSkill, actionAim), actionCharge);
     }
 
     private void FinishAction()
@@ -1127,7 +1127,7 @@ public partial class Hero
             return;
         }
 
-        SkillExecutor.Execute(this, channelSkill, new SkillAim(GetMouseGroundPoint()));
+        SkillExecutor.Execute(new SkillExecutionDefinition(this, channelSkill, new SkillAim(GetMouseGroundPoint())));
     }
 
     private void EndChannel()

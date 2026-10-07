@@ -101,7 +101,7 @@ public class GameDataTests
             Assert.That(sky.NeedsMeleeWeapon, Is.False);
             Assert.That(sky.Attack, Is.EqualTo(new AttackDefinition("Darken Sky", 80f)));
             Assert.That(sky.ManaCost, Is.EqualTo(3f));
-            Assert.That(sky.CooldownSec, Is.EqualTo(3));
+            Assert.That(sky.CooldownSec, Is.EqualTo(0));
             Assert.That(sky.Rain, Is.EqualTo(new RainSettings(5, 200f, 75f, 0.5f, 1f)));
             Assert.That(sky.Scatter, Is.Null);
         });

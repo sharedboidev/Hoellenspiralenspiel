@@ -597,7 +597,7 @@ public partial class Enemy : BaseUnit
         if (attackFailed)
             CombatText.Show(this, "Failed", Colors.Yellow, 28);
         else if (attackSkill is not null && IsInstanceValid(Target))
-            SkillExecutor.Execute(this, attackSkill, new SkillAim(Target.GlobalPosition, Target));
+            SkillExecutor.Execute(new SkillExecutionDefinition(this, attackSkill, new SkillAim(Target.GlobalPosition, Target)));
     }
 
     private void Move(EnemyMovement movement, double delta)

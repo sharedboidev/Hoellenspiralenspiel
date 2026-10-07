@@ -12,7 +12,22 @@ using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.Skills;
 
-public record SkillExecutionDefinition(BaseUnit Caster, SkillResource Skill, SkillAim SkillAim);
+//Was ein Skill beim Ausführen nutzt, zunächst alles aus dem Skill selbst. Wer davon abweicht, etwa der Schuss mit dem Pfeil der Waffe,
+//legt sich mit with eine Kopie an. Die Definition des Skills teilen sich alle, an ihr ändert keiner etwas
+public record SkillExecutionDefinition(BaseUnit Caster, SkillResource Skill, SkillAim SkillAim)
+{
+    public SkillDefinition SkillDefinition => Skill.Definition;
+
+    public SkillCast Cast { get; init; } = new(Caster, HitRequests.ForSkill(Caster.Stats, Caster.Weapon, Skill.Definition));
+
+    public PackedScene EffectScene { get; init; } = Skill.EffectScene;
+
+    public ProjectileSettings Projectile { get; init; } = Skill.Definition.Projectile;
+
+    public AreaSettings Area { get; init; } = Skill.Definition.Area;
+
+    public SweepSettings Sweep { get; init; } = Skill.Definition.Sweep;
+}
 
 public static class SkillExecutor
 {
@@ -27,63 +42,69 @@ public static class SkillExecutor
     private static readonly List<BaseUnit> UnitsInReach = new();
 
     //chargePercent zählt nur für einen geladenen Schuss: So weit war er beim Loslassen geladen
-    public static void Execute(BaseUnit caster, SkillResource skill, SkillAim aim, float chargePercent = 0f)
+    public static void Execute(SkillExecutionDefinition executionDefinition, float chargePercent = 0f)
     {
-        var definition = skill.Definition;
-        var cast       = new SkillCast(caster, HitRequests.ForSkill(caster.Stats, caster.Weapon, definition));
-
-        switch (definition.Delivery)
+        switch (executionDefinition.SkillDefinition.Delivery)
         {
-            case SkillDelivery.Weapon when caster.Weapon.IsRanged:
-                LaunchProjectile(caster, cast, caster.WeaponProjectileScene, caster.Weapon.GetProjectile(), aim, caster.Weapon.ExtraProjectiles);
+            case SkillDelivery.Weapon when executionDefinition.Caster.Weapon.IsRanged:
+                LaunchProjectile(executionDefinition with
+                                 {
+                                     EffectScene = executionDefinition.Caster.WeaponProjectileScene,
+                                     Projectile = executionDefinition.Caster.Weapon.GetProjectile()
+                                 },
+                                 executionDefinition.Caster.Weapon.ExtraProjectiles);
 
                 break;
-            case SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike or SkillDelivery.WeaponWhirl when caster.Weapon.IsRanged:
-                GD.PushWarning($"{caster.Name} braucht für {definition.Name} eine Nahkampfwaffe.");
+            case SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike or SkillDelivery.WeaponWhirl when executionDefinition.Caster.Weapon.IsRanged:
+                GD.PushWarning($"{executionDefinition.Caster.Name} braucht für {executionDefinition.SkillDefinition.Name} eine Nahkampfwaffe.");
 
                 break;
-            case SkillDelivery.ArrowRain or SkillDelivery.ChargedShot when !caster.Weapon.IsRanged:
-                GD.PushWarning($"{caster.Name} braucht für {definition.Name} einen Bogen.");
+            case SkillDelivery.ArrowRain or SkillDelivery.ChargedShot when !executionDefinition.Caster.Weapon.IsRanged:
+                GD.PushWarning($"{executionDefinition.Caster.Name} braucht für {executionDefinition.SkillDefinition.Name} einen Bogen.");
 
                 break;
             case SkillDelivery.ArrowRain:
-                RainArrows(caster, skill, aim);
+                RainArrows(executionDefinition);
 
                 break;
             case SkillDelivery.ChargedShot:
-                ShootCharged(caster, skill, aim, chargePercent);
+                ShootCharged(executionDefinition, chargePercent);
 
                 break;
             case SkillDelivery.Weapon or SkillDelivery.MeleeStrike:
-                StrikeInMelee(caster, cast, skill, aim);
+                StrikeInMelee(executionDefinition);
 
                 break;
             case SkillDelivery.WeaponSweep:
-                Sweep(caster, cast, skill.EffectScene, definition.Sweep, GetFacing(caster, aim));
+                Sweep(executionDefinition, GetFacing(executionDefinition.Caster, executionDefinition.SkillAim));
 
                 break;
             case SkillDelivery.WeaponWhirl:
-                Whirl(caster, cast, skill, aim);
+                Whirl(executionDefinition);
 
                 break;
             case SkillDelivery.Projectile:
-                LaunchProjectile(caster, cast, skill.EffectScene, definition.Projectile, aim);
+                LaunchProjectile(executionDefinition);
 
                 break;
             case SkillDelivery.AreaAroundCaster:
-                LaunchArea(caster, cast, skill.EffectScene, StartAtBodyEdge(definition.Area, caster), caster.GlobalPosition);
+                LaunchArea(executionDefinition with { Area = StartAtBodyEdge(executionDefinition) }, executionDefinition.Caster.GlobalPosition);
 
                 break;
             case SkillDelivery.AreaAtPoint:
-                LaunchArea(caster, cast, skill.EffectScene, definition.Area, aim.CurrentPoint);
+                LaunchArea(executionDefinition, executionDefinition.SkillAim.CurrentPoint);
 
                 break;
         }
     }
 
     //Der Hieb ist auch zu sehen, wenn er ins Leere geht. Trifft er, läuft er durch das Ziel
-    private static void StrikeInMelee(BaseUnit caster, SkillCast cast, SkillResource skill, SkillAim aim)
+    private static void StrikeInMelee(SkillExecutionDefinition skillExecutionDefinition)
     {
+        var caster = skillExecutionDefinition.Caster;
+        var cast = skillExecutionDefinition.Cast;
+        var aim = skillExecutionDefinition.SkillAim;
+        var skill = skillExecutionDefinition.Skill;
         var facing = GetFacing(caster, aim);
         var target = ChooseStrikeTarget(caster, cast, aim, facing);
         var hits   = target is not null;
@@ -151,8 +172,12 @@ public static class SkillExecutor
 
     //Der Pfeil in den Himmel ist nur zu sehen. Die Pfeile des Regens fallen um die Stelle, auf die der Held beim Schuss zielte,
     //schräg aus seiner Richtung. Wer von dort wegläuft, kann ihnen entkommen
-    private static void RainArrows(BaseUnit caster, SkillResource skill, SkillAim aim)
+    private static void RainArrows(SkillExecutionDefinition executionDefinition)
     {
+        var caster = executionDefinition.Caster;
+        var aim = executionDefinition.SkillAim;
+        var skill = executionDefinition.Skill;
+        
         if (skill.Definition.Rain is not { } rain || skill is not AttackSkillResource { RainScene: { } scene })
         {
             GD.PushWarning($"{caster.Name} hat keine Pfeile für {skill.Definition.Name}.");
@@ -186,8 +211,12 @@ public static class SkillExecutor
 
     //Der Pfeil der Waffe fliegt mit dem Anteil des Waffenschadens, den die Ladung ergibt. Über 100 % durchstößt er.
     //Das Projektil des Skills zeigt die Ladung, fehlt es, fliegt der gewöhnliche Pfeil der Waffe
-    private static void ShootCharged(BaseUnit caster, SkillResource skill, SkillAim aim, float chargePercent)
-    {
+    //private static void ShootCharged(BaseUnit caster, SkillResource skill, SkillAim aim, float chargePercent)
+    private static void ShootCharged(SkillExecutionDefinition executionDefinition, float chargePercent)
+    {       
+        var caster = executionDefinition.Caster;
+        var skill = executionDefinition.Skill;
+
         if (skill.Definition.Charge is not { } charge || caster.Weapon.GetProjectile() is not { } projectile)
         {
             GD.PushWarning($"{caster.Name} kann {skill.Definition.Name} nicht laden.");
@@ -196,16 +225,16 @@ public static class SkillExecutor
         }
 
         var attack = charge.GetAttack(skill.Definition.Attack, chargePercent);
-        var cast   = new SkillCast(caster, HitRequests.ForAttack(caster.Stats, caster.Weapon, attack));
-        var scene  = skill.EffectScene ?? caster.WeaponProjectileScene;
         var share  = charge.GetShownShare(chargePercent);
         var pierce = charge.Pierces(chargePercent);
+        var shot   = executionDefinition with
+        {
+            Cast = new SkillCast(caster, HitRequests.ForAttack(caster.Stats, caster.Weapon, attack)),
+            EffectScene = skill.EffectScene ?? caster.WeaponProjectileScene,
+            Projectile = projectile with { Pierces = pierce }
+        };
 
-        LaunchProjectile(caster,
-                         cast,
-                         scene,
-                         projectile with { Pierces = pierce },
-                         aim,
+        LaunchProjectile(shot,
                          caster.Weapon.ExtraProjectiles,
                          arrow => (arrow as ChargedArrow)?.ShowCharge(share, pierce));
     }
@@ -226,18 +255,20 @@ public static class SkillExecutor
     }
 
     //Ein Tick des Wirbels trifft jeden im Kreis. Zu sehen gibt es je Tick nichts Eigenes: Der Schweif aus ShowWhirlTrail läuft die ganze Zeit mit der Waffe
-    private static void Whirl(BaseUnit caster, SkillCast cast, SkillResource skill, SkillAim aim)
+    private static void Whirl(SkillExecutionDefinition executionDefinition)
     {
-        var definition = skill.Definition;
-
-        if (definition.Sweep is not { } sweep)
+        var caster = executionDefinition.Caster;
+        
+        if (executionDefinition.Sweep is not { } sweep)
         {
-            GD.PushWarning($"{caster.Name} hat keinen Kreis für {definition.Name}.");
+            GD.PushWarning($"{caster.Name} hat keinen Kreis für {executionDefinition.SkillDefinition.Name}.");
 
             return;
         }
 
-        Sweep(caster, cast, null, sweep with { ArcDegrees = SweepSettings.FullCircleDegrees }, GetFacing(caster, aim));
+        var tick = executionDefinition with { EffectScene = null, Sweep = sweep with { ArcDegrees = SweepSettings.FullCircleDegrees } };
+
+        Sweep(tick, GetFacing(caster, executionDefinition.SkillAim));
     }
 
     //Der Schweif des Wirbels hängt am Wirbelnden und folgt seiner Waffe, bis er ihn mit Dismiss zurücknimmt. Sein Radius ist der Kreis der Ticks
@@ -250,8 +281,13 @@ public static class SkillExecutor
     }
 
     //Der Bogen zeigt, wohin der Schlagende beim Ausholen schaute. Wer währenddessen hinter ihn läuft, entgeht ihm
-    private static void Sweep(BaseUnit caster, SkillCast cast, PackedScene slashScene, SweepSettings sweep, Vector3 facing)
+    private static void Sweep(SkillExecutionDefinition executionDefinition, Vector3 facing)
     {
+        var sweep = executionDefinition.Sweep;
+        var caster = executionDefinition.Caster;
+        var cast = executionDefinition.Cast;
+        var slashScene = executionDefinition.EffectScene;
+        
         if (sweep is null)
             return;
 
@@ -298,15 +334,18 @@ public static class SkillExecutor
 
     //Erhöhtes Projektiltempo lässt die Reichweite gleich. Weitere Pfeile einer Waffe zählen nur für ihre eigenen Angriffe.
     //prepare richtet jedes Projektil vor dem Einhängen ein, etwa mit seiner Ladung
-    private static void LaunchProjectile(BaseUnit               caster,
-                                         SkillCast              cast,
-                                         PackedScene            scene,
-                                         ProjectileSettings     settings,
-                                         SkillAim               aim,
-                                         int                    extraProjectiles = 0,
-                                         Action<SkillProjectile> prepare          = null)
+    //LaunchProjectile(caster, cast, skill.EffectScene, definition.Projectile, aim);
+    private static void LaunchProjectile(SkillExecutionDefinition   executionDefinition,
+                                         int                        extraProjectiles = 0,
+                                         Action<SkillProjectile>    prepare          = null)
     {
-        if (scene is null || settings is null)
+        var skillEffectScene = executionDefinition.EffectScene;
+        var effektSettings = executionDefinition.Projectile;
+        var caster = executionDefinition.Caster;
+        var aim = executionDefinition.SkillAim;
+        var cast = executionDefinition.Cast;
+        
+        if (skillEffectScene is null || effektSettings is null)
         {
             GD.PushWarning($"{caster.Name} hat kein Projektil für seinen Skill.");
 
@@ -319,14 +358,14 @@ public static class SkillExecutor
         var speedup   = caster.Stats.GetTotalMultiplier(CombatStat.ProjectileSpeed);
 
         if (speedup > 0f && !speedup.Equals(1f))
-            settings = settings with { Speed = settings.Speed * speedup, LifetimeSec = settings.LifetimeSec / speedup };
+            effektSettings = effektSettings with { Speed = effektSettings.Speed * speedup, LifetimeSec = effektSettings.LifetimeSec / speedup };
 
         for (var i = 0; i < count; i++)
         {
-            var projectile = scene.Instantiate<SkillProjectile>();
+            var projectile = skillEffectScene.Instantiate<SkillProjectile>();
             var spread     = Mathf.DegToRad(ProjectileSpread.GetOffsetDegrees(i, count));
 
-            projectile.Launch(cast, settings, scene, direction.Rotated(Vector3.Up, spread));
+            projectile.Launch(cast, effektSettings, skillEffectScene, direction.Rotated(Vector3.Up, spread));
             prepare?.Invoke(projectile);
 
             caster.GetParent().AddChild(projectile);
@@ -336,12 +375,16 @@ public static class SkillExecutor
     }
 
     //Eine Fläche um den Wirkenden beginnt wie jede Reichweite an seinem Rand
-    private static AreaSettings StartAtBodyEdge(AreaSettings settings, BaseUnit caster)
-        => settings is null ? null : settings with { Radius = settings.Radius + caster.BodyRadiusPx };
+    private static AreaSettings StartAtBodyEdge(SkillExecutionDefinition executionDefinition)
+        => executionDefinition.Area is { } area ? area with { Radius = area.Radius + executionDefinition.Caster.BodyRadiusPx } : null;
 
-    private static void LaunchArea(BaseUnit caster, SkillCast cast, PackedScene scene, AreaSettings settings, Vector3 center)
+    private static void LaunchArea(SkillExecutionDefinition executionDefinition, Vector3 center)
     {
-        if (scene is null || settings is null)
+        var scene = executionDefinition.EffectScene;
+        var caster = executionDefinition.Caster;
+        var areaSettings = executionDefinition.Area;
+        
+        if (scene is null || areaSettings is null)
         {
             GD.PushWarning($"{caster.Name} hat keine Fläche für seinen Skill.");
 
@@ -350,7 +393,7 @@ public static class SkillExecutor
 
         var area = scene.Instantiate<SkillArea>();
 
-        area.Launch(cast, settings);
+        area.Launch(executionDefinition.Cast, areaSettings);
 
         caster.GetParent().AddChild(area);
 

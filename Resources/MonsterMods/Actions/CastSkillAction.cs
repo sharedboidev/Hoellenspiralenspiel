@@ -31,7 +31,7 @@ public partial class CastSkillAction : ModAction
             if (!ModAimResolver.TryResolve(context, Aim, Radius, out var aim))
                 return;
 
-            SkillExecutor.Execute(context.Owner, Skill, aim);
+            SkillExecutor.Execute(new SkillExecutionDefinition(context.Owner, Skill, aim));
         }
     }
 }
