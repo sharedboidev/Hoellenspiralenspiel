@@ -16,4 +16,7 @@ public sealed record HitRequest(float      MinDamage,
 
     //Dazu der Faktor der Schadensart des Effekts
     public DamageOverTimeByType DamageOverTimeByType { get; init; } = DamageOverTimeByType.None;
+
+    //Pierce trifft nur halb so oft, außer der Angriff ist davon ausgenommen
+    public bool IgnoresPierceHitPenalty { get; init; }
 }

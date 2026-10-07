@@ -87,6 +87,24 @@ public class SkillDefinitionTests
     }
 
     [Test]
+    public void GeladenerSchuss_BrauchtEinenBogen_UndLaedtNurMitSeinenWerten()
+    {
+        var charge = new ChargeSettings(20f, 100f / 3f, 150f, 0.5f, 5);
+        var shot   = SkillDefinition.ForAttack("charged_shot", new AttackDefinition("Charged Shot", 300f)) with { Delivery = SkillDelivery.ChargedShot };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(shot.NeedsBow, Is.True);
+            Assert.That(shot.NeedsMeleeWeapon, Is.False);
+            Assert.That(shot.IsArea, Is.False);
+            Assert.That(shot.IsCharged, Is.False, "ohne Werte lädt nichts");
+            Assert.That((shot with { Charge = charge }).IsCharged, Is.True);
+            Assert.That((shot with { Delivery = SkillDelivery.Weapon, Charge = charge }).IsCharged, Is.False, "die Werte allein machen keinen geladenen Schuss");
+            Assert.That(SkillDefinition.ForAttack("attack", AttackDefinition.Standard).IsCharged, Is.False);
+        });
+    }
+
+    [Test]
     public void SkillOhneId_IstNichtErlaubt()
         => Assert.That(() => SkillDefinition.ForAttack(" ", AttackDefinition.Standard), Throws.InstanceOf<ArgumentException>());
 

@@ -748,4 +748,115 @@ public class SkillDamageEstimatorTests
     }
 
     #endregion
+
+    #region Geladener Schuss
+
+    private static SkillDefinition ChargedShot(float ratePerSec = 20f)
+        => SkillDefinition.ForAttack("charged_shot", new AttackDefinition("Charged Shot", 300f)) with
+        {
+            ManaCost = 2f,
+            Delivery = SkillDelivery.ChargedShot,
+            Charge = new ChargeSettings(ratePerSec, 100f / 3f, 150f, 0.5f, 5)
+        };
+
+    //Der Tooltip rechnet mit voller Ladung: 5 s Laden beim Tempo des Helden, dann die halbe Dauer eines Schusses als Erholung
+    [Test]
+    public void GeladenerSchuss_TrifftWieVollGeladen_UndBrauchtDieLadezeitJeSchuss()
+    {
+        var bow      = Bow();
+        var attacker = Attacker(bow);
+        var tempo    = attacker.GetFinal(CombatStat.Attackspeed);
+        var full     = SkillDamageEstimator.Estimate(attacker, bow, SkillDefinition.ForAttack("shot", new AttackDefinition("Shot", 300f)));
+        var charged  = SkillDamageEstimator.Estimate(attacker, bow, ChargedShot());
+        var interval = 5 / ChargeSettings.GetRateFactor(attacker) + 1 / tempo * (1 - CombatRules.ActionImpactFraction);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(charged.AverageHit, Is.EqualTo(full.AverageHit), "300 % Waffenschaden bei voller Ladung");
+            Assert.That(charged.UsesPerSecond, Is.EqualTo(1 / interval).Within(0.0001));
+            Assert.That(charged.UsesPerSecond, Is.LessThan(full.UsesPerSecond));
+            Assert.That(charged.HitDps, Is.EqualTo(charged.AverageHit * (float)charged.UsesPerSecond * charged.HitChance / 100f).Within(Tolerance));
+            Assert.That(charged.ManaPerSecond, Is.EqualTo(2f * (float)charged.UsesPerSecond).Within(Tolerance));
+            Assert.That(charged.ArrowCount, Is.Zero);
+        });
+    }
+
+    //Die Waffe allein ändert die Ladezeit nicht, nur ihre Erholung. Erst Modifier auf das Angriffstempo laden schneller
+    [Test]
+    public void SchnelleresLaden_GibtMehrSchuesse_DieWaffeAlleinNurKuerzereErholung()
+    {
+        var bow      = Bow();
+        var quick    = Attacker(Bow(4f));
+        var factor   = ChargeSettings.GetRateFactor(Attacker(bow));
+        var slow     = SkillDamageEstimator.GetUsesPerSecond(Attacker(bow), ChargedShot());
+        var fast     = SkillDamageEstimator.GetUsesPerSecond(Attacker(bow), ChargedShot(40f));
+        var recovery = 0.5 / quick.GetFinal(CombatStat.Attackspeed);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(factor, Is.EqualTo(ChargeSettings.GetRateFactor(quick)).Within(0.0001), "die Waffe selbst ist kein Modifier");
+            Assert.That(1 / fast, Is.EqualTo(1 / slow - 2.5 / factor).Within(0.0001), "halb so lange laden");
+            Assert.That(1 / SkillDamageEstimator.GetUsesPerSecond(quick, ChargedShot()), Is.EqualTo(5 / factor + recovery).Within(0.0001), "bei rund 4 Schuss je Sekunde bleibt ein Achtel Erholung");
+            Assert.That(recovery, Is.EqualTo(0.125).Within(0.01));
+        });
+    }
+
+    [Test]
+    public void ErhoehtesAngriffstempo_HalbiertDieLadezeit_UndDieErholung()
+    {
+        var bow      = Bow();
+        var attacker = Attacker(bow);
+        var before   = 1 / SkillDamageEstimator.GetUsesPerSecond(attacker, ChargedShot());
+        var recovery = 0.5 / attacker.GetFinal(CombatStat.Attackspeed);
+
+        attacker.AddModifier(new CombatStatModifier(CombatStat.Attackspeed, ModificationType.Percentage, 1f, Gear));
+
+        var after = 1 / SkillDamageEstimator.GetUsesPerSecond(attacker, ChargedShot());
+
+        Assert.That(after, Is.EqualTo(before / 2).Within(0.0001), "Ladezeit und Erholung halbieren sich beide");
+        Assert.That(before - recovery, Is.EqualTo(5 / ChargeSettings.GetRateFactor(Attacker(bow))).Within(0.0001));
+    }
+
+    //Rückmeldung des Users vom 07.10.2026: Der geladene Schuss muss immer treffen, der Malus von Pierce gilt für ihn nicht
+    [Test]
+    public void GeladenerSchuss_TrifftTrotzPierceMitVollerChance()
+    {
+        var bow      = Bow();
+        var attacker = Attacker(bow);
+        var shot     = SkillDefinition.ForAttack("charged_shot", new AttackDefinition("Charged Shot", 300f) { IgnoresPierceHitPenalty = true }) with
+        {
+            Delivery = SkillDelivery.ChargedShot,
+            Charge = ChargedShot().Charge
+        };
+
+        var plain     = SkillDamageEstimator.Estimate(attacker, bow, ChargedShot());
+        var certain   = SkillDamageEstimator.Estimate(attacker, bow, shot);
+        var request   = HitRequests.ForSkill(attacker, bow, shot);
+        var wouldMiss = HitResolver.Resolve(request, DefencelessTarget(), Rolls.Create(hit: 0.75f));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(plain.HitChance, Is.EqualTo(50f), "ohne das Kennzeichen halbiert Pierce");
+            Assert.That(certain.HitChance, Is.EqualTo(100f));
+            Assert.That(certain.HitDps, Is.EqualTo(plain.HitDps * 2f).Within(Tolerance));
+            Assert.That(request.IgnoresPierceHitPenalty, Is.True);
+            Assert.That(request.DamageType, Is.EqualTo(DamageType.Pierce), "die Schadensart bleibt Pierce, samt Rüstungsregel");
+            Assert.That(wouldMiss.HasLanded, Is.True, "ein Wurf von 75 % verfehlte mit Malus, trifft ohne");
+            Assert.That(shot.Charge.GetAttack(shot.Attack, 150f).IgnoresPierceHitPenalty, Is.True, "die Ladung behält das Kennzeichen");
+        });
+    }
+
+    [Test]
+    public void GeladenerSchuss_MitAbklingzeit_WartetDieLaengereZeitAb()
+    {
+        var bow = Bow();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(SkillDamageEstimator.GetUsesPerSecond(Attacker(bow), ChargedShot() with { CooldownSec = 10 }), Is.EqualTo(0.1).Within(0.0001));
+            Assert.That(SkillDamageEstimator.GetUsesPerSecond(Attacker(bow), ChargedShot() with { CooldownSec = 1 }), Is.EqualTo(SkillDamageEstimator.GetUsesPerSecond(Attacker(bow), ChargedShot())).Within(0.0001));
+        });
+    }
+
+    #endregion
 }

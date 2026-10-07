@@ -1,15 +1,22 @@
 using Godot;
 using Godot.Collections;
+using HashSet = System.Collections.Generic.HashSet<string>;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Items;
 
 namespace Hoellenspiralenspiel.Resources.Skills;
 
+//Der Inspector zeigt je Gruppe nur die Felder, die zur Lieferung passen. Sonst landet ein Wert leicht in der falschen Resource
 [GlobalClass]
 public abstract partial class SkillResource : Resource
 {
+    private static readonly HashSet ProjectileFields = [nameof(ProjectileSpeed), nameof(ProjectileLifetimeSec), nameof(ForkCount), nameof(ForkGenerations), nameof(ForkRange)];
+    private static readonly HashSet AreaFields       = [nameof(AreaRadius), nameof(AreaExpansionSec), nameof(AreaDelaySec)];
+    private static readonly HashSet SweepFields      = [nameof(SweepArcDegrees), nameof(SweepRangeFactor)];
+
     private SkillDefinition definition;
+    private SkillDelivery   delivery;
 
     [Export]
     public string Id { get; set; } = string.Empty;
@@ -30,7 +37,16 @@ public abstract partial class SkillResource : Resource
     public double CooldownSec { get; set; }
 
     [Export]
-    public SkillDelivery Delivery { get; set; }
+    public SkillDelivery Delivery
+    {
+        get => delivery;
+        set
+        {
+            delivery = value;
+
+            NotifyPropertyListChanged();
+        }
+    }
 
     [Export]
     public PackedScene EffectScene { get; set; }
@@ -89,4 +105,21 @@ public abstract partial class SkillResource : Resource
     public string NameOrId => string.IsNullOrWhiteSpace(DisplayName) ? Id : DisplayName;
 
     protected abstract SkillDefinition CreateBaseDefinition();
+
+    public override void _ValidateProperty(Dictionary property)
+    {
+        var name = property["name"].AsString();
+
+        var fits = !ProjectileFields.Contains(name) && !AreaFields.Contains(name) && !SweepFields.Contains(name) ||
+                   (ProjectileFields.Contains(name) && Delivery == SkillDelivery.Projectile) ||
+                   (AreaFields.Contains(name) && Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint) ||
+                   (SweepFields.Contains(name) && Delivery == SkillDelivery.WeaponSweep);
+
+        if (!fits)
+            HideInInspector(property);
+    }
+
+    //Gespeichert wird das Feld weiter, nur der Inspector zeigt es nicht
+    protected static void HideInInspector(Dictionary property)
+        => property["usage"] = (int)PropertyUsageFlags.NoEditor;
 }

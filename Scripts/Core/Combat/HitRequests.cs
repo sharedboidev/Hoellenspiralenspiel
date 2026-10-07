@@ -45,7 +45,8 @@ public static class HitRequests
         {
             AddedDamage              = added,
             DamageOverTimeMultiplier = StatusEffectRules.GetDamageOverTimeMultiplier(attacker),
-            DamageOverTimeByType     = StatusEffectRules.GetDamageOverTimeByType(attacker)
+            DamageOverTimeByType     = StatusEffectRules.GetDamageOverTimeByType(attacker),
+            IgnoresPierceHitPenalty  = attack.IgnoresPierceHitPenalty
         };
     }
 

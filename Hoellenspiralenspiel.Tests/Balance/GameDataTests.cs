@@ -107,6 +107,29 @@ public class GameDataTests
         });
     }
 
+    //Die Werte hat der User am 07.10.2026 vorgegeben, die Rate hat er nach dem Spielen im Editor von 20 auf 50 angehoben. Der Waffenschaden der Resource gilt bei voller Ladung
+    [Test]
+    public void ChargedShot_BrauchtEinenBogen_UndLaedtFuenfzigProzentJeSekunde()
+    {
+        var shot = GameData.PlayerSkill("charged_shot");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(shot.Name, Is.EqualTo("Charged Shot"));
+            Assert.That(shot.Delivery, Is.EqualTo(SkillDelivery.ChargedShot));
+            Assert.That(shot.NeedsBow, Is.True);
+            Assert.That(shot.IsCharged, Is.True);
+            Assert.That(shot.Attack, Is.EqualTo(new AttackDefinition("Charged Shot", 300f) { IgnoresPierceHitPenalty = true }), "trifft immer, der Malus von Pierce gilt nicht");
+            Assert.That(shot.ManaCost, Is.EqualTo(2f));
+            Assert.That(shot.CooldownSec, Is.Zero, "die Abklingzeit kommt nur nach dem Verpuffen");
+            Assert.That(shot.Charge, Is.EqualTo(new ChargeSettings(50f, 100f / 3f, 150f, 0.5f, 5)));
+            Assert.That(GameData.PlayerSkill("darken_sky").Charge, Is.Null, "die Rate gehört nur dem geladenen Schuss");
+            Assert.That(shot.Charge.GetAttack(shot.Attack, 100f / 3f).WeaponDamagePercent, Is.EqualTo(100f).Within(0.001f));
+            Assert.That(shot.Rain, Is.Null);
+            Assert.That(shot.Scatter, Is.Null);
+        });
+    }
+
     //Das Profil las die Laufzeitprüfung am Helden ab, der das Schwert trug
     [Test]
     public void Trainingsschwert_HatDasProfilAusDemSpiel_UndPariert()

@@ -33,5 +33,5 @@ public static class CombatFormulas
         => 1f + Math.Max(0f, criticalDamageBonusPercent) / 100f;
 
     public static float GetHitChance(HitRequest request)
-        => ClampChance(request.HitChance * request.DamageType.GetHitChanceFactor());
+        => ClampChance(request.HitChance * (request.IgnoresPierceHitPenalty ? 1f : request.DamageType.GetHitChanceFactor()));
 }

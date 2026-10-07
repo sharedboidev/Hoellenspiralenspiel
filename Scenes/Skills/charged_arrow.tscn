@@ -1,0 +1,110 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="ps1"]
+[ext_resource type="Script" path="res://Scripts/Skills/Effects/ChargedArrow.cs" id="projectile"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_1"]
+height = 2.0
+radius = 0.15
+
+[sub_resource type="BoxMesh" id="Mesh_shaft"]
+size = Vector3(0.035, 0.035, 0.8)
+
+[sub_resource type="ShaderMaterial" id="Mat_shaft"]
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.55, 0.38, 0.2, 1)
+shader_parameter/emission = Color(0.35, 0.2, 0.05, 1)
+shader_parameter/emission_energy = 1.0
+
+[sub_resource type="BoxMesh" id="Mesh_head"]
+size = Vector3(0.08, 0.025, 0.14)
+
+[sub_resource type="ShaderMaterial" id="Mat_head"]
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.85, 0.85, 0.9, 1)
+shader_parameter/emission = Color(0.6, 0.6, 0.7, 1)
+shader_parameter/emission_energy = 1.0
+
+[sub_resource type="BoxMesh" id="Mesh_vane"]
+size = Vector3(0.1, 0.025, 0.14)
+
+[sub_resource type="ShaderMaterial" id="Mat_vane"]
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0.9, 0.5, 0.15, 1)
+shader_parameter/emission = Color(0.6, 0.3, 0.05, 1)
+shader_parameter/emission_energy = 1.0
+
+[sub_resource type="SphereMesh" id="Mesh_glow"]
+radius = 0.11
+height = 0.22
+radial_segments = 8
+rings = 4
+
+[sub_resource type="ShaderMaterial" id="Mat_glow"]
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/emission = Color(1, 0.65, 0.2, 1)
+shader_parameter/emission_energy = 2.0
+
+[sub_resource type="BoxMesh" id="Mesh_trail"]
+size = Vector3(0.06, 0.06, 1.2)
+
+[sub_resource type="ShaderMaterial" id="Mat_trail"]
+shader = ExtResource("ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/emission = Color(1, 0.8, 0.4, 1)
+shader_parameter/emission_energy = 3.0
+
+[sub_resource type="Gradient" id="Grad_charge"]
+offsets = PackedFloat32Array(0, 0.3, 0.6, 0.914, 0.957, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 0.92, 0.25, 1, 1, 0.5, 0.08, 1, 1, 0.04, 0.02, 1, 0.35, 0, 0, 1, 0, 0, 0, 1)
+
+[node name="ChargedArrow" type="Area3D" node_paths=PackedStringArray("Glow", "Trail", "Light")]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("projectile")
+Glow = NodePath("Glow")
+Trail = NodePath("Trail")
+Light = NodePath("Light")
+GlowColors = SubResource("Grad_charge")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_1")
+
+[node name="Shaft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_shaft")
+surface_material_override/0 = SubResource("Mat_shaft")
+
+[node name="Head" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -0.42)
+cast_shadow = 0
+mesh = SubResource("Mesh_head")
+surface_material_override/0 = SubResource("Mat_head")
+
+[node name="Fletching" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0.32)
+cast_shadow = 0
+mesh = SubResource("Mesh_vane")
+surface_material_override/0 = SubResource("Mat_vane")
+
+[node name="Glow" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -0.3)
+cast_shadow = 0
+mesh = SubResource("Mesh_glow")
+surface_material_override/0 = SubResource("Mat_glow")
+
+[node name="Trail" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0.95)
+visible = false
+cast_shadow = 0
+mesh = SubResource("Mesh_trail")
+surface_material_override/0 = SubResource("Mat_trail")
+
+[node name="Light" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -0.3)
+light_color = Color(1, 0.7, 0.3, 1)
+light_energy = 1.5
+omni_range = 3.0

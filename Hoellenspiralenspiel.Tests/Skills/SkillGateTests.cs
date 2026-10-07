@@ -37,6 +37,13 @@ public class SkillGateTests
         Rain = new RainSettings(5, 200f, 75f, 0.5f, 1f)
     };
 
+    private static readonly SkillDefinition ChargedShot = SkillDefinition.ForAttack("charged_shot", new AttackDefinition("Charged Shot", 300f)) with
+    {
+        ManaCost = 2,
+        Delivery = SkillDelivery.ChargedShot,
+        Charge = new ChargeSettings(20f, 100f / 3f, 150f, 0.5f, 5)
+    };
+
     [Test]
     public void GenugManaUndKeineAbklingzeit_IstBereit()
         => Assert.That(SkillGate.Check(Fireball, new SkillCooldowns(), 2), Is.EqualTo(SkillUseCheck.Ready));
@@ -128,6 +135,25 @@ public class SkillGateTests
             Assert.That(SkillGate.Check(DarkenSky, new SkillCooldowns(), 2.9f, true), Is.EqualTo(SkillUseCheck.NotEnoughMana));
             Assert.That(SkillGate.FitsWeapon(DarkenSky, true), Is.True);
             Assert.That(SkillGate.FitsWeapon(DarkenSky, false), Is.False);
+        });
+    }
+
+    //Die Abklingzeit kommt nur nach einem verpufften Schuss, dann sperrt sie wie jede andere
+    [Test]
+    public void GeladenerSchussOhneBogen_WirdAbgelehnt_UndNachDemVerpuffenGesperrt()
+    {
+        var cooldowns = new SkillCooldowns();
+
+        cooldowns.Start(ChargedShot.Id, ChargedShot.Charge.OverholdCooldownSec);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(SkillGate.Check(ChargedShot, new SkillCooldowns(), 10, false), Is.EqualTo(SkillUseCheck.NeedsBow));
+            Assert.That(SkillGate.Check(ChargedShot, new SkillCooldowns(), 10, true), Is.EqualTo(SkillUseCheck.Ready));
+            Assert.That(SkillGate.Check(ChargedShot, new SkillCooldowns(), 1.9f, true), Is.EqualTo(SkillUseCheck.NotEnoughMana));
+            Assert.That(SkillGate.Check(ChargedShot, cooldowns, 10, true), Is.EqualTo(SkillUseCheck.OnCooldown));
+            Assert.That(SkillGate.FitsWeapon(ChargedShot, true), Is.True);
+            Assert.That(SkillGate.FitsWeapon(ChargedShot, false), Is.False);
         });
     }
 

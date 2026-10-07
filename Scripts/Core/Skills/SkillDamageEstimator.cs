@@ -81,10 +81,20 @@ public static class SkillDamageEstimator
 
         //Ein Zauber kommt erst wieder, wenn seine Abklingzeit um ist und der Held das Wirken beendet hat
         var intervalSec = skill.Kind == SkillKind.Attack
-                ? Math.Max(1.0 / Math.Max(CombatRules.MinAttacksPerSecond, attacker.GetFinal(CombatStat.Attackspeed)), skill.CooldownSec)
+                ? Math.Max(GetAttackCycleSec(attacker, skill), skill.CooldownSec)
                 : Math.Max(Math.Max(CombatRules.MinSpellCooldownSec, skill.CooldownSec), skill.GetCastSec(attacker));
 
         return 1.0 / intervalSec;
+    }
+
+    //Ein geladener Schuss lädt voll, statt auszuholen, schneller mit erhöhtem Angriffstempo. Danach erholt der Held sich wie nach jedem Angriff
+    private static double GetAttackCycleSec(StatSheet attacker, SkillDefinition skill)
+    {
+        var swingSec = 1.0 / Math.Max(CombatRules.MinAttacksPerSecond, attacker.GetFinal(CombatStat.Attackspeed));
+
+        return skill.IsCharged
+                ? skill.Charge.GetSecToReach(ChargeSettings.FullPercent, ChargeSettings.GetRateFactor(attacker)) + swingSec * (1 - CombatRules.ActionImpactFraction)
+                : swingSec;
     }
 
     private static MeasuredHit MeasureScatter(StatSheet attacker, WeaponProfile weapon, SkillDefinition skill)

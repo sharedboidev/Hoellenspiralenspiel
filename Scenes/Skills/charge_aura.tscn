@@ -1,0 +1,26 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Skills/Effects/ChargeAura.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="90_ps1"]
+
+[sub_resource type="TorusMesh" id="Mesh_ring"]
+inner_radius = 0.86
+outer_radius = 1.0
+rings = 16
+ring_segments = 4
+
+[sub_resource type="ShaderMaterial" id="Mat_ring"]
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/emission = Color(1, 0.6, 0.2, 1)
+shader_parameter/emission_energy = 2.0
+
+[node name="ChargeAura" type="Node3D" node_paths=PackedStringArray("Ring")]
+visible = false
+script = ExtResource("1_script")
+Ring = NodePath("Ring")
+
+[node name="Ring" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("Mesh_ring")
+surface_material_override/0 = SubResource("Mat_ring")

@@ -35,5 +35,8 @@ public static class CombatRules
 
     public const float MinAttacksPerSecond = 0.1f;
 
+    //Schlag und Zauber lösen nach diesem Anteil ihrer Dauer aus, der Rest ist Erholung
+    public const float ActionImpactFraction = 0.5f;
+
     public const double MinSpellCooldownSec = 0.1;
 }

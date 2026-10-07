@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Godot.Collections;
 using Hoellenspiralenspiel.Enums;
@@ -16,6 +17,7 @@ using Hoellenspiralenspiel.Scripts.Core.Stats;
 using Hoellenspiralenspiel.Scripts.Items;
 using Hoellenspiralenspiel.Scripts.Objects;
 using Hoellenspiralenspiel.Scripts.Skills;
+using Hoellenspiralenspiel.Scripts.Skills.Effects;
 using Hoellenspiralenspiel.Scripts.UI;
 using Hoellenspiralenspiel.Scripts.Utils;
 using Hoellenspiralenspiel.Scripts.World;
@@ -34,8 +36,7 @@ public partial class Hero
     //dafür steht er in jedem Look auf seiner Scheibe. Deshalb gehört sein BlobShadow nicht zur Gruppe blob_shadows
     public const uint BodyLayer = 1u << 18;
 
-    private const float  ImpactFraction     = 0.5f;
-    private const float  EngageFraction     = 0.9f;
+    private const float  ImpactFraction     = CombatRules.ActionImpactFraction;
     private const int    NoSlot             = -1;
     private const double StuckTimeoutSec    = 0.4;
     private const float  StuckSpeedFraction = 0.1f;
@@ -48,6 +49,9 @@ public partial class Hero
     //Für den Schuss in den Himmel: steil nach oben, 20° Richtung Ziel geneigt wie der Pfeil in SkillExecutor.SkyShotTiltDegrees
     private const float  SkyAimDegrees      = 160f;
 
+    //So schnell hebt der Held den Bogen, wenn er zu laden beginnt
+    private const double ChargeRaiseSec     = 0.2;
+
     //So lange wie SweepSec der Hiebe in melee_slash.tscn und cleave.tscn, damit Waffe und Hieb zusammen durchziehen
     private const double StrikeSec             = 0.15;
     private const double StrikeShareOfRecovery = 0.6;
@@ -55,6 +59,7 @@ public partial class Hero
     private static readonly List<BaseUnit> UnitsNearPoint = new();
 
     private          SkillAim      actionAim;
+    private          float         actionCharge;
     private readonly AttackCycle   actionCycle = new();
     private          bool          actionFailed;
     private          Tween         actionLook;
@@ -62,8 +67,11 @@ public partial class Hero
     private          PathFollower  approachPath;
     private          double        approachStuckSec;
     private          Vector3       attackAimPoint;
-    private          bool          attackInPlace;
     private          BaseUnit      attackTarget;
+    private          double        chargeAtMaxSec;
+    private          ChargeLook    chargeLook;
+    private          float         chargePercent;
+    private          SkillResource chargeSkill;
     private          ItemInstance  equippedWeapon;
     private          bool          hasDied;
     private          int           heldSlot = NoSlot;
@@ -139,6 +147,10 @@ public partial class Hero
 
     [Export]
     public float Movementspeed { get; set; } = 1000f;
+
+    //Solange ein Skill läuft, vom Ausholen, Wirken oder Laden bis zum Ende der Erholung, läuft der Held mit diesem Anteil seines Tempos
+    [Export(PropertyHint.Range, "0, 100, 1")]
+    public float SkillWalkSpeedPercent { get; set; } = 50f;
 
     [Export]
     public float Manaregeneration { get; set; } = 0.5f;
@@ -368,6 +380,7 @@ public partial class Hero
         UpdateHoveredEnemy();
         RepeatHeldSkill();
         AdvanceAction(delta);
+        AdvanceCharge(delta);
         Move(GetWantedDirection(delta), delta);
     }
 
@@ -473,7 +486,8 @@ public partial class Hero
         if (IsDead)
             return;
 
-        if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } && OrderUse(FindUsableUnderMouse()))
+        //Mit der Taste zum Stehenbleiben greift der Klick immer an, auch über Truhe oder Händler
+        if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } && !IsStandingStill && OrderUse(FindUsableUnderMouse()))
         {
             GetViewport().SetInputAsHandled();
 
@@ -510,10 +524,10 @@ public partial class Hero
         return skill is not null && UseSkill(skill, new SkillAim(GetMouseGroundPoint(), FindHostileUnitUnderMouse()), isRepeat, IsStandingStill);
     }
 
-    //Zauber wirkt der Held ohnehin aus dem Stand. Für Angriffe heißt Stehenbleiben: nicht zum Ziel laufen, sofort Richtung Maus
+    //Jeder Skill geht aus dem Stand los. Stehenbleiben erlaubt einem Nahkampfangriff den Hieb ins Leere Richtung Maus, ohne Gegner unter ihr
     public bool UseSkill(SkillResource skill, SkillAim aim, bool isRepeat = false, bool standsStill = false)
     {
-        if (IsDead || skill is null || IsActing)
+        if (IsDead || skill is null || IsActing || IsCharging)
             return false;
 
         return skill.Kind == SkillKind.Attack ? OrderAttack(skill, aim, isRepeat, standsStill) : CastSpell(skill, aim, isRepeat);
@@ -527,6 +541,11 @@ public partial class Hero
     //Ein begonnener Schlag oder Zauber läuft bis zum Ende seiner Erholung. So lange steht der Held, dreht sich nicht und beginnt nichts Neues
     private bool IsActing => !actionCycle.IsReady;
 
+    //Solange der Held einen Schuss lädt, hält er den Bogen gehoben, läuft langsamer, schaut zur Maus und beginnt nichts Neues
+    public bool IsCharging => chargeSkill is not null;
+
+    public float ChargePercent => chargePercent;
+
     private bool CastSpell(SkillResource skill, SkillAim aim, bool isRepeat)
     {
         if (!Report(TryPayFor(skill, CombatRules.MinSpellCooldownSec), isRepeat))
@@ -537,11 +556,10 @@ public partial class Hero
         return true;
     }
 
+    //Der Angriff geht im nächsten Takt los, Richtung Gegner unter der Maus oder Richtung Maus. Hinlaufen tut der Held nicht
     private bool OrderAttack(SkillResource skill, SkillAim aim, bool isRepeat, bool standsStill)
     {
-        var order = AttackOrders.Choose(IsMelee(skill), aim.HasTarget, standsStill);
-
-        if (order == AttackOrder.None)
+        if (!AttackOrders.IsAllowed(IsMelee(skill), aim.HasTarget, standsStill))
             return false;
 
         if (aim.HasTarget && !IsHostileTo(aim.Target))
@@ -550,17 +568,18 @@ public partial class Hero
         if (!Report(SkillGate.Check(skill.Definition, SkillCooldowns, AvailableMana, Weapon.IsRanged), isRepeat))
             return false;
 
-        var previousTarget = attackTarget;
+        //Ein geladener Schuss lädt auf der Stelle und geht beim Loslassen dorthin, wo die Maus dann ist
+        if (skill.Definition.IsCharged)
+        {
+            BeginCharge(skill);
 
-        useTarget        = null;
-        orderedSkill     = skill;
-        attackTarget     = aim.HasTarget ? aim.Target : null;
-        attackInPlace    = order == AttackOrder.InPlace;
-        attackAimPoint   = aim.Point;
-        approachStuckSec = 0;
+            return true;
+        }
 
-        if (attackTarget != previousTarget)
-            approachPath.Reset();
+        useTarget      = null;
+        orderedSkill   = skill;
+        attackTarget   = aim.HasTarget ? aim.Target : null;
+        attackAimPoint = aim.Point;
 
         return true;
     }
@@ -589,7 +608,7 @@ public partial class Hero
             return;
         }
 
-        if (orderedSkill is not null || IsActing)
+        if (orderedSkill is not null || IsActing || IsCharging)
             return;
 
         UseSlot(heldSlot, true);
@@ -608,8 +627,9 @@ public partial class Hero
 
     private Vector3 GetWantedDirection(double delta)
     {
-        if (IsActing)
-            return Vector3.Zero;
+        //Solange ein Skill läuft oder lädt, laufen die Richtungstasten frei und langsamer, nichts bricht ihn ab. Alles andere wartet
+        if (IsActing || IsCharging)
+            return GetInputDirection();
 
         var inputDirection = GetInputDirection();
 
@@ -626,24 +646,8 @@ public partial class Hero
         if (orderedSkill is null)
             return Vector3.Zero;
 
-        if (attackTarget is null || attackInPlace)
-        {
-            StartSwing((IsValidTarget(attackTarget) ? attackTarget.GlobalPosition : attackAimPoint) - GlobalPosition);
-
-            return Vector3.Zero;
-        }
-
-        if (!IsValidTarget(attackTarget))
-        {
-            ClearOrder();
-
-            return Vector3.Zero;
-        }
-
-        if (DistancePxTo(attackTarget) > GetEngageRange(orderedSkill.Definition))
-            return approachPath.GetDirectionTo(attackTarget.GlobalPosition, delta);
-
-        StartSwing(attackTarget.GlobalPosition - GlobalPosition);
+        //Sofort aus dem Stand, Richtung Gegner oder Punkt. Steht der Gegner zu weit, geht der Hieb ins Leere, der Held läuft selbst heran
+        StartSwing((IsValidTarget(attackTarget) ? attackTarget.GlobalPosition : attackAimPoint) - GlobalPosition);
 
         return Vector3.Zero;
     }
@@ -673,32 +677,23 @@ public partial class Hero
         return right * input.X - forward * input.Y;
     }
 
-    private float GetEngageRange(SkillDefinition skill)
-        => skill.Delivery switch
-        {
-            SkillDelivery.Weapon           => Weapon.Range,
-            SkillDelivery.MeleeStrike      => Weapon.Range,
-            SkillDelivery.ArrowRain        => Weapon.Range,
-            SkillDelivery.WeaponSweep      => skill.Sweep.GetEngageRange(Weapon),
-            SkillDelivery.Projectile       => skill.Projectile.Reach * EngageFraction,
-            SkillDelivery.AreaAroundCaster => skill.Area.Radius * EngageFraction,
-            _                              => float.MaxValue
-        };
-
-    //Der Held schaut immer zur Maus, auch beim Laufen. Nur während eines Skills bleibt er, wie er steht
+    //Der Held schaut immer zur Maus, auch beim Laufen. Während eines Skills dreht er sich nicht und läuft langsamer
     private void Move(Vector3 direction, double delta)
     {
         if (!IsActing)
             Face(GetMouseGroundPoint() - GlobalPosition);
 
-        MoveOnGround(direction, MovementspeedPx);
+        var speedPx = IsActing || IsCharging ? MovementspeedPx * AttackOrders.GetSkillWalkFactor(SkillWalkSpeedPercent) : MovementspeedPx;
+
+        MoveOnGround(direction, speedPx);
 
         GiveUpTargetWhenStuck(direction, delta);
     }
 
+    //Nur Benutzbares läuft der Held noch an. Hängt er dabei fest, gibt er auf
     private void GiveUpTargetWhenStuck(Vector3 direction, double delta)
     {
-        var isApproaching = (attackTarget is not null || useTarget is not null) && direction != Vector3.Zero;
+        var isApproaching = useTarget is not null && direction != Vector3.Zero;
 
         if (!isApproaching || GetRealVelocity().Length() > WorldScale.ToMeters(MovementspeedPx) * StuckSpeedFraction)
         {
@@ -712,10 +707,7 @@ public partial class Hero
         if (approachStuckSec < StuckTimeoutSec)
             return;
 
-        ClearOrder();
-
         useTarget        = null;
-        heldSlot         = NoSlot;
         approachStuckSec = 0;
     }
 
@@ -761,7 +753,7 @@ public partial class Hero
         }
 
         if (actionSkill is not null)
-            SkillExecutor.Execute(this, actionSkill, actionAim);
+            SkillExecutor.Execute(this, actionSkill, actionAim, actionCharge);
     }
 
     private void FinishAction()
@@ -770,8 +762,9 @@ public partial class Hero
 
         var previousTarget = actionAim.Target;
 
-        actionSkill = null;
-        actionAim   = default;
+        actionSkill  = null;
+        actionAim    = default;
+        actionCharge = 0f;
 
         if (heldSlot != NoSlot)
             ContinueHeldAttack(previousTarget);
@@ -795,9 +788,8 @@ public partial class Hero
 
     private void ClearOrder()
     {
-        orderedSkill  = null;
-        attackTarget  = null;
-        attackInPlace = false;
+        orderedSkill = null;
+        attackTarget = null;
     }
 
     //Vergisst, wohin der Held wollte. Ein begonnener Schlag oder Zauber läuft weiter
@@ -814,9 +806,11 @@ public partial class Hero
     private void CancelAttack()
     {
         DropOrders();
+        EndCharge();
 
-        actionSkill = null;
-        actionAim   = default;
+        actionSkill  = null;
+        actionAim    = default;
+        actionCharge = 0f;
 
         actionCycle.CancelWindup();
 
@@ -872,6 +866,161 @@ public partial class Hero
 
         if (weaponPivot is not null)
             weaponPivot.RotationDegrees = Vector3.Zero;
+    }
+
+    #endregion
+
+    #region Geladener Schuss
+
+    //Bezahlt wird erst beim Schuss, das Laden selbst kostet nichts. Der Held hebt den Bogen und legt den Pfeil ein
+    private void BeginCharge(SkillResource skill)
+    {
+        ClearOrder();
+
+        useTarget      = null;
+        chargeSkill    = skill;
+        chargePercent  = 0f;
+        chargeAtMaxSec = 0;
+
+        Face(GetMouseGroundPoint() - GlobalPosition);
+        PlayChargeLook();
+
+        chargeLook = ChargeLook.Show(skill as AttackSkillResource, this, FindBowPoint());
+    }
+
+    //Die Ladung wächst, solange die Taste gehalten wird. Am Maximum läuft die Frist, nach der der Schuss verpufft
+    private void AdvanceCharge(double delta)
+    {
+        if (!IsCharging)
+            return;
+
+        var charge = chargeSkill.Definition.Charge;
+
+        if (!IsChargeKeyHeld())
+        {
+            ReleaseCharge();
+
+            return;
+        }
+
+        chargePercent = charge.Advance(chargePercent, delta, ChargeSettings.GetRateFactor(Stats));
+
+        if (charge.IsAtMax(chargePercent))
+            chargeAtMaxSec += delta;
+
+        if (charge.IsOverheld(chargePercent, chargeAtMaxSec))
+        {
+            FizzleCharge();
+
+            return;
+        }
+
+        chargeLook?.Update(charge, chargePercent);
+    }
+
+    //Die Taste gilt als gehalten, solange ein Platz der Leiste mit diesem Skill gedrückt ist
+    private bool IsChargeKeyHeld()
+    {
+        for (var slot = 0; slot < Loadout.SlotCount; slot++)
+        {
+            if (Loadout.GetSkillId(slot) == chargeSkill.Id && Input.IsActionPressed(InputActions.SkillSlots[slot]))
+                return true;
+        }
+
+        return false;
+    }
+
+    //Unter der Mindestladung verpufft der Schuss, sonst geht er dorthin, wo die Maus jetzt ist. Danach erholt der Held sich wie nach jedem Schuss
+    private void ReleaseCharge()
+    {
+        var skill   = chargeSkill;
+        var percent = chargePercent;
+
+        EndCharge();
+
+        if (!skill.Definition.Charge.CanFire(percent) || !Report(TryPayFor(skill), true))
+        {
+            Recover(null, default, 0f);
+
+            return;
+        }
+
+        var aim = new SkillAim(GetMouseGroundPoint(), FindHostileUnitUnderMouse());
+
+        Recover(skill, aim, percent);
+    }
+
+    //Zu lange am Maximum gehalten: nichts fliegt, der Skill bekommt seine Abklingzeit, der Held erholt sich trotzdem
+    private void FizzleCharge()
+    {
+        var skill = chargeSkill;
+
+        EndCharge();
+
+        SkillCooldowns.Start(skill.Id, skill.Definition.Charge.OverholdCooldownSec);
+        CombatText.Show(this, "Overcharged", Colors.Yellow, 28);
+
+        Recover(null, default, 0f);
+    }
+
+    private void EndCharge()
+    {
+        chargeSkill    = null;
+        chargePercent  = 0f;
+        chargeAtMaxSec = 0;
+
+        chargeLook?.Dismiss();
+
+        chargeLook = null;
+    }
+
+    //Der Schuss geht sofort los, nur die Erholung eines Angriffs bleibt. Ohne Skill bleibt allein die Erholung
+    private void Recover(SkillResource skill, SkillAim aim, float percent)
+    {
+        var swingSec    = 1.0 / Math.Max(CombatRules.MinAttacksPerSecond, Stats.GetFinal(CombatStat.Attackspeed));
+        var recoverySec = swingSec * (1 - ImpactFraction);
+
+        actionSkill  = skill;
+        actionAim    = aim;
+        actionCharge = percent;
+        actionFailed = skill is not null && RollActionFailure();
+
+        if (skill is not null)
+            Face(aim.CurrentPoint - GlobalPosition);
+
+        actionCycle.Start(0, recoverySec);
+        PlayReleaseLook(recoverySec);
+
+        if (actionCycle.Advance(0))
+            Release();
+    }
+
+    private Node3D FindBowPoint()
+        => wornItems?.FindAttachPoints(Equipment.GetPlaceFor(ItemSlot.PhysicalWeapon)).FirstOrDefault();
+
+    //Der Bogen hebt sich wie zum Schuss und bleibt oben, bis der Schuss losgeht
+    private void PlayChargeLook()
+    {
+        if (weaponPivot is null)
+            return;
+
+        actionLook?.Kill();
+
+        actionLook = CreateTween().SetProcessMode(Tween.TweenProcessMode.Physics);
+
+        actionLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(AimRaiseDegrees, 0, 0), ChargeRaiseSec);
+    }
+
+    private void PlayReleaseLook(double recoverySec)
+    {
+        if (weaponPivot is null)
+            return;
+
+        actionLook?.Kill();
+
+        actionLook = CreateTween().SetProcessMode(Tween.TweenProcessMode.Physics);
+
+        actionLook.TweenProperty(weaponPivot, "rotation_degrees", Vector3.Zero, recoverySec);
     }
 
     #endregion
@@ -950,12 +1099,19 @@ public partial class Hero
         wornItems?.Hide(item);
     }
 
+    //Wechselt die Waffe während des Ladens, verpufft die Ladung ohne Erholung
     private void WieldWeapon(ItemInstance newWeapon)
     {
         equippedWeapon = newWeapon;
         weapon         = newWeapon?.ToWeaponProfile() ?? WeaponProfile.Unarmed;
 
         weapon.ApplyTo(Stats);
+
+        if (IsCharging)
+        {
+            EndCharge();
+            EndActionLook();
+        }
     }
 
     public void GiveStartingItems()

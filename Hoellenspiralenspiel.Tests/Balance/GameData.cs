@@ -137,7 +137,10 @@ internal static class GameData
             var script when script.EndsWith("/AttackSkillResource.cs", StringComparison.Ordinal) =>
                     SkillDefinition.ForAttack(id, new AttackDefinition(name,
                                                                        values.Float("WeaponDamagePercent", 100f),
-                                                                       values.Bool("ConvertsDamageType", false) ? values.Enum("DealtAs", DamageType.Crush) : null)) with
+                                                                       values.Bool("ConvertsDamageType", false) ? values.Enum("DealtAs", DamageType.Crush) : null)
+                                              {
+                                                  IgnoresPierceHitPenalty = values.Bool("IgnoresPierceHitPenalty", false)
+                                              }) with
                     {
                         Scatter = values.Int("ScatterCount", 0) > 0
                                 ? new ScatterSettings(values.Int("ScatterCount", 0),
@@ -179,6 +182,13 @@ internal static class GameData
                                        values.Float("RainImpactRadius", 75f),
                                        values.Float("RainDelaySec", 0.5f),
                                        values.Float("RainDurationSec", 1f))
+                    : null,
+            Charge = delivery == SkillDelivery.ChargedShot
+                    ? new ChargeSettings(values.Float("ChargeRatePerSec", 20f),
+                                         values.Float("ChargeMinPercent", 100f / 3f),
+                                         values.Float("ChargeMaxPercent", 150f),
+                                         values.Float("ChargeOverholdSec", 0.5f),
+                                         values.Double("ChargeOverholdCooldownSec", 5))
                     : null
         };
     }

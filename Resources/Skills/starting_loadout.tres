@@ -10,7 +10,8 @@
 [ext_resource type="Resource" path="res://Resources/Skills/Player/cleave.tres" id="8_cleave"]
 [ext_resource type="Resource" path="res://Resources/Skills/Player/magma_strike.tres" id="9_magma"]
 [ext_resource type="Resource" path="res://Resources/Skills/Player/darken_sky.tres" id="10_sky"]
+[ext_resource type="Resource" path="res://Resources/Skills/Player/charged_shot.tres" id="11_charged"]
 
 [resource]
 script = ExtResource("1_script")
-Slots = Array[ExtResource("2_skill")]([ExtResource("3_attack"), ExtResource("4_strike"), ExtResource("8_cleave"), ExtResource("5_nova"), ExtResource("6_thunder"), ExtResource("7_fireball"), ExtResource("9_magma"), ExtResource("10_sky"), null, null])
+Slots = Array[ExtResource("2_skill")]([ExtResource("3_attack"), ExtResource("4_strike"), ExtResource("8_cleave"), ExtResource("5_nova"), ExtResource("6_thunder"), ExtResource("7_fireball"), ExtResource("9_magma"), ExtResource("10_sky"), ExtResource("11_charged"), null])

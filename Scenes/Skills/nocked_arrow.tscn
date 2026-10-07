@@ -1,0 +1,137 @@
+[gd_scene format=3 uid="uid://cf3j08t4mjt8h"]
+
+[ext_resource type="Script" uid="uid://dyt65pmjjc4ux" path="res://Scripts/Skills/Effects/NockedArrow.cs" id="1_script"]
+[ext_resource type="Shader" uid="uid://c2lknp40isk5w" path="res://Shaders/Ps1/ps1_surface.gdshader" id="90_ps1"]
+
+[sub_resource type="Gradient" id="Grad_charge"]
+offsets = PackedFloat32Array(0, 0.3, 0.6, 0.914, 0.957, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 0.92, 0.25, 1, 1, 0.5, 0.08, 1, 1, 0.04, 0.02, 1, 0.35, 0, 0, 1, 0, 0, 0, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_shaft"]
+size = Vector3(0.04, 0.04, 0.8)
+
+[sub_resource type="ShaderMaterial" id="Mat_shaft"]
+render_priority = 0
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0.55, 0.38, 0.2, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
+shader_parameter/emission = Color(0, 0, 0, 1)
+shader_parameter/emission_energy = 0.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(852, 480)
+shader_parameter/affine = 1.0
+
+[sub_resource type="BoxMesh" id="Mesh_head"]
+size = Vector3(0.08, 0.03, 0.14)
+
+[sub_resource type="ShaderMaterial" id="Mat_head"]
+render_priority = 0
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0.75, 0.77, 0.82, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
+shader_parameter/emission = Color(0, 0, 0, 1)
+shader_parameter/emission_energy = 0.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(852, 480)
+shader_parameter/affine = 1.0
+
+[sub_resource type="BoxMesh" id="Mesh_vane_flat"]
+size = Vector3(0.12, 0.03, 0.14)
+
+[sub_resource type="ShaderMaterial" id="Mat_vane"]
+render_priority = 0
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0.9, 0.5, 0.15, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
+shader_parameter/emission = Color(0, 0, 0, 1)
+shader_parameter/emission_energy = 0.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(852, 480)
+shader_parameter/affine = 1.0
+
+[sub_resource type="BoxMesh" id="Mesh_vane_upright"]
+size = Vector3(0.03, 0.12, 0.14)
+
+[sub_resource type="SphereMesh" id="Mesh_glow"]
+radius = 0.09
+height = 0.18
+radial_segments = 8
+rings = 4
+
+[sub_resource type="ShaderMaterial" id="Mat_glow"]
+render_priority = 0
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
+shader_parameter/emission = Color(1, 0.65, 0.2, 1)
+shader_parameter/emission_energy = 2.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(852, 480)
+shader_parameter/affine = 1.0
+
+[sub_resource type="BoxMesh" id="Mesh_trail"]
+size = Vector3(0.05, 0.05, 0.5)
+
+[sub_resource type="ShaderMaterial" id="Mat_trail"]
+render_priority = 0
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
+shader_parameter/emission = Color(1, 0.8, 0.4, 1)
+shader_parameter/emission_energy = 3.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(852, 480)
+shader_parameter/affine = 1.0
+
+[node name="NockedArrow" type="Node3D" unique_id=1687175300 node_paths=PackedStringArray("Glow", "Trail")]
+script = ExtResource("1_script")
+Glow = NodePath("Glow")
+Trail = NodePath("Trail")
+GlowColors = SubResource("Grad_charge")
+
+[node name="Shaft" type="MeshInstance3D" parent="." unique_id=1490149510]
+cast_shadow = 0
+mesh = SubResource("Mesh_shaft")
+surface_material_override/0 = SubResource("Mat_shaft")
+
+[node name="Head" type="MeshInstance3D" parent="." unique_id=1991009831]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.42)
+cast_shadow = 0
+mesh = SubResource("Mesh_head")
+surface_material_override/0 = SubResource("Mat_head")
+
+[node name="VaneFlat" type="MeshInstance3D" parent="." unique_id=1904244734]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.32)
+cast_shadow = 0
+mesh = SubResource("Mesh_vane_flat")
+surface_material_override/0 = SubResource("Mat_vane")
+
+[node name="VaneUpright" type="MeshInstance3D" parent="." unique_id=83879848]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.32)
+cast_shadow = 0
+mesh = SubResource("Mesh_vane_upright")
+surface_material_override/0 = SubResource("Mat_vane")
+
+[node name="Glow" type="MeshInstance3D" parent="." unique_id=1987943571]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.45251164)
+visible = false
+cast_shadow = 0
+mesh = SubResource("Mesh_glow")
+surface_material_override/0 = SubResource("Mat_glow")
+
+[node name="Trail" type="MeshInstance3D" parent="." unique_id=1566888679]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.65)
+visible = false
+cast_shadow = 0
+mesh = SubResource("Mesh_trail")
+surface_material_override/0 = SubResource("Mat_trail")

@@ -57,4 +57,20 @@ public class ProjectileSettingsTests
     [Test]
     public void Reichweite_DerWaffe_HatEtwasSpielraum()
         => Assert.That(WeaponProfile.Unarmed.Reach, Is.EqualTo(WeaponProfile.UnarmedRange * WeaponProfile.RangeTolerance));
+
+    //Ein durchstoßender Pfeil fliegt so weit und so schnell wie der gewöhnliche, nur bleibt er nach dem Treffer nicht stecken
+    [Test]
+    public void DasProjektilDerWaffe_DurchstoesstErstAufAnweisung()
+    {
+        var bow      = new WeaponProfile(5, 11, 1.2f, 6, DamageType.Pierce, 700, true, 1400);
+        var piercing = bow.GetProjectile() with { Pierces = true };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(bow.GetProjectile().Pierces, Is.False);
+            Assert.That(piercing.Pierces, Is.True);
+            Assert.That(piercing.Reach, Is.EqualTo(bow.GetProjectile().Reach));
+            Assert.That(piercing.Speed, Is.EqualTo(bow.GetProjectile().Speed));
+        });
+    }
 }

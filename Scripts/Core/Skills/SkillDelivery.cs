@@ -13,5 +13,8 @@ public enum SkillDelivery
     MeleeStrike,
 
     //Ein Schuss in den Himmel, nach dem Pfeile auf das Zielgebiet fallen. Nur mit einem Bogen
-    ArrowRain
+    ArrowRain,
+
+    //Ein Schuss mit dem Projektil der Waffe, der mit gehaltener Taste lädt und beim Loslassen Richtung Maus geht. Nur mit einem Bogen
+    ChargedShot
 }

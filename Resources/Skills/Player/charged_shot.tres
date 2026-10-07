@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AttackSkillResource" format=3 uid="uid://ixw3l72rh445"]
+
+[ext_resource type="Script" uid="uid://06hypuyik5ex" path="res://Resources/Skills/AttackSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cbsnqu61bqk70" path="res://Textures/Skills/Icons/charged_shot.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/charged_arrow.tscn" id="3_arrow"]
+[ext_resource type="PackedScene" uid="uid://cf3j08t4mjt8h" path="res://Scenes/Skills/nocked_arrow.tscn" id="4_nocked"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/charge_aura.tscn" id="5_aura"]
+
+[resource]
+script = ExtResource("1_script")
+WeaponDamagePercent = 300.0
+IgnoresPierceHitPenalty = true
+ChargeRatePerSec = 50.0
+ChargeArrowScene = ExtResource("4_nocked")
+ChargeAuraScene = ExtResource("5_aura")
+Id = "charged_shot"
+DisplayName = "Charged Shot"
+Description = "Hold to draw the bow. The shot charges 50% per second and flies on release: 100% weapon damage at a third, 300% when full, up to 450% at 150%. Past full charge the arrow pierces everything in its path. Released early it fizzles; held too long it is lost and the skill cools down. Never misses because of Pierce. Needs a bow."
+Icon = ExtResource("2_icon")
+ManaCost = 2.0
+Delivery = 7
+EffectScene = ExtResource("3_arrow")

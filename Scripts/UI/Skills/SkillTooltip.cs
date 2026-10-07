@@ -30,7 +30,10 @@ public static class SkillTooltip
         if (!SkillGate.FitsWeapon(skill.Definition, caster.Weapon.IsRanged))
             text.Append(skill.Definition.NeedsBow ? "[color=red]Needs a bow[/color]" : "[color=red]Needs a melee weapon[/color]").Append(NewLine);
         text.Append($"[color=orange]DPS: {Format(estimate.Dps)}[/color]").Append(NewLine);
-        text.Append($"Average Hit: {Format(estimate.AverageHit)}").Append(NewLine);
+        text.Append($"Average Hit: {Format(estimate.AverageHit)}{(skill.Definition.IsCharged ? " at full charge" : string.Empty)}").Append(NewLine);
+
+        if (skill.Definition.IsCharged)
+            AppendCharge(text, skill.Definition, ChargeSettings.GetRateFactor(caster.Stats));
 
         if (estimate.ScatterCount > 0)
             text.Append($"Per Ball: {Format(estimate.ScatterAverageHit)} ({estimate.ScatterCount} Balls)").Append(NewLine);
@@ -78,6 +81,25 @@ public static class SkillTooltip
 
         return margin;
     }
+
+    //Der Waffenschaden des Skills gilt bei voller Ladung, die Mindest- und Höchstladung geben ihren Anteil davon. Die Zeiten gelten für das Tempo des Helden
+    private static void AppendCharge(StringBuilder text, SkillDefinition skill, float rateFactor)
+    {
+        var charge = skill.Charge;
+        var min    = Stage(skill, charge.MinPercent, rateFactor);
+        var full   = Stage(skill, ChargeSettings.FullPercent, rateFactor);
+        var max    = Stage(skill, charge.MaxPercent, rateFactor);
+
+        text.Append($"Charge: {min}, {full}, {max}").Append(NewLine);
+        text.Append($"Pierces past {Seconds(charge, ChargeSettings.FullPercent, rateFactor)}. Held {charge.OverholdSec:0.#} s past {Seconds(charge, charge.MaxPercent, rateFactor)} it fizzles, {charge.OverholdCooldownSec:0.#} s cooldown")
+            .Append(NewLine);
+    }
+
+    private static string Stage(SkillDefinition skill, float chargePercent, float rateFactor)
+        => $"{skill.Attack.WeaponDamagePercent * skill.Charge.GetDamageFactor(chargePercent):0}% at {Seconds(skill.Charge, chargePercent, rateFactor)}";
+
+    private static string Seconds(ChargeSettings charge, float chargePercent, float rateFactor)
+        => $"{charge.GetSecToReach(chargePercent, rateFactor):0.#} s";
 
     public static SkillDamageEstimate Estimate(SkillResource skill, IHero caster)
         => SkillDamageEstimator.Estimate(caster.Stats, caster.Weapon, skill.Definition, caster.StatusEffects.ActionFailureChance);

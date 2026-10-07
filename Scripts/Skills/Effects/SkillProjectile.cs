@@ -73,7 +73,10 @@ public partial class SkillProjectile : Area3D
         cast.ApplyTo(unit);
 
         Fork(unit);
-        Spend();
+
+        //Der Wurf merkt sich jeden Getroffenen, ein durchstoßendes Projektil trifft ihn deshalb kein zweites Mal
+        if (!settings.Pierces)
+            Spend();
     }
 
     private void Fork(BaseUnit hitUnit)

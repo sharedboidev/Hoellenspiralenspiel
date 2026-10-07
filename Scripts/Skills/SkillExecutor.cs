@@ -24,7 +24,8 @@ public static class SkillExecutor
 
     private static readonly List<BaseUnit> UnitsInReach = new();
 
-    public static void Execute(BaseUnit caster, SkillResource skill, SkillAim aim)
+    //chargePercent zählt nur für einen geladenen Schuss: So weit war er beim Loslassen geladen
+    public static void Execute(BaseUnit caster, SkillResource skill, SkillAim aim, float chargePercent = 0f)
     {
         var definition = skill.Definition;
         var cast       = new SkillCast(caster, HitRequests.ForSkill(caster.Stats, caster.Weapon, definition));
@@ -39,12 +40,16 @@ public static class SkillExecutor
                 GD.PushWarning($"{caster.Name} braucht für {definition.Name} eine Nahkampfwaffe.");
 
                 break;
-            case SkillDelivery.ArrowRain when !caster.Weapon.IsRanged:
+            case SkillDelivery.ArrowRain or SkillDelivery.ChargedShot when !caster.Weapon.IsRanged:
                 GD.PushWarning($"{caster.Name} braucht für {definition.Name} einen Bogen.");
 
                 break;
             case SkillDelivery.ArrowRain:
                 RainArrows(caster, skill, aim);
+
+                break;
+            case SkillDelivery.ChargedShot:
+                ShootCharged(caster, skill, aim, chargePercent);
 
                 break;
             case SkillDelivery.Weapon or SkillDelivery.MeleeStrike:
@@ -73,14 +78,15 @@ public static class SkillExecutor
     //Der Hieb ist auch zu sehen, wenn er ins Leere geht. Trifft er, läuft er durch das Ziel
     private static void StrikeInMelee(BaseUnit caster, SkillCast cast, SkillResource skill, SkillAim aim)
     {
-        var target = aim.Target;
-        var hits   = aim.HasTarget && cast.CanHit(target) && caster.DistancePxTo(target) <= caster.Weapon.Reach;
+        var facing = GetFacing(caster, aim);
+        var target = ChooseStrikeTarget(caster, cast, aim, facing);
+        var hits   = target is not null;
 
         var radiusPx = hits
                            ? WorldScale.GroundDistancePx(caster.GlobalPosition, target.GlobalPosition)
                            : caster.BodyRadiusPx + caster.Weapon.Range;
 
-        ShowSlash(caster, skill.EffectScene, GetFacing(caster, aim), radiusPx);
+        ShowSlash(caster, skill.EffectScene, facing, radiusPx);
 
         if (!hits)
             return;
@@ -91,6 +97,25 @@ public static class SkillExecutor
 
         if (cast.ApplyTo(target, true).HasLanded)
             Scatter(caster, skill, scatterOrigin, targetRadius);
+    }
+
+    //Der angeklickte Gegner in Reichweite hat Vorrang. Sonst trifft der Schlag den nächsten Gegner in der Zone vor dem Schlagenden
+    private static BaseUnit ChooseStrikeTarget(BaseUnit caster, SkillCast cast, SkillAim aim, Vector3 facing)
+    {
+        if (aim.HasTarget && cast.CanHit(aim.Target) && caster.DistancePxTo(aim.Target) <= caster.Weapon.Reach)
+            return aim.Target;
+
+        var center = caster.GlobalPosition;
+
+        UnitRegistry.FindNear(center, caster.BodyRadiusPx + caster.Weapon.Reach, UnitsInReach);
+        UnitsInReach.RemoveAll(unit => !cast.CanHit(unit));
+
+        return StrikeHitbox.PickNearest(UnitsInReach,
+                                        unit => (WorldScale.ToPx(unit.GlobalPosition.X - center.X), WorldScale.ToPx(unit.GlobalPosition.Z - center.Z), unit.BodyRadiusPx),
+                                        facing.X,
+                                        facing.Z,
+                                        caster.Weapon.Reach,
+                                        caster.BodyRadiusPx);
     }
 
     //Die Kugeln springen aus dem Körper des Getroffenen und schlagen um die Stelle ein, an der er beim Treffer stand. Läuft er weg, kann er ihnen entkommen
@@ -151,6 +176,32 @@ public static class SkillExecutor
 
             arrow.GlobalPosition = landing;
         }
+    }
+
+    //Der Pfeil der Waffe fliegt mit dem Anteil des Waffenschadens, den die Ladung ergibt. Über 100 % durchstößt er.
+    //Das Projektil des Skills zeigt die Ladung, fehlt es, fliegt der gewöhnliche Pfeil der Waffe
+    private static void ShootCharged(BaseUnit caster, SkillResource skill, SkillAim aim, float chargePercent)
+    {
+        if (skill.Definition.Charge is not { } charge || caster.Weapon.GetProjectile() is not { } projectile)
+        {
+            GD.PushWarning($"{caster.Name} kann {skill.Definition.Name} nicht laden.");
+
+            return;
+        }
+
+        var attack = charge.GetAttack(skill.Definition.Attack, chargePercent);
+        var cast   = new SkillCast(caster, HitRequests.ForAttack(caster.Stats, caster.Weapon, attack));
+        var scene  = skill.EffectScene ?? caster.WeaponProjectileScene;
+        var share  = charge.GetShownShare(chargePercent);
+        var pierce = charge.Pierces(chargePercent);
+
+        LaunchProjectile(caster,
+                         cast,
+                         scene,
+                         projectile with { Pierces = pierce },
+                         aim,
+                         caster.Weapon.ExtraProjectiles,
+                         arrow => (arrow as ChargedArrow)?.ShowCharge(share, pierce));
     }
 
     private static void ShowSkyShot(BaseUnit caster, PackedScene scene, Vector3 facing)
@@ -216,8 +267,15 @@ public static class SkillExecutor
         slash.GlobalPosition = WorldScale.OnGround(caster.GlobalPosition);
     }
 
-    //Erhöhtes Projektiltempo lässt die Reichweite gleich. Weitere Pfeile einer Waffe zählen nur für ihre eigenen Angriffe
-    private static void LaunchProjectile(BaseUnit caster, SkillCast cast, PackedScene scene, ProjectileSettings settings, SkillAim aim, int extraProjectiles = 0)
+    //Erhöhtes Projektiltempo lässt die Reichweite gleich. Weitere Pfeile einer Waffe zählen nur für ihre eigenen Angriffe.
+    //prepare richtet jedes Projektil vor dem Einhängen ein, etwa mit seiner Ladung
+    private static void LaunchProjectile(BaseUnit               caster,
+                                         SkillCast              cast,
+                                         PackedScene            scene,
+                                         ProjectileSettings     settings,
+                                         SkillAim               aim,
+                                         int                    extraProjectiles = 0,
+                                         Action<SkillProjectile> prepare          = null)
     {
         if (scene is null || settings is null)
         {
@@ -240,6 +298,7 @@ public static class SkillExecutor
             var spread     = Mathf.DegToRad(ProjectileSpread.GetOffsetDegrees(i, count));
 
             projectile.Launch(cast, settings, scene, direction.Rotated(Vector3.Up, spread));
+            prepare?.Invoke(projectile);
 
             caster.GetParent().AddChild(projectile);
 
