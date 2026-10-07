@@ -164,4 +164,26 @@ public class SkillDefinitionTests
 
         Assert.That(HitRequests.ForSkill(hero, WeaponProfile.Unarmed, skill), Is.EqualTo(HitRequests.ForSkill(monster, WeaponProfile.Unarmed, skill)));
     }
+
+
+    //Der Wirbel braucht eine Klinge und kanalisiert nur mit seinen Werten
+    [Test]
+    public void Wirbel_BrauchtEineNahkampfwaffe_UndKanalisiertNurMitSeinenWerten()
+    {
+        var channel = new ChannelSettings(3f);
+        var whirl   = SkillDefinition.ForAttack("typhoon", new AttackDefinition("Typhoon", 60f)) with { Delivery = SkillDelivery.WeaponWhirl, ManaCost = 1f };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(whirl.NeedsMeleeWeapon, Is.True);
+            Assert.That(whirl.NeedsBow, Is.False);
+            Assert.That(whirl.IsArea, Is.False);
+            Assert.That(whirl.IsCharged, Is.False);
+            Assert.That(whirl.IsChanneled, Is.False, "ohne Werte kanalisiert nichts");
+            Assert.That((whirl with { Channel = channel }).IsChanneled, Is.True);
+            Assert.That((whirl with { Delivery = SkillDelivery.WeaponSweep, Channel = channel }).IsChanneled, Is.False, "die Werte allein machen keinen Wirbel");
+            Assert.That(whirl.GetManaPerUse(2f), Is.EqualTo(1f), "ohne Kanal zählen die Kosten je Einsatz");
+            Assert.That((whirl with { Channel = channel }).GetManaPerUse(2f), Is.EqualTo(1.5f).Within(0.0001f), "mit Kanal der Anteil je Tick: 3 Mana je Sekunde bei 2 Ticks");
+        });
+    }
 }

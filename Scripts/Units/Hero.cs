@@ -52,6 +52,10 @@ public partial class Hero
     //So schnell hebt der Held den Bogen, wenn er zu laden beginnt
     private const double ChargeRaiseSec     = 0.2;
 
+    //Für den Wirbel: die Waffe waagerecht nach vorn, so schnell geht sie hoch
+    private const float  WhirlRaiseDegrees  = 90f;
+    private const double WhirlRaiseSec      = 0.15;
+
     //So lange wie SweepSec der Hiebe in melee_slash.tscn und cleave.tscn, damit Waffe und Hieb zusammen durchziehen
     private const double StrikeSec             = 0.15;
     private const double StrikeShareOfRecovery = 0.6;
@@ -68,6 +72,8 @@ public partial class Hero
     private          double        approachStuckSec;
     private          Vector3       attackAimPoint;
     private          BaseUnit      attackTarget;
+    private readonly ChannelClock  channelClock = new();
+    private          SkillResource channelSkill;
     private          double        chargeAtMaxSec;
     private          ChargeLook    chargeLook;
     private          float         chargePercent;
@@ -381,6 +387,7 @@ public partial class Hero
         RepeatHeldSkill();
         AdvanceAction(delta);
         AdvanceCharge(delta);
+        AdvanceChannel(delta);
         Move(GetWantedDirection(delta), delta);
     }
 
@@ -527,7 +534,7 @@ public partial class Hero
     //Jeder Skill geht aus dem Stand los. Stehenbleiben erlaubt einem Nahkampfangriff den Hieb ins Leere Richtung Maus, ohne Gegner unter ihr
     public bool UseSkill(SkillResource skill, SkillAim aim, bool isRepeat = false, bool standsStill = false)
     {
-        if (IsDead || skill is null || IsActing || IsCharging)
+        if (IsDead || skill is null || IsActing || IsCharging || IsChanneling)
             return false;
 
         return skill.Kind == SkillKind.Attack ? OrderAttack(skill, aim, isRepeat, standsStill) : CastSpell(skill, aim, isRepeat);
@@ -543,6 +550,9 @@ public partial class Hero
 
     //Solange der Held einen Schuss lädt, hält er den Bogen gehoben, läuft langsamer, schaut zur Maus und beginnt nichts Neues
     public bool IsCharging => chargeSkill is not null;
+
+    //Solange der Held wirbelt, dreht er sich mit der Waffe, läuft langsamer, zahlt je Sekunde und beginnt nichts Neues
+    public bool IsChanneling => channelSkill is not null;
 
     public float ChargePercent => chargePercent;
 
@@ -572,6 +582,17 @@ public partial class Hero
         if (skill.Definition.IsCharged)
         {
             BeginCharge(skill);
+
+            return true;
+        }
+
+        //Ein Wirbel beginnt sofort, wenn das Mana bis zum ersten Tick reicht, und läuft, solange die Taste gehalten wird
+        if (skill.Definition.IsChanneled)
+        {
+            if (!skill.Definition.Channel.CanStart(AvailableMana, ChannelSettings.GetAttacksPerSec(Stats)))
+                return Report(SkillUseCheck.NotEnoughMana, isRepeat);
+
+            BeginChannel(skill, aim);
 
             return true;
         }
@@ -608,7 +629,7 @@ public partial class Hero
             return;
         }
 
-        if (orderedSkill is not null || IsActing || IsCharging)
+        if (orderedSkill is not null || IsActing || IsCharging || IsChanneling)
             return;
 
         UseSlot(heldSlot, true);
@@ -627,8 +648,8 @@ public partial class Hero
 
     private Vector3 GetWantedDirection(double delta)
     {
-        //Solange ein Skill läuft oder lädt, laufen die Richtungstasten frei und langsamer, nichts bricht ihn ab. Alles andere wartet
-        if (IsActing || IsCharging)
+        //Solange ein Skill läuft, lädt oder wirbelt, laufen die Richtungstasten frei und langsamer, nichts bricht ihn ab. Alles andere wartet
+        if (IsActing || IsCharging || IsChanneling)
             return GetInputDirection();
 
         var inputDirection = GetInputDirection();
@@ -677,13 +698,13 @@ public partial class Hero
         return right * input.X - forward * input.Y;
     }
 
-    //Der Held schaut immer zur Maus, auch beim Laufen. Während eines Skills dreht er sich nicht und läuft langsamer
+    //Der Held schaut immer zur Maus, auch beim Laufen. Während eines Skills dreht er sich nicht zur Maus und läuft langsamer, beim Wirbel dreht er sich mit der Waffe
     private void Move(Vector3 direction, double delta)
     {
-        if (!IsActing)
+        if (!IsActing && !IsChanneling)
             Face(GetMouseGroundPoint() - GlobalPosition);
 
-        var speedPx = IsActing || IsCharging ? MovementspeedPx * AttackOrders.GetSkillWalkFactor(SkillWalkSpeedPercent) : MovementspeedPx;
+        var speedPx = IsActing || IsCharging || IsChanneling ? MovementspeedPx * AttackOrders.GetSkillWalkFactor(SkillWalkSpeedPercent) : MovementspeedPx;
 
         MoveOnGround(direction, speedPx);
 
@@ -807,6 +828,7 @@ public partial class Hero
     {
         DropOrders();
         EndCharge();
+        EndChannel();
 
         actionSkill  = null;
         actionAim    = default;
@@ -896,7 +918,7 @@ public partial class Hero
 
         var charge = chargeSkill.Definition.Charge;
 
-        if (!IsChargeKeyHeld())
+        if (!IsSkillKeyHeld(chargeSkill))
         {
             ReleaseCharge();
 
@@ -919,11 +941,11 @@ public partial class Hero
     }
 
     //Die Taste gilt als gehalten, solange ein Platz der Leiste mit diesem Skill gedrückt ist
-    private bool IsChargeKeyHeld()
+    private bool IsSkillKeyHeld(SkillResource skill)
     {
         for (var slot = 0; slot < Loadout.SlotCount; slot++)
         {
-            if (Loadout.GetSkillId(slot) == chargeSkill.Id && Input.IsActionPressed(InputActions.SkillSlots[slot]))
+            if (Loadout.GetSkillId(slot) == skill.Id && Input.IsActionPressed(InputActions.SkillSlots[slot]))
                 return true;
         }
 
@@ -1025,6 +1047,99 @@ public partial class Hero
 
     #endregion
 
+    #region Wirbel
+
+    //Der Wirbel beginnt sofort und läuft, solange die Taste gehalten wird. Bezahlt wird je Sekunde, der erste Tick kommt nach einem halben Intervall
+    private void BeginChannel(SkillResource skill, SkillAim aim)
+    {
+        ClearOrder();
+
+        useTarget    = null;
+        channelSkill = skill;
+
+        channelClock.Start(skill.Definition.Channel.GetFirstTickSec(ChannelSettings.GetAttacksPerSec(Stats)));
+
+        Face(aim.CurrentPoint - GlobalPosition);
+        PlayWhirlLook();
+    }
+
+    //Taste losgelassen oder Mana leer beendet den Wirbel mit der Erholung eines Angriffs. Sonst zahlt der Held, dreht sich und trifft, wenn ein Tick fällig ist
+    private void AdvanceChannel(double delta)
+    {
+        if (!IsChanneling)
+            return;
+
+        var channel = channelSkill.Definition.Channel;
+        var isHeld  = IsSkillKeyHeld(channelSkill);
+
+        if (!isHeld || !channel.CanContinue(ManaCurrent, delta))
+        {
+            if (isHeld)
+                Report(SkillUseCheck.NotEnoughMana, false);
+
+            EndChannel();
+            Recover(null, default, 0f);
+
+            return;
+        }
+
+        var attacksPerSec = ChannelSettings.GetAttacksPerSec(Stats);
+
+        SpendMana(channel.GetManaFor(delta));
+        Spin(channel.GetSpinDegreesPerSec(attacksPerSec) * delta);
+
+        var ticks = channelClock.Advance(delta, channel.GetIntervalSec(attacksPerSec));
+
+        for (var i = 0; i < ticks && IsChanneling; i++)
+            Tick();
+    }
+
+    //Der Held dreht sich mit der Waffe, seine Blickrichtung dreht mit. Der Hieb eines Ticks beginnt dort, wo die Waffe gerade ist
+    private void Spin(double degrees)
+    {
+        if (Visual is null)
+            return;
+
+        var angle = Visual.Rotation.Y + Mathf.DegToRad((float)degrees);
+
+        Face(new Vector3(-Mathf.Sin(angle), 0, -Mathf.Cos(angle)));
+    }
+
+    //Ein Tick ist ein Schlag auf alle im Kreis. Unter Schock kann er fehlschlagen wie jeder Schlag
+    private void Tick()
+    {
+        if (RollActionFailure())
+        {
+            CombatText.Show(this, "Failed", Colors.Yellow, 28);
+
+            return;
+        }
+
+        SkillExecutor.Execute(this, channelSkill, new SkillAim(GetMouseGroundPoint()));
+    }
+
+    private void EndChannel()
+    {
+        channelSkill = null;
+
+        channelClock.Stop();
+    }
+
+    //Die Waffe geht waagerecht nach vorn und bleibt dort, bis der Wirbel endet
+    private void PlayWhirlLook()
+    {
+        if (weaponPivot is null)
+            return;
+
+        actionLook?.Kill();
+
+        actionLook = CreateTween().SetProcessMode(Tween.TweenProcessMode.Physics);
+
+        actionLook.TweenProperty(weaponPivot, "rotation_degrees", new Vector3(WhirlRaiseDegrees, 0, 0), WhirlRaiseSec);
+    }
+
+    #endregion
+
     #region Items
 
     public int GetRequiredValue(Requirement requirement)
@@ -1099,7 +1214,7 @@ public partial class Hero
         wornItems?.Hide(item);
     }
 
-    //Wechselt die Waffe während des Ladens, verpufft die Ladung ohne Erholung
+    //Wechselt die Waffe während des Ladens oder Wirbelns, endet beides ohne Erholung
     private void WieldWeapon(ItemInstance newWeapon)
     {
         equippedWeapon = newWeapon;
@@ -1107,9 +1222,10 @@ public partial class Hero
 
         weapon.ApplyTo(Stats);
 
-        if (IsCharging)
+        if (IsCharging || IsChanneling)
         {
             EndCharge();
+            EndChannel();
             EndActionLook();
         }
     }

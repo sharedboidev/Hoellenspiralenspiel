@@ -102,9 +102,12 @@ internal sealed class Fighter
             return (enemy.AttackWindupSec / rate, enemy.AttackRecoverySec / rate);
         }
 
-        var durationSec = skill.Kind == SkillKind.Attack
-                ? 1.0 / Math.Max(CombatRules.MinAttacksPerSecond, stats.GetFinal(CombatStat.Attackspeed))
-                : skill.GetCastSec(stats);
+        //Ein Wirbel trifft je Tick, der Simulator rechnet jeden Tick wie einen Schlag mit halbem Ausholen und halber Erholung
+        var durationSec = skill.IsChanneled
+                ? skill.Channel.GetIntervalSec(ChannelSettings.GetAttacksPerSec(stats))
+                : skill.Kind == SkillKind.Attack
+                        ? 1.0 / Math.Max(CombatRules.MinAttacksPerSecond, stats.GetFinal(CombatStat.Attackspeed))
+                        : skill.GetCastSec(stats);
 
         return (durationSec * HeroImpactFraction, durationSec * (1 - HeroImpactFraction));
     }

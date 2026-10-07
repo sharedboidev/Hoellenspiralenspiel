@@ -22,7 +22,7 @@ public static class SkillTooltip
     public static string Build(SkillResource skill, IHero caster)
     {
         var estimate = Estimate(skill, caster);
-        var uses     = skill.Kind == SkillKind.Attack ? "Attacks" : "Casts";
+        var uses     = skill.Definition.IsChanneled ? "Hits" : skill.Kind == SkillKind.Attack ? "Attacks" : "Casts";
         var text     = new StringBuilder();
 
         text.Append(Title($"[color=gold]{skill.NameOrId}[/color]")).Append(NewLine).Append(NewLine);
@@ -43,6 +43,9 @@ public static class SkillTooltip
 
         text.Append($"Crit Chance: {estimate.CriticalHitChance:0.#}%").Append(NewLine);
         text.Append($"{uses} per Second: {estimate.UsesPerSecond:0.##}");
+
+        if (skill.Definition.IsChanneled)
+            text.Append(NewLine).Append($"Mana per Second: {skill.Definition.Channel.ManaPerSec:0.#} while held");
 
         if (skill.Kind == SkillKind.Spell && skill.Definition.CastSec > 0)
             text.Append(NewLine).Append($"Cast Time: {skill.Definition.GetCastSec(caster.Stats):0.##} s");

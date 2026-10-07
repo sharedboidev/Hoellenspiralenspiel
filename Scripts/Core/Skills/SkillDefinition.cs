@@ -49,16 +49,26 @@ public sealed record SkillDefinition
     //Nur für Attacks mit dem Bogen: Die Ladung eines Schusses, der mit gehaltener Taste stärker wird
     public ChargeSettings Charge { get; init; }
 
+    //Nur für den Wirbel: Mana je Sekunde und Ticks je Angriff des Angriffstempos
+    public ChannelSettings Channel { get; init; }
+
     public bool IsArea => Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint;
 
     //Ein Bogen ist keine Klinge: Mit einer Fernkampfwaffe in der Hand lassen sich diese Skills nicht einsetzen
-    public bool NeedsMeleeWeapon => Delivery is SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike;
+    public bool NeedsMeleeWeapon => Delivery is SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike or SkillDelivery.WeaponWhirl;
 
     //Pfeile kommen nur aus einem Bogen, der einzigen Fernkampfwaffe
     public bool NeedsBow => Delivery is SkillDelivery.ArrowRain or SkillDelivery.ChargedShot;
 
     //Ein geladener Schuss lädt statt auszuholen. Die Taste bestimmt, wann er losgeht
     public bool IsCharged => Delivery == SkillDelivery.ChargedShot && Charge is not null;
+
+    //Ein Wirbel läuft, solange die Taste gehalten wird, und trifft in Ticks statt je Einsatz
+    public bool IsChanneled => Delivery == SkillDelivery.WeaponWhirl && Channel is not null;
+
+    //Ein Wirbel zahlt je Tick den Anteil seines Manas je Sekunde, alles andere seine Kosten je Einsatz
+    public float GetManaPerUse(float attacksPerSec)
+        => IsChanneled ? Channel.GetManaPerTick(attacksPerSec) : ManaCost;
 
     //Erhöhtes Zaubertempo teilt die Wirkzeit: 50 % mehr ergibt zwei Drittel der Zeit
     public double GetCastSec(StatSheet caster)

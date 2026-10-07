@@ -75,7 +75,7 @@ internal static class FightSimulator
             if (cycle.IsReady && Choose(attacker, cooldowns, mana) is { } skill)
             {
                 if (attacker.PaysMana)
-                    mana -= skill.ManaCost;
+                    mana -= skill.GetManaPerUse(ChannelSettings.GetAttacksPerSec(attackerStats));
 
                 cooldowns.Start(skill.Id, attacker.GetCooldownSec(skill));
 

@@ -859,4 +859,58 @@ public class SkillDamageEstimatorTests
     }
 
     #endregion
+
+
+    private static SkillDefinition Typhoon(float ticksPerAttack = 1f, float manaPerSec = 3f)
+        => SkillDefinition.ForAttack("typhoon", new AttackDefinition("Typhoon", 60f)) with
+        {
+            Delivery = SkillDelivery.WeaponWhirl,
+            Sweep = new SweepSettings(360f, 1.25f),
+            Channel = new ChannelSettings(manaPerSec, ticksPerAttack)
+        };
+
+    //Der Wirbel trifft je Tick mit 60 % Waffenschaden, die Ticks folgen dem Angriffstempo mal dem Faktor, das Mana fließt je Sekunde
+    [Test]
+    public void Wirbel_TrifftJeTick_ImTaktDesAngriffstempos()
+    {
+        var sword    = Weapon(DamageType.Slash);
+        var attacker = Attacker(sword);
+        var tempo    = attacker.GetFinal(CombatStat.Attackspeed);
+        var swing    = SkillDamageEstimator.Estimate(attacker, sword, SkillDefinition.ForAttack("swing", new AttackDefinition("Swing", 60f)));
+        var whirl    = SkillDamageEstimator.Estimate(attacker, sword, Typhoon());
+        var doubled  = SkillDamageEstimator.Estimate(attacker, sword, Typhoon(2f));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(whirl.AverageHit, Is.EqualTo(swing.AverageHit), "ein Tick trifft wie ein Schlag mit 60 %");
+            Assert.That(whirl.UsesPerSecond, Is.EqualTo(tempo).Within(0.0001), "ein Tick je Angriff");
+            Assert.That(doubled.UsesPerSecond, Is.EqualTo(2 * tempo).Within(0.0001), "zwei Ticks je Angriff");
+            Assert.That(whirl.HitDps, Is.EqualTo(whirl.AverageHit * (float)whirl.UsesPerSecond * whirl.HitChance / 100f).Within(Tolerance));
+            Assert.That(doubled.HitDps, Is.EqualTo(2 * whirl.HitDps).Within(Tolerance));
+            Assert.That(whirl.ManaPerSecond, Is.EqualTo(3f).Within(Tolerance), "je Sekunde, nicht je Tick");
+            Assert.That(doubled.ManaPerSecond, Is.EqualTo(3f).Within(Tolerance), "mehr Ticks kosten nicht mehr");
+            Assert.That(whirl.ScatterCount, Is.Zero);
+            Assert.That(whirl.ArrowCount, Is.Zero);
+        });
+    }
+
+    //Reicht die Regeneration nicht für das Mana je Sekunde, hält der Held den Wirbel nur anteilig durch
+    [Test]
+    public void Wirbel_MitKnappemMana_HaeltNurAnteiligDurch()
+    {
+        var sword = Weapon(DamageType.Slash);
+        var rich  = SkillDamageEstimator.Estimate(Attacker(sword, 3f), sword, Typhoon());
+        var poor  = SkillDamageEstimator.Estimate(Attacker(sword, 1f), sword, Typhoon());
+        var free  = SkillDamageEstimator.Estimate(Attacker(sword), sword, Typhoon(manaPerSec: 0f));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(rich.IsLimitedByMana, Is.False, "3 Regeneration deckt 3 je Sekunde");
+            Assert.That(rich.SustainedDps, Is.EqualTo(rich.Dps));
+            Assert.That(poor.IsLimitedByMana, Is.True);
+            Assert.That(poor.SustainedDps, Is.EqualTo(poor.Dps / 3f).Within(Tolerance), "ein Drittel der Zeit wirbelt er");
+            Assert.That(free.IsLimitedByMana, Is.False, "ohne Kosten keine Grenze");
+            Assert.That(free.ManaPerSecond, Is.Zero);
+        });
+    }
 }

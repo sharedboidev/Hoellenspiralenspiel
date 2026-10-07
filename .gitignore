@@ -32,3 +32,6 @@ obj/
 # Seiten der Affix-Datenbank, die tools/python/fetch.py lädt
 tools/python/cache/
 __pycache__/
+
+# Rider-Anbindung von Claude Code mit lokalem Port, je Rechner anders
+.mcp.json

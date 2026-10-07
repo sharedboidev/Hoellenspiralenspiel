@@ -18,6 +18,8 @@ public partial class AttackSkillResource : SkillResource
         nameof(ChargeArrowScene), nameof(ChargeAuraScene)
     ];
 
+    private static readonly HashSet ChannelFields = [nameof(ChannelManaPerSec), nameof(ChannelTicksPerAttack)];
+
     [ExportGroup("Attack")]
     [Export]
     public float WeaponDamagePercent { get; set; } = 100f;
@@ -100,19 +102,29 @@ public partial class AttackSkillResource : SkillResource
     [Export]
     public PackedScene ChargeAuraScene { get; set; }
 
+    //Der Wirbel bei Delivery WeaponWhirl: Mana je Sekunde statt je Einsatz, ManaCost bleibt dabei der Preis für den Beginn
+    [ExportGroup("Channel")]
+    [Export]
+    public float ChannelManaPerSec { get; set; } = 3f;
+
+    //Ticks je Angriff des Angriffstempos. Jeder Tick trifft jeden im Kreis mit WeaponDamagePercent
+    [Export]
+    public float ChannelTicksPerAttack { get; set; } = 1f;
+
     public override SkillKind Kind => SkillKind.Attack;
 
-    //Kugeln springen nur aus einem Schlag, Pfeile regnen nur nach dem Schuss in den Himmel, geladen wird nur der geladene Schuss
+    //Kugeln springen nur aus einem Schlag, Pfeile regnen nur nach dem Schuss in den Himmel, geladen wird nur der geladene Schuss, der Wirbel kanalisiert als Einziger
     public override void _ValidateProperty(Dictionary property)
     {
         base._ValidateProperty(property);
 
         var name = property["name"].AsString();
 
-        var fits = !ScatterFields.Contains(name) && !RainFields.Contains(name) && !ChargeFields.Contains(name) ||
+        var fits = !ScatterFields.Contains(name) && !RainFields.Contains(name) && !ChargeFields.Contains(name) && !ChannelFields.Contains(name) ||
                    (ScatterFields.Contains(name) && Delivery is SkillDelivery.Weapon or SkillDelivery.MeleeStrike) ||
                    (RainFields.Contains(name) && Delivery == SkillDelivery.ArrowRain) ||
-                   (ChargeFields.Contains(name) && Delivery == SkillDelivery.ChargedShot);
+                   (ChargeFields.Contains(name) && Delivery == SkillDelivery.ChargedShot) ||
+                   (ChannelFields.Contains(name) && Delivery == SkillDelivery.WeaponWhirl);
 
         if (!fits)
             HideInInspector(property);
@@ -125,6 +137,7 @@ public partial class AttackSkillResource : SkillResource
             Rain    = Delivery == SkillDelivery.ArrowRain ? new RainSettings(RainCount, RainRadius, RainImpactRadius, RainDelaySec, RainDurationSec) : null,
             Charge  = Delivery == SkillDelivery.ChargedShot
                     ? new ChargeSettings(ChargeRatePerSec, ChargeMinPercent, ChargeMaxPercent, ChargeOverholdSec, ChargeOverholdCooldownSec)
-                    : null
+                    : null,
+            Channel = Delivery == SkillDelivery.WeaponWhirl ? new ChannelSettings(ChannelManaPerSec, ChannelTicksPerAttack) : null
         };
 }

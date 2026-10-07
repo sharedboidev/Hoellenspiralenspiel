@@ -36,7 +36,7 @@ public static class SkillExecutor
                 LaunchProjectile(caster, cast, caster.WeaponProjectileScene, caster.Weapon.GetProjectile(), aim, caster.Weapon.ExtraProjectiles);
 
                 break;
-            case SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike when caster.Weapon.IsRanged:
+            case SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike or SkillDelivery.WeaponWhirl when caster.Weapon.IsRanged:
                 GD.PushWarning($"{caster.Name} braucht für {definition.Name} eine Nahkampfwaffe.");
 
                 break;
@@ -57,7 +57,11 @@ public static class SkillExecutor
 
                 break;
             case SkillDelivery.WeaponSweep:
-                Sweep(caster, cast, skill.EffectScene, definition.Sweep, aim);
+                Sweep(caster, cast, skill.EffectScene, definition.Sweep, GetFacing(caster, aim));
+
+                break;
+            case SkillDelivery.WeaponWhirl:
+                Whirl(caster, cast, skill, aim);
 
                 break;
             case SkillDelivery.Projectile:
@@ -219,17 +223,36 @@ public static class SkillExecutor
         arrow.GlobalPosition = caster.GlobalPosition + Vector3.Up * SkyShotStartHeightMeters + facing * SkyShotStartAheadMeters;
     }
 
+    //Ein Tick des Wirbels trifft jeden im Kreis. Der Hieb beginnt an der Waffe und läuft bis zum nächsten Tick einmal herum,
+    //so wie der Wirbelnde sich dreht. Die Waffe zeigt nach vorn, der Hieb von MeleeSlash beginnt hinten, deshalb die Gegenrichtung
+    private static void Whirl(BaseUnit caster, SkillCast cast, SkillResource skill, SkillAim aim)
+    {
+        var definition = skill.Definition;
+
+        if (definition.Sweep is not { } sweep || definition.Channel is not { } channel)
+        {
+            GD.PushWarning($"{caster.Name} hat keinen Kreis für {definition.Name}.");
+
+            return;
+        }
+
+        var facing   = GetFacing(caster, aim);
+        var fullArc  = sweep with { ArcDegrees = SweepSettings.FullCircleDegrees };
+        var slashSec = channel.GetIntervalSec(ChannelSettings.GetAttacksPerSec(caster.Stats));
+
+        Sweep(caster, cast, skill.EffectScene, fullArc, facing, -facing, slashSec);
+    }
+
     //Der Bogen zeigt, wohin der Schlagende beim Ausholen schaute. Wer währenddessen hinter ihn läuft, entgeht ihm
-    private static void Sweep(BaseUnit caster, SkillCast cast, PackedScene slashScene, SweepSettings sweep, SkillAim aim)
+    private static void Sweep(BaseUnit caster, SkillCast cast, PackedScene slashScene, SweepSettings sweep, Vector3 facing, Vector3? slashFacing = null, double slashSec = 0)
     {
         if (sweep is null)
             return;
 
-        var facing  = GetFacing(caster, aim);
         var reachPx = sweep.GetReach(caster.Weapon);
         var center  = caster.GlobalPosition;
 
-        ShowSlash(caster, slashScene, facing, caster.BodyRadiusPx + reachPx, sweep.ArcDegrees);
+        ShowSlash(caster, slashScene, slashFacing ?? facing, caster.BodyRadiusPx + reachPx, sweep.ArcDegrees, slashSec);
 
         UnitRegistry.FindNear(center, caster.BodyRadiusPx + reachPx, UnitsInReach);
 
@@ -253,7 +276,8 @@ public static class SkillExecutor
         return WorldScale.OnGround(aim.CurrentPoint - caster.GlobalPosition).Normalized();
     }
 
-    private static void ShowSlash(BaseUnit caster, PackedScene scene, Vector3 facing, float radiusPx, float arcDegrees = 0f)
+    //Eine Dauer von 0 lässt dem Hieb die Zeit seiner Szene
+    private static void ShowSlash(BaseUnit caster, PackedScene scene, Vector3 facing, float radiusPx, float arcDegrees = 0f, double sweepSec = 0)
     {
         if (scene is null)
             return;
@@ -261,6 +285,9 @@ public static class SkillExecutor
         var slash = scene.Instantiate<MeleeSlash>();
 
         slash.Launch(facing, WorldScale.ToMeters(radiusPx), arcDegrees);
+
+        if (sweepSec > 0)
+            slash.SweepSec = (float)sweepSec;
 
         caster.GetParent().AddChild(slash);
 

@@ -44,6 +44,13 @@ public class SkillGateTests
         Charge = new ChargeSettings(20f, 100f / 3f, 150f, 0.5f, 5)
     };
 
+    private static readonly SkillDefinition Typhoon = SkillDefinition.ForAttack("typhoon", new AttackDefinition("Typhoon", 60f)) with
+    {
+        Delivery = SkillDelivery.WeaponWhirl,
+        Sweep = new SweepSettings(360f, 1.25f),
+        Channel = new ChannelSettings(3f)
+    };
+
     [Test]
     public void GenugManaUndKeineAbklingzeit_IstBereit()
         => Assert.That(SkillGate.Check(Fireball, new SkillCooldowns(), 2), Is.EqualTo(SkillUseCheck.Ready));
@@ -168,6 +175,20 @@ public class SkillGateTests
         {
             Assert.That(SkillGate.Check(DarkenSky, cooldowns, 0, false), Is.EqualTo(SkillUseCheck.NeedsBow));
             Assert.That(SkillGate.Check(DarkenSky, cooldowns, 0, true), Is.EqualTo(SkillUseCheck.OnCooldown), "mit Bogen zählt die Abklingzeit der Attack");
+        });
+    }
+
+
+    //Der Wirbel kostet nichts beim Beginn, das Mana je Sekunde prüft der Held selbst gegen den ersten Tick
+    [Test]
+    public void WirbelMitBogen_WirdAbgelehnt_OhneBogenGehtErAuchOhneMana()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(SkillGate.Check(Typhoon, new SkillCooldowns(), 10, true), Is.EqualTo(SkillUseCheck.NeedsMeleeWeapon));
+            Assert.That(SkillGate.Check(Typhoon, new SkillCooldowns(), 0, false), Is.EqualTo(SkillUseCheck.Ready));
+            Assert.That(SkillGate.FitsWeapon(Typhoon, true), Is.False);
+            Assert.That(SkillGate.FitsWeapon(Typhoon, false), Is.True);
         });
     }
 }

@@ -189,6 +189,12 @@ internal static class GameData
                                          values.Float("ChargeMaxPercent", 150f),
                                          values.Float("ChargeOverholdSec", 0.5f),
                                          values.Double("ChargeOverholdCooldownSec", 5))
+                    : null,
+            Sweep = delivery is SkillDelivery.WeaponSweep or SkillDelivery.WeaponWhirl
+                    ? new SweepSettings(values.Float("SweepArcDegrees", 180f), values.Float("SweepRangeFactor", 1f))
+                    : null,
+            Channel = delivery == SkillDelivery.WeaponWhirl
+                    ? new ChannelSettings(values.Float("ChannelManaPerSec", 3f), values.Float("ChannelTicksPerAttack", 1f))
                     : null
         };
     }

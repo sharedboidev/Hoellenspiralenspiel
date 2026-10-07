@@ -25,7 +25,7 @@ public static class SkillDamageEstimator
         var failureChance  = Math.Clamp(actionFailureChance, 0f, 1f);
         var landingShare   = (1f - failureChance) * main.HitChance / 100f;
         var usesPerSecond  = GetUsesPerSecond(attacker, skill);
-        var manaPerSecond  = paysMana ? (float)(skill.ManaCost * usesPerSecond) : 0f;
+        var manaPerSecond  = paysMana ? GetManaPerSecond(skill, usesPerSecond) : 0f;
         var arrowCount     = skill.Rain?.GetCount(BonusProjectiles.ForBow(attacker, weapon)) ?? 0;
         var arrowsOnTarget = arrowCount * (skill.Rain?.GetShareOnCenter() ?? 0f);
         var scatter        = MeasureScatter(attacker, weapon, skill);
@@ -62,10 +62,10 @@ public static class SkillDamageEstimator
 
         var manaRegeneration = Math.Max(0f, attacker.GetFinal(CombatStat.Manaregeneration));
 
-        if (!paysMana || skill.ManaCost <= 0f || manaPerSecond <= manaRegeneration)
+        if (!paysMana || manaPerSecond <= 0f || manaPerSecond <= manaRegeneration)
             return estimate with { SustainedDps = estimate.Dps };
 
-        var sustainedUses = manaRegeneration / skill.ManaCost;
+        var sustainedUses = usesPerSecond * manaRegeneration / manaPerSecond;
 
         return estimate with
         {
@@ -87,15 +87,23 @@ public static class SkillDamageEstimator
         return 1.0 / intervalSec;
     }
 
-    //Ein geladener Schuss lädt voll, statt auszuholen, schneller mit erhöhtem Angriffstempo. Danach erholt der Held sich wie nach jedem Angriff
+    //Ein geladener Schuss lädt voll, statt auszuholen, schneller mit erhöhtem Angriffstempo. Danach erholt der Held sich wie nach jedem Angriff.
+    //Ein Wirbel trifft je Tick, sein Einsatz ist der Tick
     private static double GetAttackCycleSec(StatSheet attacker, SkillDefinition skill)
     {
         var swingSec = 1.0 / Math.Max(CombatRules.MinAttacksPerSecond, attacker.GetFinal(CombatStat.Attackspeed));
+
+        if (skill.IsChanneled)
+            return skill.Channel.GetIntervalSec(ChannelSettings.GetAttacksPerSec(attacker));
 
         return skill.IsCharged
                 ? skill.Charge.GetSecToReach(ChargeSettings.FullPercent, ChargeSettings.GetRateFactor(attacker)) + swingSec * (1 - CombatRules.ActionImpactFraction)
                 : swingSec;
     }
+
+    //Ein Wirbel kostet je Sekunde, alles andere je Einsatz
+    private static float GetManaPerSecond(SkillDefinition skill, double usesPerSecond)
+        => skill.IsChanneled ? Math.Max(0f, skill.Channel.ManaPerSec) : (float)(skill.ManaCost * usesPerSecond);
 
     private static MeasuredHit MeasureScatter(StatSheet attacker, WeaponProfile weapon, SkillDefinition skill)
     {

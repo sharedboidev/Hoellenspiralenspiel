@@ -16,5 +16,8 @@ public enum SkillDelivery
     ArrowRain,
 
     //Ein Schuss mit dem Projektil der Waffe, der mit gehaltener Taste lädt und beim Loslassen Richtung Maus geht. Nur mit einem Bogen
-    ChargedShot
+    ChargedShot,
+
+    //Ein Wirbel mit der Nahkampfwaffe, der läuft, solange die Taste gehalten wird, und in Ticks jeden im Kreis trifft. Nur mit einer Nahkampfwaffe
+    WeaponWhirl
 }

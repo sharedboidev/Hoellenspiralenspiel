@@ -143,4 +143,31 @@ public class GameDataTests
             Assert.That(sword.Guard.MeleeParry, Is.EqualTo(5f));
         });
     }
+
+
+    //Die Werte hat der User am 07.10.2026 vorgegeben: 60 % Waffenschaden je Tick, 3 Mana je Sekunde, ein Tick je Angriff, 1,25-fache Reichweite
+    [Test]
+    public void Typhoon_BrauchtEineNahkampfwaffe_UndWirbeltMitDreiManaJeSekunde()
+    {
+        var typhoon = GameData.PlayerSkill("typhoon");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(typhoon.Name, Is.EqualTo("Typhoon"));
+            Assert.That(typhoon.Delivery, Is.EqualTo(SkillDelivery.WeaponWhirl));
+            Assert.That(typhoon.NeedsMeleeWeapon, Is.True);
+            Assert.That(typhoon.NeedsBow, Is.False);
+            Assert.That(typhoon.IsChanneled, Is.True);
+            Assert.That(typhoon.Attack, Is.EqualTo(new AttackDefinition("Typhoon", 60f)));
+            Assert.That(typhoon.ManaCost, Is.Zero, "der Beginn kostet nichts, bezahlt wird je Sekunde");
+            Assert.That(typhoon.CooldownSec, Is.Zero);
+            Assert.That(typhoon.Channel, Is.EqualTo(new ChannelSettings(3f, 1f)));
+            Assert.That(typhoon.Sweep, Is.EqualTo(new SweepSettings(360f, 1.25f)));
+            Assert.That(GameData.PlayerSkill("cleave").Channel, Is.Null, "nur der Wirbel kanalisiert");
+            Assert.That(GameData.PlayerSkill("cleave").Sweep, Is.EqualTo(new SweepSettings(180f, 1.5f)));
+            Assert.That(typhoon.Scatter, Is.Null);
+            Assert.That(typhoon.Rain, Is.Null);
+            Assert.That(typhoon.Charge, Is.Null);
+        });
+    }
 }

@@ -99,7 +99,7 @@ public abstract partial class SkillResource : Resource
         Delivery = Delivery,
         Projectile = Delivery == SkillDelivery.Projectile ? new ProjectileSettings(ProjectileSpeed, ProjectileLifetimeSec, ForkCount, ForkGenerations, ForkRange) : null,
         Area = Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint ? new AreaSettings(AreaRadius, AreaExpansionSec, AreaDelaySec) : null,
-        Sweep = Delivery == SkillDelivery.WeaponSweep ? new SweepSettings(SweepArcDegrees, SweepRangeFactor) : null
+        Sweep = Delivery is SkillDelivery.WeaponSweep or SkillDelivery.WeaponWhirl ? new SweepSettings(SweepArcDegrees, SweepRangeFactor) : null
     };
 
     public string NameOrId => string.IsNullOrWhiteSpace(DisplayName) ? Id : DisplayName;
@@ -113,7 +113,7 @@ public abstract partial class SkillResource : Resource
         var fits = !ProjectileFields.Contains(name) && !AreaFields.Contains(name) && !SweepFields.Contains(name) ||
                    (ProjectileFields.Contains(name) && Delivery == SkillDelivery.Projectile) ||
                    (AreaFields.Contains(name) && Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint) ||
-                   (SweepFields.Contains(name) && Delivery == SkillDelivery.WeaponSweep);
+                   (SweepFields.Contains(name) && Delivery is SkillDelivery.WeaponSweep or SkillDelivery.WeaponWhirl);
 
         if (!fits)
             HideInInspector(property);
