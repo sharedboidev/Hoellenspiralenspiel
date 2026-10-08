@@ -388,6 +388,7 @@ public partial class Enemy : BaseUnit
 
         brain.Die();
         EndAttackLook();
+        ShatterIfBrittle();
         StatusEffects.Clear();
 
         Velocity = Vector3.Zero;

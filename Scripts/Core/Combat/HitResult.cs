@@ -34,6 +34,9 @@ public sealed record HitResult
 
     public PerElement<StatusEffectApplication> AddedEffects { get; init; }
 
+    //Was der Treffer löst, bevor sein Schaden zählt, etwa Brittle durch Feuer. Nur bei einem gelandeten Treffer gesetzt
+    public IReadOnlyList<StatusEffectKind> RemovedEffects { get; init; } = [];
+
     public bool HasLanded => Avoidance == HitAvoidance.None;
 
     //Der Zusatzschaden ist immer elementar, physisch kann nur der Hauptteil sein. Aus ihm saugt Leech

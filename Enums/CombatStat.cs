@@ -165,5 +165,9 @@ public enum CombatStat
 
     //Weitere Sprünge für Skills, die von Ziel zu Ziel springen. Zusätzliche Projektile zählen für sie nicht
     [Description("Proliferate")]
-    Proliferate
+    Proliferate,
+
+    //Faktor auf physischen Schaden, den die Einheit nimmt, auch über Zeit. Brittle gibt ihn als More-Modifier
+    [Description("Physical Damage taken")]
+    PhysicalDamageTaken
 }

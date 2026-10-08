@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Units/StatusLooks/BrittleCrust.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_ice_crust.gdshader" id="2_crust"]
+[ext_resource type="PackedScene" path="res://Scenes/Units/StatusLooks/ice_spike.tscn" id="3_spike"]
+
+[sub_resource type="ShaderMaterial" id="Mat_crust"]
+render_priority = 1
+shader = ExtResource("2_crust")
+
+[node name="BrittleCrust" type="Node3D"]
+script = ExtResource("1_script")
+CrustMaterial = SubResource("Mat_crust")
+SpikeScene = ExtResource("3_spike")

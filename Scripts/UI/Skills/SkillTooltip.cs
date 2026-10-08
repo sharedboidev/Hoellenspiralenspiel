@@ -3,7 +3,9 @@ using Godot;
 using Hoellenspiralenspiel.Interfaces;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
+using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Skills;
 
@@ -29,8 +31,14 @@ public static class SkillTooltip
 
         if (!SkillGate.FitsWeapon(skill.Definition, caster.Weapon.IsRanged))
             text.Append(skill.Definition.NeedsBow ? "[color=red]Needs a bow[/color]" : "[color=red]Needs a melee weapon[/color]").Append(NewLine);
-        text.Append($"[color=orange]DPS: {Format(estimate.Dps)}[/color]").Append(NewLine);
-        text.Append($"Average Hit: {Format(estimate.AverageHit)}{(skill.Definition.IsCharged ? " at full charge" : string.Empty)}").Append(NewLine);
+
+        if (skill.Definition.Cloud is { } cloud)
+            AppendCloud(text, cloud);
+        else
+        {
+            text.Append($"[color=orange]DPS: {Format(estimate.Dps)}[/color]").Append(NewLine);
+            text.Append($"Average Hit: {Format(estimate.AverageHit)}{(skill.Definition.IsCharged ? " at full charge" : string.Empty)}").Append(NewLine);
+        }
 
         if (skill.Definition.IsCharged)
             AppendCharge(text, skill.Definition, ChargeSettings.GetRateFactor(caster.Stats));
@@ -44,7 +52,9 @@ public static class SkillTooltip
         if (skill.Definition.Chain is { } chain)
             text.Append($"Jumps: {chain.GetJumps(ChainSettings.GetProliferate(caster.Stats))}, each {chain.FalloffPercent:0.#}% less damage").Append(NewLine);
 
-        text.Append($"Crit Chance: {estimate.CriticalHitChance:0.#}%").Append(NewLine);
+        if (skill.Definition.Cloud is null)
+            text.Append($"Crit Chance: {estimate.CriticalHitChance:0.#}%").Append(NewLine);
+
         text.Append($"{uses} per Second: {estimate.UsesPerSecond:0.##}");
 
         if (skill.Definition.IsChanneled)
@@ -62,6 +72,20 @@ public static class SkillTooltip
             text.Append(NewLine).Append($"Cooldown: {skill.CooldownSec:0.##} s");
 
         return text.ToString();
+    }
+
+    //Der Nebel macht selbst keinen Schaden. Er nennt Dauer, Größe und was sein Effekt bewirkt
+    private static void AppendCloud(StringBuilder text, CloudSettings cloud)
+    {
+        text.Append($"Mist: {cloud.DurationSec:0.#} s, radius {WorldScale.ToMeters(cloud.Radius):0.##} m growing by {cloud.GrowthPercent:0.#}%").Append(NewLine);
+
+        if (cloud.Effect == StatusEffectKind.Brittle)
+        {
+            text.Append($"[color=paleturquoise]Brittle[/color] for {CombatRules.BrittleDurationSec:0.#} s, renewed every {cloud.PulseSec:0.##} s inside").Append(NewLine);
+            text.Append($"Brittle enemies take {CombatRules.BrittlePhysicalDamageTaken * 100f:0}% more Physical Damage").Append(NewLine);
+            text.Append("Fire Damage removes Brittle before it counts").Append(NewLine);
+            text.Append($"Brittle enemies shatter on death for {CombatRules.BrittleShatterLifeFraction * 100f:0}% of their Life as Cold Damage").Append(NewLine);
+        }
     }
 
     public static string BuildNote(string title, string hint)

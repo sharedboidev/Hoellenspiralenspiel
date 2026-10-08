@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://no1ucmpu5qx"]
+
+[ext_resource type="Script" uid="uid://cbamyhsoiio5w" path="res://Scripts/Skills/Effects/SkillArea.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cn6o5g2hyxhdg" path="res://Scripts/Skills/Effects/ShardBurst.cs" id="2_shards"]
+[ext_resource type="Script" uid="uid://cxmmujavlob0l" path="res://Scripts/Skills/Effects/FrostRing.cs" id="3_ring"]
+[ext_resource type="Shader" uid="uid://c2lknp40isk5w" path="res://Shaders/Ps1/ps1_surface.gdshader" id="90_ps1"]
+
+[sub_resource type="TorusMesh" id="Mesh_line"]
+inner_radius = 0.975
+rings = 48
+ring_segments = 3
+
+[sub_resource type="ShaderMaterial" id="Mat_line"]
+render_priority = 0
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
+shader_parameter/emission = Color(0.3, 0.75, 1, 1)
+shader_parameter/emission_energy = 2.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(852, 480)
+shader_parameter/affine = 1.0
+
+[sub_resource type="ShaderMaterial" id="Mat_shard"]
+render_priority = 0
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0.55, 0.85, 1, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
+shader_parameter/emission = Color(0.3, 0.75, 1, 1)
+shader_parameter/emission_energy = 2.5
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(852, 480)
+shader_parameter/affine = 1.0
+
+[node name="BrittleShatter" type="Node3D" unique_id=936503639 node_paths=PackedStringArray("Visual", "Impact")]
+script = ExtResource("1_script")
+Visual = NodePath("Visual")
+Impact = NodePath("Visual/Impact")
+LingerSec = 0.25
+
+[node name="Visual" type="Node3D" parent="." unique_id=28227885]
+
+[node name="Line" type="MeshInstance3D" parent="Visual" unique_id=1725515125]
+transform = Transform3D(1, 0, 0, 0, 0.2, 0, 0, 0, 1, 0, 0.03, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_line")
+surface_material_override/0 = SubResource("Mat_line")
+
+[node name="Crystals" type="Node3D" parent="Visual" unique_id=1699813852]
+script = ExtResource("3_ring")
+Material = SubResource("Mat_shard")
+
+[node name="Impact" type="Node3D" parent="Visual" unique_id=343535943]
+
+[node name="Flash" type="OmniLight3D" parent="Visual/Impact" unique_id=1951880499]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+light_color = Color(0.6, 0.85, 1, 1)
+light_energy = 4.0
+omni_range = 6.0
+
+[node name="Shards" type="Node3D" parent="." unique_id=85021918]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+script = ExtResource("2_shards")
+Material = SubResource("Mat_shard")
+Count = 50

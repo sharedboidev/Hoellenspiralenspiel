@@ -3769,6 +3769,84 @@ Bewusst offen gelassen:
 - Gegner mit dem Blitz sind nicht geprüft. Die Lieferung fragt nur die Fraktion, ein Gegner könnte ihn über `CastSkillAction` wirken.
 - Die DPS im Tooltip zählen nur das erste Ziel, die Sprünge treffen andere Gegner.
 
+#### Skill 7: Brittle Mist und Brittle
+
+Umgesetzt am 08.10.2026 auf `master_BrittleMist`, abgezweigt von `81073a9`, wartet auf Rückmeldung des Users. Wunsch des Users: "Brittle Mist. Bei Auslösen wird unter der Maus in einem runden, größeren Bereich ein eisiger Nebel erzeugt. Dieser Nebel bleibt 6 s lang bestehen und breitet sich in der Zeit um 25 % aus. Gegner, die den Nebel berühren, erhalten einen Brittle-Debuff (ein grundlegendes Buff/Debuff-System kann hier geschaffen werden). Der Brittle-Debuff zeigt auf der betroffenen Einheit eine eisige Kruste mit ein paar Eiszacken. Einheiten mit Brittle erleiden 30 % mehr physischen Schaden. Der Debuff hält 3 s an und wird jede halbe Sekunde erneuert, die eine Einheit im Nebel steht. Bekommt eine Einheit mit Brittle Feuerschaden, wird Brittle entfernt, bevor der Multiplikator von 30 % mehr Schaden greifen kann." Gleich danach ergänzt: "Wenn eine Einheit mit Brittle getötet wird, explodiert sie für 15 % ihrer Max HP an AoE-Schaden als Cold Damage."
+
+Getroffene Entscheidungen des Users vom 08.10.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| Größe und Kosten | 3 m Radius, der in 6 s um 25 % auf 3,75 m wächst. 8 Mana, 0,5 s Wirkzeit, 6 s Abklingzeit, keine Reichweitengrenze, der Nebel liegt direkt unter der Maus. Er macht selbst keinen Schaden |
+| Mehrere Nebel | Beliebig viele zugleich. Überlappen sie, frischt Brittle trotzdem nur auf 3 s auf, es stapelt sich nicht |
+| Feuer | Jeder Treffer mit Feuer, auch zusätzlicher Feuerschaden auf einem Waffenschlag, löst Brittle, bevor gerechnet wird. Der ganze Treffer bekommt dann keine 30 %. Ticks von Burn lösen Brittle auch. Bleed bekommt die 30 % als physischer Schaden mit. "Chance to Avoid Ailments" schützt auch vor Brittle |
+| Explosion | 2 m um den Rand des Toten, 15 % seines Lebens als Kälte. Sie wächst mit dem Helden wie ein Zauber, kann mit seiner Chance kritisch treffen, verfehlt aber nicht. Die Frostresistenz der Getroffenen mindert sie, Chill löst sie aus. Stirbt ein anderer mit Brittle daran, zerspringt er ebenfalls. Kills und Beute gehen an den Helden |
+
+- Erledigt: Brittle als neuer Statuseffekt im vorhandenen System, `StatusEffectKind.Brittle` (am Ende angehängt, Wert 4). Stapelt nach der stärksten Instanz, eine neue Auflage ersetzt die ältere und läuft wieder volle 3 s. Werte in `CombatRules`: `BrittlePhysicalDamageTaken` 0,3, `BrittleDurationSec` 3, `BrittleShatterLifeFraction` 0,15.
+- Erledigt: Das Status-System als Grundlage für Buffs und Debuffs ausgebaut. `StatusEffectRule.RemovedBy` nennt eine Schadensart, die den Effekt löst. `StatusEffectApplication.Source` trägt den Urheber, `StatusEffectTracker.GetSource` liefert den der zuletzt aufgefrischten Instanz. `Remove` und `RemoveAllRemovedBy` lösen Effekte. `StatusEffectRules.CreateApplication` baut Effekte ohne Treffer (Shock, Chill, Brittle). `BaseUnit.TryApplyStatusEffect` würfelt die Ailment-Vermeidung für jeden Effekt, auch für einen aus einem Nebel.
+- Erledigt: Der neue Stat `CombatStat.PhysicalDamageTaken` (am Ende angehängt, Wert 71), Brittle gibt ihn als More-Modifier. `Defences.GetDamageTakenFactor` setzt ihn nach Rüstung und physischer Schadensminderung auf jeden physischen Teil eines Treffers. Bleed wächst im Tracker mit demselben Faktor.
+- Erledigt: Feuer vor dem Mehrschaden. `HitRequest.Deals` sagt, ob Hauptteil oder Zusatzschaden eine Schadensart haben. `HitResolver` fragt `StatusEffectRules.GetRemovedBy` und rechnet den Faktor mit `StatSheet.GetTotalMultiplierWithout`, also ohne die Modifier der gelösten Effekte. `HitResult.RemovedEffects` nennt sie, nur bei einem gelandeten Treffer. `BaseUnit.ReceiveDamage` löst sie, bevor der Schaden ankommt. Wer an einem Feuertreffer stirbt, zerspringt deshalb nicht. Ein Tick von Burn löst Brittle im Tracker.
+- Erledigt: Eine neue Lieferung `SkillDelivery.LingeringCloud` (am Ende angehängt, Wert 10) mit `CloudSettings` im Kern: Radius, Dauer, Wachstum, Puls und Effekt. `GetRadiusAfter` wächst gleichmäßig bis zum Ende der Dauer, `IsDue` sagt, wann ein Gegner den Effekt wieder bekommt. Der Effekt `LingeringCloud` (`Scripts/Skills/Effects/LingeringCloud.cs`) gibt jedem Gegner, der den Nebel berührt, sofort den Effekt und danach je Puls, gemessen ab dem Rand des Körpers. Ein vermiedener Effekt zählt als Puls, der nächste Wurf kommt eine halbe Sekunde später. Nach der Dauer gibt der Nebel nichts mehr und verflüchtigt sich in 1,5 s nach oben: Er steigt um 1,2 m, weitet sich um 30 % und verschwindet von unten nach oben.
+- Erledigt: Brittle Mist als `Resources/Skills/Player/brittle_mist.tres`, eine `SpellSkillResource` ohne Schaden. Die Szene `Scenes/Skills/brittle_mist.tscn`: acht übereinander gestapelte Scheiben von 0,05 bis 1,68 m Höhe mit dem neuen Shader `ps1_mist.gdshader`, dazu ein blasses Licht. Jede Scheibe ist ein Schnitt durch dieselbe Wolke: Das Rauschen kommt aus der Weltlage in allen drei Achsen und treibt langsam aufwärts, so wirken die Schnitte zusammen wie ein Volumen. Bis 1,8 m wird die Wolke schmaler und dünner, eine Kuppel, und jede Scheibe wogt bis 0,25 m auf und ab. Die Dichte ist in vier Stufen abgestuft. Durchscheinend, so bleibt der Umriss der Figuren unberührt.
+- Erledigt: Das Zerspringen als `Resources/Skills/Effects/brittle_shatter.tres`, eine Fläche aus Kälte mit 2 m Radius und 10 % Krit, Szene `Scenes/Skills/brittle_shatter.tscn` mit einer dünnen türkisen Frostlinie am Rand, einem Kranz aus 44 kleinen, schräg nach außen stehenden Eiskristallen (`FrostRing`, `Scripts/Skills/Effects/FrostRing.cs`, dieselbe Form wie die Splitter, gleicht die Streckung der wachsenden Fläche aus und schrumpft am Ende weg), Blitzlicht und `ShardBurst` (`Scripts/Skills/Effects/ShardBurst.cs`): 36 scharfkantige Splitter, unregelmäßige Doppelpyramiden mit drei Kanten, meist klein, wenige mittelgroß, fliegen in 0,45 bis 0,8 s im Bogen vom Toten weg, drehen sich, prallen kurz am Boden ab und schrumpfen weg. Sie treffen nichts und hängen sich an den Level, damit sie die kürzer lebende Fläche überdauern. `BrittleShatter.CreateRequest` im Kern macht daraus einen Zauber mit 15 % des Lebens des Toten über `HitRequests.ForSpell` und mindestens 100 % Trefferchance. `SkillExecutor.Shatter` wirft die Fläche am Toten, ihr Radius zählt ab seinem Rand. `Enemy.BeginDeath` ruft `BaseUnit.ShatterIfBrittle` vor dem Löschen der Effekte.
+- Erledigt: Das Aussehen der Effekte. `StatusLook` (`Scripts/Units/StatusLooks/`) ist die Basis einer Szene, die an der Einheit hängt, solange ihr Effekt läuft. `BaseUnit` hängt sie bei `Started` an und nimmt sie bei `Ended` ab. Brittle zeigt `BrittleCrust` (`Scenes/Units/StatusLooks/brittle_crust.tscn`): ein Overlay mit dem neuen Shader `ps1_ice_crust.gdshader` über jedem Netz der Einheit, durchscheinend, zur Kante heller, mit Rissen entlang der UV, einen Hauch außen aufliegend und auf demselben Raster wie der Körper. Dazu sieben Eiszacken (`ice_spike.tscn`), die in 0,15 s wachsen. Bei einem Modell mit Skelett hängt jede an einem zufälligen Knochen und folgt der Animation, sonst steht sie am Körper. Endet Brittle, schmelzen sie in 0,2 s.
+- Erledigt: Der Tooltip nennt bei einem Nebel statt DPS und Krit seine Dauer, Radius und Wachstum, dazu Brittle mit Dauer, Puls, Mehrschaden, Feuer und Zerspringen. Die Schadenszahl zeigt "Brittle" in Blasstürkis.
+- Zusätzlich: Ein Platzhalter-Icon unter `Textures/Skills/Icons/brittle_mist.png`, ein Eiskristall über Nebel.
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Startbelegung | Alle zehn Plätze sind belegt. Brittle Mist liegt nicht in der Startbelegung, der Spieler legt ihn per Rechtsklick auf einen Platz |
+| Werte von Brittle | Stehen in `CombatRules` wie die von Chill und Shock, nicht im Nebel. So gilt Brittle aus jeder künftigen Quelle gleich. Nur Größe, Dauer, Wachstum und Puls des Nebels stehen in der Resource |
+| Zerspringen und Zauberschaden | Die Explosion rechnet über `HitRequests.ForSpell`. Neben Elementar- und Kälteschaden erhöht sie also auch Zauberschaden, und "Adds X to Y Cold Damage to Spells" kommt flach dazu |
+| Krit der Explosion | 10 % Grundchance aus `brittle_shatter.tres`, erhöht mit der Krit-Chance des Helden für Zauber |
+| Ausweichen | Die Explosion verfehlt nicht, Ausweichen, Spell Parry und Spell Block gelten für sie wie für jeden Zauber |
+| Urheber tot | Stirbt der Held, gehört die Explosion ihm weiter. Ist seine Einheit freigegeben, zerspringt niemand |
+| Der Held | Brittle Mist trifft nur die andere Fraktion. Der Held kann Brittle bisher nicht bekommen, die Regeln gälten für ihn aber genauso. Nur `Enemy` zerspringt beim Tod |
+| Feuer verfehlt | Ein verfehlter oder ausgewichener Treffer mit Feuer löst Brittle nicht |
+| Ton | Keiner, wie bei den anderen neuen Skills. Er kommt mit Etappe 13 von M8 |
+
+Neue Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| `SkillResource`, Gruppe Cloud, nur bei `LingeringCloud` | `CloudRadius` | 300 | Radius am Anfang in Pixeln |
+| | `CloudDurationSec` | 6 | So lange liegt der Nebel |
+| | `CloudGrowthPercent` | 25 | So viel wächst der Radius bis zum Ende |
+| | `CloudPulseSec` | 0,5 | So oft bekommt jeder darin den Effekt erneut |
+| | `CloudEffect` | Brittle | Der Effekt, den der Nebel gibt. Effekte mit Schaden über Zeit gehen nicht, sie brauchen einen Treffer |
+| `brittle_mist.tscn` (`LingeringCloud`) | `FadeInSec`, `FadeOutSec` | 0,3, 1,5 | Aufziehen und Auflösen |
+| `ps1_mist.gdshader` | `color`, `opacity`, `noise_scale`, `drift`, `coverage`, `edge`, `steps` | blassblau, 0,36, 0,9, (0,12, 0,08, 0,05), 0,65, 0,35, 4 | Farbe, Deckkraft je Scheibe, Flecken je Meter, Treiben in drei Achsen, Anteil mit Nebel, Breite des Rands, Stufen der Dichte |
+| | `top_height`, `top_width`, `top_density`, `wobble`, `wobble_speed` | 1,8, 0,6, 0,45, 0,25, 0,35 | Höhe der Wolke, Breite und Dichte oben im Verhältnis zu unten, wie weit und wie schnell jede Scheibe wogt |
+| | `rise_height`, `rise_spread` | 1,2, 0,3 | So weit steigt die Wolke beim Auflösen und so viel weitet sie sich |
+| `brittle_crust.tscn` (`BrittleCrust`) | `SpikeCount`, `SpikeScale`, `GrowSec`, `MeltSec` | 7, 0,7 bis 1,3, 0,15, 0,2 | Zahl und Größe der Zacken, Wachsen und Schmelzen |
+| `ps1_ice_crust.gdshader` | `ice_color`, `rim_color`, `opacity`, `thickness`, `rim_power`, `crack_scale`, `crack_width` | | Farbe, Kante, Deckkraft, Abstand zum Körper, Risse |
+| `ice_spike.tscn` | Mesh | 0,42 m lang, 0,06 m Fußradius | Eine Zacke. Die erste Fassung mit 0,32 m und 0,035 m war im PS1-Bild kaum zu sehen |
+| `brittle_shatter.tscn` (`ShardBurst`) | `Count`, `LengthMeters`, `SpeedMeters`, `UpSpeedMeters`, `Gravity`, `LifetimeSec`, `StartHeight` | 36, 0,12 bis 0,45, 2,5 bis 6,5, 1,5 bis 4,5, 12, 0,45 bis 0,8, 0,8 | Zahl und Länge der Splitter, Tempo nach außen und oben, Fall, Lebensdauer, Höhe des Starts |
+| `brittle_shatter.tscn` (`FrostRing`) | `Count`, `LengthMeters`, `TiltDegrees`, `RadiusShare`, `LifetimeSec`, `ShrinkSec` | 44, 0,1 bis 0,28, 20 bis 60, 0,85 bis 1, 0,4, 0,15 | Zahl und Länge der Kristalle im Kranz, wie steil sie stehen, wie weit innen, Lebensdauer passend zur Fläche, Schrumpfen am Ende |
+
+Ein neuer Nebel mit anderem Effekt, etwa Chill: eine `SpellSkillResource` mit `Delivery` LingeringCloud, den Feldern der Gruppe Cloud und einer Szene mit `LingeringCloud`. Ein neues Aussehen für einen Effekt: eine Szene, deren Wurzel von `StatusLook` erbt, und eine Zeile in `StatusLook.ScenePaths`.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen im Spiel |
+| Unit-Tests | 20 neue: 30 % mehr physischer Schaden, Crush und Pierce eingeschlossen; Kälte unverändert; Bleed wächst mit; ein Feueranteil löst Brittle vor dem Mehrschaden; ohne Feuer und bei verfehltem Feuer löst nichts; ein Tick von Burn löst Brittle; Feuer löst nur, was es nennt; Brittle hält 3 s und frischt auf; Urheber ist der zuletzt aufgefrischte; Effekte ohne Treffer; die Explosion macht 15 % des Lebens als Kälte, wächst mit dem Helden und verfehlt nicht; der Faktor ohne eine Herkunft; der Nebel wächst um ein Viertel, ohne Wachstum und Dauer, endet nach 6 s, pulst jede halbe Sekunde; die Werte aus `brittle_mist.tres` und `brittle_shatter.tres`. Zusammen 1953, alle grün |
+| Laufendes Spiel, headless | 42 Prüfungen im Hub, `Hero.UseSkill` mit festem Zielpunkt, ruhige Skelette mit 5000 Leben. 8 Mana und 6 s Abklingzeit bezahlt. Der Nebel liegt nach der halben Wirkzeit am Zielpunkt. Skelette darin sind Brittle, eins außerhalb nicht, eins mit 100 % Ailment-Vermeidung nicht, der Held im eigenen Nebel nicht. Urheber ist der Held. Kruste als Overlay auf dem Körper, sieben Zacken an Knochen. Pierce 130 gegen 100, Kälte 100 gegen 100. Ein Treffer mit 10 Feuer löst Brittle sofort, der physische Teil bleibt bei 100, die Kruste schmilzt, der nächste Puls legt Brittle wieder. Ein Skelett stirbt mit Brittle: drei Explosionen, die Kette läuft von A über D zu E, der Nachbar bekommt genau den erwarteten Schaden (784,7 aus 5118 Leben mit dem Zauberschaden des Helden), ein Unbeteiligter neben A wird getroffen, einer weit weg nicht, die Kills gehören dem Helden. Wer am Feuer stirbt, zerspringt nicht. Der Nebel ist nach knapp 3 s auf 3,35 m gewachsen, verschwindet nach 6 s, Brittle hält danach noch bis zu 3 s, dann sind Kruste, Zacken und Overlay weg. Keine Warnungen im Log |
+| Laufendes Spiel, Fenster | Derselbe Lauf mit Bildern: der Nebel als blasse, treibende Scheibe, Skelette mit Brittle eisig weiß-blau mit Zacken, Ring und Splitter der Explosion. Die Shader kompilieren ohne Fehler |
+| Spielstand | Die Probe lief in einem Worktree mit eigenem Spielstand und eigener Einstellungsdatei, beides ist wieder gelöscht, der Spielstand des Users blieb unberührt. Die Probe ist wieder gelöscht |
+
+Bewusst offen gelassen:
+
+- Nach dem ersten Anspielen sah der Nebel aus wie eine Pfütze, weil er nur aus zwei flachen Scheiben bestand. Auf Wunsch des Users ("muss voluminöser wirken und deutlich über dem Boden wabern") am selben Tag zum Stapel aus acht Scheiben mit Kuppel und Wogen umgebaut, Farbe und Schimmer blieben. Danach noch: Am Ende sank der Nebel scheinbar in den Boden, weil die dünnere Spitze beim gleichmäßigen Ausblenden zuerst verschwand. Jetzt steigt er beim Auflösen auf, die Spitze behält ihre Dichte, und er verschwindet von unten nach oben. Zuletzt war die Explosion zu klobig ("statt riesen, fetter Stachel viele kleine und mittelgroße, scharfkantige Splitter, die von der toten Unit weg-explodieren"): Die acht gestreckten Zacken sind durch `ShardBurst` ersetzt. Die erste Fassung mit 0,08 bis 0,32 m langen, blassen Splittern ging vor dem hellen Nebel unter, darum sind sie jetzt bis 0,45 m lang und kräftiger türkis. Danach war noch der dicke, sich ausbreitende Ring zu klobig: Er ist jetzt eine dünne Linie mit einem Kranz kleiner Kristalle (`FrostRing`) in Form und Farbe der Splitter.
+- Das Aussehen ist ein erster Wurf. Farben, Dichte und Zacken stellt der User im Inspector und in den Shadern ein.
+- Das Icon ist ein gezeichneter Platzhalter, bis der User ein eigenes liefert.
+- Eine Anzeige der Buffs und Debuffs des Helden in der Oberfläche gibt es noch nicht. Bisher zeigt nur die Einheit selbst ihren Effekt.
+- Gegner mit Brittle Mist sind nicht geprüft. Die Lieferung fragt nur die Fraktion, ein Gegner könnte den Nebel über `CastSkillAction` legen.
+- Die DPS im Tooltip zählen den Mehrschaden von Brittle nicht.
+
 ### M9: Inhalt und Politur (L, fortlaufend)
 
 - Die übrigen acht Kreise nach dem Muster aus M8.

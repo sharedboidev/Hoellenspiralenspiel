@@ -22,5 +22,8 @@ public enum SkillDelivery
     WeaponWhirl,
 
     //Ein Blitz ohne Flugzeit vom Wirkenden zum Ziel, der von dort auf weitere Gegner springt
-    ChainBeam
+    ChainBeam,
+
+    //Ein Nebel unter der Maus, der eine Weile liegt, dabei wächst und jedem Gegner darin immer wieder einen Effekt gibt. Er macht keinen Schaden
+    LingeringCloud
 }

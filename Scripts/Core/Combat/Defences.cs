@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Hoellenspiralenspiel.Enums;
+using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 using Hoellenspiralenspiel.Scripts.Core.Stats;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Combat;
@@ -27,6 +30,21 @@ public static class Defences
         ArgumentNullException.ThrowIfNull(defender);
 
         return Math.Clamp(defender.GetFinal(CombatStat.Damagereduction), 0f, CombatRules.MaxPhysicalDamageReduction);
+    }
+
+    //Brittle und Ähnliches heben den physischen Schaden, den die Einheit nimmt. Ein Treffer, der einen Effekt löst, zählt dessen Anteil nicht mehr
+    public static float GetDamageTakenFactor(StatSheet defender, DamageType damageType, IReadOnlyList<StatusEffectKind> removedEffects = null)
+    {
+        ArgumentNullException.ThrowIfNull(defender);
+
+        if (!damageType.IsPhysical())
+            return 1f;
+
+        var factor = removedEffects is { Count: > 0 }
+                ? defender.GetTotalMultiplierWithout(CombatStat.PhysicalDamageTaken, removedEffects.Select(StatusEffectRules.GetOriginId).ToArray())
+                : defender.GetTotalMultiplier(CombatStat.PhysicalDamageTaken);
+
+        return Math.Max(0f, factor);
     }
 
     //Ein Krit macht seinen Zusatzschaden, "You take 50% reduced Extra Damage from Critical Strikes" halbiert ihn

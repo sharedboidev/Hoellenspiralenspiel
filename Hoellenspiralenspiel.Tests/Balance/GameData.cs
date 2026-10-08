@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 using Hoellenspiralenspiel.Scripts.Core.Enemies;
 using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
@@ -38,6 +39,10 @@ internal static class GameData
 
     public static SkillDefinition PlayerSkill(string id)
         => Skill($"res://Resources/Skills/Player/{id}.tres");
+
+    //Skills, die kein Spieler wählt, sondern ein Effekt auslöst, etwa das Zerspringen mit Brittle
+    public static SkillDefinition EffectSkill(string id)
+        => Skill($"res://Resources/Skills/Effects/{id}.tres");
 
     public static MonsterModDefinition PoolMod(string id)
         => Mod($"res://Resources/MonsterMods/Pool/{id}.tres");
@@ -204,6 +209,13 @@ internal static class GameData
                                         values.Float("ChainJumpRange", 500f),
                                         values.Int("ChainJumps", 2),
                                         values.Float("ChainFalloffPercent", 25f))
+                    : null,
+            Cloud = delivery == SkillDelivery.LingeringCloud
+                    ? new CloudSettings(values.Float("CloudRadius", 300f),
+                                        values.Float("CloudDurationSec", 6f),
+                                        values.Float("CloudGrowthPercent", 25f),
+                                        values.Float("CloudPulseSec", 0.5f),
+                                        values.Enum("CloudEffect", StatusEffectKind.Brittle))
                     : null
         };
     }

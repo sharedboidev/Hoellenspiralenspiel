@@ -4,6 +4,7 @@ using Godot;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Skills.Effects;
@@ -42,8 +43,12 @@ public static class SkillExecutor
     //Der Blitz verlässt den Wirkenden in dieser Höhe und trifft die Mitte des Körpers
     private const float ChainStartHeightShare = 0.7f;
 
+    public const string BrittleShatterPath = "res://Resources/Skills/Effects/brittle_shatter.tres";
+
     private static readonly List<BaseUnit> UnitsInReach = new();
     private static readonly List<BaseUnit> ChainLinks   = new();
+
+    private static SkillResource brittleShatter;
 
     //chargePercent zählt nur für einen geladenen Schuss: So weit war er beim Loslassen geladen
     public static void Execute(SkillExecutionDefinition executionDefinition, float chargePercent = 0f)
@@ -103,7 +108,57 @@ public static class SkillExecutor
                 ChainBeam(executionDefinition);
 
                 break;
+            case SkillDelivery.LingeringCloud:
+                LaunchCloud(executionDefinition, executionDefinition.SkillAim.CurrentPoint);
+
+                break;
         }
+    }
+
+    //Eine Einheit mit Brittle zerspringt beim Tod: eine Fläche um sie, ab ihrem Rand gemessen, mit einem Anteil ihres Lebens als Kälte.
+    //Sie gehört dem, der Brittle gelegt hat, Kills und Beute gehen an ihn. Wer daran mit Brittle stirbt, zerspringt ebenfalls
+    public static void Shatter(BaseUnit source, BaseUnit victim)
+    {
+        brittleShatter ??= ResourceLoader.Load<SkillResource>(BrittleShatterPath);
+
+        if (brittleShatter?.Definition is not { Spell: { } spell, Area: { } area })
+        {
+            GD.PushWarning($"{BrittleShatterPath} ist kein Zauber mit Fläche.");
+
+            return;
+        }
+
+        var request = BrittleShatter.CreateRequest(source.Stats, spell, victim.LifeMaximum);
+
+        var executionDefinition = new SkillExecutionDefinition(source, brittleShatter, new SkillAim(victim.GlobalPosition))
+        {
+            Cast = new SkillCast(source, request),
+            Area = area with { Radius = area.Radius + victim.BodyRadiusPx }
+        };
+
+        LaunchArea(executionDefinition, victim.GlobalPosition);
+    }
+
+    private static void LaunchCloud(SkillExecutionDefinition executionDefinition, Vector3 center)
+    {
+        var scene    = executionDefinition.EffectScene;
+        var caster   = executionDefinition.Caster;
+        var settings = executionDefinition.SkillDefinition.Cloud;
+
+        if (scene is null || settings is null)
+        {
+            GD.PushWarning($"{caster.Name} hat keinen Nebel für seinen Skill.");
+
+            return;
+        }
+
+        var cloud = scene.Instantiate<LingeringCloud>();
+
+        cloud.Launch(caster, settings);
+
+        caster.GetParent().AddChild(cloud);
+
+        cloud.GlobalPosition = WorldScale.OnGround(center);
     }
 
     //Der Blitz springt ohne Flugzeit vom Wirkenden zum ersten Ziel und von dort zum nächsten Gegner, den er noch nicht getroffen hat.

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="SpellSkillResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Skills/SpellSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" path="res://Textures/Skills/Icons/brittle_mist.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/brittle_mist.tscn" id="3_scene"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "brittle_mist"
+DisplayName = "Brittle Mist"
+Description = "Conjures an icy mist under the cursor. It lingers for 6 seconds and spreads by a quarter. Enemies touching it become Brittle: they take more Physical Damage and shatter in a burst of cold when they die. Fire Damage melts Brittle away."
+Icon = ExtResource("2_icon")
+ManaCost = 8.0
+CooldownSec = 6.0
+Delivery = 10
+EffectScene = ExtResource("3_scene")
+CloudRadius = 300.0
+CloudDurationSec = 6.0
+CloudGrowthPercent = 25.0
+CloudPulseSec = 0.5
+CloudEffect = 4
+MinDamage = 0.0
+MaxDamage = 0.0
+DamageType = 4
+CriticalHitChance = 0.0
+CastSec = 0.5

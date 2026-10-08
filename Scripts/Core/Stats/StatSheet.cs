@@ -63,6 +63,28 @@ public sealed class StatSheet
     public float GetTotalMultiplier(CombatStat stat)
         => GetIncreasedMultiplier(stat) * GetMoreMultiplier(stat);
 
+    //Derselbe Faktor, als fehlten die Modifier dieser Herkunft. Ein Sammel-Stat zählt nicht mit, er ist hier nie gemeint
+    public float GetTotalMultiplierWithout(CombatStat stat, IReadOnlyCollection<string> originIds)
+    {
+        ArgumentNullException.ThrowIfNull(originIds);
+
+        var increasedSum = increased[(int)stat];
+        var moreProduct  = more[(int)stat];
+
+        foreach (var modifier in modifiers)
+        {
+            if (modifier.AffectedStat != stat || !originIds.Contains(modifier.OriginId))
+                continue;
+
+            if (modifier.ModificationType == ModificationType.Percentage)
+                increasedSum -= modifier.Value;
+            else if (modifier.ModificationType == ModificationType.More && !(1 + modifier.Value).Equals(0f))
+                moreProduct /= 1 + modifier.Value;
+        }
+
+        return (1 + increasedSum) * moreProduct;
+    }
+
     public float GetFinal(CombatStat stat)
         => finalValues[(int)stat];
 

@@ -6,7 +6,8 @@ using Hoellenspiralenspiel.Scripts.Core.Stats;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 
-public sealed record StatusEffectRule(StatusEffectKind Kind, StackingRule Stacking, int MaxInstances, bool DealsDamage);
+//RemovedBy: Schaden dieser Art löst den Effekt, bevor er den Treffer verstärkt
+public sealed record StatusEffectRule(StatusEffectKind Kind, StackingRule Stacking, int MaxInstances, bool DealsDamage, DamageType? RemovedBy = null);
 
 //Ein Effekt mit Schaden über Zeit: welche Schadensart ihn auslöst und welcher Anteil des Treffers über welche Dauer wirkt.
 //Bleed rechnet mit dem Schaden vor der Rüstung, Burn mit dem nach der Resistenz
@@ -19,8 +20,11 @@ public static class StatusEffectRules
         new(StatusEffectKind.Bleed, StackingRule.Sum, int.MaxValue, true),
         new(StatusEffectKind.Burn, StackingRule.Sum, CombatRules.BurnMaxStacks, true),
         new(StatusEffectKind.Shock, StackingRule.Strongest, int.MaxValue, false),
-        new(StatusEffectKind.Chill, StackingRule.Strongest, int.MaxValue, false)
+        new(StatusEffectKind.Chill, StackingRule.Strongest, int.MaxValue, false),
+        new(StatusEffectKind.Brittle, StackingRule.Strongest, int.MaxValue, false, DamageType.Fire)
     ];
+
+    private static readonly StatusEffectKind[] NoKinds = [];
 
     //Ein neuer Effekt mit Schaden über Zeit braucht hier eine Zeile und in Rules DealsDamage. Der Multiplikator des Angreifers,
     //die Schätzung im Tooltip und die Treffer greifen dann von selbst
@@ -38,6 +42,35 @@ public static class StatusEffectRules
 
     public static DamageOverTimeRule FindDamageOverTime(DamageType trigger)
         => Array.Find(DamageOverTimeRules, rule => rule.Trigger == trigger);
+
+    public static DamageOverTimeRule FindDamageOverTime(StatusEffectKind kind)
+        => Array.Find(DamageOverTimeRules, rule => rule.Kind == kind);
+
+    //Die Effekte, die ein Treffer mit dieser Schadensart löst, egal ob die Einheit sie gerade hat
+    public static IReadOnlyList<StatusEffectKind> GetRemovedBy(HitRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        List<StatusEffectKind> removed = null;
+
+        foreach (var rule in Rules)
+        {
+            if (rule.RemovedBy is { } damageType && request.Deals(damageType))
+                (removed ??= new List<StatusEffectKind>()).Add(rule.Kind);
+        }
+
+        return removed ?? (IReadOnlyList<StatusEffectKind>)NoKinds;
+    }
+
+    //Was eine Fläche oder ein Skill ohne Treffer legt. Effekte mit Schaden über Zeit hängen am Schaden eines Treffers und fehlen hier
+    public static StatusEffectApplication CreateApplication(StatusEffectKind kind, object source = null)
+        => kind switch
+        {
+            StatusEffectKind.Shock   => new StatusEffectApplication(kind, CombatRules.ShockActionFailureChance, CombatRules.ShockDurationSec) { Source = source },
+            StatusEffectKind.Chill   => new StatusEffectApplication(kind, CombatRules.ChillSlow, CombatRules.ChillDurationSec) { Source = source },
+            StatusEffectKind.Brittle => new StatusEffectApplication(kind, CombatRules.BrittlePhysicalDamageTaken, CombatRules.BrittleDurationSec) { Source = source },
+            _                        => null
+        };
 
     //Erhöhter Schaden über Zeit addiert sich, der Multiplikator ist ein More-Modifier
     public static float GetDamageOverTimeMultiplier(StatSheet attacker)
@@ -91,11 +124,18 @@ public static class StatusEffectRules
 
     public static IReadOnlyList<CombatStatModifier> GetModifiers(StatusEffectKind kind, float magnitude)
     {
-        if (kind != StatusEffectKind.Chill || magnitude <= 0)
+        if (magnitude <= 0)
             return [];
 
         var originId = GetOriginId(kind);
-        var slow     = -Math.Min(magnitude, 1f);
+
+        if (kind == StatusEffectKind.Brittle)
+            return [new CombatStatModifier(CombatStat.PhysicalDamageTaken, ModificationType.More, magnitude, originId)];
+
+        if (kind != StatusEffectKind.Chill)
+            return [];
+
+        var slow = -Math.Min(magnitude, 1f);
 
         return
         [

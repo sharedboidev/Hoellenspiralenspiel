@@ -31,6 +31,11 @@ public static class CombatRules
     public const float ChillSlow        = 0.3f;
     public const float ChillDurationSec = 3f;
 
+    //Brittle: so viel mehr physischen Schaden nimmt die Einheit. Stirbt sie damit, zerspringt sie für diesen Anteil ihres Lebens als Kälte
+    public const float BrittlePhysicalDamageTaken = 0.3f;
+    public const float BrittleDurationSec         = 3f;
+    public const float BrittleShatterLifeFraction = 0.15f;
+
     public const double StatusTickIntervalSec = 0.5;
 
     public const float MinAttacksPerSecond = 0.1f;

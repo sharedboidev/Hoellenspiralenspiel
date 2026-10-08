@@ -87,6 +87,50 @@ public sealed class StatusEffectTracker
             Started?.Invoke(application.Kind);
     }
 
+    //Der Urheber der Instanz, die am längsten läuft. Bei Brittle ist das die zuletzt aufgefrischte
+    public object GetSource(StatusEffectKind kind)
+    {
+        var    list    = instances[(int)kind];
+        object source  = null;
+        var    longest = double.MinValue;
+
+        foreach (var instance in list)
+        {
+            if (instance.RemainingSec <= longest)
+                continue;
+
+            longest = instance.RemainingSec;
+            source  = instance.Source;
+        }
+
+        return source;
+    }
+
+    public bool Remove(StatusEffectKind kind)
+    {
+        var index = (int)kind;
+
+        if (instances[index].Count == 0)
+            return false;
+
+        instances[index].Clear();
+        pendingDamage[index] = 0f;
+
+        End(kind);
+
+        return true;
+    }
+
+    //Schaden dieser Art löst jeden Effekt, dessen Regel ihn nennt, etwa Feuer das Brittle
+    public void RemoveAllRemovedBy(DamageType damageType)
+    {
+        foreach (var kind in AllKinds)
+        {
+            if (StatusEffectRules.Get(kind).RemovedBy == damageType)
+                Remove(kind);
+        }
+    }
+
     public void Advance(double deltaSec, List<StatusTick> ticks)
     {
         ArgumentNullException.ThrowIfNull(ticks);
@@ -96,8 +140,16 @@ public sealed class StatusEffectTracker
 
         foreach (var kind in AllKinds)
         {
-            if (instances[(int)kind].Count > 0)
-                AdvanceKind(kind, deltaSec, ticks);
+            if (instances[(int)kind].Count == 0)
+                continue;
+
+            var ticksBefore = ticks.Count;
+
+            AdvanceKind(kind, deltaSec, ticks);
+
+            //Ein Tick von Burn ist Feuerschaden und löst Brittle wie ein Treffer
+            if (ticks.Count > ticksBefore && StatusEffectRules.FindDamageOverTime(kind) is { } damageOverTime)
+                RemoveAllRemovedBy(damageOverTime.Trigger);
         }
     }
 
@@ -124,13 +176,18 @@ public sealed class StatusEffectTracker
         var dealsDamage = StatusEffectRules.Get(kind).DealsDamage;
         var timeLeft    = deltaSec;
 
+        //Bleed ist physischer Schaden und wächst mit Brittle wie ein Treffer
+        var takenFactor = dealsDamage && StatusEffectRules.FindDamageOverTime(kind) is { } damageOverTime
+                ? Defences.GetDamageTakenFactor(stats, damageOverTime.Trigger)
+                : 1f;
+
         //In Teilschritten bis zum Ende der jeweils kürzesten Instanz, damit keine Instanz über ihr Ende hinaus wirkt
         while (timeLeft > Epsilon && list.Count > 0)
         {
             var step = Math.Min(timeLeft, GetShortestRemaining(list));
 
             if (dealsDamage)
-                pendingDamage[index] += GetMagnitude(kind) * (float)step;
+                pendingDamage[index] += GetMagnitude(kind) * takenFactor * (float)step;
 
             for (var i = list.Count - 1; i >= 0; i--)
             {
@@ -226,12 +283,12 @@ public sealed class StatusEffectTracker
         }
 
         list.RemoveAll(instance => instance.Magnitude <= application.Magnitude && instance.RemainingSec <= application.DurationSec);
-        list.Add(new Instance(application.Magnitude, application.DurationSec));
+        list.Add(new Instance(application.Magnitude, application.DurationSec, application.Source));
     }
 
     private static void AddToStack(List<Instance> list, StatusEffectApplication application, int maxInstances)
     {
-        list.Add(new Instance(application.Magnitude, application.DurationSec));
+        list.Add(new Instance(application.Magnitude, application.DurationSec, application.Source));
 
         if (list.Count <= maxInstances)
             return;
@@ -259,13 +316,15 @@ public sealed class StatusEffectTracker
 
     private struct Instance
     {
-        public Instance(float magnitude, double remainingSec)
+        public Instance(float magnitude, double remainingSec, object source)
         {
             Magnitude    = magnitude;
             RemainingSec = remainingSec;
+            Source       = source;
         }
 
         public float  Magnitude       { get; }
+        public object Source          { get; }
         public double RemainingSec    { get; set; }
         public double RemainingEffect => Magnitude * RemainingSec;
     }

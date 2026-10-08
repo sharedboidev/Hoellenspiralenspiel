@@ -100,8 +100,9 @@ public static class CombatText
             StatusEffectKind.Bleed => Colors.Crimson,
             StatusEffectKind.Burn  => Colors.OrangeRed,
             StatusEffectKind.Shock => Colors.Yellow,
-            StatusEffectKind.Chill => Colors.DeepSkyBlue,
-            _                      => Colors.White
+            StatusEffectKind.Chill   => Colors.DeepSkyBlue,
+            StatusEffectKind.Brittle => Colors.PaleTurquoise,
+            _                        => Colors.White
         };
 
     private static string GetNameOf(StatusEffectKind kind)
@@ -110,7 +111,8 @@ public static class CombatText
             StatusEffectKind.Bleed => "Bleeding",
             StatusEffectKind.Burn  => "Burning",
             StatusEffectKind.Shock => "Shocked",
-            StatusEffectKind.Chill => "Chilled",
-            _                      => kind.ToString()
+            StatusEffectKind.Chill   => "Chilled",
+            StatusEffectKind.Brittle => "Brittle",
+            _                        => kind.ToString()
         };
 }

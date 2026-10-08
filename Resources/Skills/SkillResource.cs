@@ -2,6 +2,7 @@ using Godot;
 using Godot.Collections;
 using HashSet = System.Collections.Generic.HashSet<string>;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Items;
 
@@ -15,6 +16,7 @@ public abstract partial class SkillResource : Resource
     private static readonly HashSet AreaFields       = [nameof(AreaRadius), nameof(AreaExpansionSec), nameof(AreaDelaySec)];
     private static readonly HashSet SweepFields      = [nameof(SweepArcDegrees), nameof(SweepRangeFactor)];
     private static readonly HashSet ChainFields      = [nameof(ChainRange), nameof(ChainJumpRange), nameof(ChainJumps), nameof(ChainFalloffPercent)];
+    private static readonly HashSet CloudFields      = [nameof(CloudRadius), nameof(CloudDurationSec), nameof(CloudGrowthPercent), nameof(CloudPulseSec), nameof(CloudEffect)];
 
     private SkillDefinition definition;
     private SkillDelivery   delivery;
@@ -102,6 +104,24 @@ public abstract partial class SkillResource : Resource
     [Export(PropertyHint.Range, "0, 100, 1")]
     public float ChainFalloffPercent { get; set; } = 25f;
 
+    //Der Nebel bei Delivery LingeringCloud. Der Radius in Pixeln am Anfang, bis zum Ende wächst er um CloudGrowthPercent
+    [ExportGroup("Cloud")]
+    [Export]
+    public float CloudRadius { get; set; } = 300f;
+
+    [Export]
+    public float CloudDurationSec { get; set; } = 6f;
+
+    [Export(PropertyHint.Range, "0, 200, 1")]
+    public float CloudGrowthPercent { get; set; } = 25f;
+
+    //So oft bekommt jeder darin den Effekt erneut
+    [Export]
+    public float CloudPulseSec { get; set; } = 0.5f;
+
+    [Export]
+    public StatusEffectKind CloudEffect { get; set; } = StatusEffectKind.Brittle;
+
     //Bleibt leer, bis entschieden ist, wie der Held Skills bekommt
     [ExportGroup("Requirements")]
     [Export]
@@ -117,7 +137,8 @@ public abstract partial class SkillResource : Resource
         Projectile = Delivery == SkillDelivery.Projectile ? new ProjectileSettings(ProjectileSpeed, ProjectileLifetimeSec, ForkCount, ForkGenerations, ForkRange) : null,
         Area = Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint ? new AreaSettings(AreaRadius, AreaExpansionSec, AreaDelaySec) : null,
         Sweep = Delivery is SkillDelivery.WeaponSweep or SkillDelivery.WeaponWhirl ? new SweepSettings(SweepArcDegrees, SweepRangeFactor) : null,
-        Chain = Delivery == SkillDelivery.ChainBeam ? new ChainSettings(ChainRange, ChainJumpRange, ChainJumps, ChainFalloffPercent) : null
+        Chain = Delivery == SkillDelivery.ChainBeam ? new ChainSettings(ChainRange, ChainJumpRange, ChainJumps, ChainFalloffPercent) : null,
+        Cloud = Delivery == SkillDelivery.LingeringCloud ? new CloudSettings(CloudRadius, CloudDurationSec, CloudGrowthPercent, CloudPulseSec, CloudEffect) : null
     };
 
     public string NameOrId => string.IsNullOrWhiteSpace(DisplayName) ? Id : DisplayName;
@@ -128,11 +149,12 @@ public abstract partial class SkillResource : Resource
     {
         var name = property["name"].AsString();
 
-        var fits = !ProjectileFields.Contains(name) && !AreaFields.Contains(name) && !SweepFields.Contains(name) && !ChainFields.Contains(name) ||
+        var fits = !ProjectileFields.Contains(name) && !AreaFields.Contains(name) && !SweepFields.Contains(name) && !ChainFields.Contains(name) && !CloudFields.Contains(name) ||
                    (ProjectileFields.Contains(name) && Delivery == SkillDelivery.Projectile) ||
                    (AreaFields.Contains(name) && Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint) ||
                    (SweepFields.Contains(name) && Delivery is SkillDelivery.WeaponSweep or SkillDelivery.WeaponWhirl) ||
-                   (ChainFields.Contains(name) && Delivery == SkillDelivery.ChainBeam);
+                   (ChainFields.Contains(name) && Delivery == SkillDelivery.ChainBeam) ||
+                   (CloudFields.Contains(name) && Delivery == SkillDelivery.LingeringCloud);
 
         if (!fits)
             HideInInspector(property);

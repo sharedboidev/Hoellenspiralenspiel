@@ -20,6 +20,10 @@ public sealed record HitRequest(float      MinDamage,
     //Pierce trifft nur halb so oft, außer der Angriff ist davon ausgenommen
     public bool IgnoresPierceHitPenalty { get; init; }
 
+    //Der Hauptteil oder ein Zusatzschaden hat diese Art
+    public bool Deals(DamageType damageType)
+        => DamageType == damageType || damageType.IsElemental() && !AddedDamage[damageType].IsEmpty;
+
     //Derselbe Treffer mit weniger Schaden, etwa nach dem Sprung eines Blitzes. Treffer- und Kritchance bleiben
     public HitRequest Times(float factor)
         => this with

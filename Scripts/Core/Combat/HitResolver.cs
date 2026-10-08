@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
@@ -36,19 +37,21 @@ public static class HitResolver
             };
         }
 
+        //Ein Treffer mit Feuer löst Brittle, bevor dessen Mehrschaden zählt
+        var removed    = StatusEffectRules.GetRemovedBy(request);
         var isCritical = critRoll < CombatFormulas.ClampChance(request.CriticalHitChance);
         var wasBlocked = blockRoll < CombatFormulas.ClampChance(defender.GetFinal(GetBlockStat(request.SkillKind)));
         var critFactor = isCritical ? CombatFormulas.GetCriticalFactor(Defences.GetCriticalDamageBonusTaken(defender, request.CriticalDamageBonus)) : 1f;
         var damage     = Strike(rolledDamage, request.DamageType, defender, critFactor, wasBlocked);
 
-        var finalDamage = (int)MathF.Round(Mitigate(damage, request.DamageType, defender));
+        var finalDamage = (int)MathF.Round(Mitigate(damage, request.DamageType, defender, removed));
 
         //Der Zusatzschaden der Elemente trifft mit demselben Wurf, kritisch und geblockt wie der Hauptteil
         var addedUnmitigated = request.AddedDamage.Select((element, range) => range.IsEmpty
                                                                                   ? 0f
                                                                                   : Strike(Roll(range, damageRoll), element, defender, critFactor, wasBlocked));
 
-        var addedDamage  = addedUnmitigated.Select((element, unmitigated) => (int)MathF.Round(Mitigate(unmitigated, element, defender)));
+        var addedDamage  = addedUnmitigated.Select((element, unmitigated) => (int)MathF.Round(Mitigate(unmitigated, element, defender, removed)));
         var addedEffects = addedUnmitigated.Select((element, unmitigated) => StatusEffectRules.GetEffectOfHit(element, unmitigated, addedDamage[element], GetDamageOverTimeMultiplier(request, element)));
 
         return new HitResult
@@ -63,7 +66,8 @@ public static class HitResolver
             FinalDamage       = finalDamage + addedDamage.Fire + addedDamage.Frost + addedDamage.Lightning,
             InflictedEffect   = StatusEffectRules.GetEffectOfHit(request.DamageType, damage, finalDamage, GetDamageOverTimeMultiplier(request, request.DamageType)),
             AddedDamage       = addedDamage,
-            AddedEffects      = addedEffects
+            AddedEffects      = addedEffects,
+            RemovedEffects    = removed
         };
     }
 
@@ -108,7 +112,7 @@ public static class HitResolver
     }
 
     //Pierce geht an der Rüstung vorbei, die zusätzliche Minderung physischen Schadens trifft ihn trotzdem
-    private static float Mitigate(float damage, DamageType damageType, StatSheet defender)
+    private static float Mitigate(float damage, DamageType damageType, StatSheet defender, IReadOnlyList<StatusEffectKind> removedEffects)
     {
         if (damageType.IsElemental())
             return CombatFormulas.MitigateByResistance(damage, Defences.GetEffectiveResistance(defender, damageType));
@@ -117,7 +121,7 @@ public static class HitResolver
                 ? Math.Max(0f, damage)
                 : CombatFormulas.MitigateByArmor(damage, defender.GetFinal(CombatStat.Armor));
 
-        return afterArmor * (1f - Defences.GetPhysicalDamageReduction(defender) / 100f);
+        return afterArmor * (1f - Defences.GetPhysicalDamageReduction(defender) / 100f) * Defences.GetDamageTakenFactor(defender, damageType, removedEffects);
     }
 
     private static CombatStat GetParryStat(SkillKind skillKind)

@@ -1,6 +1,7 @@
 using System.Linq;
 using Hoellenspiralenspiel.Enums;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
+using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 using Hoellenspiralenspiel.Scripts.Core.Enemies;
 using Hoellenspiralenspiel.Scripts.Core.Items;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
@@ -190,6 +191,43 @@ public class GameDataTests
             Assert.That(chain.Chain, Is.EqualTo(new ChainSettings(800f, 500f, 2, 25f)));
             Assert.That(chain.Projectile, Is.Null, "zusätzliche Projektile gelten für den Blitz nicht");
             Assert.That(chain.NeedsBow || chain.NeedsMeleeWeapon, Is.False);
+        });
+    }
+
+    //Die Werte hat der User am 08.10.2026 vorgegeben: 3 m, die in 6 s auf 3,75 m wachsen, 8 Mana, 0,5 s Wirkzeit, 6 s Abklingzeit, Brittle jede halbe Sekunde
+    [Test]
+    public void BrittleMist_LegtEinenNebelMitBrittle()
+    {
+        var mist = GameData.PlayerSkill("brittle_mist");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(mist.Name, Is.EqualTo("Brittle Mist"));
+            Assert.That(mist.Kind, Is.EqualTo(SkillKind.Spell));
+            Assert.That(mist.Delivery, Is.EqualTo(SkillDelivery.LingeringCloud));
+            Assert.That(mist.Spell.MinDamage + mist.Spell.MaxDamage, Is.Zero, "der Nebel selbst macht keinen Schaden");
+            Assert.That(mist.ManaCost, Is.EqualTo(8f));
+            Assert.That(mist.CooldownSec, Is.EqualTo(6.0));
+            Assert.That(mist.CastSec, Is.EqualTo(0.5));
+            Assert.That(mist.Cloud, Is.EqualTo(new CloudSettings(300f, 6f, 25f, 0.5f, StatusEffectKind.Brittle)));
+            Assert.That(mist.Area, Is.Null);
+            Assert.That(mist.NeedsBow || mist.NeedsMeleeWeapon, Is.False);
+        });
+    }
+
+    //Das Zerspringen ist eine Fläche aus Kälte, 2 m ab dem Rand des Toten. Den Schaden rechnet BrittleShatter aus seinem Leben
+    [Test]
+    public void BrittleShatter_IstEineFlaecheAusKaelte()
+    {
+        var shatter = GameData.EffectSkill("brittle_shatter");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(shatter.Kind, Is.EqualTo(SkillKind.Spell));
+            Assert.That(shatter.Delivery, Is.EqualTo(SkillDelivery.AreaAtPoint));
+            Assert.That(shatter.Spell.DamageType, Is.EqualTo(DamageType.Frost));
+            Assert.That(shatter.Spell.CriticalHitChance, Is.EqualTo(10f));
+            Assert.That(shatter.Area, Is.EqualTo(new AreaSettings(200f, 0.15f)));
         });
     }
 }

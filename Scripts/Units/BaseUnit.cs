@@ -9,7 +9,9 @@ using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 using Hoellenspiralenspiel.Scripts.Core.Rng;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Stats;
+using Hoellenspiralenspiel.Scripts.Skills;
 using Hoellenspiralenspiel.Scripts.UI;
+using Hoellenspiralenspiel.Scripts.Units.StatusLooks;
 using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.Units;
@@ -28,7 +30,8 @@ public abstract partial class BaseUnit : CharacterBody3D
 
     private static readonly StringName HighlightParameter = "highlight";
 
-    private readonly List<StatusTick> statusTicks = new();
+    private readonly Dictionary<StatusEffectKind, StatusLook> statusLooks = new();
+    private readonly List<StatusTick>                         statusTicks = new();
     private          CollisionShape3D bodyShape;
     private          float            lifeCurrent;
 
@@ -38,6 +41,7 @@ public abstract partial class BaseUnit : CharacterBody3D
 
         Stats.Changed         += OnStatsChanged;
         StatusEffects.Started += OnStatusEffectStarted;
+        StatusEffects.Ended   += OnStatusEffectEnded;
     }
 
     public StatSheet Stats { get; } = new();
@@ -251,6 +255,10 @@ public abstract partial class BaseUnit : CharacterBody3D
 
         if (hit.HasLanded)
         {
+            //Feuer löst Brittle, bevor der Schaden ankommt. Wer daran stirbt, zerspringt also nicht
+            foreach (var kind in hit.RemovedEffects)
+                StatusEffects.Remove(kind);
+
             LifeCurrent -= hit.FinalDamage;
 
             foreach (var effect in hit.InflictedEffects)
@@ -258,14 +266,34 @@ public abstract partial class BaseUnit : CharacterBody3D
                 if (IsDead)
                     break;
 
-                if (!StatusEffectRules.IsAvoided(Stats, GameRandom.Shared))
-                    StatusEffects.Apply(effect);
+                TryApplyStatusEffect(effect);
             }
         }
 
         CombatText.ShowHit(this, hit);
 
         DamageTaken?.Invoke(this, hit, attacker);
+    }
+
+    //"chance to Avoid Ailments" würfelt für jeden Effekt, auch für einen ohne Treffer wie Brittle
+    public bool TryApplyStatusEffect(StatusEffectApplication effect)
+    {
+        if (effect is null || !IsTargetable || StatusEffectRules.IsAvoided(Stats, GameRandom.Shared))
+            return false;
+
+        StatusEffects.Apply(effect);
+
+        return true;
+    }
+
+    //Wer mit Brittle stirbt, zerspringt. Die Explosion gehört dem, der es zuletzt gelegt hat. Vor StatusEffects.Clear aufrufen
+    protected void ShatterIfBrittle()
+    {
+        if (!StatusEffects.IsActive(StatusEffectKind.Brittle))
+            return;
+
+        if (StatusEffects.GetSource(StatusEffectKind.Brittle) is BaseUnit source && IsInstanceValid(source))
+            SkillExecutor.Shatter(source, this);
     }
 
     public bool RollActionFailure()
@@ -449,7 +477,23 @@ public abstract partial class BaseUnit : CharacterBody3D
 
     private void OnStatusEffectStarted(StatusEffectKind kind)
     {
-        if (IsInsideTree())
-            CombatText.ShowStatusStarted(this, kind);
+        if (!IsInsideTree())
+            return;
+
+        CombatText.ShowStatusStarted(this, kind);
+
+        if (Visual is not null && StatusLook.Create(kind) is { } look)
+        {
+            statusLooks[kind] = look;
+
+            AddChild(look);
+            look.Attach(Visual, PickHeight, PickRadius);
+        }
+    }
+
+    private void OnStatusEffectEnded(StatusEffectKind kind)
+    {
+        if (statusLooks.Remove(kind, out var look) && IsInstanceValid(look))
+            look.Detach();
     }
 }

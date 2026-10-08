@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_surface.gdshader" id="1_ps1"]
+
+[sub_resource type="CylinderMesh" id="Mesh_spike"]
+top_radius = 0.0
+bottom_radius = 0.06
+height = 0.42
+radial_segments = 4
+rings = 0
+
+[sub_resource type="ShaderMaterial" id="Mat_ice"]
+shader = ExtResource("1_ps1")
+shader_parameter/albedo = Color(0.75, 0.92, 1, 1)
+shader_parameter/emission = Color(0.55, 0.85, 1, 1)
+shader_parameter/emission_energy = 0.8
+
+[node name="IceSpike" type="Node3D"]
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_spike")
+surface_material_override/0 = SubResource("Mat_ice")

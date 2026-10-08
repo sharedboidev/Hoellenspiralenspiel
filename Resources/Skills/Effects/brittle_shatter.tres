@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SpellSkillResource" format=3]
+
+[ext_resource type="Script" path="res://Resources/Skills/SpellSkillResource.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/brittle_shatter.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "brittle_shatter"
+DisplayName = "Brittle Shatter"
+Description = "A Brittle enemy bursts into shards of ice when it dies. The damage is a share of its Life and belongs to whoever made it Brittle."
+Delivery = 3
+EffectScene = ExtResource("2_scene")
+AreaRadius = 200.0
+AreaExpansionSec = 0.15
+MinDamage = 0.0
+MaxDamage = 0.0
+DamageType = 4
+CriticalHitChance = 10.0
