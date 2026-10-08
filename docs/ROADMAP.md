@@ -3703,6 +3703,72 @@ Bewusst offen gelassen:
 - `SkillExecutor` hat weiter keine Unit-Tests, er hängt an Godot. Fehler dort zeigt nur eine Probe im Spiel.
 - Ein `with`, das den Skill austauscht, behält Szene und Werte des alten Skills, weil `with` die Vorbelegung nicht neu ausführt. Für einen anderen Skill gehört eine neue `SkillExecutionDefinition` her.
 
+#### Skill 6: Chain Lightning
+
+Umgesetzt am 08.10.2026 auf `master_ChainLightning`, abgezweigt von `e6c69d2`, wartet auf Rückmeldung. Wunsch des Users: "Chainlightning. Der Skill hat keinen Cooldown und ist nur durch die Cast Time und Mana limitiert. Springt auf zwei Ziele über. Jeder Sprung reduziert den Schaden um 25 %. Dies ist ein Spell und keine Attack, also hat sie einen Basedamage und skaliert nicht mit Waffen. Bonus Projectile funktioniert nicht. Aber Bonus Chains kann es z. B. auf Items oder in Talenten geben und dies funktioniert, heißen hier aber Proliferate."
+
+Getroffene Entscheidungen des Users vom 08.10.2026:
+
+| Frage | Entscheidung |
+|---|---|
+| Auslösen | Sofort-Strahl ohne Flugzeit nach der Hälfte der Wirkzeit. Zum Gegner unter der Maus, sonst zum Gegner, der dem Mauspunkt am nächsten ist. Ist keiner da, zuckt der Blitz ins Leere, das Mana ist bezahlt. Jedes Ziel wird nur einmal getroffen |
+| Abnahme | Jeweils vom vorigen Sprung: 100 %, 75 %, 56,25 %, 42,2 % und so weiter. Der Schaden wird auch mit viel Proliferate nie null |
+| Zahlen | 30 bis 90 Lightning, 10 % Krit, 3 Mana, 0,6 s Wirkzeit, Reichweite bis zum ersten Ziel 800, Sprungweite 500 |
+| Proliferate | Ein neuer Stat und dazu gleich ein Affix. Für das Affix: Suffix auf Stäben, "+1 Proliferate" ab Itemlevel 30, "+2" ab 60, damit es in den jetzigen Kreisen fällt |
+
+- Erledigt: Chain Lightning als `Resources/Skills/Player/chain_lightning.tres`, eine `SpellSkillResource` mit eigenem Grundschaden. Eine neue Lieferung `SkillDelivery.ChainBeam` (am Ende angehängt, Wert 9) braucht keine bestimmte Waffe.
+- Erledigt: `ChainSettings` im Kern hält Reichweite, Sprungweite, Sprünge und Abnahme. `GetJumps` zählt Proliferate dazu, `GetDamageFactor(sprung)` ist (1 − Abnahme)^Sprung, `ClampToRange` rückt einen Mauspunkt jenseits der Reichweite auf ihren Rand. `GetProliferate` liest den Stat, nie unter 0.
+- Erledigt: Der neue Stat `CombatStat.Proliferate` (am Ende angehängt, Wert 70), Grundwert 0. Zusätzliche Projektile (`ProjectileCount`) zählen für den Blitz nicht.
+- Erledigt: `SkillExecutor.ChainBeam`. Der Blitz verlässt den Wirkenden in 70 % seiner Höhe und trifft die Mitte des Körpers. Erstes Ziel ist der Gegner unter der Maus, wenn er höchstens 800 vom Wirkenden entfernt ist und keine Mauer dazwischen steht. Sonst der Gegner, der dem Mauspunkt am nächsten liegt, höchstens 500 davon und 800 vom Wirkenden entfernt. Von jedem Ziel springt er zum nächsten Gegner in 500, den er noch nicht getroffen hat, mit freier Sicht. Gemessen wird wie überall von Rand zu Rand. Die Lage eines Ziels wird vor dem Treffer gemerkt, ein getöteter Gegner gibt den Sprung also noch weiter. Ohne Ziel zuckt der Blitz zum Mauspunkt am Boden, höchstens bis zur Reichweite, und endet an einer Mauer.
+- Erledigt: `SkillCast.ApplyTo` nimmt einen Faktor für den einen Treffer, `HitRequest.Times` schwächt Grundschaden und Zusatzschaden der Elemente gleich, Treffer- und Kritchance bleiben. Ein Cast für alle Sprünge, so merkt er sich jeden Getroffenen.
+- Erledigt: Der Effekt `ChainArc` (`Scripts/Skills/Effects/ChainArc.cs`, Szene `Scenes/Skills/chain_lightning.tscn`): je Sprung ein gezacktes, blassblaues Band zwischen zwei Punkten, das zur Kamera zeigt, alle 0,05 s neu zackt und in 0,25 s verblasst, dazu ein Licht am Einschlag.
+- Erledigt: Der Tooltip nennt "Jumps: 2, each 25% less damage", mit Proliferate des Helden mehr.
+- Erledigt: Der Suffix `Resources/Affixes/Suffixes/Weapons/Staves/Proliferate.tres`, global: Stufe 2 "+1 to Proliferate" ab Itemlevel 30, Gewicht 1000, "of Arcing"; Stufe 1 "+2 to Proliferate" ab 60, Gewicht 100, "of the Tempest". Aufbau wie die Zusatzpfeile am Bogen, aber früher. Die Vorlage hat keinen solchen Affix, die Werte sind ein Vorschlag, den der User gewählt hat.
+- Zusätzlich: Ein Platzhalter-Icon unter `Textures/Skills/Icons/chain_lightning.png`, drei Lichtpunkte, verbunden von einem Blitz.
+
+Von mir festgelegt, weil es sich aus dem Bau ergab:
+
+| Punkt | Festlegung |
+|---|---|
+| Startbelegung | Alle zehn Plätze sind belegt. Chain Lightning liegt nicht in der Startbelegung, der Spieler legt ihn per Rechtsklick auf einen Platz |
+| Abklingzeit | Keine. Wie jeder Zauber hat er die technische Untergrenze von 0,1 s aus `CombatRules.MinSpellCooldownSec`, die Wirkzeit von 0,6 s ist ohnehin länger |
+| Ziel suchen | Ohne Gegner unter der Maus sucht der Blitz um den Mauspunkt im Umkreis der Sprungweite. Ein Gegner hinter dem Helden wird also nicht getroffen, wenn die Maus vor ihm liegt |
+| Mauern | Jeder Sprung braucht freie Sicht, geprüft mit einem Strahl gegen die Ebene Walls. Ein Gegner hinter einer Mauer zählt nicht als Ziel |
+| Sofort | Alle Sprünge treffen im selben Takt, ohne Verzögerung zwischen ihnen |
+| Proliferate an Fireball | Proliferate wirkt nur auf Skills mit `ChainSettings`. Die Forks von Fireball bleiben getrennt |
+| Ton | Keiner, wie bei den anderen neuen Skills. Er kommt mit Etappe 13 von M8 |
+
+Neue Felder im Inspector:
+
+| Ort | Feld | Wert | Bedeutung |
+|---|---|---|---|
+| `SkillResource`, Gruppe Chain, nur bei `ChainBeam` | `ChainRange` | 800 | Bis zum ersten Ziel, von Rand zu Rand |
+| | `ChainJumpRange` | 500 | Von Ziel zu Ziel und um den Mauspunkt |
+| | `ChainJumps` | 2 | Sprünge nach dem ersten Ziel, Proliferate gibt weitere |
+| | `ChainFalloffPercent` | 25 | So viel weniger Schaden macht jeder Sprung als der davor |
+| `chain_lightning.tscn` (`ChainArc`) | `WidthMeters`, `KinksPerMeter`, `JitterMeters` | 0,1, 1,5, 0,25 | Breite des Bands (Standard 0,08, der User hat im Editor 0,1 eingestellt), Knicke je Meter, Ausschlag eines Knicks |
+| | `LifetimeSec`, `FlickerSec`, `Color` | 0,25, 0,05, blassblau | So lange ist er zu sehen, so oft zackt er neu, Farbe |
+
+Ein neuer springender Zauber, etwa mit Frost: eine `SpellSkillResource` mit `Delivery` ChainBeam, den Feldern der Gruppe Chain und einer Szene mit `ChainArc`. Code braucht er keinen.
+
+Geprüft, alles fehlerfrei:
+
+| Prüfung | Umfang |
+|---|---|
+| Build | Ohne Fehler und Warnungen im Spiel |
+| Unit-Tests | 9 neue: jeder Sprung 25 % weniger als der davor, nie null; Abnahme zwischen 0 und 100 %; Proliferate gibt weitere Sprünge, nie weniger; Proliferate aus dem Stat, Bonusprojektile nicht; ohne Stat-Blatt geworfen; Mauspunkt in Reichweite bleibt, jenseits rückt er auf den Rand ab dem Körperrand; ein schwächerer Treffer behält seine Chancen und schwächt den Zusatzschaden mit; die Werte aus `chain_lightning.tres`. Dazu der Stab mit dem neuen Suffix in den Tests der Affix-Daten. Zusammen 1933, alle grün |
+| Laufendes Spiel, headless | 33 Prüfungen im Hub, `Hero.UseSkill` direkt aufgerufen, ruhige Skelette mit viel Leben. Der Held kennt den Skill. Zwei Skelette 510 auseinander: nur das Ziel getroffen, ein Bogen. Rückt das zweite in Sprungweite, folgt es mit 75 %. Vier Skelette: drei Treffer, jeder einmal, 100 %, 75 %, 56,25 %, drei Bögen. Mit drei Bonusprojektilen weiter drei Treffer. Proliferate 1: vier Treffer, der vierte mit 42 %. Proliferate 5 bei vier Skeletten: vier verschiedene, keiner doppelt. Ein Mauspunkt neben einem Skelett ohne Ziel: der Blitz beginnt bei diesem. Ins Leere: 3 Mana bezahlt, kein Treffer, ein Bogen. Der zweite Zauber geht nach 37 Takten los, die Wirkzeit sind 36. Ein Skelett unter der Maus 885 entfernt wird nicht getroffen. Keine Warnungen im Log |
+| Laufendes Spiel, Fenster | Ein Bild mit Proliferate 1: vier gezackte Bögen vom Helden über die Skelette |
+| Spielstand | Die Probe lief in einem Worktree mit eigenem Spielstand und eigener Einstellungsdatei, beides ist wieder gelöscht, der Spielstand des Users blieb unberührt. Die Probe ist wieder gelöscht |
+
+Bewusst offen gelassen:
+
+- Das Band ist in der Auflösung des PS1-Looks schmal. Breite, Zacken und Farbe stellt der User in `chain_lightning.tscn` ein.
+- Das Icon ist ein gezeichneter Platzhalter, bis der User ein eigenes liefert.
+- Talente gibt es noch nicht. Proliferate ist ein gewöhnlicher Stat, ein Talent kann ihn später wie ein Affix geben.
+- Gegner mit dem Blitz sind nicht geprüft. Die Lieferung fragt nur die Fraktion, ein Gegner könnte ihn über `CastSkillAction` wirken.
+- Die DPS im Tooltip zählen nur das erste Ziel, die Sprünge treffen andere Gegner.
+
 ### M9: Inhalt und Politur (L, fortlaufend)
 
 - Die übrigen acht Kreise nach dem Muster aus M8.

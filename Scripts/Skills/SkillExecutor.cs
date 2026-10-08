@@ -39,7 +39,11 @@ public static class SkillExecutor
     private const float SkyShotStartHeightMeters = 1.4f;
     private const float SkyShotStartAheadMeters  = 0.4f;
 
+    //Der Blitz verlässt den Wirkenden in dieser Höhe und trifft die Mitte des Körpers
+    private const float ChainStartHeightShare = 0.7f;
+
     private static readonly List<BaseUnit> UnitsInReach = new();
+    private static readonly List<BaseUnit> ChainLinks   = new();
 
     //chargePercent zählt nur für einen geladenen Schuss: So weit war er beim Loslassen geladen
     public static void Execute(SkillExecutionDefinition executionDefinition, float chargePercent = 0f)
@@ -95,7 +99,129 @@ public static class SkillExecutor
                 LaunchArea(executionDefinition, executionDefinition.SkillAim.CurrentPoint);
 
                 break;
+            case SkillDelivery.ChainBeam:
+                ChainBeam(executionDefinition);
+
+                break;
         }
+    }
+
+    //Der Blitz springt ohne Flugzeit vom Wirkenden zum ersten Ziel und von dort zum nächsten Gegner, den er noch nicht getroffen hat.
+    //Jeder Sprung macht weniger Schaden, Mauern halten ihn auf. Ohne Ziel zuckt er ins Leere zum Mauspunkt, höchstens bis zur Reichweite
+    private static void ChainBeam(SkillExecutionDefinition executionDefinition)
+    {
+        var caster = executionDefinition.Caster;
+        var cast   = executionDefinition.Cast;
+        var scene  = executionDefinition.EffectScene;
+
+        if (executionDefinition.SkillDefinition.Chain is not { } chain)
+        {
+            GD.PushWarning($"{caster.Name} hat keinen Blitz für {executionDefinition.SkillDefinition.Name}.");
+
+            return;
+        }
+
+        var from   = caster.GlobalPosition + Vector3.Up * (caster.PickHeight * ChainStartHeightShare);
+        var aimAt  = GetChainAimPoint(caster, executionDefinition.SkillAim, chain);
+        var target = ChooseChainStart(caster, cast, executionDefinition.SkillAim, chain, from, aimAt);
+
+        if (target is null)
+        {
+            ShowChainArc(caster, scene, from, StopAtWall(caster, from, aimAt));
+
+            return;
+        }
+
+        var jumps = chain.GetJumps(ChainSettings.GetProliferate(caster.Stats));
+
+        for (var jump = 0; target is not null; jump++)
+        {
+            //Vor dem Treffer gemessen, er kann das Ziel töten
+            var to     = GetBodyCenter(target);
+            var origin = target.GlobalPosition;
+            var radius = target.BodyRadiusPx;
+
+            ShowChainArc(caster, scene, from, to);
+
+            cast.ApplyTo(target, false, chain.GetDamageFactor(jump));
+
+            if (jump >= jumps)
+                break;
+
+            from   = to;
+            target = PickChainLink(caster, cast, origin, chain.JumpRange + radius, from, unit => Math.Max(0f, WorldScale.GroundDistancePx(origin, unit.GlobalPosition) - radius - unit.BodyRadiusPx), chain.JumpRange);
+        }
+    }
+
+    //Der Gegner unter der Maus hat Vorrang, wenn der Blitz ihn erreicht. Sonst trifft er den Gegner, der dem Mauspunkt am nächsten liegt,
+    //höchstens eine Sprungweite davon entfernt
+    private static BaseUnit ChooseChainStart(BaseUnit caster, SkillCast cast, SkillAim aim, ChainSettings chain, Vector3 from, Vector3 aimAt)
+    {
+        if (aim.HasTarget && cast.CanHit(aim.Target) && caster.DistancePxTo(aim.Target) <= chain.Range && IsWithoutWall(caster, from, GetBodyCenter(aim.Target)))
+            return aim.Target;
+
+        return PickChainLink(caster,
+                             cast,
+                             aimAt,
+                             chain.JumpRange,
+                             from,
+                             unit => caster.DistancePxTo(unit) <= chain.Range ? unit.DistancePxTo(aimAt) : -1f,
+                             chain.JumpRange);
+    }
+
+    //getDistancePx gibt für einen Kandidaten, der nicht in Frage kommt, einen negativen Wert
+    private static BaseUnit PickChainLink(BaseUnit caster, SkillCast cast, Vector3 center, float searchPx, Vector3 from, Func<BaseUnit, float> getDistancePx, float maxDistancePx)
+    {
+        UnitRegistry.FindNear(center, searchPx, UnitsInReach);
+
+        NearestPicker.Pick(UnitsInReach,
+                           unit =>
+                           {
+                               if (!cast.CanHit(unit))
+                                   return -1f;
+
+                               var distancePx = getDistancePx(unit);
+
+                               return distancePx >= 0f && distancePx <= maxDistancePx && IsWithoutWall(caster, from, GetBodyCenter(unit)) ? distancePx * distancePx : -1f;
+                           },
+                           maxDistancePx,
+                           1,
+                           ChainLinks);
+
+        return ChainLinks.Count > 0 ? ChainLinks[0] : null;
+    }
+
+    private static Vector3 GetChainAimPoint(BaseUnit caster, SkillAim aim, ChainSettings chain)
+    {
+        var offset  = WorldScale.OnGround(aim.CurrentPoint - caster.GlobalPosition);
+        var (x, z)  = chain.ClampToRange(WorldScale.ToPx(offset.X), WorldScale.ToPx(offset.Z), caster.BodyRadiusPx);
+
+        return WorldScale.OnGround(caster.GlobalPosition) + new Vector3(WorldScale.ToMeters(x), 0f, WorldScale.ToMeters(z));
+    }
+
+    private static Vector3 GetBodyCenter(BaseUnit unit)
+        => unit.GlobalPosition + Vector3.Up * (unit.PickHeight * ScatterStartHeightShare);
+
+    private static bool IsWithoutWall(BaseUnit caster, Vector3 from, Vector3 to)
+        => caster.GetWorld3D().DirectSpaceState.IntersectRay(PhysicsRayQueryParameters3D.Create(from, to, CollisionLayers.Walls)).Count == 0;
+
+    private static Vector3 StopAtWall(BaseUnit caster, Vector3 from, Vector3 to)
+    {
+        var hit = caster.GetWorld3D().DirectSpaceState.IntersectRay(PhysicsRayQueryParameters3D.Create(from, to, CollisionLayers.Walls));
+
+        return hit.Count > 0 ? hit["position"].AsVector3() : to;
+    }
+
+    private static void ShowChainArc(BaseUnit caster, PackedScene scene, Vector3 from, Vector3 to)
+    {
+        if (scene is null)
+            return;
+
+        var arc = scene.Instantiate<ChainArc>();
+
+        arc.Launch(from, to);
+
+        caster.GetParent().AddChild(arc);
     }
 
     //Der Hieb ist auch zu sehen, wenn er ins Leere geht. Trifft er, läuft er durch das Ziel

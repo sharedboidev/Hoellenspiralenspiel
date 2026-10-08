@@ -171,4 +171,25 @@ public class GameDataTests
             Assert.That(typhoon.Charge, Is.Null);
         });
     }
+
+    //Die Werte hat der User am 08.10.2026 vorgegeben: zwei Sprünge, jeder 25 % weniger als der davor, keine Abklingzeit, ein Zauber mit eigenem Grundschaden
+    [Test]
+    public void ChainLightning_IstEinZauber_UndSpringtZweimal()
+    {
+        var chain = GameData.PlayerSkill("chain_lightning");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(chain.Name, Is.EqualTo("Chain Lightning"));
+            Assert.That(chain.Kind, Is.EqualTo(SkillKind.Spell));
+            Assert.That(chain.Delivery, Is.EqualTo(SkillDelivery.ChainBeam));
+            Assert.That(chain.Spell, Is.EqualTo(new SpellDefinition("Chain Lightning", 30, 90, DamageType.Lightning, 10)));
+            Assert.That(chain.ManaCost, Is.EqualTo(3f));
+            Assert.That(chain.CooldownSec, Is.Zero);
+            Assert.That(chain.CastSec, Is.EqualTo(0.6));
+            Assert.That(chain.Chain, Is.EqualTo(new ChainSettings(800f, 500f, 2, 25f)));
+            Assert.That(chain.Projectile, Is.Null, "zusätzliche Projektile gelten für den Blitz nicht");
+            Assert.That(chain.NeedsBow || chain.NeedsMeleeWeapon, Is.False);
+        });
+    }
 }

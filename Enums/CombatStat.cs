@@ -161,5 +161,9 @@ public enum CombatStat
     FireDamageOverTime,
 
     [Description("Projectile Speed")]
-    ProjectileSpeed
+    ProjectileSpeed,
+
+    //Weitere Sprünge für Skills, die von Ziel zu Ziel springen. Zusätzliche Projektile zählen für sie nicht
+    [Description("Proliferate")]
+    Proliferate
 }

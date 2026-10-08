@@ -198,6 +198,12 @@ internal static class GameData
                                           values.Float("ChannelTicksPerAttack", 1f),
                                           values.Float("ChannelTurnsPerTick", 1f),
                                           values.Bool("ChannelGrantsPhasing", false))
+                    : null,
+            Chain = delivery == SkillDelivery.ChainBeam
+                    ? new ChainSettings(values.Float("ChainRange", 800f),
+                                        values.Float("ChainJumpRange", 500f),
+                                        values.Int("ChainJumps", 2),
+                                        values.Float("ChainFalloffPercent", 25f))
                     : null
         };
     }

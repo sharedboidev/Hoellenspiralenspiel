@@ -28,12 +28,13 @@ public sealed class SkillCast
            unit.Faction != Faction &&
            !hitUnits.Contains(unit.GetInstanceId());
 
-    //Nur ein Schlag im Nahkampf kann Reflect auslösen, Projektile und Flächen nicht
-    public HitResult ApplyTo(BaseUnit unit, bool isMelee = false)
+    //Nur ein Schlag im Nahkampf kann Reflect auslösen, Projektile und Flächen nicht. damageFactor schwächt nur diesen einen Treffer, etwa nach einem Sprung
+    public HitResult ApplyTo(BaseUnit unit, bool isMelee = false, float damageFactor = 1f)
     {
         hitUnits.Add(unit.GetInstanceId());
 
-        var result   = HitResolver.Resolve(Hit, unit.Stats, GameRandom.Shared);
+        var hit      = damageFactor.Equals(1f) ? Hit : Hit.Times(damageFactor);
+        var result   = HitResolver.Resolve(hit, unit.Stats, GameRandom.Shared);
         var attacker = GodotObject.IsInstanceValid(caster) ? caster : null;
 
         unit.ReceiveDamage(result, attacker);

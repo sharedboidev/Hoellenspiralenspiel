@@ -41,6 +41,9 @@ public static class SkillTooltip
         if (estimate.ArrowCount > 0)
             text.Append($"Arrows: {estimate.ArrowCount}, about {estimate.ArrowsOnTarget:0.#} on a single target").Append(NewLine);
 
+        if (skill.Definition.Chain is { } chain)
+            text.Append($"Jumps: {chain.GetJumps(ChainSettings.GetProliferate(caster.Stats))}, each {chain.FalloffPercent:0.#}% less damage").Append(NewLine);
+
         text.Append($"Crit Chance: {estimate.CriticalHitChance:0.#}%").Append(NewLine);
         text.Append($"{uses} per Second: {estimate.UsesPerSecond:0.##}");
 

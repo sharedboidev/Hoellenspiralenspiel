@@ -14,6 +14,7 @@ public abstract partial class SkillResource : Resource
     private static readonly HashSet ProjectileFields = [nameof(ProjectileSpeed), nameof(ProjectileLifetimeSec), nameof(ForkCount), nameof(ForkGenerations), nameof(ForkRange)];
     private static readonly HashSet AreaFields       = [nameof(AreaRadius), nameof(AreaExpansionSec), nameof(AreaDelaySec)];
     private static readonly HashSet SweepFields      = [nameof(SweepArcDegrees), nameof(SweepRangeFactor)];
+    private static readonly HashSet ChainFields      = [nameof(ChainRange), nameof(ChainJumpRange), nameof(ChainJumps), nameof(ChainFalloffPercent)];
 
     private SkillDefinition definition;
     private SkillDelivery   delivery;
@@ -85,6 +86,22 @@ public abstract partial class SkillResource : Resource
     [Export]
     public float SweepRangeFactor { get; set; } = 1f;
 
+    //Der Blitz bei Delivery ChainBeam. In Pixeln von Rand zu Rand: bis zum ersten Ziel und von Ziel zu Ziel
+    [ExportGroup("Chain")]
+    [Export]
+    public float ChainRange { get; set; } = 800f;
+
+    [Export]
+    public float ChainJumpRange { get; set; } = 500f;
+
+    //Sprünge nach dem ersten Ziel, Proliferate gibt weitere
+    [Export]
+    public int ChainJumps { get; set; } = 2;
+
+    //So viel weniger Schaden macht jeder Sprung als der davor
+    [Export(PropertyHint.Range, "0, 100, 1")]
+    public float ChainFalloffPercent { get; set; } = 25f;
+
     //Bleibt leer, bis entschieden ist, wie der Held Skills bekommt
     [ExportGroup("Requirements")]
     [Export]
@@ -99,7 +116,8 @@ public abstract partial class SkillResource : Resource
         Delivery = Delivery,
         Projectile = Delivery == SkillDelivery.Projectile ? new ProjectileSettings(ProjectileSpeed, ProjectileLifetimeSec, ForkCount, ForkGenerations, ForkRange) : null,
         Area = Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint ? new AreaSettings(AreaRadius, AreaExpansionSec, AreaDelaySec) : null,
-        Sweep = Delivery is SkillDelivery.WeaponSweep or SkillDelivery.WeaponWhirl ? new SweepSettings(SweepArcDegrees, SweepRangeFactor) : null
+        Sweep = Delivery is SkillDelivery.WeaponSweep or SkillDelivery.WeaponWhirl ? new SweepSettings(SweepArcDegrees, SweepRangeFactor) : null,
+        Chain = Delivery == SkillDelivery.ChainBeam ? new ChainSettings(ChainRange, ChainJumpRange, ChainJumps, ChainFalloffPercent) : null
     };
 
     public string NameOrId => string.IsNullOrWhiteSpace(DisplayName) ? Id : DisplayName;
@@ -110,10 +128,11 @@ public abstract partial class SkillResource : Resource
     {
         var name = property["name"].AsString();
 
-        var fits = !ProjectileFields.Contains(name) && !AreaFields.Contains(name) && !SweepFields.Contains(name) ||
+        var fits = !ProjectileFields.Contains(name) && !AreaFields.Contains(name) && !SweepFields.Contains(name) && !ChainFields.Contains(name) ||
                    (ProjectileFields.Contains(name) && Delivery == SkillDelivery.Projectile) ||
                    (AreaFields.Contains(name) && Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint) ||
-                   (SweepFields.Contains(name) && Delivery is SkillDelivery.WeaponSweep or SkillDelivery.WeaponWhirl);
+                   (SweepFields.Contains(name) && Delivery is SkillDelivery.WeaponSweep or SkillDelivery.WeaponWhirl) ||
+                   (ChainFields.Contains(name) && Delivery == SkillDelivery.ChainBeam);
 
         if (!fits)
             HideInInspector(property);

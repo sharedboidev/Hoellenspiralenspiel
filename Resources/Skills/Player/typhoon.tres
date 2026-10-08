@@ -1,22 +1,19 @@
-[gd_resource type="Resource" script_class="AttackSkillResource" format=3]
+[gd_resource type="Resource" script_class="AttackSkillResource" format=3 uid="uid://cng4gqut5jao0"]
 
-[ext_resource type="Script" path="res://Resources/Skills/AttackSkillResource.cs" id="1_script"]
-[ext_resource type="Texture2D" path="res://Textures/Skills/Icons/typhoon.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://06hypuyik5ex" path="res://Resources/Skills/AttackSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://1vpr2w1w4ma0" path="res://Textures/Skills/Icons/typhoon.png" id="2_icon"]
 [ext_resource type="PackedScene" path="res://Scenes/Skills/typhoon.tscn" id="3_scene"]
 
 [resource]
 script = ExtResource("1_script")
 WeaponDamagePercent = 60.0
-ChannelManaPerSec = 3.0
-ChannelTicksPerAttack = 1.0
 ChannelTurnsPerTick = 2.0
 ChannelGrantsPhasing = true
 Id = "typhoon"
 DisplayName = "Typhoon"
 Description = "Hold to spin with your melee weapon. While held it drains 3 mana per second and hits every enemy within 125% of your weapon's reach for 60% weapon damage, once per attack of your attack speed. You keep walking at half speed and phase through enemies. Needs a melee weapon."
 Icon = ExtResource("2_icon")
-ManaCost = 0.0
 Delivery = 8
 EffectScene = ExtResource("3_scene")
-SweepArcDegrees = 360
+SweepArcDegrees = 360.0
 SweepRangeFactor = 1.25

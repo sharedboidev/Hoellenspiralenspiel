@@ -19,5 +19,8 @@ public enum SkillDelivery
     ChargedShot,
 
     //Ein Wirbel mit der Nahkampfwaffe, der läuft, solange die Taste gehalten wird, und in Ticks jeden im Kreis trifft. Nur mit einer Nahkampfwaffe
-    WeaponWhirl
+    WeaponWhirl,
+
+    //Ein Blitz ohne Flugzeit vom Wirkenden zum Ziel, der von dort auf weitere Gegner springt
+    ChainBeam
 }

@@ -52,6 +52,9 @@ public sealed record SkillDefinition
     //Nur für den Wirbel: Mana je Sekunde und Ticks je Angriff des Angriffstempos
     public ChannelSettings Channel { get; init; }
 
+    //Nur für den springenden Blitz: Reichweite, Sprungweite, Sprünge und Abnahme je Sprung
+    public ChainSettings Chain { get; init; }
+
     public bool IsArea => Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint;
 
     //Ein Bogen ist keine Klinge: Mit einer Fernkampfwaffe in der Hand lassen sich diese Skills nicht einsetzen

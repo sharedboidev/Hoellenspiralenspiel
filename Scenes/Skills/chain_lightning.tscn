@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://h1nglqkq8ojs"]
+
+[ext_resource type="Script" uid="uid://bptld7nu6c6g2" path="res://Scripts/Skills/Effects/ChainArc.cs" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_bolt"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+
+[node name="ChainArc" type="Node3D" unique_id=1028708245 node_paths=PackedStringArray("Bolt", "Flash")]
+script = ExtResource("1_script")
+Bolt = NodePath("Bolt")
+Flash = NodePath("Flash")
+WidthMeters = 0.1
+
+[node name="Bolt" type="MeshInstance3D" parent="." unique_id=2136060687]
+material_override = SubResource("Mat_bolt")
+cast_shadow = 0
+
+[node name="Flash" type="OmniLight3D" parent="." unique_id=1946440108]
+light_color = Color(0.6, 0.8, 1, 1)
+light_energy = 3.0
+omni_range = 4.0

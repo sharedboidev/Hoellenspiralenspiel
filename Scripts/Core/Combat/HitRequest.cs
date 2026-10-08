@@ -19,4 +19,13 @@ public sealed record HitRequest(float      MinDamage,
 
     //Pierce trifft nur halb so oft, außer der Angriff ist davon ausgenommen
     public bool IgnoresPierceHitPenalty { get; init; }
+
+    //Derselbe Treffer mit weniger Schaden, etwa nach dem Sprung eines Blitzes. Treffer- und Kritchance bleiben
+    public HitRequest Times(float factor)
+        => this with
+        {
+            MinDamage = MinDamage * factor,
+            MaxDamage = MaxDamage * factor,
+            AddedDamage = AddedDamage.Select((_, range) => range.Times(factor))
+        };
 }

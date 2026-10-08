@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellSkillResource" format=3 uid="uid://ceopgmuak6kme"]
+
+[ext_resource type="Script" uid="uid://cclogpxawybak" path="res://Resources/Skills/SpellSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dvm7sofpei734" path="res://Textures/Skills/Icons/chain_lightning.png" id="2_icon"]
+[ext_resource type="PackedScene" uid="uid://h1nglqkq8ojs" path="res://Scenes/Skills/chain_lightning.tscn" id="3_scene"]
+
+[resource]
+script = ExtResource("1_script")
+MinDamage = 30.0
+MaxDamage = 90.0
+DamageType = 5
+CriticalHitChance = 10.0
+CastSec = 0.6
+Id = "chain_lightning"
+DisplayName = "Chain Lightning"
+Description = "A bolt of lightning strikes the enemy under the cursor and jumps to two more enemies. Each jump deals 25% less damage than the one before."
+Icon = ExtResource("2_icon")
+ManaCost = 3.0
+Delivery = 9
+EffectScene = ExtResource("3_scene")

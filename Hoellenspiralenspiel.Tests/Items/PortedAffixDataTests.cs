@@ -28,7 +28,7 @@ public class PortedAffixDataTests
             ["AdditionalArrows", "DamageOverTimeMultiplier", "FlatCriticalDamage", "FlatDexterity", "IncreasedAttackspeed", "IncreasedCriticalHitChance", "IncreasedProjectileSpeed", "LifeLeech", "LifeOnHit", "LifeOnKill", "ManaLeech", "ManaOnKill", "ReducedAttributeRequirements"]),
         new("Weapons/Staves", ItemSlot.SpellWeapon, WeaponType.Staff,
             ["AddedFireDamage", "AddedFireDamageToSpells", "AddedFrostDamage", "AddedFrostDamageToSpells", "AddedLightningDamage", "AddedLightningDamageToSpells", "AddedPhysicalDamage", "FlatMana", "IncreasedElementalDamage", "IncreasedFireDamage", "IncreasedFrostDamage", "IncreasedLightningDamage", "IncreasedPhysicalDamage", "IncreasedSpellDamage", "IncreasedSpellDamageAndMana"],
-            ["DamageOverTimeMultiplier", "FireDamageOverTimeMultiplier", "FlatCriticalDamage", "FlatIntelligence", "FlatMeleeBlock", "FlatSpellBlock", "FlatStrength", "IncreasedAttackspeed", "IncreasedCastSpeed", "IncreasedCriticalHitChance", "IncreasedManaRegeneration", "IncreasedSpellCriticalHitChance", "LifeLeech", "LifeOnHit", "LifeOnKill", "ManaLeech", "ManaOnKill", "PhysicalDamageOverTimeMultiplier", "ReducedAttributeRequirements"]),
+            ["DamageOverTimeMultiplier", "FireDamageOverTimeMultiplier", "FlatCriticalDamage", "FlatIntelligence", "FlatMeleeBlock", "FlatSpellBlock", "FlatStrength", "IncreasedAttackspeed", "IncreasedCastSpeed", "IncreasedCriticalHitChance", "IncreasedManaRegeneration", "IncreasedSpellCriticalHitChance", "LifeLeech", "LifeOnHit", "LifeOnKill", "ManaLeech", "ManaOnKill", "PhysicalDamageOverTimeMultiplier", "Proliferate", "ReducedAttributeRequirements"]),
         new("Armors/Helmets", ItemSlot.Helmet, null,
             ["FlatArmor", "FlatArmorAndLife", "FlatLife", "IncreasedArmor", "ReflectPhysicalDamage"],
             ["FireResistance", "FlatIntelligence", "FlatLifeRegeneration", "FlatStrength", "FrostResistance", "IncreasedLifeRegeneration", "LightningResistance", "ReducedAttributeRequirements"]),
@@ -74,6 +74,8 @@ public class PortedAffixDataTests
         ["MaxLightningResistance"]           = (CombatStat.MaxLightningResistance, ModificationType.Flat, false),
         ["PhysicalDamageOverTimeMultiplier"] = (CombatStat.PhysicalDamageOverTime, ModificationType.More, false),
         ["PhysicalDamageReduction"]          = (CombatStat.Damagereduction, ModificationType.Flat, false),
+        //Ohne Vorlage: weitere Sprünge für Chain Lightning, auf dem Stab wie die Zusatzpfeile am Bogen
+        ["Proliferate"]                      = (CombatStat.Proliferate, ModificationType.Flat, false),
         ["ReducedCriticalDamageTaken"]       = (CombatStat.ReducedCriticalDamageTaken, ModificationType.Flat, false),
         ["ReflectPhysicalDamage"]            = (CombatStat.ReflectPhysical, ModificationType.Flat, false),
         ["FireResistance"]               = (CombatStat.FireResistance, ModificationType.Flat, false),
