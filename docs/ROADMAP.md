@@ -3705,7 +3705,7 @@ Bewusst offen gelassen:
 
 #### Skill 6: Chain Lightning
 
-Umgesetzt am 08.10.2026 auf `master_ChainLightning`, abgezweigt von `e6c69d2`, wartet auf Rückmeldung. Wunsch des Users: "Chainlightning. Der Skill hat keinen Cooldown und ist nur durch die Cast Time und Mana limitiert. Springt auf zwei Ziele über. Jeder Sprung reduziert den Schaden um 25 %. Dies ist ein Spell und keine Attack, also hat sie einen Basedamage und skaliert nicht mit Waffen. Bonus Projectile funktioniert nicht. Aber Bonus Chains kann es z. B. auf Items oder in Talenten geben und dies funktioniert, heißen hier aber Proliferate."
+Umgesetzt am 08.10.2026 auf `master_ChainLightning`, abgezweigt von `e6c69d2`, liegt seit demselben Tag auf `master`. Wunsch des Users: "Chainlightning. Der Skill hat keinen Cooldown und ist nur durch die Cast Time und Mana limitiert. Springt auf zwei Ziele über. Jeder Sprung reduziert den Schaden um 25 %. Dies ist ein Spell und keine Attack, also hat sie einen Basedamage und skaliert nicht mit Waffen. Bonus Projectile funktioniert nicht. Aber Bonus Chains kann es z. B. auf Items oder in Talenten geben und dies funktioniert, heißen hier aber Proliferate."
 
 Getroffene Entscheidungen des Users vom 08.10.2026:
 
