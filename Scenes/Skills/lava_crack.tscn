@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://v3dn65171l17"]
+
+[ext_resource type="Script" uid="uid://mqhtbirww4d2" path="res://Scripts/Skills/Effects/LavaCrack.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_lava_crack.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="Mat_crack"]
+render_priority = 0
+shader = ExtResource("2_shader")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/world_uv_scale = 0.0
+shader_parameter/tint = Vector3(1, 1, 1)
+shader_parameter/emission = Color(0, 0, 0, 1)
+shader_parameter/emission_energy = 0.0
+shader_parameter/snap = 1.0
+shader_parameter/snap_resolution = Vector2(852, 480)
+shader_parameter/affine = 1.0
+shader_parameter/lift = 0.02
+shader_parameter/core_color = Color(1, 0.86, 0.38, 1)
+shader_parameter/lava_color = Color(1, 0.32, 0.04, 1)
+shader_parameter/deep_color = Color(0.55, 0.07, 0.02, 1)
+shader_parameter/rim_color = Color(0.09, 0.05, 0.04, 1)
+shader_parameter/cooled_color = Color(0.2, 0.14, 0.12, 1)
+shader_parameter/rim_share = 0.42
+shader_parameter/twig_rim_share = 0.7
+shader_parameter/ragged = 0.35
+shader_parameter/flow_speed = 0.7
+shader_parameter/flow_scale = 2.2
+shader_parameter/tip_glow = 0.8
+shader_parameter/steps = 4.0
+
+[node name="LavaCrack" type="Node3D" unique_id=1933294416 node_paths=PackedStringArray("Crack", "Glow")]
+script = ExtResource("1_script")
+Crack = NodePath("Crack")
+Glow = NodePath("Glow")
+
+[node name="Crack" type="MeshInstance3D" parent="." unique_id=1948568672]
+material_override = SubResource("Mat_crack")
+cast_shadow = 0
+
+[node name="Glow" type="OmniLight3D" parent="." unique_id=1222503499]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+light_color = Color(1, 0.45, 0.12, 1)
+light_energy = 1.8
+omni_range = 3.0

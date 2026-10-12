@@ -58,10 +58,13 @@ public sealed record SkillDefinition
     //Nur für den Nebel am Boden: Radius, Dauer, Wachstum, Puls und der Effekt, den er gibt
     public CloudSettings Cloud { get; init; }
 
+    //Nur für den Schlag auf den Boden: Einschlag, Länge, Breite, Wachsen, Dauer und Schaden der Lavarisse
+    public FissureSettings Fissure { get; init; }
+
     public bool IsArea => Delivery is SkillDelivery.AreaAroundCaster or SkillDelivery.AreaAtPoint;
 
     //Ein Bogen ist keine Klinge: Mit einer Fernkampfwaffe in der Hand lassen sich diese Skills nicht einsetzen
-    public bool NeedsMeleeWeapon => Delivery is SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike or SkillDelivery.WeaponWhirl;
+    public bool NeedsMeleeWeapon => Delivery is SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike or SkillDelivery.WeaponWhirl or SkillDelivery.Fissure;
 
     //Pfeile kommen nur aus einem Bogen, der einzigen Fernkampfwaffe
     public bool NeedsBow => Delivery is SkillDelivery.ArrowRain or SkillDelivery.ChargedShot;

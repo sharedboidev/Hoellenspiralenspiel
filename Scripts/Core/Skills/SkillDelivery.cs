@@ -25,5 +25,8 @@ public enum SkillDelivery
     ChainBeam,
 
     //Ein Nebel unter der Maus, der eine Weile liegt, dabei wächst und jedem Gegner darin immer wieder einen Effekt gibt. Er macht keinen Schaden
-    LingeringCloud
+    LingeringCloud,
+
+    //Ein Schlag auf den Boden vor dem Helden, aus dem Lavarisse in Blickrichtung laufen. Nur mit einer Nahkampfwaffe
+    Fissure
 }

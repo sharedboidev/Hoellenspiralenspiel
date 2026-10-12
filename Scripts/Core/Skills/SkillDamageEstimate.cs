@@ -36,7 +36,13 @@ public sealed record SkillDamageEstimate
     public int   ArrowCount     { get; init; }
     public float ArrowsOnTarget { get; init; }
 
-    public float Dps => HitDps + EffectDps;
+    //Der Treffer des Lavarisses, einmal je Schlag. HitDps und EffectDps zählen ihn mit
+    public float CrackAverageHit { get; init; }
+
+    //Schaden je Sekunde, solange das Ziel auf einem Lavariss steht. Mehrere Risse zählen nicht doppelt
+    public float GroundDps { get; init; }
+
+    public float Dps => HitDps + EffectDps + GroundDps;
 
     public float ManaPerSecond { get; init; }
 

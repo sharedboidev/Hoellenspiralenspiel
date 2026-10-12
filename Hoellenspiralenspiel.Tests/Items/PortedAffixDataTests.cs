@@ -112,6 +112,12 @@ public class PortedAffixDataTests
 
     //Lokal verändert ein Affix das Item selbst. Angriffstempo und Krit sind das nur auf einer Waffe, auf Handschuhen gelten sie dem Helden
     private static readonly HashSet<string> LocalOnWeapons = ["AddedFireDamage", "AddedFrostDamage", "AddedLightningDamage", "AddedPhysicalDamage", "AdditionalArrows", "IncreasedAttackspeed", "IncreasedCriticalHitChance", "IncreasedPhysicalDamage", "ReducedAttributeRequirements"];
+    //Der User hat Proliferate am 08.10.2026 im Editor zusätzlich für den Helm freigegeben
+    private static readonly Dictionary<string, ItemSlot[]> ExtraItemTypes = new()
+    {
+        ["Proliferate"] = [ItemSlot.Helmet]
+    };
+
     private static readonly HashSet<string> LocalOnArmour  = ["FlatArmor", "FlatArmorAndLife", "IncreasedArmor", "IncreasedBlockChance", "ReducedAttributeRequirements"];
 
     //Der zweite Stat der hybriden Affixe, beide global
@@ -159,7 +165,8 @@ public class PortedAffixDataTests
             Assert.That(values.Enum("ModificationType", ModificationType.Flat), Is.EqualTo(family.Modification));
             Assert.That(values.Bool("AllowFractions", false), Is.EqualTo(family.AllowsFractions));
             Assert.That(values.Bool("IsInherentMod", false), Is.EqualTo(isLocal));
-            Assert.That(IntArray(values.String("AffectableItemTypes")), Is.EqualTo(new[] { (int)portedClass.Slot }));
+            Assert.That(IntArray(values.String("AffectableItemTypes")),
+                        Is.EquivalentTo(new[] { portedClass.Slot }.Concat(ExtraItemTypes.GetValueOrDefault(name, [])).Select(slot => (int)slot)));
             Assert.That(IntArray(values.String("AffectableWeaponTypes")), Is.EqualTo(weapons));
             Assert.That(values.Bool("IsHybrid", false), Is.EqualTo(Hybrids.ContainsKey(name)));
 
@@ -172,11 +179,12 @@ public class PortedAffixDataTests
         });
     }
 
-    //Höhere Stufen kommen später und sind stärker. Bei "reduced" zählt der Betrag, bei "Adds X to Y" beide Werte
+    //Höhere Stufen kommen später und sind stärker. Bei "reduced" zählt der Betrag, bei "Adds X to Y" beide Werte.
+    //Die Reihenfolge in der Datei zählt nicht: Bei Proliferate hat der User die neue Stufe 3 hinten angehängt
     [TestCaseSource(nameof(FileCases))]
     public void Stufen_SindVollstaendigUndSteigen(PortedClass portedClass, string path)
     {
-        var tiers = Tiers(path);
+        var tiers = Tiers(path).OrderByDescending(tier => tier.Tier).ToList();
 
         Assert.That(tiers.Select(tier => tier.Tier), Is.EqualTo(Enumerable.Range(1, tiers.Count).Reverse()));
 

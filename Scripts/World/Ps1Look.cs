@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using Hoellenspiralenspiel.Scripts.Core.Settings;
 using Hoellenspiralenspiel.Scripts.Saving;
+using Hoellenspiralenspiel.Scripts.Skills.Effects;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.World.Levels;
 
@@ -311,5 +312,5 @@ public partial class Ps1Look : Node
     }
 
     private bool IsPs1Shader(Shader shader)
-        => shader == SurfaceShader || shader == ObjectOutline.Shader || shader == WallFade.MasonryShader || shader == WallFade.MarkShader || shader == LevelMarks.FloorShader || UnitSight.IsUnitShader(shader);
+        => shader == SurfaceShader || shader == ObjectOutline.Shader || shader == WallFade.MasonryShader || shader == WallFade.MarkShader || shader == LevelMarks.FloorShader || shader == LavaCrack.Shader || shader == LavaCrater.Shader || UnitSight.IsUnitShader(shader);
 }

@@ -64,7 +64,7 @@ public static class SkillExecutor
                                  executionDefinition.Caster.Weapon.ExtraProjectiles);
 
                 break;
-            case SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike or SkillDelivery.WeaponWhirl when executionDefinition.Caster.Weapon.IsRanged:
+            case SkillDelivery.WeaponSweep or SkillDelivery.MeleeStrike or SkillDelivery.WeaponWhirl or SkillDelivery.Fissure when executionDefinition.Caster.Weapon.IsRanged:
                 GD.PushWarning($"{executionDefinition.Caster.Name} braucht für {executionDefinition.SkillDefinition.Name} eine Nahkampfwaffe.");
 
                 break;
@@ -112,7 +112,61 @@ public static class SkillExecutor
                 LaunchCloud(executionDefinition, executionDefinition.SkillAim.CurrentPoint);
 
                 break;
+            case SkillDelivery.Fissure:
+                CrackGround(executionDefinition);
+
+                break;
         }
+    }
+
+    //Der Held schlägt in Reichweite seiner Waffe vor sich auf den Boden und trifft jeden um den Einschlag. Aus dem Einschlag laufen die Risse
+    //in seine Blickrichtung, je zusätzlichem Projektil einer mehr, gefächert. Proliferate gibt jedem Hauptriss Nebenrisse unter den ersten Getroffenen
+    private static void CrackGround(SkillExecutionDefinition executionDefinition)
+    {
+        var caster = executionDefinition.Caster;
+        var skill  = executionDefinition.Skill;
+
+        if (skill.Definition.Fissure is not { } fissure || skill.Definition.Attack is not { } slam || executionDefinition.EffectScene is null)
+        {
+            GD.PushWarning($"{caster.Name} hat keine Risse für {skill.Definition.Name}.");
+
+            return;
+        }
+
+        var facing = GetFacing(caster, executionDefinition.SkillAim);
+        var ground = WorldScale.OnGround(caster.GlobalPosition);
+        var reach  = facing * WorldScale.ToMeters(caster.BodyRadiusPx + caster.Weapon.Reach);
+        var lift   = Vector3.Up * LavaCrack.WallCheckHeight;
+        var impact = WorldScale.OnGround(StopAtWall(caster, ground + lift, ground + reach + lift));
+
+        var attackSkill = skill as AttackSkillResource;
+        var perSecond   = HitRequests.ForAttack(caster.Stats, caster.Weapon, fissure.GetAttack(slam));
+
+        //Ein Treffer des Risses für den ganzen Schlag, jeder Gegner bekommt ihn höchstens einmal, ob vom Schlag oder von einem Riss
+        var crackHit = new SkillCast(caster, HitRequests.ForAttack(caster.Stats, caster.Weapon, fissure.GetHitAttack(slam)));
+
+        if (attackSkill?.FissureSlamScene is { } slamScene &&
+            LaunchArea(executionDefinition with { EffectScene = slamScene, Area = new AreaSettings(fissure.ImpactRadius) }, impact) is { } slamArea)
+        {
+            slamArea.UnitHit += (unit, result) =>
+            {
+                if (result.HasLanded && crackHit.CanHit(unit))
+                    crackHit.ApplyTo(unit);
+            };
+        }
+
+        var branches  = new FissureBranches(ChainSettings.GetProliferate(caster.Stats));
+        var count     = fissure.GetCount(BonusProjectiles.FromStats(caster.Stats));
+        var angle     = Mathf.Atan2(facing.Z, facing.X);
+
+        var cracks    = new List<LavaCrack>(count);
+
+        for (var i = 0; i < count; i++)
+            cracks.Add(LavaCrack.Open(executionDefinition.EffectScene, caster, perSecond, crackHit, fissure, impact, angle + Mathf.DegToRad(fissure.GetOffsetDegrees(i, count)), branches, i));
+
+        //Erst nach den Rissen, der Wall bekommt Kerben, wo sie hinauslaufen
+        if (attackSkill?.FissureCraterScene is { } craterScene)
+            LavaCrater.Open(craterScene, caster.GetParent(), impact, cracks, fissure.DurationSec);
     }
 
     //Eine Einheit mit Brittle zerspringt beim Tod: eine Fläche um sie, ab ihrem Rand gemessen, mit einem Anteil ihres Lebens als Kälte.
@@ -559,7 +613,7 @@ public static class SkillExecutor
     private static AreaSettings StartAtBodyEdge(SkillExecutionDefinition executionDefinition)
         => executionDefinition.Area is { } area ? area with { Radius = area.Radius + executionDefinition.Caster.BodyRadiusPx } : null;
 
-    private static void LaunchArea(SkillExecutionDefinition executionDefinition, Vector3 center)
+    private static SkillArea LaunchArea(SkillExecutionDefinition executionDefinition, Vector3 center)
     {
         var scene = executionDefinition.EffectScene;
         var caster = executionDefinition.Caster;
@@ -569,7 +623,7 @@ public static class SkillExecutor
         {
             GD.PushWarning($"{caster.Name} hat keine Fläche für seinen Skill.");
 
-            return;
+            return null;
         }
 
         var area = scene.Instantiate<SkillArea>();
@@ -579,5 +633,7 @@ public static class SkillExecutor
         caster.GetParent().AddChild(area);
 
         area.GlobalPosition = WorldScale.OnGround(center);
+
+        return area;
     }
 }

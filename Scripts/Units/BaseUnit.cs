@@ -275,10 +275,10 @@ public abstract partial class BaseUnit : CharacterBody3D
         DamageTaken?.Invoke(this, hit, attacker);
     }
 
-    //"chance to Avoid Ailments" würfelt für jeden Effekt, auch für einen ohne Treffer wie Brittle
+    //"chance to Avoid Ailments" würfelt für jeden Effekt, auch für einen ohne Treffer wie Brittle. Lava vom Boden ist kein Ailment
     public bool TryApplyStatusEffect(StatusEffectApplication effect)
     {
-        if (effect is null || !IsTargetable || StatusEffectRules.IsAvoided(Stats, GameRandom.Shared))
+        if (effect is null || !IsTargetable || StatusEffectRules.Get(effect.Kind).IsAilment && StatusEffectRules.IsAvoided(Stats, GameRandom.Shared))
             return false;
 
         StatusEffects.Apply(effect);

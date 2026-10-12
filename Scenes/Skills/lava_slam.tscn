@@ -1,0 +1,58 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://cbamyhsoiio5w" path="res://Scripts/Skills/Effects/SkillArea.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cn6o5g2hyxhdg" path="res://Scripts/Skills/Effects/ShardBurst.cs" id="2_shards"]
+[ext_resource type="Shader" uid="uid://c2lknp40isk5w" path="res://Shaders/Ps1/ps1_surface.gdshader" id="90_ps1"]
+
+[sub_resource type="TorusMesh" id="Mesh_ring"]
+inner_radius = 0.93
+rings = 48
+ring_segments = 3
+
+[sub_resource type="ShaderMaterial" id="Mat_ring"]
+render_priority = 0
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0.1, 0.03, 0, 1)
+shader_parameter/emission = Color(1, 0.4, 0.08, 1)
+shader_parameter/emission_energy = 2.0
+
+[sub_resource type="ShaderMaterial" id="Mat_rock"]
+render_priority = 0
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0.22, 0.13, 0.09, 1)
+shader_parameter/emission = Color(1, 0.35, 0.05, 1)
+shader_parameter/emission_energy = 0.6
+
+[node name="LavaSlam" type="Node3D" node_paths=PackedStringArray("Visual", "Impact")]
+script = ExtResource("1_script")
+Visual = NodePath("Visual")
+Impact = NodePath("Visual/Impact")
+LingerSec = 0.3
+HitsInMelee = true
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Ring" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 0.25, 0, 0, 0, 1, 0, 0.03, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_ring")
+surface_material_override/0 = SubResource("Mat_ring")
+
+[node name="Impact" type="Node3D" parent="Visual"]
+
+[node name="Flash" type="OmniLight3D" parent="Visual/Impact"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+light_color = Color(1, 0.5, 0.15, 1)
+light_energy = 4.0
+omni_range = 5.0
+
+[node name="Debris" type="Node3D" parent="."]
+script = ExtResource("2_shards")
+Material = SubResource("Mat_rock")
+Count = 28
+LengthMeters = Vector2(0.08, 0.28)
+SpeedMeters = Vector2(1.5, 4.0)
+UpSpeedMeters = Vector2(2.5, 5.0)
+Gravity = 14.0
+LifetimeSec = Vector2(0.4, 0.75)
+StartHeight = 0.1

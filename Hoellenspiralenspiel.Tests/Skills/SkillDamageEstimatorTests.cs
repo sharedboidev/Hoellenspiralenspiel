@@ -913,4 +913,36 @@ public class SkillDamageEstimatorTests
             Assert.That(free.ManaPerSecond, Is.Zero);
         });
     }
+
+    #region Lavariss
+
+    //Der Schlag zählt wie ein Angriff, der Riss trifft einmal je Schlag und brennt dazu je Sekunde, solange das Ziel darauf steht
+    [Test]
+    public void Lavariss_ZaehltSchlagUndBrennenAufDemRiss()
+    {
+        var weapon   = Weapon(DamageType.Crush);
+        var attacker = Attacker(weapon);
+        var fissure  = new FissureSettings(100f, 1000f, 50f, 0.4f, 4f, 120f, 30f, 85f, 5);
+        var skill    = SkillDefinition.ForAttack("lava_crack", new AttackDefinition("Lava Crack", 100f)) with { Delivery = SkillDelivery.Fissure, Fissure = fissure };
+        var slamOnly = skill with { Fissure = null };
+        var perSec   = HitRequests.ForAttack(attacker, weapon, fissure.GetAttack(skill.Attack));
+        var crackHit = HitRequests.ForAttack(attacker, weapon, fissure.GetHitAttack(skill.Attack));
+
+        var estimate = SkillDamageEstimator.Estimate(attacker, weapon, skill);
+        var slam     = SkillDamageEstimator.Estimate(attacker, weapon, slamOnly);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(perSec.DamageType, Is.EqualTo(DamageType.Fire));
+            Assert.That(estimate.GroundDps, Is.EqualTo(AverageOf(perSec)).Within(Tolerance));
+            Assert.That(estimate.AverageHit, Is.EqualTo(slam.AverageHit), "Average Hit ist der Schlag");
+            Assert.That(crackHit.DamageType, Is.EqualTo(DamageType.Fire));
+            Assert.That(estimate.CrackAverageHit, Is.EqualTo(AverageOf(crackHit)).Within(Tolerance), "der Treffer des Risses ohne Krit");
+            Assert.That(estimate.HitDps - slam.HitDps, Is.EqualTo(estimate.CrackAverageHit * estimate.UsesPerSecond * estimate.HitChance / 100f).Within(Tolerance), "einmal je Schlag");
+            Assert.That(estimate.Dps, Is.EqualTo(estimate.HitDps + estimate.EffectDps + estimate.GroundDps).Within(Tolerance));
+            Assert.That(slam.GroundDps, Is.Zero);
+        });
+    }
+
+    #endregion
 }

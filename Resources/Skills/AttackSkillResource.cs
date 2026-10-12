@@ -20,6 +20,12 @@ public partial class AttackSkillResource : SkillResource
 
     private static readonly HashSet ChannelFields = [nameof(ChannelManaPerSec), nameof(ChannelTicksPerAttack), nameof(ChannelTurnsPerTick), nameof(ChannelGrantsPhasing)];
 
+    private static readonly HashSet FissureFields =
+    [
+        nameof(FissureImpactRadius), nameof(FissureLength), nameof(FissureWidth), nameof(FissureGrowSec), nameof(FissureDurationSec),
+        nameof(FissureWeaponDamagePercentPerSec), nameof(FissureHitWeaponDamagePercent), nameof(FissureMaxMainCracks), nameof(FissureSpreadDegrees), nameof(FissureSlamScene), nameof(FissureCraterScene)
+    ];
+
     [ExportGroup("Attack")]
     [Export]
     public float WeaponDamagePercent { get; set; } = 100f;
@@ -119,20 +125,67 @@ public partial class AttackSkillResource : SkillResource
     [Export]
     public bool ChannelGrantsPhasing { get; set; }
 
+    //Der Schlag auf den Boden bei Delivery Fissure. Er trifft jeden in FissureImpactRadius um den Einschlag mit WeaponDamagePercent,
+    //der Einschlag liegt in Reichweite der Waffe vor dem Helden. In Pixeln
+    [ExportGroup("Fissure")]
+    [Export]
+    public float FissureImpactRadius { get; set; } = 100f;
+
+    //Jeder Riss läuft so weit vom Einschlag weg, ein Nebenriss so weit vom Gegner unter ihm. In Pixeln
+    [Export]
+    public float FissureLength { get; set; } = 1000f;
+
+    //Wer diese Breite mit seinem Körper berührt, steht auf dem Riss. In Pixeln
+    [Export]
+    public float FissureWidth { get; set; } = 50f;
+
+    //In dieser Zeit wächst ein Riss auf seine Länge, danach liegt er bis FissureDurationSec, gezählt ab seinem Entstehen
+    [Export]
+    public float FissureGrowSec { get; set; } = 0.4f;
+
+    [Export]
+    public float FissureDurationSec { get; set; } = 4f;
+
+    //Schaden je Sekunde auf dem Riss, ganz in Feuer umgewandelt. Mehrere Risse unter einem Gegner zählen nicht doppelt
+    [Export]
+    public float FissureWeaponDamagePercentPerSec { get; set; } = 120f;
+
+    //Der Treffer, wenn der wachsende Riss durch einen Gegner läuft oder der Schlag ihn trifft. Einmal je Gegner und Schlag, ganz in Feuer
+    [Export]
+    public float FissureHitWeaponDamagePercent { get; set; } = 85f;
+
+    //So viele Hauptrisse eines Wirkenden liegen höchstens zugleich, ein weiterer löst den ältesten vorzeitig auf. 0 heißt ohne Grenze
+    [Export]
+    public int FissureMaxMainCracks { get; set; } = 5;
+
+    //Zusätzliche Projektile geben weitere Risse, so weit auseinander gefächert
+    [Export(PropertyHint.Range, "0, 90, 1")]
+    public float FissureSpreadDegrees { get; set; } = 30f;
+
+    //Der Einschlag, sein Wurzelknoten ist eine SkillArea. Der Riss ist EffectScene
+    [Export]
+    public PackedScene FissureSlamScene { get; set; }
+
+    //Der Krater am Einschlag, aus dessen Mitte die Risse abfließen. Sein Wurzelknoten ist ein LavaCrater
+    [Export]
+    public PackedScene FissureCraterScene { get; set; }
+
     public override SkillKind Kind => SkillKind.Attack;
 
-    //Kugeln springen nur aus einem Schlag, Pfeile regnen nur nach dem Schuss in den Himmel, geladen wird nur der geladene Schuss, der Wirbel kanalisiert als Einziger
+    //Kugeln springen nur aus einem Schlag, Pfeile regnen nur nach dem Schuss in den Himmel, geladen wird nur der geladene Schuss, der Wirbel kanalisiert als Einziger,
+    //Risse kommen nur aus dem Schlag auf den Boden
     public override void _ValidateProperty(Dictionary property)
     {
         base._ValidateProperty(property);
 
         var name = property["name"].AsString();
 
-        var fits = !ScatterFields.Contains(name) && !RainFields.Contains(name) && !ChargeFields.Contains(name) && !ChannelFields.Contains(name) ||
+        var fits = !ScatterFields.Contains(name) && !RainFields.Contains(name) && !ChargeFields.Contains(name) && !ChannelFields.Contains(name) && !FissureFields.Contains(name) ||
                    (ScatterFields.Contains(name) && Delivery is SkillDelivery.Weapon or SkillDelivery.MeleeStrike) ||
                    (RainFields.Contains(name) && Delivery == SkillDelivery.ArrowRain) ||
                    (ChargeFields.Contains(name) && Delivery == SkillDelivery.ChargedShot) ||
-                   (ChannelFields.Contains(name) && Delivery == SkillDelivery.WeaponWhirl);
+                   (ChannelFields.Contains(name) && Delivery == SkillDelivery.WeaponWhirl) ||
+                   (FissureFields.Contains(name) && Delivery == SkillDelivery.Fissure);
 
         if (!fits)
             HideInInspector(property);
@@ -146,6 +199,9 @@ public partial class AttackSkillResource : SkillResource
             Charge  = Delivery == SkillDelivery.ChargedShot
                     ? new ChargeSettings(ChargeRatePerSec, ChargeMinPercent, ChargeMaxPercent, ChargeOverholdSec, ChargeOverholdCooldownSec)
                     : null,
-            Channel = Delivery == SkillDelivery.WeaponWhirl ? new ChannelSettings(ChannelManaPerSec, ChannelTicksPerAttack, ChannelTurnsPerTick, ChannelGrantsPhasing) : null
+            Channel = Delivery == SkillDelivery.WeaponWhirl ? new ChannelSettings(ChannelManaPerSec, ChannelTicksPerAttack, ChannelTurnsPerTick, ChannelGrantsPhasing) : null,
+            Fissure = Delivery == SkillDelivery.Fissure
+                    ? new FissureSettings(FissureImpactRadius, FissureLength, FissureWidth, FissureGrowSec, FissureDurationSec, FissureWeaponDamagePercentPerSec, FissureSpreadDegrees, FissureHitWeaponDamagePercent, FissureMaxMainCracks)
+                    : null
         };
 }
