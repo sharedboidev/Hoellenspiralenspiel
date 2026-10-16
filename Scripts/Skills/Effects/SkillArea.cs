@@ -124,8 +124,13 @@ public partial class SkillArea : Node3D
 
             var offset = unit.GlobalPosition - center;
 
-            if (AreaSettings.Contains(WorldScale.ToPx(offset.X), WorldScale.ToPx(offset.Z), radiusPx + unit.BodyRadiusPx))
-                UnitHit?.Invoke(unit, cast.ApplyTo(unit, HitsInMelee));
+            if (!AreaSettings.Contains(WorldScale.ToPx(offset.X), WorldScale.ToPx(offset.Z), radiusPx + unit.BodyRadiusPx))
+                continue;
+
+            //Nicht als Argument von UnitHit?.Invoke: Ohne Abonnenten wertet C# die Argumente gar nicht aus, der Treffer fiele weg
+            var result = cast.ApplyTo(unit, HitsInMelee);
+
+            UnitHit?.Invoke(unit, result);
         }
     }
 
