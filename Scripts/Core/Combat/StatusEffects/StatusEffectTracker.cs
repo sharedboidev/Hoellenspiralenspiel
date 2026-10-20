@@ -147,9 +147,9 @@ public sealed class StatusEffectTracker
 
             AdvanceKind(kind, deltaSec, ticks);
 
-            //Ein Tick von Burn ist Feuerschaden und löst Brittle wie ein Treffer
-            if (ticks.Count > ticksBefore && StatusEffectRules.FindDamageOverTime(kind) is { } damageOverTime)
-                RemoveAllRemovedBy(damageOverTime.Trigger);
+            //Ein Tick von Burn oder Lava ist Feuerschaden und löst Brittle wie ein Treffer
+            if (ticks.Count > ticksBefore && StatusEffectRules.GetDamageType(kind) is { } damageType)
+                RemoveAllRemovedBy(damageType);
         }
     }
 
@@ -177,8 +177,8 @@ public sealed class StatusEffectTracker
         var timeLeft    = deltaSec;
 
         //Bleed ist physischer Schaden und wächst mit Brittle wie ein Treffer
-        var takenFactor = dealsDamage && StatusEffectRules.FindDamageOverTime(kind) is { } damageOverTime
-                ? Defences.GetDamageTakenFactor(stats, damageOverTime.Trigger)
+        var takenFactor = dealsDamage && StatusEffectRules.GetDamageType(kind) is { } damageType
+                ? Defences.GetDamageTakenFactor(stats, damageType)
                 : 1f;
 
         //In Teilschritten bis zum Ende der jeweils kürzesten Instanz, damit keine Instanz über ihr Ende hinaus wirkt

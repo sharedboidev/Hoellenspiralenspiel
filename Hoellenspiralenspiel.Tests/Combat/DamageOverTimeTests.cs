@@ -89,12 +89,17 @@ public class DamageOverTimeTests
 
     //Wer einen neuen Effekt mit Schaden einführt, muss ihm eine Regel für Schaden über Zeit geben, sonst griffe der Multiplikator nicht
     [Test]
-    public void JederEffektMitSchaden_HatEineRegelFuerSchadenUeberZeit()
+    public void JederEffektMitSchaden_HatEineSchadensart()
     {
-        var damaging = Enum.GetValues<StatusEffectKind>().Where(kind => StatusEffectRules.Get(kind).DealsDamage);
+        var damaging = Enum.GetValues<StatusEffectKind>().Where(kind => StatusEffectRules.Get(kind).DealsDamage).ToList();
+        var withType = Enum.GetValues<StatusEffectKind>().Where(kind => StatusEffectRules.GetDamageType(kind) is not null);
         var withRule = Enum.GetValues<DamageType>().Select(StatusEffectRules.FindDamageOverTime).Where(rule => rule is not null).Select(rule => rule.Kind);
 
-        Assert.That(withRule, Is.EquivalentTo(damaging));
+        Assert.Multiple(() =>
+        {
+            Assert.That(withType, Is.EquivalentTo(damaging));
+            Assert.That(withRule, Is.SubsetOf(damaging), "Bleed und Burn kommen aus einem Treffer, Lava vom Boden");
+        });
     }
 
     [Test]

@@ -8,7 +8,10 @@ public enum StatusEffectKind
     Chill,
 
     //Kein Ailment eines Treffers: Brittle Mist legt es. Die Einheit nimmt mehr physischen Schaden, Feuer löst es
-    Brittle
+    Brittle,
+
+    //Kein Ailment: Wer auf einem Lavariss steht, brennt, solange er darauf steht. Mehrere Risse zählen nicht doppelt
+    Lava
 }
 
 public enum StackingRule

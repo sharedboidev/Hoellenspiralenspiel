@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="AttackSkillResource" format=3 uid="uid://cu27s0ci71nk2"]
+
+[ext_resource type="Script" uid="uid://06hypuyik5ex" path="res://Resources/Skills/AttackSkillResource.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dq2ewixl5hlk1" path="res://Textures/Skills/Icons/lava_crack.png" id="2_icon"]
+[ext_resource type="PackedScene" uid="uid://v3dn65171l17" path="res://Scenes/Skills/lava_crack.tscn" id="3_crack"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/lava_slam.tscn" id="4_slam"]
+[ext_resource type="PackedScene" path="res://Scenes/Skills/lava_crater.tscn" id="5_crater"]
+
+[resource]
+script = ExtResource("1_script")
+FissureLength = 1500.0
+FissureGrowSec = 0.4
+FissureSlamScene = ExtResource("4_slam")
+FissureCraterScene = ExtResource("5_crater")
+Id = "lava_crack"
+DisplayName = "Lava Crack"
+Description = "Slams the melee weapon into the ground in front of you and hits every enemy around the impact. A glowing crack of lava tears 15 metres through the ground in the direction you face. Enemies standing on it burn for 120% of your weapon damage as fire per second. More projectiles open more cracks, Proliferate branches them off under the first enemies they reach. Needs a melee weapon."
+Icon = ExtResource("2_icon")
+ManaCost = 1.0
+Delivery = 11
+EffectScene = ExtResource("3_crack")

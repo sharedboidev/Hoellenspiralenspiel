@@ -230,4 +230,26 @@ public class GameDataTests
             Assert.That(shatter.Area, Is.EqualTo(new AreaSettings(200f, 0.15f)));
         });
     }
+
+    //Die Werte hat der User am 08.10.2026 vorgegeben: Schlag mit 100 % in 1 m um den Einschlag, Risse 10 m lang (nach dem Anspielen 15 m), 120 % Waffenschaden als Feuer je Sekunde, 85 % als Treffer,
+    //in 0,4 s gewachsen, 4 s liegend. 6 Mana ohne Abklingzeit (nach dem Anspielen 1 Mana), nur mit einer Nahkampfwaffe
+    [Test]
+    public void LavaCrack_SchlaegtAufDenBoden_UndReisstLavarisse()
+    {
+        var crack = GameData.PlayerSkill("lava_crack");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(crack.Name, Is.EqualTo("Lava Crack"));
+            Assert.That(crack.Kind, Is.EqualTo(SkillKind.Attack));
+            Assert.That(crack.Delivery, Is.EqualTo(SkillDelivery.Fissure));
+            Assert.That(crack.Attack, Is.EqualTo(new AttackDefinition("Lava Crack", 100f)), "der Schlag bleibt physisch");
+            Assert.That(crack.ManaCost, Is.EqualTo(1f));
+            Assert.That(crack.CooldownSec, Is.Zero);
+            Assert.That(crack.Fissure, Is.EqualTo(new FissureSettings(100f, 1500f, 50f, 0.4f, 4f, 120f, 30f, 85f, 5)));
+            Assert.That(crack.NeedsMeleeWeapon, Is.True);
+            Assert.That(crack.NeedsBow, Is.False);
+            Assert.That(crack.Area, Is.Null);
+        });
+    }
 }

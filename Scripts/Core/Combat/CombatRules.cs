@@ -36,6 +36,9 @@ public static class CombatRules
     public const float BrittleDurationSec         = 3f;
     public const float BrittleShatterLifeFraction = 0.15f;
 
+    //Schaden vom Boden wie aus einem Lavariss brennt so lange nach, nachdem die Einheit ihn verlassen hat. Jeder Physik-Frame darauf frischt ihn auf
+    public const float GroundDamageLingerSec = 0.2f;
+
     public const double StatusTickIntervalSec = 0.5;
 
     public const float MinAttacksPerSecond = 0.1f;

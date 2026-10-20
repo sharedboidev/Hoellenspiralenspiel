@@ -5,6 +5,7 @@ using Hoellenspiralenspiel.Resources.Skills;
 using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
+using Hoellenspiralenspiel.Scripts.Core.Stats;
 using Hoellenspiralenspiel.Scripts.World;
 
 namespace Hoellenspiralenspiel.Scripts.UI.Skills;
@@ -49,6 +50,9 @@ public static class SkillTooltip
         if (estimate.ArrowCount > 0)
             text.Append($"Arrows: {estimate.ArrowCount}, about {estimate.ArrowsOnTarget:0.#} on a single target").Append(NewLine);
 
+        if (skill.Definition.Fissure is { } fissure)
+            AppendFissure(text, fissure, estimate, caster.Stats);
+
         if (skill.Definition.Chain is { } chain)
             text.Append($"Jumps: {chain.GetJumps(ChainSettings.GetProliferate(caster.Stats))}, each {chain.FalloffPercent:0.#}% less damage").Append(NewLine);
 
@@ -72,6 +76,22 @@ public static class SkillTooltip
             text.Append(NewLine).Append($"Cooldown: {skill.CooldownSec:0.##} s");
 
         return text.ToString();
+    }
+
+    //Average Hit ist der Schlag auf den Boden. Die Risse brennen je Sekunde, solange ein Gegner darauf steht
+    private static void AppendFissure(StringBuilder text, FissureSettings fissure, SkillDamageEstimate estimate, StatSheet stats)
+    {
+        var cracks   = fissure.GetCount(BonusProjectiles.FromStats(stats));
+        var branches = ChainSettings.GetProliferate(stats);
+
+        text.Append($"Crack Hit: {Format(estimate.CrackAverageHit)} Fire, once per slam").Append(NewLine);
+        text.Append($"Lava: {Format(estimate.GroundDps)} Fire per second on a crack").Append(NewLine);
+        text.Append($"Cracks: {cracks} x {WorldScale.ToMeters(fissure.Length):0.#} m for {fissure.DurationSec:0.#} s");
+
+        if (branches > 0)
+            text.Append($", up to {branches} branch{(branches == 1 ? string.Empty : "es")} each");
+
+        text.Append(NewLine);
     }
 
     //Der Nebel macht selbst keinen Schaden. Er nennt Dauer, Größe und was sein Effekt bewirkt

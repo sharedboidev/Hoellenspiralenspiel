@@ -1,0 +1,63 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Skills/Effects/LavaCrater.cs" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/Ps1/ps1_lava_crater.gdshader" id="2_crater"]
+[ext_resource type="Shader" uid="uid://c2lknp40isk5w" path="res://Shaders/Ps1/ps1_surface.gdshader" id="90_ps1"]
+
+[sub_resource type="PlaneMesh" id="Mesh_disc"]
+size = Vector2(2, 2)
+subdivide_width = 4
+subdivide_depth = 4
+
+[sub_resource type="ShaderMaterial" id="Mat_bowl"]
+render_priority = 0
+shader = ExtResource("2_crater")
+shader_parameter/lift = 0.008
+
+[sub_resource type="ShaderMaterial" id="Mat_pool"]
+render_priority = 0
+shader = ExtResource("2_crater")
+shader_parameter/lift = 0.045
+shader_parameter/pool_only = true
+
+[sub_resource type="ShaderMaterial" id="Mat_rock"]
+render_priority = 0
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0.34, 0.24, 0.18, 1)
+shader_parameter/emission = Color(1, 0.35, 0.05, 1)
+shader_parameter/emission_energy = 0.08
+
+[sub_resource type="ShaderMaterial" id="Mat_hot"]
+render_priority = 0
+shader = ExtResource("90_ps1")
+shader_parameter/albedo = Color(0.25, 0.08, 0.03, 1)
+shader_parameter/emission = Color(1, 0.3, 0.04, 1)
+shader_parameter/emission_energy = 0.9
+
+[node name="LavaCrater" type="Node3D" node_paths=PackedStringArray("Bowl", "Pool", "Rim", "Glow")]
+script = ExtResource("1_script")
+RockMaterial = SubResource("Mat_rock")
+HotMaterial = SubResource("Mat_hot")
+Bowl = NodePath("Bowl")
+Pool = NodePath("Pool")
+Rim = NodePath("Rim")
+Glow = NodePath("Glow")
+
+[node name="Bowl" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("Mesh_disc")
+material_override = SubResource("Mat_bowl")
+
+[node name="Pool" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("Mesh_disc")
+material_override = SubResource("Mat_pool")
+
+[node name="Rim" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+
+[node name="Glow" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+light_color = Color(1, 0.45, 0.12, 1)
+light_energy = 2.5
+omni_range = 3.0

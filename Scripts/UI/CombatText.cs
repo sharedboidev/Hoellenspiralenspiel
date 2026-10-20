@@ -102,6 +102,7 @@ public static class CombatText
             StatusEffectKind.Shock => Colors.Yellow,
             StatusEffectKind.Chill   => Colors.DeepSkyBlue,
             StatusEffectKind.Brittle => Colors.PaleTurquoise,
+            StatusEffectKind.Lava    => Colors.DarkOrange,
             _                        => Colors.White
         };
 
@@ -113,6 +114,7 @@ public static class CombatText
             StatusEffectKind.Shock => "Shocked",
             StatusEffectKind.Chill   => "Chilled",
             StatusEffectKind.Brittle => "Brittle",
+            StatusEffectKind.Lava    => "Lava",
             _                        => kind.ToString()
         };
 }

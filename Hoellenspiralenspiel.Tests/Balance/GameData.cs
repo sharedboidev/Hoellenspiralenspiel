@@ -216,6 +216,17 @@ internal static class GameData
                                         values.Float("CloudGrowthPercent", 25f),
                                         values.Float("CloudPulseSec", 0.5f),
                                         values.Enum("CloudEffect", StatusEffectKind.Brittle))
+                    : null,
+            Fissure = delivery == SkillDelivery.Fissure
+                    ? new FissureSettings(values.Float("FissureImpactRadius", 100f),
+                                          values.Float("FissureLength", 1000f),
+                                          values.Float("FissureWidth", 50f),
+                                          values.Float("FissureGrowSec", 0.4f),
+                                          values.Float("FissureDurationSec", 4f),
+                                          values.Float("FissureWeaponDamagePercentPerSec", 120f),
+                                          values.Float("FissureSpreadDegrees", 30f),
+                                          values.Float("FissureHitWeaponDamagePercent", 85f),
+                                          values.Int("FissureMaxMainCracks", 5))
                     : null
         };
     }

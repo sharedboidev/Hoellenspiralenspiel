@@ -6,8 +6,15 @@ using Hoellenspiralenspiel.Scripts.Core.Stats;
 
 namespace Hoellenspiralenspiel.Scripts.Core.Combat.StatusEffects;
 
-//RemovedBy: Schaden dieser Art löst den Effekt, bevor er den Treffer verstärkt
-public sealed record StatusEffectRule(StatusEffectKind Kind, StackingRule Stacking, int MaxInstances, bool DealsDamage, DamageType? RemovedBy = null);
+//RemovedBy: Schaden dieser Art löst den Effekt, bevor er den Treffer verstärkt. DamageAs: die Schadensart eines Effekts mit Schaden,
+//der aus keinem Treffer kommt, etwa Lava vom Boden. IsAilment: "chance to Avoid Ailments" schützt davor
+public sealed record StatusEffectRule(StatusEffectKind Kind,
+                                      StackingRule     Stacking,
+                                      int              MaxInstances,
+                                      bool             DealsDamage,
+                                      DamageType?      RemovedBy   = null,
+                                      DamageType?      DamageAs    = null,
+                                      bool             IsAilment   = true);
 
 //Ein Effekt mit Schaden über Zeit: welche Schadensart ihn auslöst und welcher Anteil des Treffers über welche Dauer wirkt.
 //Bleed rechnet mit dem Schaden vor der Rüstung, Burn mit dem nach der Resistenz
@@ -21,7 +28,8 @@ public static class StatusEffectRules
         new(StatusEffectKind.Burn, StackingRule.Sum, CombatRules.BurnMaxStacks, true),
         new(StatusEffectKind.Shock, StackingRule.Strongest, int.MaxValue, false),
         new(StatusEffectKind.Chill, StackingRule.Strongest, int.MaxValue, false),
-        new(StatusEffectKind.Brittle, StackingRule.Strongest, int.MaxValue, false, DamageType.Fire)
+        new(StatusEffectKind.Brittle, StackingRule.Strongest, int.MaxValue, false, DamageType.Fire),
+        new(StatusEffectKind.Lava, StackingRule.Strongest, int.MaxValue, true, null, DamageType.Fire, false)
     ];
 
     private static readonly StatusEffectKind[] NoKinds = [];
@@ -45,6 +53,10 @@ public static class StatusEffectRules
 
     public static DamageOverTimeRule FindDamageOverTime(StatusEffectKind kind)
         => Array.Find(DamageOverTimeRules, rule => rule.Kind == kind);
+
+    //Die Schadensart, die ein Effekt mit Schaden macht. Bleed und Burn haben die ihres Treffers, Lava die ihrer Regel
+    public static DamageType? GetDamageType(StatusEffectKind kind)
+        => FindDamageOverTime(kind)?.Trigger ?? Get(kind).DamageAs;
 
     //Die Effekte, die ein Treffer mit dieser Schadensart löst, egal ob die Einheit sie gerade hat
     public static IReadOnlyList<StatusEffectKind> GetRemovedBy(HitRequest request)

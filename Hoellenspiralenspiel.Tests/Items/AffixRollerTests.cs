@@ -135,6 +135,26 @@ public class AffixRollerTests
         });
     }
 
+    //Wie Proliferate seit dem 08.10.2026: Stäbe und Helme. Der Waffentyp schränkt nur die Waffen ein, der Helm bekommt das Affix trotzdem
+    [Test]
+    public void Waffentyp_SchraenktNurWaffenEin()
+    {
+        var staffOrHelmet = new AffixDefinition(AffixType.Suffix, CombatStat.Proliferate, ModificationType.Flat)
+        {
+            AllowedSlots       = [ItemSlot.SpellWeapon, ItemSlot.Helmet],
+            AllowedWeaponTypes = [WeaponType.Staff],
+            Tiers              = [new AffixTierDefinition(1, 1, 100, 1, 1, "of Bifurcation")]
+        };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(staffOrHelmet.CanAppearOn(TestItems.Staff), Is.True);
+            Assert.That(staffOrHelmet.CanAppearOn(TestItems.Helmet), Is.True, "ein Helm ist keine Waffe, der Waffentyp gilt für ihn nicht");
+            Assert.That(staffOrHelmet.CanAppearOn(TestItems.Sword), Is.False, "falscher Slot");
+            Assert.That(staffOrHelmet.CanAppearOn(TestItems.Shield), Is.False, "falscher Slot");
+        });
+    }
+
     [Test]
     public void Itemlevel_SchliesstHoehereStufenAus()
     {

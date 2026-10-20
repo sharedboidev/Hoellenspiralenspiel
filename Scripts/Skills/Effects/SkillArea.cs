@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using Godot;
+using Hoellenspiralenspiel.Scripts.Core.Combat;
 using Hoellenspiralenspiel.Scripts.Core.Skills;
 using Hoellenspiralenspiel.Scripts.Units;
 using Hoellenspiralenspiel.Scripts.World;
@@ -34,6 +36,13 @@ public partial class SkillArea : Node3D
 
     [Export]
     public float LingerSec { get; set; }
+
+    //Ein Schlag mit der Waffe wie der auf den Boden: Er zählt als Nahkampftreffer, Dornen werfen Schaden auf den Schlagenden zurück
+    [Export]
+    public bool HitsInMelee { get; set; }
+
+    //Nach jedem Treffer der Fläche, gelandet oder nicht. Der Schlag von Lava Crack hängt so den Treffer seines Risses an
+    public event Action<BaseUnit, HitResult> UnitHit;
 
     //Nach der Verzögerung, ohne sie im ersten Physik-Frame
     protected bool HasImpacted => hasStarted;
@@ -115,8 +124,13 @@ public partial class SkillArea : Node3D
 
             var offset = unit.GlobalPosition - center;
 
-            if (AreaSettings.Contains(WorldScale.ToPx(offset.X), WorldScale.ToPx(offset.Z), radiusPx + unit.BodyRadiusPx))
-                cast.ApplyTo(unit);
+            if (!AreaSettings.Contains(WorldScale.ToPx(offset.X), WorldScale.ToPx(offset.Z), radiusPx + unit.BodyRadiusPx))
+                continue;
+
+            //Nicht als Argument von UnitHit?.Invoke: Ohne Abonnenten wertet C# die Argumente gar nicht aus, der Treffer fiele weg
+            var result = cast.ApplyTo(unit, HitsInMelee);
+
+            UnitHit?.Invoke(unit, result);
         }
     }
 

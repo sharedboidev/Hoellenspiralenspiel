@@ -43,7 +43,8 @@ public sealed record AffixDefinition(AffixType Type, CombatStat Stat, Modificati
         return false;
     }
 
-    //Ohne Waffentypen gilt das Affix für alles im Slot, mit ihnen nur für Waffen dieser Typen
+    //Ohne Waffentypen gilt das Affix für alles im Slot. Die Waffentypen schränken nur Waffen ein: Ein Item ohne Waffe in einem erlaubten Slot,
+    //etwa der Helm bei Proliferate, bekommt es trotzdem
     public bool CanAppearOn(ItemDefinition item)
     {
         ArgumentNullException.ThrowIfNull(item);
@@ -51,7 +52,7 @@ public sealed record AffixDefinition(AffixType Type, CombatStat Stat, Modificati
         if (!CanAppearOn(item.Slot))
             return false;
 
-        if (AllowedWeaponTypes.Count == 0)
+        if (AllowedWeaponTypes.Count == 0 || item.Weapon is null)
             return true;
 
         foreach (var weaponType in AllowedWeaponTypes)

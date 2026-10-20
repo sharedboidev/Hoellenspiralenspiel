@@ -30,6 +30,7 @@ public static class SkillDamageEstimator
         var arrowsOnTarget = arrowCount * (skill.Rain?.GetShareOnCenter() ?? 0f);
         var scatter        = MeasureScatter(attacker, weapon, skill);
         var scatterCount   = scatter is null ? 0 : skill.Scatter.GetCount(BonusProjectiles.FromStats(attacker));
+        var crackHit       = MeasureFissureHit(attacker, weapon, skill);
 
         //Bei einem Pfeilregen ist der Haupttreffer ein Pfeil, und nur ein Teil der Pfeile erreicht ein Ziel in der Mitte
         var hits = new List<(MeasuredHit Hit, float LandingsPerUse)> { (main, skill.Rain is null ? landingShare : landingShare * arrowsOnTarget) };
@@ -37,6 +38,10 @@ public static class SkillDamageEstimator
         //Die Kugeln springen nur aus einem gelandeten Treffer. Mit einem Ziel trifft es jede von ihnen
         if (scatter is not null)
             hits.Add((scatter, landingShare * scatterCount * scatter.HitChance / 100f));
+
+        //Der Riss trifft das Ziel einmal je Schlag, durch den Schlag oder beim Wachsen
+        if (crackHit is not null)
+            hits.Add((crackHit, (1f - failureChance) * crackHit.HitChance / 100f));
 
         var estimate = new SkillDamageEstimate
         {
@@ -57,6 +62,8 @@ public static class SkillDamageEstimator
             ScatterAverageHit   = scatter?.AverageHit ?? 0f,
             ArrowCount          = arrowCount,
             ArrowsOnTarget      = arrowsOnTarget,
+            CrackAverageHit     = crackHit?.AverageHit ?? 0f,
+            GroundDps           = MeasureGround(attacker, weapon, skill),
             ManaPerSecond       = manaPerSecond
         };
 
@@ -70,7 +77,7 @@ public static class SkillDamageEstimator
         return estimate with
         {
             IsLimitedByMana = true,
-            SustainedDps    = GetHitDps(hits, sustainedUses) + GetEffectDps(hits, sustainedUses)
+            SustainedDps    = GetHitDps(hits, sustainedUses) + GetEffectDps(hits, sustainedUses) + estimate.GroundDps
         };
     }
 
@@ -111,6 +118,23 @@ public static class SkillDamageEstimator
             return null;
 
         return Measure(HitRequests.ForAttack(attacker, weapon, scatter.GetAttack(skill.Attack)));
+    }
+
+    private static MeasuredHit MeasureFissureHit(StatSheet attacker, WeaponProfile weapon, SkillDefinition skill)
+    {
+        if (skill.Fissure is not { } fissure || skill.Attack is null || weapon is null)
+            return null;
+
+        return Measure(HitRequests.ForAttack(attacker, weapon, fissure.GetHitAttack(skill.Attack)));
+    }
+
+    //Ein Ziel, das auf einem Riss steht, brennt ohne Unterbrechung, egal wie oft der Held schlägt
+    private static float MeasureGround(StatSheet attacker, WeaponProfile weapon, SkillDefinition skill)
+    {
+        if (skill.Fissure is not { } fissure || skill.Attack is null || weapon is null)
+            return 0f;
+
+        return GroundDamage.GetDamagePerSecond(HitRequests.ForAttack(attacker, weapon, fissure.GetAttack(skill.Attack)), FissureSettings.CrackDamageType);
     }
 
     private static MeasuredHit Measure(HitRequest hit)
